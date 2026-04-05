@@ -18,6 +18,8 @@ class BudgetCalculationService
   def call
     total_reserves = RESERVE_KEYS.sum { |key| @reserve_funds.fetch(key, 0).to_i }
 
+    raise ArgumentError, "available_cash is required" if @available_cash.nil?
+
     net_cash = @available_cash - total_reserves
     raise InsufficientFundsError, "Available cash (#{@available_cash}) is less than total reserves (#{total_reserves})" if net_cash <= 0
 

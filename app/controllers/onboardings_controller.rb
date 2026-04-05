@@ -40,6 +40,11 @@ class OnboardingsController < ApplicationController
   def create_step3
     @setting.assign_attributes(step3_params)
 
+    unless @setting.available_cash.present?
+      redirect_to start_onboarding_url
+      return
+    end
+
     result = BudgetCalculationService.call(
       available_cash: @setting.available_cash,
       reserve_funds: {
