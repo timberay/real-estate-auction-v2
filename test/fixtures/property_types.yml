@@ -1,0 +1,17 @@
+apartment:
+  name: "아파트"
+  code: "apartment"
+  enabled: true
+  sort_order: 0
+
+villa:
+  name: "빌라/다세대"
+  code: "villa"
+  enabled: true
+  sort_order: 1
+
+officetel:
+  name: "오피스텔"
+  code: "officetel"
+  enabled: true
+  sort_order: 2
