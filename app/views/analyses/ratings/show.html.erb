@@ -1,14 +1,14 @@
+<%# app/views/analyses/ratings/show.html.erb %>
 <%= turbo_frame_tag "analysis_flow" do %>
-  <h2>안전 등급: <%= @property.safety_rating&.upcase %></h2>
-  <% if @risk_results.any? %>
-    <h3>위험 항목</h3>
-    <% @risk_results.each do |result| %>
-      <div>
-        <p><%= result.checklist_item.question %></p>
-        <p><%= result.resolvable ? "해결 가능" : "해결 불가" %></p>
-      </div>
-    <% end %>
-  <% end %>
-  <%= link_to "목록으로 돌아가기", properties_path %>
-  <%= link_to "다시 분석하기", property_path(@property) %>
+  <div class="space-y-6">
+    <%= render RatingResultComponent.new(property: @property, risk_results: @risk_results) %>
+
+    <div class="flex justify-center gap-3">
+      <%= button_to "다시 분석하기", property_analyses_start_path(@property), method: :post,
+          class: "inline-flex items-center rounded-md bg-slate-100 dark:bg-slate-700 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600" %>
+      <%= link_to "목록으로 돌아가기", properties_path,
+          class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700",
+          data: { turbo_frame: "_top" } %>
+    </div>
+  </div>
 <% end %>
