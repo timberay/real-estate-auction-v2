@@ -51,7 +51,7 @@ class ButtonComponent < ViewComponent::Base
     tag_attributes[:href] = @href if @tag == :a
 
     content_tag(@tag, tag_attributes) do
-      safe_join([icon_html, content].compact)
+      safe_join([ icon_html, content ].compact)
     end
   end
 
