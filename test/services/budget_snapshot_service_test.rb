@@ -14,7 +14,7 @@ class BudgetSnapshotServiceTest < ActiveSupport::TestCase
       scrivener_fee: 80,
       moving_cost: 150,
       maintenance_fee: 50,
-      loan_policy: loan_policies(:general_apartment),
+      loan_policy: loan_policies(:auction_bank_apartment),
       loan_ratio: 0.7,
       max_bid_amount: 96200,
       area_unit: "pyeong",
@@ -33,7 +33,7 @@ class BudgetSnapshotServiceTest < ActiveSupport::TestCase
     assert_equal "아파트", snapshot.property_type_name
     assert_equal "59~84㎡", snapshot.area_range
     assert_equal 0.7, snapshot.loan_ratio.to_f
-    assert_equal "일반 주담대", snapshot.loan_policy_name
+    assert_equal "경락대출 (1금융)", snapshot.loan_policy_name
     assert_equal 96200, snapshot.max_bid_amount
     assert_nil snapshot.parent_snapshot_id
     assert snapshot.calculated_at.present?

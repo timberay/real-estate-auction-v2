@@ -55,7 +55,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     post step1_onboarding_url, params: { budget_setting: { available_cash: 30000 } }
 
     apt = property_types(:apartment)
-    policy = loan_policies(:general_apartment)
+    policy = loan_policies(:auction_bank_apartment)
     post step2_onboarding_url, params: {
       budget_setting: {
         property_type_id: apt.id, area_range_min: 59, area_range_max: 84,

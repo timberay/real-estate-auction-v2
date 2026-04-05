@@ -8,7 +8,7 @@ class BudgetSettingTest < ActiveSupport::TestCase
       area_range_min: 59, area_range_max: 84,
       repair_cost: 500, acquisition_tax: 360, scrivener_fee: 80,
       moving_cost: 150, maintenance_fee: 50,
-      loan_policy: loan_policies(:general_apartment), loan_ratio: 0.7,
+      loan_policy: loan_policies(:auction_bank_apartment), loan_ratio: 0.7,
       max_bid_amount: 85333, area_unit: "pyeong",
       failed_auction_rounds: 0, searchable_appraisal_limit: 85333
     )

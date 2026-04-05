@@ -8,7 +8,7 @@ class BudgetSnapshotTest < ActiveSupport::TestCase
       area_range: "59~84㎡", area_unit: "pyeong",
       repair_cost: 500, acquisition_tax: 360, scrivener_fee: 80,
       moving_cost: 150, maintenance_fee: 50,
-      loan_policy_name: "일반 주담대", loan_ratio: 0.7,
+      loan_policy_name: "경락대출 (1금융)", loan_ratio: 0.7,
       max_bid_amount: 85333, failed_auction_rounds: 0,
       searchable_appraisal_limit: 85333, calculated_at: Time.current
     )
