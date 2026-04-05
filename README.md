@@ -1,62 +1,62 @@
-# Real Estate Auction Service
+# 부동산 경매 서비스
 
-A web service for real estate auction beginners in Korea. Guides users through the entire auction process — from budget planning to bidding — with automated risk analysis, profit calculation, and step-by-step checklists.
+한국 부동산 경매 초심자를 위한 웹 서비스입니다. 예산 설정부터 입찰까지 경매 전 과정을 자동화된 위험 분석, 수익 계산, 단계별 체크리스트로 안내합니다.
 
-## What This Service Does
+## 이 서비스가 하는 일
 
-Real estate auctions in Korea offer properties at below-market prices, but beginners face steep barriers: complex legal rights analysis, hidden tax costs, loan uncertainty, and fear of the eviction process. This service eliminates those barriers through automation and structured guidance.
+한국의 부동산 경매는 시세보다 저렴하게 물건을 취득할 수 있지만, 초심자에게는 높은 진입 장벽이 있습니다 — 복잡한 권리 분석, 숨겨진 세금 비용, 대출 불확실성, 명도에 대한 두려움. 이 서비스는 자동화와 구조화된 가이드를 통해 이러한 장벽을 제거합니다.
 
-### Core Features (MVP — P0)
+### 핵심 기능 (MVP — P0)
 
-| Feature | Description |
+| 기능 | 설명 |
 |---|---|
-| **F01. Onboarding Budget Setup** | 3-step questionnaire after signup to calculate maximum biddable amount based on cash, reserve funds, and expected loan ratio. Results auto-set the property search filter. |
-| **F02. Safe Property Filtering** | Auto-identify risky properties across 3 axes — legal risk (liens, statutory superficies), resale risk (new villas, studios), and loan risk (illegal construction) — with a 3-tier safety rating system. |
-| **F03. Rights Analysis Report** | Automated analysis of extinguishment base rights, tenant opposing power, and assumed amounts from registry data. AI report always shown alongside original court documents to prevent overconfidence. Detects HUG opportunity properties. |
-| **F04. Net Profit Calculator** | Calculate actual bank-deposit profit after all taxes and costs. Reverse mode: input target profit to get maximum bid price. Side-by-side individual vs. trader tax rate comparison. |
-| **F05. Process Checklist** | Per-property 8-step pipeline tracking with step-skip warnings (e.g., warns if bidding without loan confirmation). Drives repetition mastery through analysis count tracking and weekly goals. |
+| **F01. 온보딩 예산 설정** | 회원가입 직후 3단계 질문으로 보유 현금, 예비비, 대출 비율을 기반으로 입찰 가능 최대 금액을 산출합니다. 결과가 물건 검색 필터에 자동 연동됩니다. |
+| **F02. 안전 물건 필터링** | 법적 위험(유치권, 법정지상권), 매도 위험(신축 빌라, 원룸), 대출 위험(위반 건축물) 3가지 축으로 위험 물건을 자동 식별하고, 3단계 안전 등급을 부여합니다. |
+| **F03. 권리 분석 리포트** | 등기부등본과 매각물건명세서를 기반으로 말소기준권리, 임차인 대항력, 인수 금액을 자동 분석합니다. AI 리포트와 원문을 항상 병행 표시하여 과신을 방지합니다. HUG 기회 물건을 자동 탐지합니다. |
+| **F04. 순수익 계산기** | 모든 세금과 비용을 차감한 실제 순수익을 계산합니다. 역산 모드: 목표 수익을 입력하면 최대 입찰가를 산출합니다. 개인 vs 매매사업자 세율 비교를 나란히 표시합니다. |
+| **F05. 프로세스 체크리스트** | 물건별 8단계 파이프라인 추적과 단계 누락 경고(예: 대출 확인 없이 입찰 시 경고)를 제공합니다. 분석 건수 추적과 주간 목표로 반복 숙달을 유도합니다. |
 
-### Expansion Features (P1)
+### 확장 기능 (P1)
 
-| Feature | Description |
+| 기능 | 설명 |
 |---|---|
-| **F06. Market Price Dashboard** | Integrated actual transaction prices, listing prices, and distressed-sale prices with gap-rate warnings to prevent overbidding. |
-| **F07. Loan Matching** | Pre-check auction balance loan eligibility and compare terms from partner consultants. |
-| **F08. Virtual Bid Simulation** | Practice bidding on completed past auctions to build practical intuition before risking real money. |
+| **F06. 통합 시세 조회** | 실거래가, 호가, 급매가를 한 화면에서 비교하며, 괴리율 경고로 호가를 시세로 착각하여 비싸게 입찰하는 실수를 방지합니다. |
+| **F07. 대출 사전 매칭** | 경락잔금대출 가능 여부를 사전 확인하고, 제휴 상담사로부터 조건을 비교합니다. |
+| **F08. 가상 입찰 시뮬레이션** | 과거 완료된 경매 데이터로 가상 입찰을 연습하여, 실제 돈을 걸기 전에 실전 감각을 기릅니다. |
 
-### Growth Features (P2–P3)
+### 성장 기능 (P2–P3)
 
-| Feature | Description |
+| 기능 | 설명 |
 |---|---|
-| **F09. Online Pre-Inspection** | Pre-screen properties online (street view, building data, nearby agents) before on-site visits. |
-| **F10. Eviction Scenario Guide** | Situation-specific eviction response guides with auto-generated legal documents. |
-| **F11. Expert Mentoring** | Verified expert marketplace for 1:1 feedback on AI analysis results. |
+| **F09. 온라인 사전 임장** | 로드뷰, 건축물대장, 인근 중개사 목록 등으로 임장 전 사전 스크리닝을 지원합니다. |
+| **F10. 명도 시나리오 가이드** | 상황별 명도 대응 시나리오와 법적 서류(내용증명, 인도명령 등)를 자동 생성합니다. |
+| **F11. 전문가 멘토링 연결** | 검증된 전문가에게 AI 분석 결과에 대한 1:1 유료 피드백을 받을 수 있는 마켓플레이스입니다. |
 
-## Design Principles
+## 설계 원칙
 
-- **Repetition & Mastery** — Guide users to analyze multiple properties, not just one
-- **Overconfidence Prevention** — AI reports always shown with original court documents
-- **Respect for Fieldwork** — Online tools are pre-screening only; final decisions require on-site inspection
+- **반복 숙달 유도** — 한 건 분석 후 끝이 아니라, 다음 물건으로 자연스럽게 이어지는 사이클
+- **과신 방지** — AI 리포트는 항상 매각물건명세서 원문과 함께 표시
+- **현장 존중** — 온라인 기능은 사전 스크리닝 전용. 최종 판단은 현장 임장에서
 
-## Tech Stack
+## 기술 스택
 
-- **Framework**: Ruby on Rails 8.1 (Ruby 3.4.8)
-- **Frontend**: Hotwire (Turbo + Stimulus), TailwindCSS, ViewComponent
-- **Database**: SQLite + Solid Cache / Queue / Cable
-- **Assets**: Propshaft + ImportMap (no Node.js)
-- **Deployment**: Docker + Kamal + Thruster
+- **프레임워크**: Ruby on Rails 8.1 (Ruby 3.4.8)
+- **프론트엔드**: Hotwire (Turbo + Stimulus), TailwindCSS, ViewComponent
+- **데이터베이스**: SQLite + Solid Cache / Queue / Cable
+- **에셋 파이프라인**: Propshaft + ImportMap (Node.js 불필요)
+- **배포**: Docker + Kamal + Thruster
 
-## Getting Started
+## 시작하기
 
 ```bash
-bin/setup        # Install dependencies and prepare database
-bin/dev          # Start dev server (Puma + CSS/JS watchers)
-bin/rails test   # Run tests
-bin/ci           # Full CI pipeline (setup, lint, security, tests, seed check)
+bin/setup        # 의존성 설치 및 데이터베이스 준비
+bin/dev          # 개발 서버 실행 (Puma + CSS/JS 감시)
+bin/rails test   # 테스트 실행
+bin/ci           # 전체 CI 파이프라인 (셋업, 린트, 보안, 테스트, 시드 확인)
 ```
 
-## Documentation
+## 문서
 
-- [SRS v1.0](docs/superpowers/specs/2026-04-05-srs-design.md) — Full requirements specification
-- [STANDARDS.md](STANDARDS.md) — Development standards and architecture patterns
-- [CLAUDE.md](CLAUDE.md) — AI assistant guidelines
+- [SRS v1.0](docs/superpowers/specs/2026-04-05-srs-design.md) — 전체 요구사항 정의서
+- [STANDARDS.md](STANDARDS.md) — 개발 표준 및 아키텍처 패턴
+- [CLAUDE.md](CLAUDE.md) — AI 어시스턴트 가이드라인

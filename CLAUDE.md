@@ -10,6 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - Use **Korean** for explanations and conversation
 - Use **English** for code, markdown files, YAML, and commit messages
+- **Exception**: `README.md` must be written in **Korean** (the service targets Korean users)
 
 ## Project Overview
 
