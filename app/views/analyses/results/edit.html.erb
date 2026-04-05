@@ -1,0 +1,20 @@
+<%= turbo_frame_tag "analysis_flow" do %>
+  <h2>분석 결과</h2>
+  <%= form_with url: property_analyses_result_path(@property), method: :patch do |f| %>
+    <% @results_by_axis.each do |axis, results| %>
+      <h3><%= { "legal" => "법적 위험", "resale" => "매도 위험", "loan" => "대출 위험" }[axis] %></h3>
+      <% results.each do |result| %>
+        <div>
+          <p><%= result.checklist_item.question %></p>
+          <p><%= result.has_risk ? "위험" : "안전" %></p>
+          <% if result.has_risk %>
+            <label><%= radio_button_tag "resolutions[#{result.id}][resolvable]", "true" %> 해결 가능</label>
+            <label><%= radio_button_tag "resolutions[#{result.id}][resolvable]", "false" %> 해결 불가</label>
+            <%= text_field_tag "resolutions[#{result.id}][resolution_note]", "", placeholder: "해결 방안 메모" %>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
+    <%= f.submit "등급 산정" %>
+  <% end %>
+<% end %>
