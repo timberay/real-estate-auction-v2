@@ -1,89 +1,52 @@
-<div class="container mx-auto px-4 py-8 max-w-lg">
+<div class="max-w-lg mx-auto">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold">스냅샷 v<%= @snapshot.version %></h1>
-    <%= link_to "목록으로", settings_budget_snapshots_path,
-      class: "text-blue-600 text-sm underline" %>
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">스냅샷 v<%= @snapshot.version %></h1>
+    <%= render ButtonComponent.new(variant: :ghost, tag: :a, href: settings_budget_snapshots_path, icon: "arrow-left", size: :sm) { "목록으로" } %>
   </div>
 
-  <div class="mb-4">
-    <% trigger_class = case @snapshot.trigger
-      when 'onboarding' then 'bg-blue-100 text-blue-700'
-      when 'manual_edit' then 'bg-green-100 text-green-700'
-      when 'recalculate' then 'bg-amber-100 text-amber-700'
-      else 'bg-gray-100 text-gray-700'
+  <div class="mb-4 flex items-center gap-2">
+    <% badge_variant = case @snapshot.trigger
+      when 'onboarding' then :info
+      when 'manual_edit' then :success
+      when 'recalculate' then :accent
+      else :default
       end %>
-    <span class="inline-block px-2 py-0.5 text-xs rounded-full <%= trigger_class %>">
-      <%= @snapshot.trigger %>
-    </span>
-    <span class="text-xs text-gray-400 ml-2"><%= @snapshot.calculated_at&.strftime("%Y-%m-%d %H:%M") %></span>
+    <%= render BadgeComponent.new(variant: badge_variant) { @snapshot.trigger.humanize } %>
+    <span class="text-xs text-slate-400 dark:text-slate-500"><%= @snapshot.calculated_at&.strftime("%Y-%m-%d %H:%M") %></span>
   </div>
 
   <% if @snapshot.max_bid_amount %>
-    <div class="bg-blue-600 text-white rounded-xl p-6 mb-6 text-center">
-      <p class="text-sm opacity-80 mb-1">최대 입찰가</p>
-      <p class="text-3xl font-bold"><%= number_with_delimiter(@snapshot.max_bid_amount) %><span class="text-base">만원</span></p>
+    <div class="mb-6">
+      <%= render StatCardComponent.new(
+        label: "최대 입찰가",
+        value: "#{number_with_delimiter(@snapshot.max_bid_amount)}만원"
+      ) %>
     </div>
   <% end %>
 
-  <div class="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6">
-    <h2 class="text-lg font-semibold p-4 bg-gray-50 border-b">상세 내역</h2>
-    <table class="w-full">
-      <tbody class="divide-y divide-gray-100">
-        <tr class="flex justify-between px-4 py-3">
-          <td class="text-gray-600">유용자금</td>
-          <td class="font-medium"><%= number_with_delimiter(@snapshot.available_cash) %>만원</td>
-        </tr>
-        <tr class="flex justify-between px-4 py-3">
-          <td class="text-gray-600">부동산 유형</td>
-          <td class="font-medium"><%= @snapshot.property_type_name || "-" %></td>
-        </tr>
-        <tr class="flex justify-between px-4 py-3">
-          <td class="text-gray-600">면적</td>
-          <td class="font-medium"><%= @snapshot.area_range || "-" %></td>
-        </tr>
-        <tr class="flex justify-between px-4 py-3">
-          <td class="text-gray-600">수선비</td>
-          <td class="font-medium"><%= number_with_delimiter(@snapshot.repair_cost) %>만원</td>
-        </tr>
-        <tr class="flex justify-between px-4 py-3">
-          <td class="text-gray-600">취득세</td>
-          <td class="font-medium"><%= number_with_delimiter(@snapshot.acquisition_tax) %>만원</td>
-        </tr>
-        <tr class="flex justify-between px-4 py-3">
-          <td class="text-gray-600">법무사비</td>
-          <td class="font-medium"><%= number_with_delimiter(@snapshot.scrivener_fee) %>만원</td>
-        </tr>
-        <tr class="flex justify-between px-4 py-3">
-          <td class="text-gray-600">이사비</td>
-          <td class="font-medium"><%= number_with_delimiter(@snapshot.moving_cost) %>만원</td>
-        </tr>
-        <tr class="flex justify-between px-4 py-3">
-          <td class="text-gray-600">관리비</td>
-          <td class="font-medium"><%= number_with_delimiter(@snapshot.maintenance_fee) %>만원</td>
-        </tr>
-        <tr class="flex justify-between px-4 py-3">
-          <td class="text-gray-600">대출 정책</td>
-          <td class="font-medium"><%= @snapshot.loan_policy_name || "-" %></td>
-        </tr>
-        <tr class="flex justify-between px-4 py-3">
-          <td class="text-gray-600">대출 비율 (LTV)</td>
-          <td class="font-medium"><%= @snapshot.loan_ratio ? "#{(@snapshot.loan_ratio.to_f * 100).round}%" : "-" %></td>
-        </tr>
-        <tr class="flex justify-between px-4 py-3">
-          <td class="text-gray-600">유찰 회차</td>
-          <td class="font-medium"><%= @snapshot.failed_auction_rounds %>회차</td>
-        </tr>
-        <tr class="flex justify-between px-4 py-3">
-          <td class="text-gray-600">검색 가능 감정가</td>
-          <td class="font-medium"><%= number_with_delimiter(@snapshot.searchable_appraisal_limit) %>만원</td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="mb-6">
+    <%= render SummaryTableComponent.new(
+      title: "상세 내역",
+      rows: [
+        { label: "유용자금", value: "#{number_with_delimiter(@snapshot.available_cash)}만원" },
+        { label: "부동산 유형", value: @snapshot.property_type_name || "-" },
+        { label: "면적", value: @snapshot.area_range || "-" },
+        { label: "수선비", value: "#{number_with_delimiter(@snapshot.repair_cost)}만원" },
+        { label: "취득세", value: "#{number_with_delimiter(@snapshot.acquisition_tax)}만원" },
+        { label: "법무사비", value: "#{number_with_delimiter(@snapshot.scrivener_fee)}만원" },
+        { label: "이사비", value: "#{number_with_delimiter(@snapshot.moving_cost)}만원" },
+        { label: "관리비", value: "#{number_with_delimiter(@snapshot.maintenance_fee)}만원" },
+        { label: "대출 정책", value: @snapshot.loan_policy_name || "-" },
+        { label: "대출 비율 (LTV)", value: @snapshot.loan_ratio ? "#{(@snapshot.loan_ratio.to_f * 100).round}%" : "-" },
+        { label: "유찰 회차", value: "#{@snapshot.failed_auction_rounds}회차" },
+        { label: "검색 가능 감정가", value: "#{number_with_delimiter(@snapshot.searchable_appraisal_limit)}만원" }
+      ]
+    ) %>
   </div>
 
   <div class="flex gap-4">
-    <%= button_to "현재 조건으로 재계산", recalculate_settings_budget_snapshot_path(@snapshot),
-      method: :post,
-      class: "flex-1 text-center py-3 px-6 bg-amber-500 text-white rounded-lg font-semibold hover:bg-amber-600 transition-colors" %>
+    <%= button_to recalculate_settings_budget_snapshot_path(@snapshot), method: :post, class: "flex-1" do %>
+      <%= render ButtonComponent.new(variant: :outline, icon: "arrow-path", tag: :span, class: "w-full justify-center") { "현재 조건으로 재계산" } %>
+    <% end %>
   </div>
 </div>

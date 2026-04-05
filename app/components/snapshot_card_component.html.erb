@@ -13,6 +13,6 @@
 
   <div class="flex items-center gap-2">
     <%= render ButtonComponent.new(variant: :ghost, size: :sm, tag: :a, href: @show_path, icon: "eye").with_content("상세") %>
-    <%= render ButtonComponent.new(variant: :ghost, size: :sm, tag: :a, href: @recalculate_path, icon: "arrow-path").with_content("재계산") %>
+    <%= render ButtonComponent.new(variant: :ghost, size: :sm, tag: :a, href: @recalculate_path, icon: "arrow-path", data: { turbo_method: :post }).with_content("재계산") %>
   </div>
 </div>

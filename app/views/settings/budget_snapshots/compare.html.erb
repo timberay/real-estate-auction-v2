@@ -1,28 +1,29 @@
-<div class="container mx-auto px-4 py-8 max-w-2xl">
+<div class="max-w-2xl mx-auto">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold">스냅샷 비교</h1>
-    <%= link_to "목록으로", settings_budget_snapshots_path,
-      class: "text-blue-600 text-sm underline" %>
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">스냅샷 비교</h1>
+    <%= render ButtonComponent.new(variant: :ghost, tag: :a, href: settings_budget_snapshots_path, icon: "arrow-left", size: :sm) { "목록으로" } %>
   </div>
 
-  <div class="flex gap-4 mb-6">
-    <div class="flex-1 p-3 bg-gray-50 rounded-lg text-center">
-      <p class="text-xs text-gray-500">기준</p>
-      <p class="font-semibold">v<%= @snapshot_a.version %> (<%= @snapshot_a.trigger %>)</p>
-      <p class="text-xs text-gray-400"><%= @snapshot_a.calculated_at&.strftime("%Y-%m-%d") %></p>
-    </div>
-    <div class="flex items-center text-gray-400">vs</div>
-    <div class="flex-1 p-3 bg-gray-50 rounded-lg text-center">
-      <p class="text-xs text-gray-500">비교 대상</p>
-      <p class="font-semibold">v<%= @snapshot_b.version %> (<%= @snapshot_b.trigger %>)</p>
-      <p class="text-xs text-gray-400"><%= @snapshot_b.calculated_at&.strftime("%Y-%m-%d") %></p>
-    </div>
+  <div class="flex gap-4 mb-6 items-stretch">
+    <%= render CardComponent.new(class: "flex-1 text-center") do %>
+      <p class="text-xs text-slate-500 dark:text-slate-400">기준</p>
+      <p class="font-semibold text-slate-900 dark:text-slate-100">v<%= @snapshot_a.version %> (<%= @snapshot_a.trigger %>)</p>
+      <p class="text-xs text-slate-400 dark:text-slate-500"><%= @snapshot_a.calculated_at&.strftime("%Y-%m-%d") %></p>
+    <% end %>
+    <div class="flex items-center text-slate-400 dark:text-slate-500 font-medium">vs</div>
+    <%= render CardComponent.new(class: "flex-1 text-center") do %>
+      <p class="text-xs text-slate-500 dark:text-slate-400">비교 대상</p>
+      <p class="font-semibold text-slate-900 dark:text-slate-100">v<%= @snapshot_b.version %> (<%= @snapshot_b.trigger %>)</p>
+      <p class="text-xs text-slate-400 dark:text-slate-500"><%= @snapshot_b.calculated_at&.strftime("%Y-%m-%d") %></p>
+    <% end %>
   </div>
 
   <% if @diff.empty? %>
-    <div class="p-6 bg-gray-50 rounded-lg text-center">
-      <p class="text-gray-500">두 스냅샷의 값이 동일합니다.</p>
-    </div>
+    <%= render EmptyStateComponent.new(
+      icon: "check-circle",
+      title: "변경 사항 없음",
+      description: "두 스냅샷의 값이 동일합니다."
+    ) %>
   <% else %>
     <%
       field_labels = {
@@ -37,48 +38,32 @@
         failed_auction_rounds: "유찰 회차",
         searchable_appraisal_limit: "검색 가능 감정가"
       }
+
+      diff_rows = @diff.map do |field, change|
+        was_value = if field == :loan_ratio
+          "#{(change[:was].to_f * 100).round}%"
+        elsif change[:was].is_a?(Numeric)
+          number_with_delimiter(change[:was])
+        else
+          change[:was]
+        end
+
+        now_value = if field == :loan_ratio
+          "#{(change[:now].to_f * 100).round}%"
+        elsif change[:now].is_a?(Numeric)
+          number_with_delimiter(change[:now])
+        else
+          change[:now]
+        end
+
+        {
+          label: field_labels[field] || field.to_s,
+          was: was_value,
+          now: now_value,
+          delta: change[:delta] || 0
+        }
+      end
     %>
-    <div class="border border-gray-200 rounded-lg overflow-hidden">
-      <table class="w-full">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">항목</th>
-            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">기존</th>
-            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">변경</th>
-            <th class="px-4 py-3 text-right text-sm font-medium text-gray-700">차이</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-100">
-          <% @diff.each do |field, change| %>
-            <tr>
-              <td class="px-4 py-3 text-sm text-gray-600"><%= field_labels[field] || field %></td>
-              <td class="px-4 py-3 text-sm text-right font-medium">
-                <% if field == :loan_ratio %>
-                  <%= "#{(change[:was].to_f * 100).round}%" %>
-                <% else %>
-                  <%= change[:was].is_a?(Numeric) ? number_with_delimiter(change[:was]) : change[:was] %>
-                <% end %>
-              </td>
-              <td class="px-4 py-3 text-sm text-right font-medium">
-                <% if field == :loan_ratio %>
-                  <%= "#{(change[:now].to_f * 100).round}%" %>
-                <% else %>
-                  <%= change[:now].is_a?(Numeric) ? number_with_delimiter(change[:now]) : change[:now] %>
-                <% end %>
-              </td>
-              <td class="px-4 py-3 text-sm text-right font-medium">
-                <% if change[:delta] %>
-                  <span class="<%= change[:delta] > 0 ? 'text-green-600' : 'text-red-600' %>">
-                    <%= change[:delta] > 0 ? "+" : "" %><%= number_with_delimiter(change[:delta]) %>
-                  </span>
-                <% else %>
-                  -
-                <% end %>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-    </div>
+    <%= render CompareTableComponent.new(diff: diff_rows) %>
   <% end %>
 </div>
