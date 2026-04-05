@@ -1,0 +1,127 @@
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+  <h1 class="text-2xl font-bold mb-6">예산 설정</h1>
+
+  <% if notice %>
+    <div class="mb-4 p-3 bg-green-50 text-green-700 rounded-lg text-sm">
+      <%= notice %>
+    </div>
+  <% end %>
+
+  <% if @setting.errors.any? %>
+    <div class="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+      <% @setting.errors.full_messages.each do |msg| %>
+        <p><%= msg %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= form_with model: @setting, url: settings_budget_path, method: :patch do |f| %>
+    <%# Step 1: Available Cash %>
+    <div class="mb-8">
+      <h2 class="text-lg font-semibold mb-4 pb-2 border-b">유용자금</h2>
+      <div class="flex items-center gap-2">
+        <label class="w-24 text-sm font-medium text-gray-700">유용자금</label>
+        <%= f.number_field :available_cash, inputmode: "numeric",
+          class: "flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500",
+          data: { controller: "number-format", action: "input->number-format#format" } %>
+        <span class="text-gray-600 font-medium">만원</span>
+      </div>
+    </div>
+
+    <%# Step 2: Reserve Funds %>
+    <div class="mb-8">
+      <h2 class="text-lg font-semibold mb-4 pb-2 border-b">예비비</h2>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">부동산 유형</label>
+        <%= f.collection_select :property_type_id, @property_types, :id, :name,
+          { prompt: "선택하세요" },
+          { class: "w-full px-4 py-3 border border-gray-300 rounded-lg" } %>
+      </div>
+
+      <div class="mb-4 grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">면적 최소 (㎡)</label>
+          <%= f.number_field :area_range_min, inputmode: "numeric",
+            class: "w-full px-4 py-3 border border-gray-300 rounded-lg" %>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">면적 최대 (㎡)</label>
+          <%= f.number_field :area_range_max, inputmode: "numeric",
+            class: "w-full px-4 py-3 border border-gray-300 rounded-lg" %>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">면적 단위</label>
+        <div class="flex gap-4">
+          <%= f.radio_button :area_unit, "pyeong", checked: @setting.area_unit == "pyeong", class: "mr-1" %>
+          <label>평</label>
+          <%= f.radio_button :area_unit, "sqm", checked: @setting.area_unit == "sqm", class: "mr-1 ml-4" %>
+          <label>㎡</label>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <% [ [:repair_cost, "수선비"], [:acquisition_tax, "취득세"], [:scrivener_fee, "법무사비"],
+             [:moving_cost, "이사비"], [:maintenance_fee, "관리비"] ].each do |field, label| %>
+          <div class="flex items-center gap-2">
+            <label class="w-24 text-sm font-medium text-gray-700"><%= label %></label>
+            <%= f.number_field field, inputmode: "numeric",
+              class: "flex-1 px-4 py-2 border border-gray-300 rounded-lg" %>
+            <span class="text-gray-600 text-sm">만원</span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Step 3: Loan Policy %>
+    <div class="mb-8">
+      <h2 class="text-lg font-semibold mb-4 pb-2 border-b">대출 정책</h2>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">대출 정책</label>
+        <div class="space-y-2">
+          <% @loan_policies.each do |policy| %>
+            <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+              <%= f.radio_button :loan_policy_id, policy.id, class: "text-blue-600" %>
+              <div>
+                <span class="font-medium"><%= policy.policy_name %></span>
+                <span class="text-sm text-gray-500 ml-2">LTV <%= (policy.loan_ratio * 100).to_i %>%</span>
+              </div>
+            </label>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">대출 비율 (LTV)</label>
+        <div class="flex items-center gap-2">
+          <%= f.number_field :loan_ratio, step: 0.01, min: 0, max: 1,
+            class: "flex-1 px-4 py-3 border border-gray-300 rounded-lg" %>
+        </div>
+      </div>
+
+      <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">유찰 회차</label>
+        <%= f.number_field :failed_auction_rounds, min: 0, max: 3,
+          class: "w-full px-4 py-3 border border-gray-300 rounded-lg" %>
+      </div>
+    </div>
+
+    <%# Current Results %>
+    <% if @setting.max_bid_amount %>
+      <div class="mb-8 p-4 bg-blue-50 rounded-lg">
+        <p class="text-sm text-gray-600">현재 최대입찰가</p>
+        <p class="text-2xl font-bold text-blue-700"><%= number_with_delimiter(@setting.max_bid_amount) %>만원</p>
+      </div>
+    <% end %>
+
+    <div class="flex gap-4">
+      <%= link_to "스냅샷 이력", settings_budget_snapshots_path,
+        class: "flex-1 text-center py-3 px-6 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors" %>
+      <%= f.submit "저장",
+        class: "flex-1 bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors cursor-pointer" %>
+    </div>
+  <% end %>
+</div>
