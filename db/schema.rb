@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_05_070618) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_05_070748) do
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.integer "area_range_max"
@@ -34,6 +34,34 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_070618) do
     t.index ["loan_policy_id"], name: "index_budget_settings_on_loan_policy_id"
     t.index ["property_type_id"], name: "index_budget_settings_on_property_type_id"
     t.index ["user_id"], name: "index_budget_settings_on_user_id", unique: true
+  end
+
+  create_table "budget_snapshots", force: :cascade do |t|
+    t.integer "acquisition_tax"
+    t.string "area_range"
+    t.string "area_unit"
+    t.integer "available_cash"
+    t.datetime "calculated_at", null: false
+    t.datetime "created_at", null: false
+    t.integer "failed_auction_rounds"
+    t.string "loan_policy_name"
+    t.decimal "loan_ratio", precision: 3, scale: 2
+    t.integer "maintenance_fee"
+    t.integer "max_bid_amount"
+    t.integer "moving_cost"
+    t.integer "parent_snapshot_id"
+    t.integer "property_case_id"
+    t.string "property_type_name"
+    t.integer "repair_cost"
+    t.integer "scrivener_fee"
+    t.integer "searchable_appraisal_limit"
+    t.string "trigger", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.integer "version", null: false
+    t.index ["parent_snapshot_id"], name: "index_budget_snapshots_on_parent_snapshot_id"
+    t.index ["user_id", "version"], name: "index_budget_snapshots_on_user_id_and_version"
+    t.index ["user_id"], name: "index_budget_snapshots_on_user_id"
   end
 
   create_table "loan_policies", force: :cascade do |t|
@@ -88,6 +116,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_070618) do
   add_foreign_key "budget_settings", "loan_policies"
   add_foreign_key "budget_settings", "property_types"
   add_foreign_key "budget_settings", "users"
+  add_foreign_key "budget_snapshots", "budget_snapshots", column: "parent_snapshot_id"
+  add_foreign_key "budget_snapshots", "users"
   add_foreign_key "loan_policies", "property_types"
   add_foreign_key "reserve_fund_defaults", "property_types"
 end
