@@ -1,0 +1,24 @@
+require "test_helper"
+
+class Api::ReserveFundDefaultsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    get root_url  # create guest session
+  end
+
+  test "GET index returns defaults for given property_type_id" do
+    apt = property_types(:apartment)
+    get api_reserve_fund_defaults_url(property_type_id: apt.id), as: :json
+    assert_response :success
+
+    body = JSON.parse(response.body)
+    assert_kind_of Array, body
+    assert body.length > 0
+    assert_equal 300, body.first["repair_cost"]
+  end
+
+  test "GET index returns empty array for unknown type" do
+    get api_reserve_fund_defaults_url(property_type_id: 9999), as: :json
+    assert_response :success
+    assert_equal [], JSON.parse(response.body)
+  end
+end
