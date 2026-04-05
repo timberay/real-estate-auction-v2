@@ -1,0 +1,26 @@
+<div class="rounded-xl border-2 p-8 text-center <%= @config[:bg] %>">
+  <div class="text-4xl font-bold <%= @config[:color] %>"><%= @config[:label] %></div>
+  <p class="mt-2 text-sm text-slate-600 dark:text-slate-400"><%= @config[:description] %></p>
+</div>
+
+<% if @risk_results.any? %>
+  <div class="mt-6 space-y-3">
+    <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">위험 항목 상세</h3>
+    <% @risk_results.each do |result| %>
+      <details class="rounded-lg border border-slate-200 dark:border-slate-700">
+        <summary class="cursor-pointer px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-100">
+          <%= result.checklist_item.question %>
+          <span class="ml-2 text-xs <%= result.resolvable ? 'text-yellow-600' : 'text-red-600' %>">
+            <%= result.resolvable ? "해결 가능" : "해결 불가" %>
+          </span>
+        </summary>
+        <div class="border-t border-slate-200 dark:border-slate-700 px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+          <p><%= result.checklist_item.description %></p>
+          <% if result.resolution_note.present? %>
+            <p class="mt-2 font-medium">메모: <%= result.resolution_note %></p>
+          <% end %>
+        </div>
+      </details>
+    <% end %>
+  </div>
+<% end %>
