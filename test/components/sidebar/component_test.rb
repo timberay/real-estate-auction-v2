@@ -80,7 +80,7 @@ module Sidebar
       render_inline(Sidebar::Component.new)
 
       assert_selector "a[href='/onboarding']", text: "예산 설정"
-      assert_selector "a[href='/']", text: "물건 목록"
+      assert_selector "a[href='/properties']", text: "물건 목록"
     end
 
     test "renders disabled items as disabled buttons" do
@@ -106,10 +106,10 @@ module Sidebar
       assert_selector "a[href='/onboarding'][class*='font-medium']"
     end
 
-    test "marks root path as active" do
-      render_inline(Sidebar::Component.new(current_path: "/"))
+    test "marks properties path as active" do
+      render_inline(Sidebar::Component.new(current_path: "/properties"))
 
-      assert_selector "a[href='/'][class*='bg-blue-50']"
+      assert_selector "a[href='/properties'][class*='bg-blue-50']"
     end
 
     test "active item has dark mode classes" do

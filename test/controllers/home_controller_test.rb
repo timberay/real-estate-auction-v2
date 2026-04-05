@@ -6,8 +6,10 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to start_onboarding_url
   end
 
-  test "shows home page when budget settings completed" do
-    user = User.create!(email: "home@test.com", password: "password")
+  test "redirects to properties when budget settings completed" do
+    # Create guest user with completed budget settings
+    get root_url  # creates guest session
+    user = User.find_by!(email: "guest@auction.local")
     BudgetSetting.create!(
       user: user,
       available_cash: 30000,
@@ -17,10 +19,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
       completed_at: Time.current
     )
 
-    # Simulate guest session pointing to this user
     get root_url
-    # First visit creates guest session, which has no budget settings -> redirect
-    assert_redirected_to start_onboarding_url
+    assert_redirected_to properties_path
   end
 
   test "auto-creates guest session on first visit" do

@@ -7,7 +7,7 @@ module Sidebar
     MENU_GROUPS = {
       "물건검색" => [
         MenuItem.new(label: "예산 설정", icon: "calculator", path: "/onboarding", enabled: true),
-        MenuItem.new(label: "물건 목록", icon: "magnifying-glass", path: "/", enabled: true),
+        MenuItem.new(label: "물건 목록", icon: "magnifying-glass", path: "/properties", enabled: true),
         MenuItem.new(label: "시세 조회", icon: "chart-bar", path: nil, enabled: false)
       ],
       "권리분석" => [
