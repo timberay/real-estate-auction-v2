@@ -11,7 +11,7 @@ class CreateReserveFundDefaults < ActiveRecord::Migration[8.1]
       t.integer :maintenance_fee, null: false
       t.timestamps
     end
-    add_index :reserve_fund_defaults, [:property_type_id, :area_range_min, :area_range_max],
+    add_index :reserve_fund_defaults, [ :property_type_id, :area_range_min, :area_range_max ],
               name: "idx_reserve_defaults_type_area", unique: true
   end
 end

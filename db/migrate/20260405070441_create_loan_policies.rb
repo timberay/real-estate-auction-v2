@@ -11,6 +11,6 @@ class CreateLoanPolicies < ActiveRecord::Migration[8.1]
       t.boolean :enabled, null: false, default: true
       t.timestamps
     end
-    add_index :loan_policies, [:property_type_id, :enabled]
+    add_index :loan_policies, [ :property_type_id, :enabled ]
   end
 end

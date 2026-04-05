@@ -23,6 +23,6 @@ class CreateBudgetSnapshots < ActiveRecord::Migration[8.1]
       t.datetime :calculated_at, null: false
       t.timestamps
     end
-    add_index :budget_snapshots, [:user_id, :version]
+    add_index :budget_snapshots, [ :user_id, :version ]
   end
 end

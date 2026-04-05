@@ -8,6 +8,6 @@ class CreatePropertyTypes < ActiveRecord::Migration[8.1]
       t.timestamps
     end
     add_index :property_types, :code, unique: true
-    add_index :property_types, [:enabled, :sort_order]
+    add_index :property_types, [ :enabled, :sort_order ]
   end
 end
