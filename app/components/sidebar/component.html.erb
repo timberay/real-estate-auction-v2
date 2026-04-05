@@ -1,0 +1,36 @@
+<nav class="<%= NAV_CLASSES %>" data-sidebar-target="sidebar">
+  <div class="flex flex-col py-4 h-full">
+    <div class="flex-1 space-y-2 px-2">
+      <% MENU_GROUPS.each do |group_title, items| %>
+        <div data-controller="dropdown">
+          <button type="button" class="flex items-center justify-between w-full px-2 py-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400" data-action="dropdown#toggle">
+            <span><%= group_title %></span>
+            <span data-dropdown-target="chevron" class="rotate-180"><%= chevron_icon %></span>
+          </button>
+
+          <div data-dropdown-target="menu" class="space-y-1">
+            <% items.each do |item| %>
+              <% if item.enabled %>
+                <a href="<%= item.path %>" class="<%= item_classes(item) %>">
+                  <%= menu_icon(item.icon) %>
+                  <span><%= item.label %></span>
+                </a>
+              <% else %>
+                <button type="button" disabled class="<%= item_classes(item) %> w-full">
+                  <%= menu_icon(item.icon) %>
+                  <span><%= item.label %></span>
+                </button>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="border-t border-slate-200 dark:border-slate-700 px-2 py-2">
+      <button type="button" class="flex items-center justify-center w-full p-2 rounded-md text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors duration-150" data-action="sidebar#toggle">
+        <span data-sidebar-target="toggleIcon"><%= toggle_icon %></span>
+      </button>
+    </div>
+  </div>
+</nav>

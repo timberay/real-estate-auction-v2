@@ -1,0 +1,25 @@
+<header class="<%= HEADER_CLASSES %>">
+  <div class="flex items-center gap-3">
+    <button type="button" class="<%= BUTTON_CLASSES %> md:hidden" data-action="sidebar#toggleMobile">
+      <%= hamburger_icon %>
+    </button>
+    <span class="font-bold text-lg text-white"><%= @app_name %></span>
+  </div>
+
+  <div class="flex items-center gap-1">
+    <div data-controller="dark-mode">
+      <button type="button" class="<%= BUTTON_CLASSES %>" data-action="dark-mode#toggle">
+        <span data-dark-mode-target="sunIcon"><%= sun_icon %></span>
+        <span data-dark-mode-target="moonIcon" class="hidden"><%= moon_icon %></span>
+      </button>
+    </div>
+
+    <button type="button" class="<%= BUTTON_CLASSES %>">
+      <%= bell_icon %>
+    </button>
+
+    <button type="button" class="<%= BUTTON_CLASSES %>">
+      <%= user_icon %>
+    </button>
+  </div>
+</header>
