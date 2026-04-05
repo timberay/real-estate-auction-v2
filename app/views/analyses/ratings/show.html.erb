@@ -1,0 +1,14 @@
+<%= turbo_frame_tag "analysis_flow" do %>
+  <h2>안전 등급: <%= @property.safety_rating&.upcase %></h2>
+  <% if @risk_results.any? %>
+    <h3>위험 항목</h3>
+    <% @risk_results.each do |result| %>
+      <div>
+        <p><%= result.checklist_item.question %></p>
+        <p><%= result.resolvable ? "해결 가능" : "해결 불가" %></p>
+      </div>
+    <% end %>
+  <% end %>
+  <%= link_to "목록으로 돌아가기", properties_path %>
+  <%= link_to "다시 분석하기", property_path(@property) %>
+<% end %>
