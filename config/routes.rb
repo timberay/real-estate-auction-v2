@@ -27,5 +27,14 @@ Rails.application.routes.draw do
     resources :reserve_fund_defaults, only: [ :index ]
   end
 
+  resources :properties, only: [ :index, :show ] do
+    namespace :analyses do
+      resource :start, only: [ :create ], controller: "start"
+      resource :manual_input, only: [ :edit, :update ], controller: "manual_inputs"
+      resource :result, only: [ :edit, :update ], controller: "results"
+      resource :rating, only: [ :show ], controller: "ratings"
+    end
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 end
