@@ -1,6 +1,6 @@
 <turbo-frame id="onboarding_wizard">
   <div class="container mx-auto px-4 py-8 max-w-lg"
-       data-controller="loan-slider failed-rounds"
+       data-controller="loan-slider"
        data-loan-slider-available-cash-value="<%= @setting.available_cash %>"
        data-loan-slider-total-reserves-value="<%= @setting.total_reserves %>">
     <h1 class="text-2xl font-bold mb-6">대출 및 낙찰가 설정</h1>
@@ -64,18 +64,18 @@
                value="<%= @setting.failed_auction_rounds %>"
                name="budget_setting[failed_auction_rounds]"
                class="w-full"
-               data-failed-rounds-target="slider"
-               data-action="input->failed-rounds#slide">
+               data-loan-slider-target="roundsSlider"
+               data-action="input->loan-slider#slideRounds">
         <div class="flex justify-between text-sm text-gray-500 mt-1">
           <span>0회차 (신건)</span>
-          <span data-failed-rounds-target="roundsDisplay"><%= @setting.failed_auction_rounds %>회차</span>
+          <span data-loan-slider-target="roundsDisplay"><%= @setting.failed_auction_rounds %>회차</span>
           <span>3회차</span>
         </div>
       </div>
 
       <div class="mb-6 p-4 bg-gray-50 rounded-lg">
         <p class="text-sm text-gray-600">검색 가능 감정가 상한</p>
-        <p class="text-xl font-bold text-gray-700" data-failed-rounds-target="limitPreview">계산 중...</p>
+        <p class="text-xl font-bold text-gray-700" data-loan-slider-target="limitPreview">계산 중...</p>
       </div>
 
       <p class="text-xs text-gray-400 mb-6">
