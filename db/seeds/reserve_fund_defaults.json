@@ -2,26 +2,106 @@
   {
     "property_type_code": "apartment",
     "defaults": [
-      { "area_range_min": 0, "area_range_max": 58, "repair_cost": 300, "acquisition_tax_rate": 0.011, "scrivener_fee": 60, "moving_cost": 100, "maintenance_fee": 30 },
-      { "area_range_min": 59, "area_range_max": 84, "repair_cost": 500, "acquisition_tax_rate": 0.011, "scrivener_fee": 80, "moving_cost": 150, "maintenance_fee": 50 },
-      { "area_range_min": 85, "area_range_max": 135, "repair_cost": 800, "acquisition_tax_rate": 0.011, "scrivener_fee": 100, "moving_cost": 200, "maintenance_fee": 80 },
-      { "area_range_min": 136, "area_range_max": 300, "repair_cost": 1200, "acquisition_tax_rate": 0.035, "scrivener_fee": 120, "moving_cost": 250, "maintenance_fee": 100 }
+      {
+        "area_range_min": 0,
+        "area_range_max": 58,
+        "repair_cost": 527,
+        "acquisition_tax_rate": 0.011,
+        "scrivener_fee": 60,
+        "moving_cost": 176,
+        "maintenance_fee": 30
+      },
+      {
+        "area_range_min": 59,
+        "area_range_max": 84,
+        "repair_cost": 763,
+        "acquisition_tax_rate": 0.011,
+        "scrivener_fee": 80,
+        "moving_cost": 255,
+        "maintenance_fee": 30
+      },
+      {
+        "area_range_min": 85,
+        "area_range_max": 135,
+        "repair_cost": 1226,
+        "acquisition_tax_rate": 0.011,
+        "scrivener_fee": 100,
+        "moving_cost": 409,
+        "maintenance_fee": 30
+      },
+      {
+        "area_range_min": 136,
+        "area_range_max": 300,
+        "repair_cost": 2723,
+        "acquisition_tax_rate": 0.035,
+        "scrivener_fee": 120,
+        "moving_cost": 908,
+        "maintenance_fee": 30
+      }
     ]
   },
   {
     "property_type_code": "villa",
     "defaults": [
-      { "area_range_min": 0, "area_range_max": 58, "repair_cost": 400, "acquisition_tax_rate": 0.011, "scrivener_fee": 60, "moving_cost": 100, "maintenance_fee": 20 },
-      { "area_range_min": 59, "area_range_max": 84, "repair_cost": 600, "acquisition_tax_rate": 0.011, "scrivener_fee": 80, "moving_cost": 150, "maintenance_fee": 30 },
-      { "area_range_min": 85, "area_range_max": 165, "repair_cost": 900, "acquisition_tax_rate": 0.011, "scrivener_fee": 100, "moving_cost": 200, "maintenance_fee": 50 }
+      {
+        "area_range_min": 0,
+        "area_range_max": 58,
+        "repair_cost": 176,
+        "acquisition_tax_rate": 0.011,
+        "scrivener_fee": 60,
+        "moving_cost": 176,
+        "maintenance_fee": 0
+      },
+      {
+        "area_range_min": 59,
+        "area_range_max": 84,
+        "repair_cost": 255,
+        "acquisition_tax_rate": 0.011,
+        "scrivener_fee": 80,
+        "moving_cost": 255,
+        "maintenance_fee": 0
+      },
+      {
+        "area_range_min": 85,
+        "area_range_max": 165,
+        "repair_cost": 500,
+        "acquisition_tax_rate": 0.011,
+        "scrivener_fee": 100,
+        "moving_cost": 500,
+        "maintenance_fee": 0
+      }
     ]
   },
   {
     "property_type_code": "officetel",
     "defaults": [
-      { "area_range_min": 0, "area_range_max": 40, "repair_cost": 200, "acquisition_tax_rate": 0.044, "scrivener_fee": 50, "moving_cost": 80, "maintenance_fee": 30 },
-      { "area_range_min": 41, "area_range_max": 84, "repair_cost": 400, "acquisition_tax_rate": 0.044, "scrivener_fee": 70, "moving_cost": 120, "maintenance_fee": 50 },
-      { "area_range_min": 85, "area_range_max": 165, "repair_cost": 600, "acquisition_tax_rate": 0.044, "scrivener_fee": 90, "moving_cost": 160, "maintenance_fee": 70 }
+      {
+        "area_range_min": 0,
+        "area_range_max": 40,
+        "repair_cost": 242,
+        "acquisition_tax_rate": 0.044,
+        "scrivener_fee": 50,
+        "moving_cost": 121,
+        "maintenance_fee": 30
+      },
+      {
+        "area_range_min": 41,
+        "area_range_max": 84,
+        "repair_cost": 509,
+        "acquisition_tax_rate": 0.044,
+        "scrivener_fee": 70,
+        "moving_cost": 255,
+        "maintenance_fee": 30
+      },
+      {
+        "area_range_min": 85,
+        "area_range_max": 165,
+        "repair_cost": 999,
+        "acquisition_tax_rate": 0.044,
+        "scrivener_fee": 90,
+        "moving_cost": 500,
+        "maintenance_fee": 30
+      }
     ]
   }
 ]

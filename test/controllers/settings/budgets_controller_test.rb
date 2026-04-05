@@ -15,7 +15,7 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
       scrivener_fee: 80,
       moving_cost: 150,
       maintenance_fee: 50,
-      loan_policy: loan_policies(:general_apartment),
+      loan_policy: loan_policies(:auction_bank_apartment),
       loan_ratio: 0.7,
       max_bid_amount: 96200,
       area_unit: "pyeong",
@@ -43,7 +43,7 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
         scrivener_fee: 80,
         moving_cost: 150,
         maintenance_fee: 50,
-        loan_policy_id: loan_policies(:general_apartment).id,
+        loan_policy_id: loan_policies(:auction_bank_apartment).id,
         loan_ratio: 0.7,
         failed_auction_rounds: 0
       }

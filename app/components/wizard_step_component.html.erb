@@ -1,0 +1,17 @@
+<div class="max-w-lg mx-auto">
+  <div class="flex items-center justify-center mb-6">
+    <% (1..@total_steps).each do |step| %>
+      <div class="<%= dot_class(step) %>"></div>
+      <% if step < @total_steps %>
+        <div class="<%= line_class(step) %>"></div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-2"><%= @title %></h2>
+  <% if @description.present? %>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mb-6"><%= @description %></p>
+  <% end %>
+
+  <%= content %>
+</div>

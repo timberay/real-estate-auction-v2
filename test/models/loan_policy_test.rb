@@ -4,7 +4,7 @@ class LoanPolicyTest < ActiveSupport::TestCase
   test "valid with all required fields" do
     lp = LoanPolicy.new(
       property_type: property_types(:apartment),
-      policy_name: "디딤돌 대출", loan_ratio: 0.8,
+      policy_name: "경락대출 (1금융)", loan_ratio: 0.8,
       effective_date: Date.new(2026, 1, 1), enabled: true
     )
     assert lp.valid?

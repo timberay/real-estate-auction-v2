@@ -1,0 +1,7 @@
+<div class="<%= container_classes %>">
+  <p class="<%= label_classes %>"><%= @label %></p>
+  <p class="<%= value_classes %>"><%= @value %></p>
+  <% if @sublabel.present? %>
+    <p class="<%= sublabel_classes %>"><%= @sublabel %></p>
+  <% end %>
+</div>

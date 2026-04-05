@@ -1,11 +1,17 @@
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-2xl font-bold mb-4">경매 물건 목록</h1>
-  <p class="text-gray-600">물건 목록은 F02에서 구현됩니다.</p>
+<% if defined?(current_user) && current_user.budget_setting %>
+  <div class="mb-6">
+    <%= render StatCardComponent.new(
+      label: "내 최대입찰가",
+      value: "#{number_with_delimiter(current_user.budget_setting.max_bid_amount)}만원",
+      variant: :muted
+    ) %>
+  </div>
+<% end %>
 
-  <% if current_user.budget_setting %>
-    <div class="mt-6 p-4 bg-blue-50 rounded-lg">
-      <p class="font-semibold">내 최대입찰가: <%= number_with_delimiter(current_user.budget_setting.max_bid_amount) %>만원</p>
-      <a href="<%= settings_budget_path %>" class="text-blue-600 underline text-sm">예산 설정 변경</a>
-    </div>
-  <% end %>
-</div>
+<%= render EmptyStateComponent.new(
+  icon: "magnifying-glass",
+  title: "물건 목록이 준비 중입니다",
+  description: "F02 기능이 구현되면 예산 범위 내 안전한 경매 물건을 검색할 수 있습니다.",
+  cta_text: "예산 설정하기",
+  cta_href: start_onboarding_path
+) %>

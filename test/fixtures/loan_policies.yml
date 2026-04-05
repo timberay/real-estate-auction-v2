@@ -1,26 +1,17 @@
-didimdol_apartment:
+auction_bank_apartment:
   property_type: apartment
-  policy_name: "디딤돌 대출"
+  policy_name: "경락대출 (1금융)"
   loan_ratio: 0.8
-  description: "무주택 서민 주거안정을 위한 정책 모기지"
+  description: "시중은행 경락대출 — 감정가 기준 LTV 80%"
   effective_date: "2026-01-01"
   expiry_date:
   enabled: true
 
-general_apartment:
+auction_capital_apartment:
   property_type: apartment
-  policy_name: "일반 주담대"
-  loan_ratio: 0.7
-  description: "일반 주택담보대출"
-  effective_date: "2026-01-01"
-  expiry_date:
-  enabled: true
-
-newborn_apartment:
-  property_type: apartment
-  policy_name: "신생아특례"
-  loan_ratio: 0.8
-  description: "출산가구 주거지원 특례대출"
+  policy_name: "경락대출 (2금융)"
+  loan_ratio: 0.9
+  description: "캐피탈·저축은행 경락대출 — 감정가 기준 LTV 90%"
   effective_date: "2026-01-01"
   expiry_date:
   enabled: true

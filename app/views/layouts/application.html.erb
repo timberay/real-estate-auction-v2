@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html class="h-full">
   <head>
-    <title><%= content_for(:title) || "Real Estate Auction V2" %></title>
+    <title><%= content_for(:title) || "Oh My Auction" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Real Estate Auction V2">
+    <meta name="application-name" content="Oh My Auction">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -18,12 +18,51 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <%= yield %>
+  <script>
+    (function() {
+      const darkMode = localStorage.getItem("dark-mode");
+      if (darkMode === "true" || (darkMode === null && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+    })();
+  </script>
+
+  <body class="bg-slate-50 dark:bg-slate-900 font-sans antialiased break-keep" data-controller="sidebar">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-white focus:text-blue-600">
+      본문으로 건너뛰기
+    </a>
+
+    <%= render Header::Component.new %>
+    <%= render Sidebar::Component.new(current_path: request.path) %>
+
+    <div class="fixed inset-0 z-20 bg-black/50 hidden md:hidden" data-sidebar-target="backdrop" data-action="click->sidebar#close"></div>
+
+    <div class="min-h-screen pt-16 transition-[margin] duration-200 md:ml-16 lg:ml-64" data-sidebar-target="content">
+      <% if flash.any? %>
+        <div class="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+          <% flash.each do |type, message| %>
+            <% toast_type = { "notice" => :success, "alert" => :danger }.fetch(type.to_s, :info) %>
+            <%= render ToastComponent.new(message: message, type: toast_type) %>
+          <% end %>
+        </div>
+      <% end %>
+
+      <main id="main-content" class="px-4 py-4 md:px-6 md:py-6">
+        <%= yield %>
+      </main>
+
+      <footer class="border-t border-slate-200 dark:border-slate-700 px-4 py-4">
+        <p class="text-xs text-slate-400 dark:text-slate-500 text-center">&copy; 2026 Oh My Auction. All rights reserved.</p>
+      </footer>
+    </div>
   </body>
 </html>

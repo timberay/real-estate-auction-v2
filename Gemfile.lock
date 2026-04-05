@@ -103,6 +103,8 @@ GEM
     concurrent-ruby (1.3.6)
     connection_pool (3.0.2)
     crass (1.0.6)
+    css_parser (2.0.0)
+      addressable
     date (3.5.1)
     debug (1.11.1)
       irb (~> 1.10)
@@ -125,6 +127,10 @@ GEM
       raabro (~> 1.4)
     globalid (1.3.0)
       activesupport (>= 6.1)
+    heroicon (1.0.0)
+      rails (>= 5.2)
+    htmlbeautifier (1.4.3)
+    htmlentities (4.3.4)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
     image_processing (1.14.0)
@@ -161,6 +167,18 @@ GEM
     loofah (2.25.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
+    lookbook (2.3.14)
+      activemodel
+      css_parser
+      htmlbeautifier (~> 1.3)
+      htmlentities (~> 4.3.4)
+      marcel (~> 1.0)
+      railties (>= 5.0)
+      redcarpet (~> 3.5)
+      rouge (>= 3.26, < 5.0)
+      view_component (>= 2.0)
+      yard (~> 0.9)
+      zeitwerk (~> 2.5)
     mail (2.9.0)
       logger
       mini_mime (>= 0.1.1)
@@ -268,10 +286,12 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
+    redcarpet (3.6.1)
     regexp_parser (2.12.0)
     reline (0.6.3)
       io-console (~> 0.5)
     rexml (3.4.4)
+    rouge (4.7.0)
     rubocop (1.86.0)
       json (~> 2.3)
       language_server-protocol (~> 3.17.0.2)
@@ -344,6 +364,14 @@ GEM
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
     stringio (3.2.0)
+    tailwindcss-rails (4.4.0)
+      railties (>= 7.0.0)
+      tailwindcss-ruby (~> 4.0)
+    tailwindcss-ruby (4.2.1)
+    tailwindcss-ruby (4.2.1-aarch64-linux-gnu)
+    tailwindcss-ruby (4.2.1-aarch64-linux-musl)
+    tailwindcss-ruby (4.2.1-x86_64-linux-gnu)
+    tailwindcss-ruby (4.2.1-x86_64-linux-musl)
     thor (1.5.0)
     thruster (0.1.20)
     thruster (0.1.20-aarch64-linux)
@@ -360,6 +388,10 @@ GEM
     unicode-emoji (4.2.0)
     uri (1.1.1)
     useragent (0.16.11)
+    view_component (4.6.0)
+      actionview (>= 7.1.0)
+      activesupport (>= 7.1.0)
+      concurrent-ruby (~> 1)
     web-console (4.3.0)
       actionview (>= 8.0.0)
       bindex (>= 0.4.0)
@@ -371,6 +403,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    yard (0.9.38)
     zeitwerk (2.7.5)
 
 PLATFORMS
@@ -390,10 +423,12 @@ DEPENDENCIES
   bundler-audit
   capybara
   debug
+  heroicon
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
   kamal
+  lookbook
   propshaft
   puma (>= 5.0)
   rails (~> 8.1.3)
@@ -404,9 +439,11 @@ DEPENDENCIES
   solid_queue
   sqlite3 (>= 2.1)
   stimulus-rails
+  tailwindcss-rails
   thruster
   turbo-rails
   tzinfo-data
+  view_component
   web-console
 
 BUNDLED WITH

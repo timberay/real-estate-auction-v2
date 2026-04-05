@@ -1,0 +1,21 @@
+<div class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+  <div class="grid grid-cols-4 <%= HEADER_CLASSES %>">
+    <div class="<%= HEADER_CELL_CLASSES %>">항목</div>
+    <div class="<%= HEADER_CELL_CLASSES %>">기존</div>
+    <div class="<%= HEADER_CELL_CLASSES %>">변경</div>
+    <div class="<%= HEADER_CELL_CLASSES %>">차이</div>
+  </div>
+
+  <div class="divide-y divide-slate-200 dark:divide-slate-700">
+    <% @diff.each do |row| %>
+      <div class="grid grid-cols-4">
+        <div class="<%= CELL_CLASSES %>"><%= row[:label] %></div>
+        <div class="<%= CELL_CLASSES %> tabular-nums"><%= row[:was] %></div>
+        <div class="<%= CELL_CLASSES %> tabular-nums"><%= row[:now] %></div>
+        <div class="<%= CELL_CLASSES %>">
+          <span class="<%= delta_classes(row[:delta]) %>"><%= formatted_delta(row[:delta]) %></span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
