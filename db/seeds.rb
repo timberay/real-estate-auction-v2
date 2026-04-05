@@ -56,4 +56,37 @@ User.find_or_create_by!(email: "guest@auction.local") do |u|
 end
 puts "  -> Guest user ready"
 
+puts "Seeding checklist items..."
+
+# Position defines display order within F02 analysis flow
+F02_POSITIONS = {
+  "rights-011" => 1, "rights-002" => 2, "rights-019" => 3, "rights-020" => 4,
+  "rights-003" => 5, "rights-006" => 6, "rights-014" => 7, "manual-001" => 8,
+  "property-001" => 9, "property-005" => 10, "resale-001" => 11, "resale-002" => 12,
+  "resale-003" => 13, "resale-004" => 14, "property-004" => 15, "rights-005" => 16,
+  "property-002" => 17
+}.freeze
+
+checklist_data = JSON.parse(File.read(Rails.root.join("db/seeds/checklist_items_summary.json")))
+checklist_data.each do |attrs|
+  code = attrs["id"]
+  next unless code
+  next unless attrs["f02_risk_axis"]
+
+  position = F02_POSITIONS[code]
+  next unless position
+
+  ChecklistItem.find_or_create_by!(code: code) do |item|
+    item.category = attrs["category"]
+    item.risk_axis = attrs["f02_risk_axis"]
+    item.question = attrs["question"]
+    item.description = attrs["description"]
+    item.logic = attrs["logic"]
+    item.data_source_name = attrs.dig("data_source", 0, "name") || "수동 입력"
+    item.priority = attrs["priority"]
+    item.position = position
+  end
+end
+puts "  -> #{ChecklistItem.count} checklist items (expected: 17)"
+
 puts "Seed complete!"
