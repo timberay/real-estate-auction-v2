@@ -1,0 +1,28 @@
+safe_apartment:
+  case_number: "2026타경10001"
+  court_name: "서울중앙지방법원"
+  property_type: "아파트"
+  address: "서울특별시 강남구 역삼동 100-1"
+  appraisal_price: 80000
+  min_bid_price: 56000
+  status: "진행중"
+  safety_rating: 0
+
+risky_villa:
+  case_number: "2026타경10002"
+  court_name: "수원지방법원"
+  property_type: "빌라"
+  address: "경기도 수원시 영통구 200-2"
+  appraisal_price: 30000
+  min_bid_price: 21000
+  status: "진행중"
+  safety_rating: 2
+
+unanalyzed_officetel:
+  case_number: "2026타경10003"
+  court_name: "인천지방법원"
+  property_type: "오피스텔"
+  address: "인천광역시 연수구 300-3"
+  appraisal_price: 25000
+  min_bid_price: 17500
+  status: "진행중"
