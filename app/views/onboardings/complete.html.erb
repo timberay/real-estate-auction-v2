@@ -1,0 +1,83 @@
+<div class="container mx-auto px-4 py-8 max-w-lg">
+  <div class="text-center mb-8">
+    <h1 class="text-2xl font-bold mb-2">예산 설정 완료</h1>
+    <p class="text-gray-500">나의 최대 입찰 가능 금액이 계산되었습니다</p>
+  </div>
+
+  <% if @setting %>
+    <div class="bg-blue-600 text-white rounded-xl p-6 mb-6 text-center">
+      <p class="text-sm opacity-80 mb-1">최대 입찰가</p>
+      <p class="text-4xl font-bold mb-1">
+        <%= number_with_delimiter(@setting.max_bid_amount) %><span class="text-lg">만원</span>
+      </p>
+      <% if @setting.max_bid_amount && @setting.max_bid_amount >= 10000 %>
+        <p class="text-sm opacity-80">
+          (약 <%= (@setting.max_bid_amount / 10000.0).round(1) %>억원)
+        </p>
+      <% end %>
+    </div>
+
+    <% if @setting.failed_auction_rounds.to_i > 0 %>
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+        <p class="text-sm text-amber-800">
+          유찰 <%= @setting.failed_auction_rounds %>회차 기준 검색 가능 감정가:
+          <strong><%= number_with_delimiter(@setting.searchable_appraisal_limit) %>만원</strong>
+        </p>
+      </div>
+    <% end %>
+
+    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6">
+      <h2 class="text-lg font-semibold p-4 bg-gray-50 border-b">비용 내역</h2>
+      <table class="w-full">
+        <tbody class="divide-y divide-gray-100">
+          <tr class="flex justify-between px-4 py-3">
+            <td class="text-gray-600">유용자금</td>
+            <td class="font-medium"><%= number_with_delimiter(@setting.available_cash) %>만원</td>
+          </tr>
+          <tr class="flex justify-between px-4 py-3">
+            <td class="text-gray-600">수선비</td>
+            <td class="font-medium"><%= number_with_delimiter(@setting.repair_cost) %>만원</td>
+          </tr>
+          <tr class="flex justify-between px-4 py-3">
+            <td class="text-gray-600">취득세</td>
+            <td class="font-medium"><%= number_with_delimiter(@setting.acquisition_tax) %>만원</td>
+          </tr>
+          <tr class="flex justify-between px-4 py-3">
+            <td class="text-gray-600">법무사비</td>
+            <td class="font-medium"><%= number_with_delimiter(@setting.scrivener_fee) %>만원</td>
+          </tr>
+          <tr class="flex justify-between px-4 py-3">
+            <td class="text-gray-600">이사비</td>
+            <td class="font-medium"><%= number_with_delimiter(@setting.moving_cost) %>만원</td>
+          </tr>
+          <tr class="flex justify-between px-4 py-3">
+            <td class="text-gray-600">관리비</td>
+            <td class="font-medium"><%= number_with_delimiter(@setting.maintenance_fee) %>만원</td>
+          </tr>
+          <tr class="flex justify-between px-4 py-3 bg-gray-50 font-semibold">
+            <td class="text-gray-700">예비비 합계</td>
+            <td><%= number_with_delimiter(@setting.total_reserves) %>만원</td>
+          </tr>
+          <tr class="flex justify-between px-4 py-3">
+            <td class="text-gray-600">대출 비율 (LTV)</td>
+            <td class="font-medium"><%= (@setting.loan_ratio.to_f * 100).round %>%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <% if @snapshot %>
+      <p class="text-xs text-gray-400 text-center mb-6">
+        적용 정책: <%= @setting.loan_policy&.policy_name || "직접 설정" %> |
+        계산일: <%= @snapshot.calculated_at.strftime("%Y-%m-%d %H:%M") %>
+      </p>
+    <% end %>
+
+    <div class="space-y-3">
+      <%= link_to "내 예산 범위 물건 보기", root_path,
+        class: "block w-full text-center bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors" %>
+      <%= link_to "설정 다시 하기", settings_budget_path,
+        class: "block w-full text-center py-3 px-6 border border-gray-300 rounded-lg font-semibold text-gray-700 hover:bg-gray-50 transition-colors" %>
+    </div>
+  <% end %>
+</div>
