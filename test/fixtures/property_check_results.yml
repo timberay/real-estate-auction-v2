@@ -1,0 +1,12 @@
+safe_apartment_rights_011:
+  property: safe_apartment
+  checklist_item: rights_011
+  source_type: 0
+  has_risk: false
+
+risky_villa_rights_011:
+  property: risky_villa
+  checklist_item: rights_011
+  source_type: 0
+  has_risk: true
+  resolvable: false
