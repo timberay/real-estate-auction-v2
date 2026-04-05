@@ -1,0 +1,4 @@
+<h1>물건 목록</h1>
+<% @properties.each do |property| %>
+  <div><%= link_to property.case_number, property_path(property) %></div>
+<% end %>
