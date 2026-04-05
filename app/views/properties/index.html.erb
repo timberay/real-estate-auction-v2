@@ -1,4 +1,32 @@
-<h1>물건 목록</h1>
-<% @properties.each do |property| %>
-  <div><%= link_to property.case_number, property_path(property) %></div>
-<% end %>
+<%# app/views/properties/index.html.erb %>
+<div class="space-y-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">물건 목록</h1>
+    <div data-controller="property-filter" class="flex items-center gap-2">
+      <%= form_with url: properties_path, method: :get, data: { property_filter_target: "form" }, class: "flex items-center gap-2" do %>
+        <%= select_tag :safety_rating,
+            options_for_select([["전체", ""], ["Safe", "safe"], ["Caution", "caution"], ["Danger", "danger"]], params[:safety_rating]),
+            class: "rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 text-sm",
+            data: { property_filter_target: "ratingSelect", action: "change->property-filter#filter" } %>
+        <button type="button" data-action="click->property-filter#safeOnly"
+                class="inline-flex items-center rounded-md bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400 dark:ring-green-400/20 dark:hover:bg-green-900/50">
+          Safe만 보기
+        </button>
+      <% end %>
+    </div>
+  </div>
+
+  <% if @properties.any? %>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <% @properties.each do |property| %>
+        <%= render PropertyCardComponent.new(property: property) %>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render EmptyStateComponent.new(
+      icon: "magnifying-glass",
+      title: "물건이 없습니다",
+      description: "조건에 맞는 물건이 없습니다. 필터를 변경해보세요."
+    ) %>
+  <% end %>
+</div>
