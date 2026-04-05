@@ -1,0 +1,24 @@
+<div class="rounded-lg border p-4 <%= risk_classes %>">
+  <div class="flex items-start justify-between">
+    <p class="text-sm font-medium text-slate-900 dark:text-slate-100"><%= @checklist_item.question %></p>
+    <span class="ml-2 text-xs font-semibold <%= status_color %>"><%= status_text %></span>
+  </div>
+  <% if @checklist_item.description.present? %>
+    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400"><%= @checklist_item.description %></p>
+  <% end %>
+  <% if @show_resolution && @result.has_risk %>
+    <div class="mt-3 border-t border-slate-200 dark:border-slate-600 pt-3">
+      <div class="flex items-center gap-4">
+        <label class="inline-flex items-center text-sm">
+          <%= radio_button_tag "resolutions[#{@result.id}][resolvable]", "true", @result.resolvable == true, class: "mr-1" %> 해결 가능
+        </label>
+        <label class="inline-flex items-center text-sm">
+          <%= radio_button_tag "resolutions[#{@result.id}][resolvable]", "false", @result.resolvable == false, class: "mr-1" %> 해결 불가
+        </label>
+      </div>
+      <%= text_field_tag "resolutions[#{@result.id}][resolution_note]", @result.resolution_note,
+          placeholder: "해결 방안 메모",
+          class: "mt-2 w-full rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-700 text-sm" %>
+    </div>
+  <% end %>
+</div>
