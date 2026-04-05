@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_05_070748) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_05_135601) do
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.integer "area_range_max"
@@ -64,6 +64,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_070748) do
     t.index ["user_id"], name: "index_budget_snapshots_on_user_id"
   end
 
+  create_table "checklist_items", force: :cascade do |t|
+    t.string "category", null: false
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.string "data_source_name"
+    t.text "description"
+    t.json "logic"
+    t.integer "position", default: 0, null: false
+    t.string "priority", default: "상", null: false
+    t.text "question", null: false
+    t.integer "risk_axis", null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_checklist_items_on_code", unique: true
+    t.index ["position"], name: "index_checklist_items_on_position"
+    t.index ["risk_axis"], name: "index_checklist_items_on_risk_axis"
+  end
+
   create_table "loan_policies", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -77,6 +94,40 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_070748) do
     t.datetime "updated_at", null: false
     t.index ["property_type_id", "enabled"], name: "index_loan_policies_on_property_type_id_and_enabled"
     t.index ["property_type_id"], name: "index_loan_policies_on_property_type_id"
+  end
+
+  create_table "properties", force: :cascade do |t|
+    t.string "address"
+    t.integer "appraisal_price"
+    t.string "case_number", null: false
+    t.string "court_name"
+    t.datetime "created_at", null: false
+    t.integer "min_bid_price"
+    t.string "property_type"
+    t.json "raw_data"
+    t.integer "safety_rating"
+    t.string "status"
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.index ["case_number"], name: "index_properties_on_case_number", unique: true
+    t.index ["safety_rating"], name: "index_properties_on_safety_rating"
+    t.index ["user_id"], name: "index_properties_on_user_id"
+  end
+
+  create_table "property_check_results", force: :cascade do |t|
+    t.text "api_value"
+    t.integer "checklist_item_id", null: false
+    t.datetime "created_at", null: false
+    t.boolean "has_risk"
+    t.text "manual_value"
+    t.integer "property_id", null: false
+    t.text "resolution_note"
+    t.boolean "resolvable"
+    t.integer "source_type"
+    t.datetime "updated_at", null: false
+    t.index ["checklist_item_id"], name: "index_property_check_results_on_checklist_item_id"
+    t.index ["property_id", "checklist_item_id"], name: "idx_check_results_property_item", unique: true
+    t.index ["property_id"], name: "index_property_check_results_on_property_id"
   end
 
   create_table "property_types", force: :cascade do |t|
@@ -119,5 +170,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_070748) do
   add_foreign_key "budget_snapshots", "budget_snapshots", column: "parent_snapshot_id"
   add_foreign_key "budget_snapshots", "users"
   add_foreign_key "loan_policies", "property_types"
+  add_foreign_key "properties", "users"
+  add_foreign_key "property_check_results", "checklist_items"
+  add_foreign_key "property_check_results", "properties"
   add_foreign_key "reserve_fund_defaults", "property_types"
 end

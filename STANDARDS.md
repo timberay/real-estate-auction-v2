@@ -189,6 +189,14 @@ docker-compose up --build
   - `navigation_controller.js`: Browser back button handling in sequential flows.
   - Additional controllers as needed for specific UI interactions.
 
+### Internationalization (i18n)
+- **Built-in Standard**: Use the built-in Rails `I18n` API (`config/locales/*.yml`) as the primary translation engine.
+- **Resource IDs**: Do not hardcode UI strings. Use structured translation keys (e.g., `t('login.button.submit')`). Maintain a hierarchical naming convention: `[page_or_component].[element].[action]`.
+- **Recommended Gems**:
+  - `rails-i18n`: For default translations of framework messages (dates, currencies, Active Record errors).
+  - `i18n-tasks`: To detect missing translations and clean up unused translation keys.
+  - `mobility`: Use this instead of `globalize` if database record translations are required.
+
 ### Hotwire Best Practices
 - **Turbo Frame Usage**:
 ```erb

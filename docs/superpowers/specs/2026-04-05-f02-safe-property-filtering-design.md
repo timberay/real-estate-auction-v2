@@ -32,37 +32,41 @@ The core value: **prevent financial loss by detecting dangerous properties befor
 
 Source: `db/seeds/checklist_items_summary.json` (moved from `docs/`)
 
+Every item in the JSON has a unique `id` field (e.g., `"rights-011"`). F02 items are identified by the presence of `f02_risk_axis` (legal/resale/loan). 12 items are pre-existing (tagged for F02), 5 are newly added for F02. Items without `f02_risk_axis` are skipped during F02 seeding.
+
 ### Legal Risk (법적 위험) — 9 items
 
-| # | Checklist ID | Question | Data Source |
-|---|---|---|---|
-| 1 | rights-011 | 매각물건명세서 비고란에 유치권 또는 법정지상권이 적혀 있습니까? | 매각물건명세서 |
-| 2 | rights-002 | 매각물건명세서의 '소멸되지 아니하는 것' 비고란에 기재된 인수 권리(가등기, 가처분, 전세권 등)가 있습니까? | 매각물건명세서 |
-| 3 | rights-019 | (아파트가 아닌 경우) 토지 별도 등기가 있거나 토지와 건물이 따로 매각되는 물건입니까? | 매각물건명세서 |
-| 4 | rights-020 | 현황 조사서에 '유치권 신고 있음'이 표시되어 있습니까? | 매각물건명세서 |
-| 5 | rights-003 | 전입신고가 되어 있는 임차인이 존재합니까? | 매각물건명세서 |
-| 6 | rights-006 | 대항력 있는 임차인이 배당요구 종기일 이전에 배당요구 신청을 하였습니까? | 매각물건명세서 |
-| 7 | rights-014 | 대항력 있는 임차인이 존재하며, 보증금 미상/확정일자 없음/배당 미신청 중 하나라도 해당됩니까? | 매각물건명세서 |
-| 8 | — | 분묘기지권 존재 여부 | Manual input only |
-| 9 | property-001 | 해당 물건이 지분 입찰 물건입니까? | 대법원 경매정보 |
+| # | f02_code | Question | Detection | Data Source |
+|---|---|---|---|---|
+| 1 | rights-011 | 매각물건명세서 비고란에 유치권 또는 법정지상권이 적혀 있습니까? | Auto | 매각물건명세서 |
+| 2 | rights-002 | 매각물건명세서의 '소멸되지 아니하는 것' 비고란에 기재된 인수 권리(가등기, 가처분, 전세권 등)가 있습니까? | Auto | 매각물건명세서 |
+| 3 | rights-019 | (아파트가 아닌 경우) 토지 별도 등기가 있거나 토지와 건물이 따로 매각되는 물건입니까? | Auto | 매각물건명세서 |
+| 4 | rights-020 | 현황 조사서에 '유치권 신고 있음'이 표시되어 있습니까? | Auto | 매각물건명세서 |
+| 5 | rights-003 | 전입신고가 되어 있는 임차인이 존재합니까? | Auto | 매각물건명세서 |
+| 6 | rights-006 | 대항력 있는 임차인이 배당요구 종기일 이전에 배당요구 신청을 하였습니까? | Auto | 매각물건명세서 |
+| 7 | rights-014 | 대항력 있는 임차인이 존재하며, 보증금 미상/확정일자 없음/배당 미신청 중 하나라도 해당됩니까? | Auto | 매각물건명세서 |
+| 8 | manual-001 | 분묘기지권(묘지 사용 권리)이 존재합니까? | Manual | 수동 입력 |
+| 9 | property-001 | 해당 물건이 지분 입찰 물건입니까? | Auto | 대법원 경매정보 |
 
 ### Resale Risk (매도 위험) — 5 items
 
-| # | Checklist ID | Question | Data Source |
-|---|---|---|---|
-| 10 | property-005 | 건축물대장 상 용도가 '사무소'로 적혀 있습니까? | 건축물대장 |
-| 11 | — | 빌라 방 구조 (원룸 식별) | 건축물대장 |
-| 12 | — | 빌라 주차 공간 충분 여부 | 건축물대장 |
-| 13 | — | 반지하 빌라 여부 | 경매정보지 |
-| 14 | — | 신축빌라 (준공 2년 이내 + 감정가 과대) | 건축물대장 |
+| # | f02_code | Question | Detection | Data Source |
+|---|---|---|---|---|
+| 10 | property-005 | 건축물대장 상 용도가 '사무소'로 적혀 있습니까? | Auto | 건축물대장 |
+| 11 | resale-001 | 빌라의 방 구조가 원룸 또는 1.5룸입니까? | Auto | 건축물대장 |
+| 12 | resale-002 | 빌라의 세대수 대비 주차 공간이 부족합니까? | Auto | 건축물대장 |
+| 13 | resale-003 | 해당 물건이 반지하 빌라입니까? | Auto | 경매정보지 |
+| 14 | resale-004 | 해당 빌라가 준공 2년 이내 신축이면서 감정가가 주변 시세보다 현저히 높습니까? | Manual* | 건축물대장 |
+
+> \* `resale-004`: 시세 비교 데이터가 F06에서 제공될 때까지 manual input으로 처리
 
 ### Loan Risk (대출 위험) — 3 items
 
-| # | Checklist ID | Question | Data Source |
-|---|---|---|---|
-| 15 | property-004 | 건축물대장에 노란색으로 '위반건축물'이라고 표시되어 있습니까? | 건축물대장 |
-| 16 | rights-005 | 매각물건명세서에 건축법상 사용 승인을 받지 않은 건물 또는 집합건물 대장 미등재라고 기재되어 있습니까? | 매각물건명세서 |
-| 17 | property-002 | 매각물건명세서에 인접 호실과 벽체 구분 없이 하나로 사용 중이라는 기재가 있습니까? | 매각물건명세서 |
+| # | f02_code | Question | Detection | Data Source |
+|---|---|---|---|---|
+| 15 | property-004 | 건축물대장에 노란색으로 '위반건축물'이라고 표시되어 있습니까? | Auto | 건축물대장 |
+| 16 | rights-005 | 매각물건명세서에 건축법상 사용 승인을 받지 않은 건물 또는 집합건물 대장 미등재라고 기재되어 있습니까? | Auto | 매각물건명세서 |
+| 17 | property-002 | 매각물건명세서에 인접 호실과 벽체 구분 없이 하나로 사용 중이라는 기재가 있습니까? | Auto | 매각물건명세서 |
 
 ## Data Model
 
@@ -87,19 +91,19 @@ Property
 ```
 
 ### ChecklistItem
-Master table seeded from `db/seeds/checklist_items_summary.json`.
+Master table seeded from `db/seeds/checklist_items_summary.json`. Each F02 item is identified by `f02_risk_axis` field in the JSON — items without it are skipped during seeding. The `id` field in JSON becomes the `code` in the database.
 
 ```
 ChecklistItem
-├── code (string, unique) — e.g., "rights-011"
+├── code (string, unique) — from JSON id, e.g., "rights-011"
 ├── category (string) — 권리분석, 물건 기본 필터링
-├── risk_axis (enum: legal/resale/loan)
+├── risk_axis (enum: legal/resale/loan) — from JSON f02_risk_axis
 ├── question (text)
 ├── description (text)
 ├── logic (json) — answer-to-meaning mapping
 ├── data_source_name (string) — 매각물건명세서, 건축물대장, etc.
 ├── priority (string) — 상/중/하
-└── position (integer) — display order
+└── position (integer) — display order (set by seed, not in JSON)
 ```
 
 ### PropertyCheckResult
@@ -190,6 +194,9 @@ Each ChecklistItem maps to a detection rule that extracts and evaluates data fro
 - Example: `rights-011` → `raw_data.dig("court_auction", "remarks")` → scan for "유치권", "법정지상권" keywords
 - Detection rules are per-item, individually testable
 - Returns `{has_risk: true/false}` or `nil` if data unavailable
+- 2 items have no auto-detection rule and always require manual input:
+  - `manual-001` (분묘기지권) — no API data source exists
+  - `resale-004` (신축빌라 감정가 과대) — requires F06 market price data, deferred to manual input for MVP
 
 ## Routes & Controllers
 
@@ -303,4 +310,4 @@ All analysis steps use Turbo Frame (`turbo_frame_tag "analysis_flow"`) for in-pa
 - `app/views/layouts/application.html.erb` — sidebar navigation update
 
 ### Moved Files
-- `docs/checklist_items_summary.json` → `db/seeds/checklist_items_summary.json`
+- `docs/checklist_items_summary.json` → `db/seeds/checklist_items_summary.json` (all 91 items now have unique `id` field; 17 F02 items tagged with `f02_risk_axis`; 5 new items appended)

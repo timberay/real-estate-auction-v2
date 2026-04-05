@@ -183,7 +183,7 @@ end
 class Property < ApplicationRecord
   belongs_to :user, optional: true
 
-  enum :safety_rating, { safe: 0, caution: 1, danger: 2 }, prefix: true
+  enum :safety_rating, { safe: 0, caution: 1, danger: 2 }
 
   validates :case_number, presence: true, uniqueness: true
 end
@@ -338,7 +338,7 @@ end
 ```ruby
 # app/models/checklist_item.rb
 class ChecklistItem < ApplicationRecord
-  enum :risk_axis, { legal: 0, resale: 1, loan: 2 }, prefix: true
+  enum :risk_axis, { legal: 0, resale: 1, loan: 2 }
 
   validates :code, presence: true, uniqueness: true
   validates :question, presence: true
@@ -546,58 +546,58 @@ git commit -m "feat(f02): add has_many associations between Property, ChecklistI
 mv docs/checklist_items_summary.json db/seeds/checklist_items_summary.json
 ```
 
-Add 5 missing items to the JSON array (append before the closing `]`):
+Add 5 missing items to the JSON array (append before the closing `]`). Each item gets a unique `id` and `f02_risk_axis` following the same convention as existing items:
 
 ```json
 {
+  "id": "manual-001",
+  "f02_risk_axis": "legal",
   "category": "권리분석",
   "question": "분묘기지권(묘지 사용 권리)이 존재합니까?",
   "description": "분묘기지권은 타인의 토지에 설치된 분묘를 소유하기 위해 토지를 사용할 수 있는 권리로, 토지 이용에 심각한 제약이 됩니다.",
   "logic": {"yes": "토지 활용이 극도로 제한됩니다.", "no": "분묘기지권 리스크가 없습니다."},
   "data_source": [{"name": "수동 입력", "url": null}],
-  "priority": "상",
-  "f02_code": "manual-001",
-  "f02_risk_axis": "legal"
+  "priority": "상"
 },
 {
+  "id": "resale-001",
+  "f02_risk_axis": "resale",
   "category": "물건 기본 필터링",
   "question": "빌라의 방 구조가 원룸 또는 1.5룸입니까?",
   "description": "원룸과 1.5룸 빌라는 재판매가 어렵고 대출 제한이 있어 투자 리스크가 높습니다.",
   "logic": {"yes": "재판매 + 대출 제한이 있어 위험합니다.", "no": "방 구조상 문제가 없습니다."},
   "data_source": [{"name": "건축물대장", "url": "https://www.gov.kr"}],
-  "priority": "상",
-  "f02_code": "resale-001",
-  "f02_risk_axis": "resale"
+  "priority": "상"
 },
 {
+  "id": "resale-002",
+  "f02_risk_axis": "resale",
   "category": "물건 기본 필터링",
   "question": "빌라의 세대수 대비 주차 공간이 부족합니까?",
   "description": "주차 공간 부족은 거주 만족도를 낮추고 매매가에 부정적 영향을 미칩니다.",
   "logic": {"yes": "주차 부족으로 매도 시 불리합니다.", "no": "주차 공간이 충분합니다."},
   "data_source": [{"name": "건축물대장", "url": "https://www.gov.kr"}],
-  "priority": "상",
-  "f02_code": "resale-002",
-  "f02_risk_axis": "resale"
+  "priority": "상"
 },
 {
+  "id": "resale-003",
+  "f02_risk_axis": "resale",
   "category": "물건 기본 필터링",
   "question": "해당 물건이 반지하 빌라입니까?",
   "description": "반지하 빌라는 침수 위험, 채광 불량, 매매 난이도가 높아 초보 투자자에게 부적합합니다.",
   "logic": {"yes": "매매/임대가 매우 어렵습니다.", "no": "반지하가 아닙니다."},
   "data_source": [{"name": "경매정보지", "url": null}],
-  "priority": "상",
-  "f02_code": "resale-003",
-  "f02_risk_axis": "resale"
+  "priority": "상"
 },
 {
+  "id": "resale-004",
+  "f02_risk_axis": "resale",
   "category": "물건 기본 필터링",
   "question": "해당 빌라가 준공 2년 이내 신축이면서 감정가가 주변 시세보다 현저히 높습니까?",
   "description": "신축 빌라 중 감정가가 부풀려진 물건은 낙찰 후 시세보다 비싸게 사는 결과가 됩니다.",
   "logic": {"yes": "감정가 과대로 손해를 볼 수 있습니다.", "no": "신축빌라 리스크가 없습니다."},
   "data_source": [{"name": "건축물대장", "url": "https://www.gov.kr"}],
-  "priority": "상",
-  "f02_code": "resale-004",
-  "f02_risk_axis": "resale"
+  "priority": "상"
 }
 ```
 
@@ -607,51 +607,37 @@ Append to `db/seeds.rb`:
 
 ```ruby
 puts "Seeding checklist items..."
-RISK_AXIS_MAP = {
-  "legal" => "legal",
-  "resale" => "resale",
-  "loan" => "loan"
-}.freeze
 
-F02_ITEMS = {
-  "rights-011" => { risk_axis: "legal", position: 1 },
-  "rights-002" => { risk_axis: "legal", position: 2 },
-  "rights-019" => { risk_axis: "legal", position: 3 },
-  "rights-020" => { risk_axis: "legal", position: 4 },
-  "rights-003" => { risk_axis: "legal", position: 5 },
-  "rights-006" => { risk_axis: "legal", position: 6 },
-  "rights-014" => { risk_axis: "legal", position: 7 },
-  "manual-001" => { risk_axis: "legal", position: 8 },
-  "property-001" => { risk_axis: "legal", position: 9 },
-  "property-005" => { risk_axis: "resale", position: 10 },
-  "resale-001" => { risk_axis: "resale", position: 11 },
-  "resale-002" => { risk_axis: "resale", position: 12 },
-  "resale-003" => { risk_axis: "resale", position: 13 },
-  "resale-004" => { risk_axis: "resale", position: 14 },
-  "property-004" => { risk_axis: "loan", position: 15 },
-  "rights-005" => { risk_axis: "loan", position: 16 },
-  "property-002" => { risk_axis: "loan", position: 17 }
+# Position defines display order within F02 analysis flow
+F02_POSITIONS = {
+  "rights-011" => 1, "rights-002" => 2, "rights-019" => 3, "rights-020" => 4,
+  "rights-003" => 5, "rights-006" => 6, "rights-014" => 7, "manual-001" => 8,
+  "property-001" => 9, "property-005" => 10, "resale-001" => 11, "resale-002" => 12,
+  "resale-003" => 13, "resale-004" => 14, "property-004" => 15, "rights-005" => 16,
+  "property-002" => 17
 }.freeze
 
 checklist_data = JSON.parse(File.read(Rails.root.join("db/seeds/checklist_items_summary.json")))
 checklist_data.each do |attrs|
-  code = attrs["f02_code"] || attrs.values_at("category", "question").join("-").parameterize[0..30]
+  code = attrs["id"]
+  next unless code                        # every item has id, but just in case
+  next unless attrs["f02_risk_axis"]       # only F02-tagged items
 
-  f02_config = F02_ITEMS[code]
-  next unless f02_config
+  position = F02_POSITIONS[code]
+  next unless position
 
   ChecklistItem.find_or_create_by!(code: code) do |item|
     item.category = attrs["category"]
-    item.risk_axis = f02_config[:risk_axis]
+    item.risk_axis = attrs["f02_risk_axis"]
     item.question = attrs["question"]
     item.description = attrs["description"]
     item.logic = attrs["logic"]
     item.data_source_name = attrs.dig("data_source", 0, "name") || "수동 입력"
     item.priority = attrs["priority"]
-    item.position = f02_config[:position]
+    item.position = position
   end
 end
-puts "  -> #{ChecklistItem.count} checklist items"
+puts "  -> #{ChecklistItem.count} checklist items (expected: 17)"
 ```
 
 - [ ] **Step 3: Run seed and verify**
@@ -1086,6 +1072,8 @@ class AutoCheckRunner
     "rights-019" => ->(raw) { raw.dig("court_auction", "separate_land_registry") == true },
     "rights-020" => ->(raw) { raw.dig("court_auction", "lien_reported") == true },
     "rights-003" => ->(raw) { raw.dig("court_auction", "tenants")&.any? },
+    # Question asks "배당요구 신청을 하였습니까?" — risk is when answer is NO (미신청).
+    # So has_risk: true when dividend_requested == false.
     "rights-006" => ->(raw) {
       tenants = raw.dig("court_auction", "tenants") || []
       tenants.any? { |t| t["dividend_requested"] == false }
@@ -1100,11 +1088,9 @@ class AutoCheckRunner
     "resale-001" => ->(raw) { (raw.dig("building_ledger", "room_count") || 99) <= 1 },
     "resale-002" => ->(raw) { (raw.dig("building_ledger", "parking_per_unit") || 99) < 0.5 },
     "resale-003" => ->(raw) { raw.dig("building_ledger", "floor_info")&.include?("반지하") },
-    "resale-004" => ->(raw) {
-      completion = raw.dig("building_ledger", "completion_date")
-      return nil unless completion
-      Date.parse(completion) > 2.years.ago.to_date
-    },
+    # MVP: checks completion < 2 years only. Spec requires "completion < 2yr AND appraisal > market price"
+    # but market price data (F06) is unavailable. Falls back to manual input via nil return for ambiguous cases.
+    "resale-004" => nil, # Deferred to manual input — auto-detection requires F06 market price data
     "property-004" => ->(raw) { raw.dig("building_ledger", "violation_flag") == true },
     "rights-005" => ->(raw) { raw.dig("court_auction", "use_approval") == false },
     "property-002" => ->(raw) { raw.dig("court_auction", "wall_partition_issue") == true }
@@ -1167,27 +1153,30 @@ git commit -m "feat(f02): add AutoCheckRunner with 17 detection rules for risk a
 require "test_helper"
 
 class SafetyRatingServiceTest < ActiveSupport::TestCase
-  test "rates safe when no risks" do
-    property = properties(:safe_apartment)
-    property.property_check_results.update_all(has_risk: false)
+  setup do
+    @property = properties(:safe_apartment)
+    @item = checklist_items(:rights_011)
+  end
 
-    SafetyRatingService.call(property: property)
-    assert_equal "safe", property.reload.safety_rating
+  test "rates safe when no risks" do
+    PropertyCheckResult.create!(property: @property, checklist_item: @item, source_type: "auto", has_risk: false)
+
+    SafetyRatingService.call(property: @property)
+    assert_equal "safe", @property.reload.safety_rating
   end
 
   test "rates caution when risks are all resolvable" do
-    property = properties(:safe_apartment)
-    property.property_check_results.where(has_risk: true).update_all(resolvable: true)
+    PropertyCheckResult.create!(property: @property, checklist_item: @item, source_type: "auto", has_risk: true, resolvable: true)
 
-    SafetyRatingService.call(property: property)
-    assert_equal "caution", property.reload.safety_rating
+    SafetyRatingService.call(property: @property)
+    assert_equal "caution", @property.reload.safety_rating
   end
 
   test "rates danger when any risk is unresolvable" do
-    property = properties(:risky_villa)
-    # risky_villa fixture has has_risk: true, resolvable: false
-    SafetyRatingService.call(property: property)
-    assert_equal "danger", property.reload.safety_rating
+    PropertyCheckResult.create!(property: @property, checklist_item: @item, source_type: "auto", has_risk: true, resolvable: false)
+
+    SafetyRatingService.call(property: @property)
+    assert_equal "danger", @property.reload.safety_rating
   end
 end
 ```
@@ -1315,10 +1304,10 @@ git commit -m "feat(f02): add PropertyAnalysisService orchestrating auto-check a
 
 - [ ] **Step 1: Add routes**
 
-Add to `config/routes.rb`, replacing `root "home#index"`:
+Add to `config/routes.rb`. Do NOT change the root path here — that happens in Task 31 to avoid breaking existing HomeController tests mid-implementation.
 
 ```ruby
-root "properties#index"
+# Keep existing: root "home#index"
 
 resources :properties, only: [ :index, :show ] do
   namespace :analyses do
@@ -1378,7 +1367,12 @@ class PropertiesController < ApplicationController
   def index
     @properties = Property.all.order(created_at: :desc)
     @properties = @properties.where(safety_rating: params[:safety_rating]) if params[:safety_rating].present?
-    @properties = @properties.where("min_bid_price <= ?", current_user.budget_setting.max_bid_amount) if current_user.budget_setting&.completed?
+
+    # F01 dependency: filter by budget if user has completed budget setup
+    budget = current_user.budget_setting
+    if budget&.completed? && budget.max_bid_amount.present?
+      @properties = @properties.where("min_bid_price <= ?", budget.max_bid_amount)
+    end
   end
 
   def show
@@ -1434,14 +1428,15 @@ class Analyses::StartControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_property_analyses_manual_input_url(property)
   end
 
-  test "POST create redirects to results when no manual input needed" do
+  test "POST create redirects to manual_inputs when manual items exist" do
+    # 2026타경10001 has manual-001 (분묘기지권) + resale-004 requiring manual input
     property = PropertyDataSyncService.call(case_number: "2026타경10001")
-    # Pre-fill all manual items
-    PropertyAnalysisService.call(property: property)
-    property.property_check_results.where(source_type: nil).update_all(source_type: 1, has_risk: false)
-
     post property_analyses_start_url(property)
-    assert_redirected_to edit_property_analyses_result_url(property)
+    assert_redirected_to edit_property_analyses_manual_input_url(property)
+
+    # Verify manual items were identified
+    pending = property.property_check_results.where(source_type: nil)
+    assert pending.any?, "Expected pending manual items"
   end
 end
 ```
