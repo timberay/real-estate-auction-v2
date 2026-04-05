@@ -4,4 +4,22 @@ class ApplicationController < ActionController::Base
 
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
+
+  before_action :set_guest_user
+
+  private
+
+  def set_guest_user
+    return if session[:user_id] && User.exists?(session[:user_id])
+
+    guest = User.find_or_create_by!(email: "guest@auction.local") do |u|
+      u.password = "123456"
+    end
+    session[:user_id] = guest.id
+  end
+
+  def current_user
+    @current_user ||= User.find_by(id: session[:user_id])
+  end
+  helper_method :current_user
 end
