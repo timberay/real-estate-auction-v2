@@ -1,2 +1,47 @@
-<h1><%= @property.case_number %></h1>
-<p><%= @property.address %></p>
+<%# app/views/properties/show.html.erb %>
+<div class="space-y-6">
+  <div class="flex items-center gap-2">
+    <%= link_to "← 목록", properties_path, class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300" %>
+  </div>
+
+  <%= render CardComponent.new(title: @property.case_number) do |card| %>
+    <div class="space-y-3">
+      <div class="flex items-center gap-2">
+        <%= render SafetyBadgeComponent.new(rating: @property.safety_rating) %>
+        <% if @property.court_name.present? %>
+          <span class="text-sm text-slate-500 dark:text-slate-400"><%= @property.court_name %></span>
+        <% end %>
+      </div>
+      <p class="text-sm text-slate-700 dark:text-slate-300"><%= @property.address %></p>
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <span class="text-slate-500 dark:text-slate-400">감정가</span>
+          <p class="font-semibold text-slate-900 dark:text-slate-100"><%= number_to_currency(@property.appraisal_price, unit: "", precision: 0, delimiter: ",") %>만원</p>
+        </div>
+        <div>
+          <span class="text-slate-500 dark:text-slate-400">최저매각가</span>
+          <p class="font-semibold text-slate-900 dark:text-slate-100"><%= number_to_currency(@property.min_bid_price, unit: "", precision: 0, delimiter: ",") %>만원</p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%= turbo_frame_tag "analysis_flow" do %>
+    <% if @property.safety_rating.present? %>
+      <div class="text-center space-y-3">
+        <p class="text-sm text-slate-600 dark:text-slate-400">이미 분석이 완료되었습니다.</p>
+        <div class="flex justify-center gap-3">
+          <%= button_to "다시 분석하기", property_analyses_start_path(@property), method: :post,
+              class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" %>
+          <%= link_to "결과 보기", property_analyses_rating_path(@property),
+              class: "inline-flex items-center rounded-md bg-slate-100 dark:bg-slate-700 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600" %>
+        </div>
+      </div>
+    <% else %>
+      <div class="text-center">
+        <%= button_to "안전 분석 시작", property_analyses_start_path(@property), method: :post,
+            class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" %>
+      </div>
+    <% end %>
+  <% end %>
+</div>
