@@ -31,20 +31,36 @@ export default class extends Controller {
   }
 
   applyState() {
-    if (this.collapsedValue) {
-      this.sidebarTarget.classList.add("w-16")
-      this.sidebarTarget.classList.remove("w-64")
-      this.contentTarget.classList.add("md:ml-16")
-      this.contentTarget.classList.remove("lg:ml-64")
-    } else {
-      this.sidebarTarget.classList.remove("w-16")
-      this.sidebarTarget.classList.add("w-64")
-      this.contentTarget.classList.remove("md:ml-16")
-      this.contentTarget.classList.add("lg:ml-64")
-    }
+    const collapsed = this.collapsedValue
 
+    // Sidebar width
+    this.sidebarTarget.classList.toggle("w-16", collapsed)
+    this.sidebarTarget.classList.toggle("w-64", !collapsed)
+
+    // Main content margin
+    this.contentTarget.classList.toggle("md:ml-16", collapsed)
+    this.contentTarget.classList.toggle("lg:ml-64", !collapsed)
+
+    // Hide text labels and group titles when collapsed
+    this.sidebarTarget.querySelectorAll("[data-sidebar-label]").forEach(el => {
+      el.classList.toggle("hidden", collapsed)
+    })
+
+    // Hide group headers when collapsed
+    this.sidebarTarget.querySelectorAll("[data-sidebar-group]").forEach(el => {
+      el.classList.toggle("hidden", collapsed)
+    })
+
+    // Center icons when collapsed
+    this.sidebarTarget.querySelectorAll("[data-sidebar-item]").forEach(el => {
+      el.classList.toggle("justify-center", collapsed)
+      el.classList.toggle("px-4", !collapsed)
+      el.classList.toggle("gap-3", !collapsed)
+    })
+
+    // Toggle icon direction
     if (this.hasToggleIconTarget) {
-      this.toggleIconTarget.classList.toggle("rotate-180", !this.collapsedValue)
+      this.toggleIconTarget.classList.toggle("rotate-180", collapsed)
     }
   }
 }

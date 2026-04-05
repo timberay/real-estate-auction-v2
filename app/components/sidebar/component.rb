@@ -57,7 +57,7 @@ module Sidebar
       raw Heroicon::Icon.render(
         name: name,
         variant: :outline,
-        options: { class: "w-5 h-5" },
+        options: { class: "w-5 h-5 flex-shrink-0" },
         path_options: {}
       )
     end
@@ -73,7 +73,7 @@ module Sidebar
 
     def toggle_icon
       raw Heroicon::Icon.render(
-        name: "chevron-left",
+        name: "chevron-double-left",
         variant: :outline,
         options: { class: "w-5 h-5" },
         path_options: {}
