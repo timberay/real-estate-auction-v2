@@ -38,6 +38,11 @@ class PropertyTest < ActiveSupport::TestCase
     assert property.danger?
   end
 
+  test "has_many property_check_results" do
+    property = properties(:safe_apartment)
+    assert_respond_to property, :property_check_results
+  end
+
   test "safety_rating defaults to nil (unanalyzed)" do
     property = Property.new(case_number: "2026타경99999", court_name: "서울중앙", address: "서울시", appraisal_price: 50000, min_bid_price: 35000)
     assert_nil property.safety_rating

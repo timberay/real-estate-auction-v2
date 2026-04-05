@@ -1,4 +1,6 @@
 class ChecklistItem < ApplicationRecord
+  has_many :property_check_results, dependent: :destroy
+
   enum :risk_axis, { legal: 0, resale: 1, loan: 2 }
 
   validates :code, presence: true, uniqueness: true

@@ -47,6 +47,11 @@ class ChecklistItemTest < ActiveSupport::TestCase
     assert legal_items.all? { |i| i.legal? }
   end
 
+  test "has_many property_check_results" do
+    item = checklist_items(:rights_011)
+    assert_respond_to item, :property_check_results
+  end
+
   test "ordered scope returns items by position" do
     items = ChecklistItem.ordered
     positions = items.map(&:position)
