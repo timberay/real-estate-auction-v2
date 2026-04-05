@@ -89,4 +89,11 @@ checklist_data.each do |attrs|
 end
 puts "  -> #{ChecklistItem.count} checklist items (expected: 17)"
 
+puts "Seeding mock properties..."
+mock_properties = JSON.parse(File.read(Rails.root.join("db/seeds/mock_properties.json")))
+mock_properties.each do |attrs|
+  PropertyDataSyncService.call(case_number: attrs["case_number"])
+end
+puts "  -> #{Property.count} properties"
+
 puts "Seed complete!"
