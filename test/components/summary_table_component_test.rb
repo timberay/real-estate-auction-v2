@@ -21,7 +21,7 @@ class SummaryTableComponentTest < ViewComponent::TestCase
   # --- Container ---
 
   test "renders container with correct styling" do
-    rows = [{ label: "항목", value: "값" }]
+    rows = [ { label: "항목", value: "값" } ]
     render_inline(SummaryTableComponent.new(rows: rows))
 
     assert_selector "div[class*='bg-white']"
@@ -34,7 +34,7 @@ class SummaryTableComponentTest < ViewComponent::TestCase
   # --- Title ---
 
   test "renders title when provided" do
-    rows = [{ label: "항목", value: "값" }]
+    rows = [ { label: "항목", value: "값" } ]
     render_inline(SummaryTableComponent.new(rows: rows, title: "요약 정보"))
 
     assert_selector "h2", text: "요약 정보"
@@ -43,7 +43,7 @@ class SummaryTableComponentTest < ViewComponent::TestCase
   end
 
   test "does not render title when not provided" do
-    rows = [{ label: "항목", value: "값" }]
+    rows = [ { label: "항목", value: "값" } ]
     render_inline(SummaryTableComponent.new(rows: rows))
 
     assert_no_selector "h2"
@@ -65,7 +65,7 @@ class SummaryTableComponentTest < ViewComponent::TestCase
   # --- Row structure ---
 
   test "rows have flex layout with justify-between" do
-    rows = [{ label: "항목", value: "값" }]
+    rows = [ { label: "항목", value: "값" } ]
     render_inline(SummaryTableComponent.new(rows: rows))
 
     assert_selector "div[class*='flex']"
@@ -77,7 +77,7 @@ class SummaryTableComponentTest < ViewComponent::TestCase
   # --- Tabular nums ---
 
   test "values use tabular-nums" do
-    rows = [{ label: "항목", value: "100" }]
+    rows = [ { label: "항목", value: "100" } ]
     render_inline(SummaryTableComponent.new(rows: rows))
 
     assert_selector "span[class*='tabular-nums']"
@@ -86,7 +86,7 @@ class SummaryTableComponentTest < ViewComponent::TestCase
   # --- Dark mode ---
 
   test "includes dark mode classes on container" do
-    rows = [{ label: "항목", value: "값" }]
+    rows = [ { label: "항목", value: "값" } ]
     render_inline(SummaryTableComponent.new(rows: rows))
 
     assert_selector "div[class*='dark:bg-slate-800']"
@@ -94,7 +94,7 @@ class SummaryTableComponentTest < ViewComponent::TestCase
   end
 
   test "includes dark mode classes on title" do
-    rows = [{ label: "항목", value: "값" }]
+    rows = [ { label: "항목", value: "값" } ]
     render_inline(SummaryTableComponent.new(rows: rows, title: "제목"))
 
     html = page.native.inner_html
