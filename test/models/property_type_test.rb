@@ -26,6 +26,7 @@ class PropertyTypeTest < ActiveSupport::TestCase
   end
 
   test "scope enabled returns only enabled types" do
+    LoanPolicy.delete_all
     ReserveFundDefault.delete_all
     PropertyType.delete_all
     PropertyType.create!(name: "아파트", code: "apartment", enabled: true, sort_order: 0)
@@ -36,6 +37,7 @@ class PropertyTypeTest < ActiveSupport::TestCase
   end
 
   test "scope ordered sorts by sort_order" do
+    LoanPolicy.delete_all
     ReserveFundDefault.delete_all
     PropertyType.delete_all
     PropertyType.create!(name: "오피스텔", code: "officetel", enabled: true, sort_order: 2)

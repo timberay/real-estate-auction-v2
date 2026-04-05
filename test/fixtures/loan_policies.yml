@@ -1,0 +1,26 @@
+didimdol_apartment:
+  property_type: apartment
+  policy_name: "디딤돌 대출"
+  loan_ratio: 0.8
+  description: "무주택 서민 주거안정을 위한 정책 모기지"
+  effective_date: "2026-01-01"
+  expiry_date:
+  enabled: true
+
+general_apartment:
+  property_type: apartment
+  policy_name: "일반 주담대"
+  loan_ratio: 0.7
+  description: "일반 주택담보대출"
+  effective_date: "2026-01-01"
+  expiry_date:
+  enabled: true
+
+newborn_apartment:
+  property_type: apartment
+  policy_name: "신생아특례"
+  loan_ratio: 0.8
+  description: "출산가구 주거지원 특례대출"
+  effective_date: "2026-01-01"
+  expiry_date:
+  enabled: true
