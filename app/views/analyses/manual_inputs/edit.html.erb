@@ -1,0 +1,14 @@
+<%= turbo_frame_tag "analysis_flow" do %>
+  <h2>수동 입력이 필요한 항목</h2>
+  <%= form_with url: property_analyses_manual_input_path(@property), method: :patch do |f| %>
+    <% @pending_results.each do |result| %>
+      <div>
+        <p><%= result.checklist_item.question %></p>
+        <%= hidden_field_tag "check_results[#{result.id}][manual_value]", "" %>
+        <label><%= radio_button_tag "check_results[#{result.id}][has_risk]", "true" %> 예</label>
+        <label><%= radio_button_tag "check_results[#{result.id}][has_risk]", "false" %> 아니오</label>
+      </div>
+    <% end %>
+    <%= f.submit "완료" %>
+  <% end %>
+<% end %>
