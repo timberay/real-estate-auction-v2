@@ -1,0 +1,19 @@
+apartment_small:
+  property_type: apartment
+  area_range_min: 0
+  area_range_max: 58
+  repair_cost: 300
+  acquisition_tax_rate: 0.011
+  scrivener_fee: 60
+  moving_cost: 100
+  maintenance_fee: 30
+
+apartment_medium:
+  property_type: apartment
+  area_range_min: 59
+  area_range_max: 84
+  repair_cost: 500
+  acquisition_tax_rate: 0.011
+  scrivener_fee: 80
+  moving_cost: 150
+  maintenance_fee: 50
