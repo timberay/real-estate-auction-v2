@@ -10,7 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_05_070441) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_05_070618) do
+  create_table "budget_settings", force: :cascade do |t|
+    t.integer "acquisition_tax"
+    t.integer "area_range_max"
+    t.integer "area_range_min"
+    t.string "area_unit", default: "pyeong", null: false
+    t.integer "available_cash"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.integer "failed_auction_rounds", default: 0, null: false
+    t.integer "loan_policy_id"
+    t.decimal "loan_ratio", precision: 3, scale: 2
+    t.integer "maintenance_fee"
+    t.integer "max_bid_amount"
+    t.integer "moving_cost"
+    t.integer "property_type_id"
+    t.integer "repair_cost"
+    t.integer "scrivener_fee"
+    t.integer "searchable_appraisal_limit"
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["loan_policy_id"], name: "index_budget_settings_on_loan_policy_id"
+    t.index ["property_type_id"], name: "index_budget_settings_on_property_type_id"
+    t.index ["user_id"], name: "index_budget_settings_on_user_id", unique: true
+  end
+
   create_table "loan_policies", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -60,6 +85,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_070441) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "budget_settings", "loan_policies"
+  add_foreign_key "budget_settings", "property_types"
+  add_foreign_key "budget_settings", "users"
   add_foreign_key "loan_policies", "property_types"
   add_foreign_key "reserve_fund_defaults", "property_types"
 end
