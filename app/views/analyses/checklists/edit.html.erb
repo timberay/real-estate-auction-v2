@@ -1,5 +1,5 @@
 <%# app/views/analyses/checklists/edit.html.erb %>
-<%= turbo_frame_tag "analysis_flow" do %>
+<%= render layout: "analyses/layout", locals: { property: @property, user_property: @user_property, active_step: @active_step } do %>
   <div class="space-y-6">
     <div>
       <h2 class="text-lg font-semibold text-slate-900 dark:text-slate-100">분석 결과 및 해결 방안</h2>

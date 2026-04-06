@@ -1,12 +1,10 @@
 guest_safe_apartment:
   user: guest
   property: safe_apartment
-  safety_rating: 0
 
 guest_risky_villa:
   user: guest
   property: risky_villa
-  safety_rating: 2
 
 guest_unanalyzed_officetel:
   user: guest

@@ -7,7 +7,6 @@
   <%= render CardComponent.new(title: @property.case_number) do |card| %>
     <div class="space-y-3">
       <div class="flex items-center gap-2">
-        <%= render SafetyBadgeComponent.new(rating: @user_property&.safety_rating) %>
         <% if @property.court_name.present? %>
           <span class="text-sm text-slate-500 dark:text-slate-400"><%= @property.court_name %></span>
         <% end %>
@@ -23,23 +22,10 @@
           <p class="font-semibold text-slate-900 dark:text-slate-100"><%= format_price_in_eok(@property.min_bid_price) %></p>
         </div>
       </div>
-    </div>
-  <% end %>
-
-  <%= render PropertyTabsComponent.new(property: @property, user: current_user, active_tab: :info) %>
-
-  <%= turbo_frame_tag "tab_content" do %>
-    <div class="text-center space-y-3">
-      <% if @user_property&.safety_rating.present? %>
-        <p class="text-sm text-slate-600 dark:text-slate-400">분석이 완료되었습니다. 탭을 선택하여 결과를 확인하세요.</p>
-        <div class="flex justify-center gap-3">
-          <%= button_to "다시 분석하기", property_analyses_start_path(@property), method: :post,
-              class: "inline-flex items-center rounded-md bg-slate-100 dark:bg-slate-700 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600" %>
-        </div>
-      <% else %>
+      <div class="mt-4 text-center">
         <%= button_to "분석 시작", property_analyses_start_path(@property), method: :post,
             class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" %>
-      <% end %>
+      </div>
     </div>
   <% end %>
 </div>

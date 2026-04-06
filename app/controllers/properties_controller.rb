@@ -20,10 +20,12 @@ class PropertiesController < ApplicationController
   def show
     @property = Property.find(params[:id])
     @user_property = current_user.user_properties.find_by(property: @property)
-    @check_results = @property.property_check_results
-      .where(user: current_user)
-      .includes(:checklist_item)
-      .order("checklist_items.position")
+
+    if @user_property&.safety_rating.present?
+      redirect_to property_analyses_rating_path(@property)
+    elsif @user_property&.analyzed_at.present?
+      redirect_to edit_property_analyses_checklist_path(@property)
+    end
   end
 
   def create

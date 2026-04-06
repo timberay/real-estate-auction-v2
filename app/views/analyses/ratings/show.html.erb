@@ -1,5 +1,5 @@
 <%# app/views/analyses/ratings/show.html.erb %>
-<%= turbo_frame_tag "analysis_flow" do %>
+<%= render layout: "analyses/layout", locals: { property: @property, user_property: @user_property, active_step: @active_step } do %>
   <div class="space-y-6">
     <%= render RatingResultComponent.new(property: @property, risk_results: @risk_results, rating: @rating) %>
 
