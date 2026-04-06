@@ -1,15 +1,35 @@
 <%= render CardComponent.new do |card| %>
   <div class="flex items-start justify-between">
     <div class="min-w-0 flex-1">
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 flex-wrap">
         <%= link_to @property.case_number, property_path(@property),
             class: "text-base font-semibold text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400" %>
         <%= render SafetyBadgeComponent.new(rating: @safety_rating) %>
       </div>
       <p class="mt-1 text-sm text-slate-600 dark:text-slate-400 truncate"><%= @property.address %></p>
-      <div class="mt-2 flex items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
-        <span>감정가 <%= formatted_price(@property.appraisal_price) %></span>
-        <span>최저가 <%= formatted_price(@property.min_bid_price) %></span>
+      <div class="mt-2 space-y-0.5">
+        <div class="flex items-center justify-between text-sm" data-price-type="appraisal">
+          <span class="text-slate-500 dark:text-slate-400"
+                data-controller="tooltip"
+                data-tooltip-content-value="감정평가사가 책정한 시장가치">
+            감정가
+            <svg class="inline w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </span>
+          <span class="font-medium text-slate-700 dark:text-slate-300"><%= formatted_price(@property.appraisal_price) %></span>
+        </div>
+        <div class="flex items-center justify-between text-sm" data-price-type="min-bid">
+          <span class="text-slate-500 dark:text-slate-400"
+                data-controller="tooltip"
+                data-tooltip-content-value="법원이 정한 최소 입찰금액">
+            최저매각가
+            <svg class="inline w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </span>
+          <span class="font-medium text-slate-700 dark:text-slate-300"><%= formatted_price(@property.min_bid_price) %></span>
+        </div>
       </div>
     </div>
   </div>
