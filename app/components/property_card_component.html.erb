@@ -12,7 +12,7 @@
       <p class="mt-1 text-sm text-slate-600 dark:text-slate-400 truncate"><%= @property.address %></p>
       <div class="mt-2 space-y-0.5">
         <div class="flex items-center justify-between text-sm" data-price-type="appraisal">
-          <span class="text-slate-500 dark:text-slate-400 cursor-help"
+          <span class="relative text-slate-500 dark:text-slate-400 cursor-help"
                 data-controller="tooltip"
                 data-tooltip-content-value="감정평가사가 책정한 시장가치"
                 data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
@@ -24,7 +24,7 @@
           <span class="font-medium text-slate-700 dark:text-slate-300"><%= formatted_price(@property.appraisal_price) %></span>
         </div>
         <div class="flex items-center justify-between text-sm" data-price-type="min-bid">
-          <span class="text-slate-500 dark:text-slate-400 cursor-help"
+          <span class="relative text-slate-500 dark:text-slate-400 cursor-help"
                 data-controller="tooltip"
                 data-tooltip-content-value="법원이 정한 최소 입찰금액"
                 data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">

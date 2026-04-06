@@ -62,4 +62,11 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_match "경매번호를 입력해주세요", flash[:alert]
   end
+
+  test "GET index renders successfully when user has no budget setting" do
+    # guest user has no budget_setting — should render without error
+    get properties_url
+    assert_response :success
+    assert_no_match "예산 초과", response.body
+  end
 end

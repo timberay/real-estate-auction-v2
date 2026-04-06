@@ -15,7 +15,6 @@ export default class extends Controller {
       "absolute z-10 px-2.5 py-1.5 text-xs font-medium text-white bg-slate-800 rounded-md shadow-sm dark:bg-slate-600 whitespace-nowrap pointer-events-none"
     this.tooltipElement.textContent = this.contentValue
 
-    this.element.classList.add("relative")
     this.element.appendChild(this.tooltipElement)
 
     this.tooltipElement.style.bottom = "100%"
