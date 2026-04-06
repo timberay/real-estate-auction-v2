@@ -26,11 +26,11 @@ module Sidebar
       ]
     }.freeze
 
-    NAV_CLASSES = "fixed left-0 top-16 bottom-0 z-30 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 w-64 hidden md:block overflow-y-auto"
+    NAV_CLASSES = "fixed left-0 top-16 bottom-0 z-30 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 w-16 lg:w-64 hidden md:block overflow-y-auto"
     ACTIVE_CLASSES = "bg-blue-50 dark:bg-blue-900/50 text-blue-700 dark:text-blue-400 font-medium"
     ENABLED_CLASSES = "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700"
     DISABLED_CLASSES = "opacity-50 cursor-not-allowed text-slate-400 dark:text-slate-500"
-    ITEM_COMMON_CLASSES = "flex items-center gap-3 px-4 py-2 text-sm rounded-md transition-colors duration-150"
+    ITEM_COMMON_CLASSES = "flex items-center justify-center lg:justify-start lg:gap-3 lg:px-4 py-2 text-sm rounded-md transition-colors duration-150"
 
     def initialize(current_path: "/")
       @current_path = current_path
