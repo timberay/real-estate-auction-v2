@@ -2,6 +2,8 @@ module Analyses
   class ChecklistsController < ApplicationController
     def edit
       @property = Property.find(params[:property_id])
+      @user_property = current_user.user_properties.find_by(property: @property)
+      @active_step = :checklist
       @results_by_axis = @property.property_check_results
         .where(user: current_user)
         .includes(:checklist_item)

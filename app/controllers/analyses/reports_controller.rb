@@ -2,6 +2,8 @@ module Analyses
   class ReportsController < ApplicationController
     def show
       @property = Property.find(params[:property_id])
+      @user_property = current_user.user_properties.find_by(property: @property)
+      @active_step = :report
       @report = RightsAnalysisReport.find_by(property: @property, user: current_user)
 
       unless @report
