@@ -30,7 +30,8 @@ Rails.application.routes.draw do
   resources :properties, only: [ :index, :show, :create ] do
     namespace :analyses do
       resource :start, only: [ :create ], controller: "start"
-      resource :result, only: [ :edit, :update ], controller: "results"
+      resource :checklist, only: [ :edit, :update ], controller: "checklists"
+      resource :report, only: [ :show, :update ], controller: "reports"
       resource :rating, only: [ :show ], controller: "ratings"
     end
   end

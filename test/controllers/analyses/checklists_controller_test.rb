@@ -1,6 +1,6 @@
 require "test_helper"
 
-class Analyses::ResultsControllerTest < ActionDispatch::IntegrationTest
+class Analyses::ChecklistsControllerTest < ActionDispatch::IntegrationTest
   setup do
     get start_onboarding_url
     @current_user = User.find_by(email: "guest@auction.local")
@@ -10,7 +10,7 @@ class Analyses::ResultsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET edit shows all check results including manual items" do
-    get edit_property_analyses_result_url(@property)
+    get edit_property_analyses_checklist_url(@property)
     assert_response :success
   end
 
@@ -24,11 +24,11 @@ class Analyses::ResultsControllerTest < ActionDispatch::IntegrationTest
     end
 
     if auto_risk
-      patch property_analyses_result_url(@property), params: {
+      patch property_analyses_checklist_url(@property), params: {
         resolutions: { auto_risk.id => { resolvable: "false", resolution_note: "해결 불가" } }
       }
     else
-      patch property_analyses_result_url(@property), params: { resolutions: {} }
+      patch property_analyses_checklist_url(@property), params: { resolutions: {} }
     end
     assert_redirected_to property_analyses_rating_url(@property)
   end
@@ -51,7 +51,7 @@ class Analyses::ResultsControllerTest < ActionDispatch::IntegrationTest
           resolutions[r.id] = { resolvable: "false", resolution_note: "" }
         end
 
-      patch property_analyses_result_url(@property), params: { resolutions: resolutions }
+      patch property_analyses_checklist_url(@property), params: { resolutions: resolutions }
       assert_redirected_to property_analyses_rating_url(@property)
 
       manual_result.reload
@@ -79,7 +79,7 @@ class Analyses::ResultsControllerTest < ActionDispatch::IntegrationTest
           resolutions[r.id] = { resolvable: "false", resolution_note: "" }
         end
 
-      patch property_analyses_result_url(@property), params: { resolutions: resolutions }
+      patch property_analyses_checklist_url(@property), params: { resolutions: resolutions }
       assert_redirected_to property_analyses_rating_url(@property)
 
       manual_result.reload
