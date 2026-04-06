@@ -11,11 +11,7 @@
             turbo_frame: "tab_content",
             action: "click->stepper#navigate"
           } do %>
-        <% if step[:status] == :completed %>
-          <span class="text-xs">✓</span>
-        <% else %>
-          <span class="text-xs"><%= step[:number] %>.</span>
-        <% end %>
+        <span class="text-xs"><%= step[:number] %>.</span>
         <span><%= step[:label] %></span>
       <% end %>
     <% end %>
