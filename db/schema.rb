@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_06_112023) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_06_113000) do
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.integer "area_range_max"
@@ -168,6 +168,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_112023) do
     t.boolean "source_doc_reviewed", default: false, null: false
     t.integer "total_risk_amount", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.datetime "user_confirmed_at"
     t.integer "user_id", null: false
     t.integer "verdict", default: 0, null: false
     t.text "verdict_summary"
