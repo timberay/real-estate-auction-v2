@@ -1,36 +1,20 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Converts area values between 평 and ㎡ for display
+// Converts area display between 평 and ㎡
 // 1평 = 3.305785㎡
 // DB always stores values in ㎡. This controller converts for display only.
+// Server handles conversion on save (convert_area_to_sqm_if_needed).
 export default class extends Controller {
-  static targets = ["minInput", "maxInput", "minLabel", "maxLabel", "form"]
-  static values = { unit: { type: String, default: "pyeong" } }
-
-  static SQM_PER_PYEONG = 3.305785
+  static targets = ["minInput", "maxInput", "minLabel", "maxLabel"]
+  static values = { unit: { type: String, default: "sqm" } }
 
   connect() {
-    this.updateLabels()
-
-    // Convert DB values (always ㎡) to display unit on page load
+    // DB values are in ㎡. Convert to pyeong for display if needed.
     if (this.unitValue === "pyeong") {
-      this.sqmToPyeong(this.minInputTarget)
-      this.sqmToPyeong(this.maxInputTarget)
+      this.convertForDisplay(this.minInputTarget, "sqmToPyeong")
+      this.convertForDisplay(this.maxInputTarget, "sqmToPyeong")
     }
-
-    // Before form submit, convert display values back to ㎡ for storage
-    const form = this.element.closest("form")
-    if (form) {
-      this.boundConvertToSqm = this.convertToSqmBeforeSubmit.bind(this)
-      form.addEventListener("submit", this.boundConvertToSqm)
-    }
-  }
-
-  disconnect() {
-    const form = this.element.closest("form")
-    if (form && this.boundConvertToSqm) {
-      form.removeEventListener("submit", this.boundConvertToSqm)
-    }
+    this.updateLabels()
   }
 
   toggle(event) {
@@ -56,23 +40,12 @@ export default class extends Controller {
     }
   }
 
-  sqmToPyeong(input) {
+  convertForDisplay(input, direction) {
     const value = parseFloat(input.value)
     if (isNaN(value) || value === 0) return
-    input.value = Math.round(value / 3.305785)
-  }
 
-  pyeongToSqm(input) {
-    const value = parseFloat(input.value)
-    if (isNaN(value) || value === 0) return
-    input.value = Math.round(value * 3.305785)
-  }
-
-  convertToSqmBeforeSubmit() {
-    // If displaying in pyeong, convert back to ㎡ before the form submits
-    if (this.unitValue === "pyeong") {
-      this.pyeongToSqm(this.minInputTarget)
-      this.pyeongToSqm(this.maxInputTarget)
+    if (direction === "sqmToPyeong") {
+      input.value = Math.round(value / 3.305785)
     }
   }
 

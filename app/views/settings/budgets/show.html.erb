@@ -40,14 +40,14 @@
         <div class="mb-4 grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-                   data-area-unit-target="minLabel">면적 최소 (<%= @setting.area_unit == "pyeong" ? "평" : "㎡" %>)</label>
+                   data-area-unit-target="minLabel">면적 최소 (㎡)</label>
             <%= f.number_field :area_range_min, inputmode: "numeric",
               data: { area_unit_target: "minInput" },
               class: "w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" %>
           </div>
           <div>
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-                   data-area-unit-target="maxLabel">면적 최대 (<%= @setting.area_unit == "pyeong" ? "평" : "㎡" %>)</label>
+                   data-area-unit-target="maxLabel">면적 최대 (㎡)</label>
             <%= f.number_field :area_range_max, inputmode: "numeric",
               data: { area_unit_target: "maxInput" },
               class: "w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" %>

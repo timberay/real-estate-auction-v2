@@ -11,6 +11,7 @@ module Settings
       @setting = current_user.budget_setting
 
       @setting.assign_attributes(budget_params)
+      convert_area_to_sqm_if_needed
 
       result = BudgetCalculationService.call(
         available_cash: @setting.available_cash,
@@ -44,6 +45,15 @@ module Settings
     end
 
     private
+
+    SQM_PER_PYEONG = 3.305785
+
+    def convert_area_to_sqm_if_needed
+      return unless @setting.area_unit == "pyeong" && @setting.area_range_min.present?
+
+      @setting.area_range_min = (@setting.area_range_min * SQM_PER_PYEONG).round
+      @setting.area_range_max = (@setting.area_range_max * SQM_PER_PYEONG).round if @setting.area_range_max.present?
+    end
 
     def budget_params
       params.expect(budget_setting: [
