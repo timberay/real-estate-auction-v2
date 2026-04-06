@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_05_135601) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_06_010133) do
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.integer "area_range_max"
@@ -105,13 +105,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_135601) do
     t.integer "min_bid_price"
     t.string "property_type"
     t.json "raw_data"
-    t.integer "safety_rating"
     t.string "status"
     t.datetime "updated_at", null: false
-    t.integer "user_id"
     t.index ["case_number"], name: "index_properties_on_case_number", unique: true
-    t.index ["safety_rating"], name: "index_properties_on_safety_rating"
-    t.index ["user_id"], name: "index_properties_on_user_id"
   end
 
   create_table "property_check_results", force: :cascade do |t|
@@ -125,9 +121,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_135601) do
     t.boolean "resolvable"
     t.integer "source_type"
     t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
     t.index ["checklist_item_id"], name: "index_property_check_results_on_checklist_item_id"
-    t.index ["property_id", "checklist_item_id"], name: "idx_check_results_property_item", unique: true
+    t.index ["property_id", "checklist_item_id", "user_id"], name: "idx_check_results_property_item_user", unique: true
     t.index ["property_id"], name: "index_property_check_results_on_property_id"
+    t.index ["user_id"], name: "index_property_check_results_on_user_id"
   end
 
   create_table "property_types", force: :cascade do |t|
@@ -156,6 +154,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_135601) do
     t.index ["property_type_id"], name: "index_reserve_fund_defaults_on_property_type_id"
   end
 
+  create_table "user_properties", force: :cascade do |t|
+    t.datetime "analyzed_at"
+    t.datetime "created_at", null: false
+    t.integer "property_id", null: false
+    t.integer "safety_rating"
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["property_id"], name: "index_user_properties_on_property_id"
+    t.index ["user_id", "property_id"], name: "index_user_properties_on_user_id_and_property_id", unique: true
+    t.index ["user_id"], name: "index_user_properties_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "email", null: false
@@ -170,8 +180,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_05_135601) do
   add_foreign_key "budget_snapshots", "budget_snapshots", column: "parent_snapshot_id"
   add_foreign_key "budget_snapshots", "users"
   add_foreign_key "loan_policies", "property_types"
-  add_foreign_key "properties", "users"
   add_foreign_key "property_check_results", "checklist_items"
   add_foreign_key "property_check_results", "properties"
+  add_foreign_key "property_check_results", "users"
   add_foreign_key "reserve_fund_defaults", "property_types"
+  add_foreign_key "user_properties", "properties"
+  add_foreign_key "user_properties", "users"
 end
