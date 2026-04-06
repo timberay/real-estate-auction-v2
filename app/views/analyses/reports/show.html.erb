@@ -1,5 +1,10 @@
+<%# app/views/analyses/reports/show.html.erb %>
 <%= turbo_frame_tag "tab_content" do %>
   <div class="space-y-8">
-    <p>Report placeholder — will be replaced in Task 16</p>
+    <%= render ReportSummaryComponent.new(report: @report) %>
+    <%= render RegistryTimelineComponent.new(report: @report) %>
+    <%= render DividendSimulatorComponent.new(report: @report, property: @property) %>
+    <%= render SourceDocViewerComponent.new(property: @property) %>
+    <%= render LegalDisclaimerComponent.new %>
   </div>
 <% end %>
