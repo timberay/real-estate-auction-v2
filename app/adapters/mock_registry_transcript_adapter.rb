@@ -105,11 +105,11 @@ class MockRegistryTranscriptAdapter < RegistryTranscriptAdapter
     return [] if rng.rand >= 0.30
 
     days_after = rng.rand(30..365)
-    [{
+    [ {
       type: "압류",
       date: (base_date + days_after).to_s,
       holder: TAX_OFFICES[rng.rand(TAX_OFFICES.size)],
       amount: rng.rand(1..20) * 1_000_000
-    }]
+    } ]
   end
 end

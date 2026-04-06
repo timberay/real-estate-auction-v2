@@ -6,7 +6,7 @@ module Analyses
 
       unless @report
         redirect_to property_url(@property), alert: "권리 분석을 먼저 실행해주세요."
-        return
+        nil
       end
     end
 
