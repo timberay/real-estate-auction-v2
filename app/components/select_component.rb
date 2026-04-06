@@ -3,16 +3,23 @@
 class SelectComponent < ViewComponent::Base
   OptionItem = Data.define(:value, :label, :selected)
 
-  SELECT_CLASSES = "w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
+  SELECT_CLASSES = "w-full rounded-md border px-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
   NORMAL_CLASSES = "border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100"
   ERROR_CLASSES = "border-red-500"
 
-  def initialize(label:, name:, prompt: nil, error: nil, required: false, **html_options)
+  SIZES = {
+    sm: "py-1.5",
+    md: "py-2.5",
+    lg: "py-3"
+  }.freeze
+
+  def initialize(label:, name:, prompt: nil, error: nil, required: false, size: :md, **html_options)
     @label = label
     @name = name
     @prompt = prompt
     @error = error
     @required = required
+    @size = size
     @html_options = html_options
     @option_items = []
   end
@@ -35,6 +42,7 @@ class SelectComponent < ViewComponent::Base
   def select_classes
     class_names(
       SELECT_CLASSES,
+      SIZES[@size],
       @error.present? ? ERROR_CLASSES : NORMAL_CLASSES
     )
   end

@@ -6,7 +6,7 @@
       <%= form_with url: properties_path, method: :get, data: { property_filter_target: "form" }, class: "flex items-center gap-2" do %>
         <%= select_tag :safety_rating,
             options_for_select([["전체", ""], ["Safe", "safe"], ["Caution", "caution"], ["Danger", "danger"]], params[:safety_rating]),
-            class: "rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 text-sm",
+            class: "rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-slate-200 text-sm px-3 py-1.5 focus:ring-2 focus:ring-blue-500/20 focus:outline-none",
             data: { property_filter_target: "ratingSelect", action: "change->property-filter#filter" } %>
         <button type="button" data-action="click->property-filter#safeOnly"
                 class="inline-flex items-center rounded-md bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400 dark:ring-green-400/20 dark:hover:bg-green-900/50">

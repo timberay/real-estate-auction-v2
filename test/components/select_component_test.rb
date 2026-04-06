@@ -62,6 +62,32 @@ class SelectComponentTest < ViewComponent::TestCase
     assert_selector "option[value='busan'][selected]", text: "부산"
   end
 
+  # --- Size ---
+
+  test "renders default md size with py-2.5" do
+    render_inline(SelectComponent.new(label: "지역", name: "region")) do |select|
+      select.with_option(value: "seoul", label: "서울")
+    end
+
+    assert_selector "select[class*='py-2.5']"
+  end
+
+  test "renders sm size with py-1.5" do
+    render_inline(SelectComponent.new(label: "지역", name: "region", size: :sm)) do |select|
+      select.with_option(value: "seoul", label: "서울")
+    end
+
+    assert_selector "select[class*='py-1.5']"
+  end
+
+  test "renders lg size with py-3" do
+    render_inline(SelectComponent.new(label: "지역", name: "region", size: :lg)) do |select|
+      select.with_option(value: "seoul", label: "서울")
+    end
+
+    assert_selector "select[class*='py-3']"
+  end
+
   # --- Dark mode ---
 
   test "includes dark mode classes" do
