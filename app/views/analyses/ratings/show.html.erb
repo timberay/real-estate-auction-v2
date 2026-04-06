@@ -1,7 +1,36 @@
 <%# app/views/analyses/ratings/show.html.erb %>
 <%= render layout: "analyses/layout", locals: { property: @property, user_property: @user_property, active_step: @active_step } do %>
   <div class="space-y-6">
-    <%= render RatingResultComponent.new(property: @property, risk_results: @risk_results, rating: @rating) %>
+    <% if @report %>
+      <div class="grid grid-cols-2 gap-4">
+        <%= render RatingResultComponent.new(property: @property, risk_results: @risk_results, rating: @rating, label: "체크리스트 등급") %>
+        <%= render RatingResultComponent.new(property: @property, risk_results: [], rating: @report.verdict, label: "권리 분석 등급") %>
+      </div>
+    <% else %>
+      <%= render RatingResultComponent.new(property: @property, risk_results: @risk_results, rating: @rating) %>
+    <% end %>
+
+    <% if @risk_results.any? %>
+      <div class="space-y-3">
+        <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">위험 항목 상세</h3>
+        <% @risk_results.each do |result| %>
+          <details class="rounded-lg border border-slate-200 dark:border-slate-700">
+            <summary class="cursor-pointer px-4 py-3 text-sm font-medium text-slate-900 dark:text-slate-100">
+              <%= result.checklist_item.question %>
+              <span class="ml-2 text-xs <%= result.resolvable ? 'text-yellow-600' : 'text-red-600' %>">
+                <%= result.resolvable ? "해결 가능" : "해결 불가" %>
+              </span>
+            </summary>
+            <div class="border-t border-slate-200 dark:border-slate-700 px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+              <p><%= result.checklist_item.description %></p>
+              <% if result.resolution_note.present? %>
+                <p class="mt-2 font-medium">메모: <%= result.resolution_note %></p>
+              <% end %>
+            </div>
+          </details>
+        <% end %>
+      </div>
+    <% end %>
 
     <div class="flex justify-center gap-3">
       <%= button_to "다시 분석하기", property_analyses_start_path(@property), method: :post,
