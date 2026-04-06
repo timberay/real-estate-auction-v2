@@ -7,6 +7,8 @@ class BudgetSummaryComponent < ViewComponent::Base
     @setting = setting
   end
 
+  private
+
   def calculated?
     @setting.present? && @setting.max_bid_amount.present?
   end
