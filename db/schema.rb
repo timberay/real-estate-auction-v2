@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_06_010133) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_06_112023) do
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.integer "area_range_max"
@@ -154,6 +154,28 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_010133) do
     t.index ["property_type_id"], name: "index_reserve_fund_defaults_on_property_type_id"
   end
 
+  create_table "rights_analysis_reports", force: :cascade do |t|
+    t.datetime "analyzed_at", null: false
+    t.integer "assumed_amount", default: 0, null: false
+    t.date "base_right_date"
+    t.string "base_right_holder"
+    t.string "base_right_type"
+    t.datetime "created_at", null: false
+    t.text "opportunity_reason"
+    t.string "opportunity_type"
+    t.integer "property_id", null: false
+    t.json "report_data"
+    t.boolean "source_doc_reviewed", default: false, null: false
+    t.integer "total_risk_amount", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.integer "verdict", default: 0, null: false
+    t.text "verdict_summary"
+    t.index ["property_id"], name: "index_rights_analysis_reports_on_property_id"
+    t.index ["user_id", "property_id"], name: "idx_rights_reports_user_property", unique: true
+    t.index ["user_id"], name: "index_rights_analysis_reports_on_user_id"
+  end
+
   create_table "user_properties", force: :cascade do |t|
     t.datetime "analyzed_at"
     t.datetime "created_at", null: false
@@ -184,6 +206,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_010133) do
   add_foreign_key "property_check_results", "properties"
   add_foreign_key "property_check_results", "users"
   add_foreign_key "reserve_fund_defaults", "property_types"
+  add_foreign_key "rights_analysis_reports", "properties"
+  add_foreign_key "rights_analysis_reports", "users"
   add_foreign_key "user_properties", "properties"
   add_foreign_key "user_properties", "users"
 end
