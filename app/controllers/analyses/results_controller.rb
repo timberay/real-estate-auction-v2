@@ -15,10 +15,26 @@ module Analyses
       if params[:resolutions].present?
         params[:resolutions].each do |id, values|
           result = @property.property_check_results.where(user: current_user).find(id)
-          result.update!(
-            resolvable: values[:resolvable] == "true",
-            resolution_note: values[:resolution_note]
-          )
+
+          if result.source_type == "auto"
+            result.update!(
+              resolvable: values[:resolvable] == "true",
+              resolution_note: values[:resolution_note]
+            )
+          else
+            has_risk = values[:has_risk] == "true"
+            attrs = { source_type: "manual", has_risk: has_risk }
+
+            if has_risk
+              attrs[:resolvable] = values[:resolvable] == "true"
+              attrs[:resolution_note] = values[:resolution_note]
+            else
+              attrs[:resolvable] = nil
+              attrs[:resolution_note] = nil
+            end
+
+            result.update!(attrs)
+          end
         end
       end
 
