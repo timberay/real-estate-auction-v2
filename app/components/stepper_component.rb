@@ -35,7 +35,7 @@ class StepperComponent < ViewComponent::Base
   def step_completed?(key)
     case key
     when :checklist then user_property&.analyzed_at.present?
-    when :report then report.present?
+    when :report then report&.user_confirmed_at.present?
     when :rating then user_property&.safety_rating.present?
     end
   end

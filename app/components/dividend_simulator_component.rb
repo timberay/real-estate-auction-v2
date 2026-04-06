@@ -26,8 +26,18 @@ class DividendSimulatorComponent < ViewComponent::Base
     BURDEN_CONFIG[@burden["verdict"]] || BURDEN_CONFIG["safe"]
   end
 
-  def format_amount(amount)
+  def format_manwon(amount)
     return "—" if amount.nil?
-    amount.to_fs(:delimited)
+    manwon = amount.to_i
+
+    if manwon >= 10000
+      eok = manwon / 10000
+      remainder = manwon % 10000
+      remainder > 0 ? "#{eok}억 #{remainder.to_fs(:delimited)}만원" : "#{eok}억원"
+    elsif manwon > 0
+      "#{manwon.to_fs(:delimited)}만원"
+    else
+      "0만원"
+    end
   end
 end

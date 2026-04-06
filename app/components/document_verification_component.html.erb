@@ -1,0 +1,38 @@
+<div class="rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-6">
+  <div class="flex items-center gap-2 mb-4">
+    <span class="text-lg">📋</span>
+    <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">서류 확인</h3>
+  </div>
+
+  <% if confirmed? %>
+    <div class="flex items-center gap-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-600 px-4 py-3">
+      <span class="text-lg">✅</span>
+      <span class="text-sm font-medium text-green-700 dark:text-green-400">확인 완료 — <%= @report.user_confirmed_at.strftime("%Y-%m-%d %H:%M") %></span>
+    </div>
+  <% else %>
+    <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+      아래 분석 내용이 물건명세서 및 건축물대장과 동일한지 확인해주세요.
+    </p>
+
+    <ul class="space-y-2 mb-6">
+      <% key_items.each do |item| %>
+        <li class="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300">
+          <span class="text-slate-400 mt-0.5">•</span>
+          <span><%= item %></span>
+        </li>
+      <% end %>
+    </ul>
+
+    <div class="flex gap-3">
+      <%= form_with url: helpers.confirm_property_analyses_report_path(@property), method: :patch do |f| %>
+        <%= f.submit "예, 동일합니다",
+            class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 cursor-pointer" %>
+      <% end %>
+      <button type="button" disabled
+          class="inline-flex items-center rounded-md bg-slate-200 dark:bg-slate-700 px-4 py-2 text-sm font-medium text-slate-400 dark:text-slate-500 cursor-not-allowed"
+          title="추후 지원 예정">
+        아니오
+      </button>
+    </div>
+  <% end %>
+</div>

@@ -1,10 +1,11 @@
 <%# app/views/analyses/reports/show.html.erb %>
 <%= render layout: "analyses/layout", locals: { property: @property, user_property: @user_property, active_step: @active_step } do %>
   <div class="space-y-8">
-    <%= render ReportSummaryComponent.new(report: @report) %>
+    <%= render ReportSummaryComponent.new(report: @report, property: @property) %>
     <%= render RegistryTimelineComponent.new(report: @report) %>
     <%= render DividendSimulatorComponent.new(report: @report, property: @property) %>
     <%= render SourceDocViewerComponent.new(property: @property) %>
+    <%= render DocumentVerificationComponent.new(report: @report, property: @property) %>
     <%= render LegalDisclaimerComponent.new %>
   </div>
 <% end %>
