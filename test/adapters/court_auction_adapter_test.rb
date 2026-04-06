@@ -22,9 +22,10 @@ class CourtAuctionAdapterTest < ActiveSupport::TestCase
     assert data.key?(:tenants)
   end
 
-  test "mock adapter returns nil for unknown case_number" do
+  test "mock adapter generates data for unknown case_number" do
     adapter = MockCourtAuctionAdapter.new
     data = adapter.fetch_data(case_number: "unknown-999")
-    assert_nil data
+    assert_not_nil data
+    assert_equal "unknown-999", data[:case_number]
   end
 end
