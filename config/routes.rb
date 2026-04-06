@@ -31,7 +31,9 @@ Rails.application.routes.draw do
     namespace :analyses do
       resource :start, only: [ :create ], controller: "start"
       resource :checklist, only: [ :edit, :update ], controller: "checklists"
-      resource :report, only: [ :show, :update ], controller: "reports"
+      resource :report, only: [ :show, :update ], controller: "reports" do
+        patch :confirm
+      end
       resource :rating, only: [ :show ], controller: "ratings"
     end
   end

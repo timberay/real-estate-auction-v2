@@ -36,6 +36,18 @@ class RightsAnalysisFlowTest < ActionDispatch::IntegrationTest
     assert report.report_data.dig("dividend_simulation", "distribution").any?
   end
 
+  test "confirm action sets user_confirmed_at and redirects to rating" do
+    RightsAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(user: @user, property: @property)
+    assert_nil report.user_confirmed_at
+
+    patch confirm_property_analyses_report_url(@property)
+    assert_redirected_to property_analyses_rating_url(@property)
+
+    report.reload
+    assert_not_nil report.user_confirmed_at
+  end
+
   test "HUG opportunity detection works end-to-end" do
     hug_property = PropertyDataSyncService.call(case_number: "2026타경10003")
     UserProperty.find_or_create_by!(user: @user, property: hug_property)

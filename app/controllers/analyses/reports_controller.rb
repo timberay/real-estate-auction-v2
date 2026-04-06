@@ -35,5 +35,12 @@ module Analyses
 
       redirect_to property_analyses_report_url(@property)
     end
+
+    def confirm
+      @property = Property.find(params[:property_id])
+      @report = RightsAnalysisReport.find_by!(property: @property, user: current_user)
+      @report.update!(user_confirmed_at: Time.current)
+      redirect_to property_analyses_rating_url(@property)
+    end
   end
 end
