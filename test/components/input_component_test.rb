@@ -118,6 +118,26 @@ class InputComponentTest < ViewComponent::TestCase
     assert_selector "input[value='홍길동']"
   end
 
+  # --- Size ---
+
+  test "renders default md size with py-2.5" do
+    render_inline(InputComponent.new(label: "이름", name: "name"))
+
+    assert_selector "input[class*='py-2.5']"
+  end
+
+  test "renders sm size with py-1.5" do
+    render_inline(InputComponent.new(label: "이름", name: "name", size: :sm))
+
+    assert_selector "input[class*='py-1.5']"
+  end
+
+  test "renders lg size with py-3" do
+    render_inline(InputComponent.new(label: "이름", name: "name", size: :lg))
+
+    assert_selector "input[class*='py-3']"
+  end
+
   # --- Focus ring ---
 
   test "input has focus ring classes" do
