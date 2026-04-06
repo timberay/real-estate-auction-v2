@@ -1,0 +1,29 @@
+safe_apartment_report:
+  user: budget_user
+  property: safe_apartment
+  base_right_type: "근저당"
+  base_right_date: "2024-01-15"
+  base_right_holder: "국민은행"
+  assumed_amount: 0
+  total_risk_amount: 0
+  verdict: 0
+  verdict_summary: "말소기준권리: 근저당 (2024-01-15, 국민은행)\n임차인 없음\n인수 금액 0원"
+  source_doc_reviewed: false
+  analyzed_at: <%= Time.current %>
+  report_data: '<%= { registry_timeline: [], tenants: [], dividend_simulation: { expected_bid: nil, distribution: [] }, bidder_burden: { assumed_amount: 0, unconfirmed_risk: 0, total_burden: 0, verdict: "safe" }, checklist_references: [] }.to_json %>'
+
+risky_villa_report:
+  user: guest
+  property: risky_villa
+  base_right_type: "근저당"
+  base_right_date: "2023-06-01"
+  base_right_holder: "신한은행"
+  assumed_amount: 30000000
+  total_risk_amount: 30000000
+  verdict: 2
+  verdict_summary: "말소기준권리: 근저당 (2023-06-01, 신한은행)\n대항력 있는 임차인 1명 — 보증금 3,000만원 인수\n유치권 신고 있음"
+  opportunity_type:
+  opportunity_reason:
+  source_doc_reviewed: false
+  analyzed_at: <%= Time.current %>
+  report_data: '<%= { registry_timeline: [], tenants: [], dividend_simulation: { expected_bid: nil, distribution: [] }, bidder_burden: { assumed_amount: 30000000, unconfirmed_risk: 0, total_burden: 30000000, verdict: "danger" }, checklist_references: ["rights-011"] }.to_json %>'
