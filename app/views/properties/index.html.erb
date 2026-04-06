@@ -17,11 +17,15 @@
   </div>
 
   <%# Case number input form %>
-  <%= form_with url: properties_path, method: :post, class: "flex items-center gap-2" do |f| %>
-    <%= f.text_field :case_number,
-        placeholder: "경매번호를 입력하세요 (예: 2026타경1234)",
-        class: "flex-1 rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 text-sm focus:ring-blue-500 focus:border-blue-500" %>
-    <%= render ButtonComponent.new(type: "submit", icon: "plus") { "물건 추가" } %>
+  <%= form_with url: properties_path, method: :post, class: "max-w-md" do |f| %>
+    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">경매번호로 물건 추가</label>
+    <div class="flex items-center gap-2">
+      <%= f.text_field :case_number,
+          placeholder: "예: 2026타경1234",
+          class: "flex-1 rounded-md border px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" %>
+      <%= render ButtonComponent.new(type: "submit", icon: "plus") { "추가" } %>
+    </div>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">법원 경매 사건번호를 입력하세요</p>
   <% end %>
 
   <% if @user_properties.any? %>
