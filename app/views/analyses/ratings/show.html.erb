@@ -1,7 +1,7 @@
 <%# app/views/analyses/ratings/show.html.erb %>
 <%= turbo_frame_tag "analysis_flow" do %>
   <div class="space-y-6">
-    <%= render RatingResultComponent.new(property: @property, risk_results: @risk_results) %>
+    <%= render RatingResultComponent.new(property: @property, risk_results: @risk_results, rating: @rating) %>
 
     <div class="flex justify-center gap-3">
       <%= button_to "다시 분석하기", property_analyses_start_path(@property), method: :post,

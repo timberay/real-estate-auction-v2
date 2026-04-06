@@ -3,6 +3,7 @@ module Analyses
     def edit
       @property = Property.find(params[:property_id])
       @results_by_axis = @property.property_check_results
+        .where(user: current_user)
         .includes(:checklist_item)
         .order("checklist_items.position")
         .group_by { |r| r.checklist_item.risk_axis }
@@ -13,7 +14,7 @@ module Analyses
 
       if params[:resolutions].present?
         params[:resolutions].each do |id, values|
-          result = @property.property_check_results.find(id)
+          result = @property.property_check_results.where(user: current_user).find(id)
           result.update!(
             resolvable: values[:resolvable] == "true",
             resolution_note: values[:resolution_note]

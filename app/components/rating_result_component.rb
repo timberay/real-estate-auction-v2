@@ -7,9 +7,9 @@ class RatingResultComponent < ViewComponent::Base
     "danger" => { color: "text-red-700 dark:text-red-400", bg: "bg-red-50 dark:bg-red-900/20", label: "Danger", description: "해결 불가능한 위험 항목이 있습니다" }
   }.freeze
 
-  def initialize(property:, risk_results:)
+  def initialize(property:, risk_results:, rating: nil)
     @property = property
     @risk_results = risk_results
-    @config = RATING_CONFIG[@property.safety_rating] || RATING_CONFIG["safe"]
+    @config = RATING_CONFIG[rating] || RATING_CONFIG["safe"]
   end
 end

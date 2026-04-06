@@ -3,7 +3,7 @@ module Analyses
     def edit
       @property = Property.find(params[:property_id])
       @pending_results = @property.property_check_results
-        .where(source_type: nil)
+        .where(source_type: nil, user: current_user)
         .includes(:checklist_item)
         .order("checklist_items.position")
     end
@@ -13,7 +13,7 @@ module Analyses
 
       if params[:check_results].present?
         params[:check_results].each do |id, values|
-          result = @property.property_check_results.find(id)
+          result = @property.property_check_results.where(user: current_user).find(id)
           result.update!(
             source_type: "manual",
             manual_value: values[:manual_value],
