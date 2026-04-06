@@ -9,9 +9,6 @@ class PropertyAnalysisService
   end
 
   def call
-    results = AutoCheckRunner.call(property: @property, user: @user)
-    pending = results.select { |r| r.source_type.nil? }
-
-    { results: results, pending_manual_items: pending }
+    AutoCheckRunner.call(property: @property, user: @user)
   end
 end

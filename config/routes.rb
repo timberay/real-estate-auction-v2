@@ -30,7 +30,6 @@ Rails.application.routes.draw do
   resources :properties, only: [ :index, :show, :create ] do
     namespace :analyses do
       resource :start, only: [ :create ], controller: "start"
-      resource :manual_input, only: [ :edit, :update ], controller: "manual_inputs"
       resource :result, only: [ :edit, :update ], controller: "results"
       resource :rating, only: [ :show ], controller: "ratings"
     end
