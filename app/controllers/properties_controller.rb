@@ -27,7 +27,7 @@ class PropertiesController < ApplicationController
     case_number = params[:case_number]&.strip
 
     if case_number.blank?
-      redirect_to properties_path, alert: "경매번호를 입력해주세요."
+      redirect_to properties_path, alert: "사건번호를 입력해주세요."
       return
     end
 
@@ -46,7 +46,7 @@ class PropertiesController < ApplicationController
         current_user.user_properties.create!(property: property)
         redirect_to properties_path, notice: "물건이 추가되었습니다."
       else
-        redirect_to properties_path, alert: "해당 경매번호의 물건을 찾을 수 없습니다."
+        redirect_to properties_path, alert: "해당 사건번호의 물건을 찾을 수 없습니다."
       end
     end
   end

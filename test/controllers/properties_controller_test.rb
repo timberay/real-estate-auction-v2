@@ -60,7 +60,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     post properties_url, params: { case_number: "" }
     assert_redirected_to properties_path
     follow_redirect!
-    assert_match "경매번호를 입력해주세요", flash[:alert]
+    assert_match "사건번호를 입력해주세요", flash[:alert]
   end
 
   test "GET index renders successfully when user has no budget setting" do
