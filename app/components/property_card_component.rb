@@ -10,8 +10,7 @@ class PropertyCardComponent < ViewComponent::Base
   private
 
   def formatted_price(amount)
-    return "—" unless amount
-    number_to_currency(amount, unit: "", precision: 0, delimiter: ",") + "만원"
+    helpers.format_price_in_eok(amount)
   end
 
   def budget_exceeded?

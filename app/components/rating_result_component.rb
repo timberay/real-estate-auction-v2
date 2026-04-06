@@ -10,6 +10,6 @@ class RatingResultComponent < ViewComponent::Base
   def initialize(property:, risk_results:, rating: nil)
     @property = property
     @risk_results = risk_results
-    @config = RATING_CONFIG[rating] || RATING_CONFIG["safe"]
+    @config = RATING_CONFIG[rating.to_s] || RATING_CONFIG["safe"]
   end
 end

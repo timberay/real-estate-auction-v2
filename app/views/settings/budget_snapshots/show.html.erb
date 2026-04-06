@@ -19,7 +19,7 @@
     <div class="mb-6">
       <%= render StatCardComponent.new(
         label: "최대 입찰가",
-        value: "#{number_with_delimiter(@snapshot.max_bid_amount)}만원"
+        value: format_price_in_eok(@snapshot.max_bid_amount)
       ) %>
     </div>
   <% end %>
@@ -28,18 +28,18 @@
     <%= render SummaryTableComponent.new(
       title: "상세 내역",
       rows: [
-        { label: "유용자금", value: "#{number_with_delimiter(@snapshot.available_cash)}만원" },
+        { label: "유용자금", value: format_price_in_eok(@snapshot.available_cash) },
         { label: "부동산 유형", value: @snapshot.property_type_name || "-" },
         { label: "면적", value: @snapshot.area_range || "-" },
-        { label: "수선비", value: "#{number_with_delimiter(@snapshot.repair_cost)}만원" },
-        { label: "취득세", value: "#{number_with_delimiter(@snapshot.acquisition_tax)}만원" },
-        { label: "법무사비", value: "#{number_with_delimiter(@snapshot.scrivener_fee)}만원" },
-        { label: "이사비", value: "#{number_with_delimiter(@snapshot.moving_cost)}만원" },
-        { label: "관리비", value: "#{number_with_delimiter(@snapshot.maintenance_fee)}만원" },
+        { label: "수선비", value: format_price_in_eok(@snapshot.repair_cost) },
+        { label: "취득세", value: format_price_in_eok(@snapshot.acquisition_tax) },
+        { label: "법무사비", value: format_price_in_eok(@snapshot.scrivener_fee) },
+        { label: "이사비", value: format_price_in_eok(@snapshot.moving_cost) },
+        { label: "관리비", value: format_price_in_eok(@snapshot.maintenance_fee) },
         { label: "대출 정책", value: @snapshot.loan_policy_name || "-" },
         { label: "대출 비율 (LTV)", value: @snapshot.loan_ratio ? "#{(@snapshot.loan_ratio.to_f * 100).round}%" : "-" },
         { label: "유찰 회차", value: "#{@snapshot.failed_auction_rounds}회차" },
-        { label: "검색 가능 감정가", value: "#{number_with_delimiter(@snapshot.searchable_appraisal_limit)}만원" }
+        { label: "검색 가능 감정가", value: format_price_in_eok(@snapshot.searchable_appraisal_limit) }
       ]
     ) %>
   </div>

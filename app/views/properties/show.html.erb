@@ -16,11 +16,11 @@
       <div class="grid grid-cols-2 gap-4 text-sm">
         <div>
           <span class="text-slate-500 dark:text-slate-400">감정가</span>
-          <p class="font-semibold text-slate-900 dark:text-slate-100"><%= number_to_currency(@property.appraisal_price, unit: "", precision: 0, delimiter: ",") %>만원</p>
+          <p class="font-semibold text-slate-900 dark:text-slate-100"><%= format_price_in_eok(@property.appraisal_price) %></p>
         </div>
         <div>
           <span class="text-slate-500 dark:text-slate-400">최저매각가</span>
-          <p class="font-semibold text-slate-900 dark:text-slate-100"><%= number_to_currency(@property.min_bid_price, unit: "", precision: 0, delimiter: ",") %>만원</p>
+          <p class="font-semibold text-slate-900 dark:text-slate-100"><%= format_price_in_eok(@property.min_bid_price) %></p>
         </div>
       </div>
     </div>

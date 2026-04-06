@@ -2,7 +2,7 @@
   <div class="mb-6">
     <%= render StatCardComponent.new(
       label: "내 최대입찰가",
-      value: "#{number_with_delimiter(current_user.budget_setting.max_bid_amount)}만원",
+      value: format_price_in_eok(current_user.budget_setting.max_bid_amount),
       variant: :muted
     ) %>
   </div>

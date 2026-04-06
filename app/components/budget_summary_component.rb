@@ -23,15 +23,15 @@ class BudgetSummaryComponent < ViewComponent::Base
   end
 
   def max_bid_amount
-    calculated? ? "#{number_with_delimiter(@setting.max_bid_amount)}만원" : "—"
+    calculated? ? helpers.format_price_in_eok(@setting.max_bid_amount) : "—"
   end
 
   def available_cash
-    calculated? ? "#{number_with_delimiter(@setting.available_cash)}만원" : "—"
+    calculated? ? helpers.format_price_in_eok(@setting.available_cash) : "—"
   end
 
   def total_reserves
-    calculated? ? "#{number_with_delimiter(@setting.total_reserves)}만원" : "—"
+    calculated? ? helpers.format_price_in_eok(@setting.total_reserves) : "—"
   end
 
   def loan_ratio

@@ -14,7 +14,7 @@ class BudgetSummaryComponentTest < ViewComponent::TestCase
     assert_selector "div[class*='border-blue-200']"
     assert_no_selector "div[class*='border-dashed']"
     assert_text "최대입찰가"
-    assert_text "96,200만원"
+    assert_text "9억 6,200만원"
   end
 
   test "renders all four metrics with calculated values" do
@@ -23,7 +23,7 @@ class BudgetSummaryComponentTest < ViewComponent::TestCase
     render_inline(BudgetSummaryComponent.new(setting: setting))
 
     assert_text "유용자금"
-    assert_text "30,000만원"
+    assert_text "3억"
     assert_text "예비비 합계"
     assert_text "1,140만원"
     assert_text "대출비율"

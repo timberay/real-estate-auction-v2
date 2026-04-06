@@ -7,15 +7,14 @@
   <% if @setting %>
     <%= render StatCardComponent.new(
       label: "최대 입찰가",
-      value: "#{number_with_delimiter(@setting.max_bid_amount)}만원",
-      sublabel: @setting.max_bid_amount && @setting.max_bid_amount >= 10000 ? "(약 #{(@setting.max_bid_amount / 10000.0).round(1)}억원)" : nil
+      value: format_price_in_eok(@setting.max_bid_amount)
     ) %>
 
     <% if @setting.failed_auction_rounds.to_i > 0 %>
       <div class="mt-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
         <p class="text-sm text-amber-800 dark:text-amber-400">
           유찰 <%= @setting.failed_auction_rounds %>회차 기준 검색 가능 감정가:
-          <strong class="tabular-nums"><%= number_with_delimiter(@setting.searchable_appraisal_limit) %>만원</strong>
+          <strong class="tabular-nums"><%= format_price_in_eok(@setting.searchable_appraisal_limit) %></strong>
         </p>
       </div>
     <% end %>
@@ -24,13 +23,13 @@
       <%= render SummaryTableComponent.new(
         title: "비용 내역",
         rows: [
-          { label: "유용자금", value: "#{number_with_delimiter(@setting.available_cash)}만원" },
-          { label: "수선비", value: "#{number_with_delimiter(@setting.repair_cost)}만원" },
-          { label: "취득세", value: "#{number_with_delimiter(@setting.acquisition_tax)}만원" },
-          { label: "법무사비", value: "#{number_with_delimiter(@setting.scrivener_fee)}만원" },
-          { label: "이사비", value: "#{number_with_delimiter(@setting.moving_cost)}만원" },
-          { label: "관리비", value: "#{number_with_delimiter(@setting.maintenance_fee)}만원" },
-          { label: "예비비 합계", value: "#{number_with_delimiter(@setting.total_reserves)}만원", highlight: true },
+          { label: "유용자금", value: format_price_in_eok(@setting.available_cash) },
+          { label: "수선비", value: format_price_in_eok(@setting.repair_cost) },
+          { label: "취득세", value: format_price_in_eok(@setting.acquisition_tax) },
+          { label: "법무사비", value: format_price_in_eok(@setting.scrivener_fee) },
+          { label: "이사비", value: format_price_in_eok(@setting.moving_cost) },
+          { label: "관리비", value: format_price_in_eok(@setting.maintenance_fee) },
+          { label: "예비비 합계", value: format_price_in_eok(@setting.total_reserves), highlight: true },
           { label: "대출 비율 (LTV)", value: "#{(@setting.loan_ratio.to_f * 100).round}%" }
         ]
       ) %>
