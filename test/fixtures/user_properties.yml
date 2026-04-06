@@ -5,7 +5,6 @@ guest_safe_apartment:
 guest_risky_villa:
   user: guest
   property: risky_villa
-  safety_rating: 2
 
 guest_unanalyzed_officetel:
   user: guest
