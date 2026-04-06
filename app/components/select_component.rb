@@ -8,9 +8,9 @@ class SelectComponent < ViewComponent::Base
   ERROR_CLASSES = "border-red-500"
 
   SIZES = {
-    sm: "py-1.5",
-    md: "py-2.5",
-    lg: "py-3"
+    sm: "h-8",
+    md: "h-10",
+    lg: "h-12"
   }.freeze
 
   def initialize(label:, name:, prompt: nil, error: nil, required: false, size: :md, **html_options)

@@ -6,9 +6,9 @@ class InputComponent < ViewComponent::Base
   ERROR_CLASSES = "border-red-500"
 
   SIZES = {
-    sm: "py-1.5",
-    md: "py-2.5",
-    lg: "py-3"
+    sm: "h-8",
+    md: "h-10",
+    lg: "h-12"
   }.freeze
 
   def initialize(label:, name:, type: "text", value: nil, required: false, error: nil, help_text: nil, suffix: nil, inputmode: nil, placeholder: nil, size: :md, **html_options)
