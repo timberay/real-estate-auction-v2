@@ -27,7 +27,7 @@ Rails.application.routes.draw do
     resources :reserve_fund_defaults, only: [ :index ]
   end
 
-  resources :properties, only: [ :index, :show ] do
+  resources :properties, only: [ :index, :show, :create ] do
     namespace :analyses do
       resource :start, only: [ :create ], controller: "start"
       resource :manual_input, only: [ :edit, :update ], controller: "manual_inputs"

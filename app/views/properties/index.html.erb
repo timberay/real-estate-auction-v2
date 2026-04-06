@@ -16,10 +16,10 @@
     </div>
   </div>
 
-  <% if @properties.any? %>
+  <% if @user_properties.any? %>
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <% @properties.each do |property| %>
-        <%= render PropertyCardComponent.new(property: property) %>
+      <% @user_properties.each do |user_property| %>
+        <%= render PropertyCardComponent.new(property: user_property.property, safety_rating: user_property.safety_rating) %>
       <% end %>
     </div>
   <% else %>

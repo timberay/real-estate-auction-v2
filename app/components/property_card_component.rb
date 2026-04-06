@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 class PropertyCardComponent < ViewComponent::Base
-  def initialize(property:)
+  def initialize(property:, safety_rating: nil)
     @property = property
+    @safety_rating = safety_rating
   end
 
   private

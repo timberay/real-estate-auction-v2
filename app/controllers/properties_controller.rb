@@ -1,11 +1,45 @@
 class PropertiesController < ApplicationController
   def index
-    @properties = Property.all.order(created_at: :desc)
-    @properties = @properties.where(safety_rating: params[:safety_rating]) if params[:safety_rating].present?
+    @user_properties = current_user.user_properties
+      .includes(:property)
+      .order(created_at: :desc)
+    @user_properties = @user_properties.where(safety_rating: params[:safety_rating]) if params[:safety_rating].present?
   end
 
   def show
     @property = Property.find(params[:id])
-    @check_results = @property.property_check_results.includes(:checklist_item).order("checklist_items.position")
+    @user_property = current_user.user_properties.find_by(property: @property)
+    @check_results = @property.property_check_results
+      .where(user: current_user)
+      .includes(:checklist_item)
+      .order("checklist_items.position")
+  end
+
+  def create
+    case_number = params[:case_number]&.strip
+
+    if case_number.blank?
+      redirect_to properties_path, alert: "경매번호를 입력해주세요."
+      return
+    end
+
+    property = Property.find_by(case_number: case_number)
+
+    if property
+      if current_user.user_properties.exists?(property: property)
+        redirect_to properties_path, notice: "이미 내 목록에 있는 물건입니다."
+      else
+        current_user.user_properties.create!(property: property)
+        redirect_to properties_path, notice: "이미 등록된 물건입니다. 내 목록에 추가했습니다."
+      end
+    else
+      property = PropertyDataSyncService.call(case_number: case_number)
+      if property
+        current_user.user_properties.create!(property: property)
+        redirect_to properties_path, notice: "물건이 추가되었습니다."
+      else
+        redirect_to properties_path, alert: "해당 경매번호의 물건을 찾을 수 없습니다."
+      end
+    end
   end
 end

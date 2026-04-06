@@ -7,7 +7,7 @@
   <%= render CardComponent.new(title: @property.case_number) do |card| %>
     <div class="space-y-3">
       <div class="flex items-center gap-2">
-        <%= render SafetyBadgeComponent.new(rating: @property.safety_rating) %>
+        <%= render SafetyBadgeComponent.new(rating: @user_property&.safety_rating) %>
         <% if @property.court_name.present? %>
           <span class="text-sm text-slate-500 dark:text-slate-400"><%= @property.court_name %></span>
         <% end %>
@@ -27,7 +27,7 @@
   <% end %>
 
   <%= turbo_frame_tag "analysis_flow" do %>
-    <% if @property.safety_rating.present? %>
+    <% if @user_property&.safety_rating.present? %>
       <div class="text-center space-y-3">
         <p class="text-sm text-slate-600 dark:text-slate-400">이미 분석이 완료되었습니다.</p>
         <div class="flex justify-center gap-3">
