@@ -96,17 +96,17 @@ class RightsAnalysisService
     end
 
     lines = []
-    if base_right
+    if base_right && base_right[:type].present?
       lines << "말소기준권리: #{base_right[:type]} (#{base_right[:date]}, #{base_right[:holder]})"
     else
       lines << "말소기준권리: 해당 없음"
     end
 
-    opposing = tenants.select { |t| t[:has_opposing_power] }
+    opposing = tenants.select { |t| t[:has_opposing_power] == true }
     if opposing.any?
       lines << "대항력 있는 임차인 #{opposing.size}명 — 인수 금액 #{format_amount(assumed[:assumed_amount])}"
     else
-      lines << tenants.any? ? "임차인 #{tenants.size}명 — 대항력 없음, 인수 금액 0원" : "임차인 없음"
+      lines << (tenants.any? ? "임차인 #{tenants.size}명 — 대항력 없음, 인수 금액 0원" : "임차인 없음")
     end
 
     lines << "유치권 신고 있음" if has_lien

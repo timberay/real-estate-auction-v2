@@ -61,6 +61,14 @@ class RightsAnalysisServiceTest < ActiveSupport::TestCase
     assert_equal "hug_waiver", report.opportunity_type
   end
 
+  test "compute_verdict handles nil and false field values gracefully" do
+    property = PropertyDataSyncService.call(case_number: "2026타경10001")
+    report = RightsAnalysisService.call(property: property, user: @user)
+
+    assert_not_includes report.verdict_summary, "false"
+    assert_not_includes report.verdict_summary, "nil"
+  end
+
   test "returns the report" do
     result = RightsAnalysisService.call(property: @safe_property, user: @user)
     assert_kind_of RightsAnalysisReport, result
