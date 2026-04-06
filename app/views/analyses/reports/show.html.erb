@@ -5,6 +5,7 @@
     <%= render RegistryTimelineComponent.new(report: @report) %>
     <%= render DividendSimulatorComponent.new(report: @report, property: @property) %>
     <%= render SourceDocViewerComponent.new(property: @property) %>
+    <%= render DocumentVerificationComponent.new(report: @report, property: @property) %>
     <%= render LegalDisclaimerComponent.new %>
   </div>
 <% end %>
