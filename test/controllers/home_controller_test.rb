@@ -24,7 +24,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "auto-creates guest session on first visit" do
-    User.where(email: "guest@auction.local").delete_all
+    User.where(email: "guest@auction.local").destroy_all
     assert_difference "User.count", 1 do
       get root_url
     end
