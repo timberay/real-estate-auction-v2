@@ -10,6 +10,7 @@ class PropertyDataSyncService
   def call
     court_data = CourtAuctionAdapter.for.fetch_data(case_number: @case_number)
     building_data = BuildingLedgerAdapter.for.fetch_data(case_number: @case_number)
+    registry_data = RegistryTranscriptAdapter.for.fetch_data(case_number: @case_number)
 
     return nil unless court_data
 
@@ -22,7 +23,8 @@ class PropertyDataSyncService
       min_bid_price: court_data[:min_bid_price],
       raw_data: {
         court_auction: court_data.deep_stringify_keys,
-        building_ledger: building_data&.deep_stringify_keys
+        building_ledger: building_data&.deep_stringify_keys,
+        registry_transcript: registry_data&.deep_stringify_keys
       }
     )
     property.save!

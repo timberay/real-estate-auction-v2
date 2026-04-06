@@ -33,4 +33,14 @@ class PropertyDataSyncServiceTest < ActiveSupport::TestCase
     property = PropertyDataSyncService.call(case_number: "2026타경10001")
     assert property.raw_data.key?("building_ledger")
   end
+
+  test "includes registry_transcript in raw_data" do
+    property = PropertyDataSyncService.call(case_number: "2026타경10001")
+    assert property.raw_data.key?("registry_transcript")
+    transcript = property.raw_data["registry_transcript"]
+    assert transcript.key?("rights")
+    assert transcript.key?("tenants")
+    assert transcript.key?("hug_waiver")
+    assert transcript.key?("seizures")
+  end
 end
