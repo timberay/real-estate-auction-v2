@@ -1,7 +1,6 @@
 guest_safe_apartment:
   user: guest
   property: safe_apartment
-  safety_rating: 0
 
 guest_risky_villa:
   user: guest
