@@ -50,14 +50,6 @@
               class: "w-full h-8 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 text-sm pl-9 pr-3 focus:ring-2 focus:ring-blue-500/20 focus:outline-none" %>
         </div>
         <%= render ButtonComponent.new(type: "submit", icon: "magnifying-glass", size: :sm, data: { property_filter_target: "searchButton" }) { "검색" } %>
-        <label class="inline-flex items-center gap-1.5 cursor-pointer select-none shrink-0">
-          <span class="text-xs text-slate-500 dark:text-slate-400">예산 내</span>
-          <input type="hidden" name="within_budget" value="0">
-          <%= check_box_tag :within_budget, "1", params[:within_budget] == "1",
-              class: "sr-only peer",
-              data: { property_filter_target: "budgetToggle", action: "change->property-filter#filter" } %>
-          <span class="relative w-9 h-5 rounded-full bg-slate-200 dark:bg-slate-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500 peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500/50 transition-colors duration-150 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:shadow-sm after:transition-transform after:duration-150 peer-checked:after:translate-x-4"></span>
-        </label>
         <div class="hidden items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400" data-property-filter-target="loading">
           <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -65,6 +57,14 @@
           </svg>
           <span>검색 중...</span>
         </div>
+        <label class="sm:ml-auto inline-flex items-center gap-1.5 cursor-pointer select-none shrink-0">
+          <span class="text-xs text-slate-500 dark:text-slate-400">예산 범위 적용</span>
+          <input type="hidden" name="within_budget" value="0">
+          <%= check_box_tag :within_budget, "1", params[:within_budget] == "1",
+              class: "sr-only peer",
+              data: { property_filter_target: "budgetToggle", action: "change->property-filter#filter" } %>
+          <span class="relative w-9 h-5 rounded-full bg-slate-200 dark:bg-slate-600 peer-checked:bg-blue-600 dark:peer-checked:bg-blue-500 peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500/50 transition-colors duration-150 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:w-4 after:h-4 after:rounded-full after:bg-white after:shadow-sm after:transition-transform after:duration-150 peer-checked:after:translate-x-4"></span>
+        </label>
       <% end %>
     </div>
 
