@@ -16,7 +16,7 @@ module Analyses
       @property = Property.find(params[:property_id])
       @report = RightsAnalysisReport.find_by!(property: @property, user: current_user)
 
-      expected_bid = params[:expected_bid]&.to_i
+      expected_bid = params[:expected_bid].present? ? params[:expected_bid].to_i : nil
       registry_data = @property.raw_data&.dig("registry_transcript")
       tenants = @report.report_data["tenants"]&.map(&:symbolize_keys) || []
       seizures = (registry_data&.dig("seizures") || [])
