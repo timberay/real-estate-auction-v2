@@ -14,11 +14,11 @@ class PropertyAnalysisServiceTest < ActiveSupport::TestCase
     end
   end
 
-  test "returns hash with results and pending_manual_items" do
+  test "returns array of check results" do
     property = PropertyDataSyncService.call(case_number: "2026타경10001")
-    result = PropertyAnalysisService.call(property: property, user: @user)
+    results = PropertyAnalysisService.call(property: property, user: @user)
 
-    assert result.key?(:results)
-    assert result.key?(:pending_manual_items)
+    assert_kind_of Array, results
+    assert results.all? { |r| r.is_a?(PropertyCheckResult) }
   end
 end
