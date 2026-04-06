@@ -2,7 +2,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["ratingSelect", "form", "searchButton", "loading"]
+  static targets = ["ratingSelect", "form", "searchButton", "loading", "budgetToggle"]
 
   filter() {
     this.showLoading()

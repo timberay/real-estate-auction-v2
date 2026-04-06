@@ -12,6 +12,9 @@ class PropertiesController < ApplicationController
       )
     end
     @max_bid_amount = current_user.budget_setting&.max_bid_amount
+    if params[:within_budget] == "1" && @max_bid_amount.present?
+      @user_properties = @user_properties.joins(:property).where("properties.appraisal_price <= ?", @max_bid_amount)
+    end
   end
 
   def show
