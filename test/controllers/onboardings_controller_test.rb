@@ -80,6 +80,37 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, user.budget_snapshots.count
   end
 
+  test "GET step1 renders budget summary in uncalculated state for new user" do
+    get start_onboarding_url
+    assert_response :success
+    # Summary grid is rendered with dashed border (uncalculated)
+    assert_select "div[class*='border-dashed']"
+    assert_select "div[class*='grid-cols-2']"
+  end
+
+  test "GET step1 renders budget summary with values for returning user" do
+    # First complete onboarding to establish a calculated setting
+    get start_onboarding_url
+    guest = User.find_by(email: "guest@auction.local")
+    apt = property_types(:apartment)
+    policy = loan_policies(:auction_bank_apartment)
+
+    BudgetSetting.create!(
+      user: guest, available_cash: 30000, property_type: apt,
+      loan_policy: policy, loan_ratio: 0.7, failed_auction_rounds: 0,
+      repair_cost: 500, acquisition_tax: 360, scrivener_fee: 80,
+      moving_cost: 150, maintenance_fee: 50,
+      max_bid_amount: 96200, searchable_appraisal_limit: 96200,
+      area_unit: "pyeong", completed_at: Time.current
+    )
+
+    get start_onboarding_url
+    assert_response :success
+    # Summary grid is rendered with solid border (calculated)
+    assert_select "div[class*='bg-blue-50']"
+    assert_select "div[class*='border-blue-200']"
+  end
+
   test "GET complete shows results" do
     get start_onboarding_url
     guest = User.find_by(email: "guest@auction.local")
