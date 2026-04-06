@@ -97,11 +97,13 @@ New route and controller action:
 ```ruby
 # config/routes.rb — inside analyses namespace
 resource :report, only: [:show, :update] do
-  patch :confirm, on: :member
+  patch :confirm
 end
+# Generates: PATCH /properties/:property_id/analyses/report/confirm
 
 # ReportsController#confirm
 def confirm
+  @property = Property.find(params[:property_id])
   @report = RightsAnalysisReport.find_by!(property: @property, user: current_user)
   @report.update!(user_confirmed_at: Time.current)
   redirect_to property_analyses_rating_url(@property)
