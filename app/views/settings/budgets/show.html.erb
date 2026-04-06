@@ -18,11 +18,14 @@
   <%= form_with model: @setting, url: settings_budget_path, method: :patch do |f| %>
     <%# Section 1: Available Cash %>
     <%= render CardComponent.new(title: "유용자금", class: "mb-6") do %>
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2" data-controller="number-format" data-number-format-initial-value="<%= @setting.available_cash %>">
         <label class="w-24 text-sm font-medium text-slate-700 dark:text-slate-300">유용자금</label>
-        <%= f.number_field :available_cash, inputmode: "numeric",
-          class: "flex-1 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
-          data: { controller: "number-format", action: "input->number-format#format blur->number-format#formatDisplay" } %>
+        <input type="text"
+          class="flex-1 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+          placeholder="예: 1억 3천"
+          data-number-format-target="display"
+          data-action="input->number-format#format blur->number-format#formatDisplay">
+        <%= f.hidden_field :available_cash, data: { number_format_target: "hidden" } %>
         <span class="text-slate-600 dark:text-slate-400 font-medium">만원</span>
       </div>
     <% end %>
