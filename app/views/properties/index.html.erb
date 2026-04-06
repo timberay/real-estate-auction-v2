@@ -32,8 +32,15 @@
           </div>
           <%= text_field_tag :search, params[:search],
               placeholder: "주소, 사건번호, 법원명 검색",
-              class: "w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 text-sm pl-9 pr-3 py-1.5 focus:ring-2 focus:ring-blue-500/20 focus:outline-none",
-              data: { action: "input->property-filter#search" } %>
+              class: "w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 text-sm pl-9 pr-3 py-1.5 focus:ring-2 focus:ring-blue-500/20 focus:outline-none" %>
+        </div>
+        <%= render ButtonComponent.new(type: "submit", icon: "magnifying-glass", size: :sm, data: { property_filter_target: "searchButton" }) { "검색" } %>
+        <div class="hidden items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400" data-property-filter-target="loading">
+          <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>검색 중...</span>
         </div>
       <% end %>
     </div>

@@ -2,20 +2,16 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["ratingSelect", "form"]
+  static targets = ["ratingSelect", "form", "searchButton", "loading"]
 
   filter() {
+    this.showLoading()
     this.formTarget.requestSubmit()
   }
 
-  search() {
-    clearTimeout(this.searchTimeout)
-    this.searchTimeout = setTimeout(() => {
-      this.formTarget.requestSubmit()
-    }, 300)
-  }
-
-  disconnect() {
-    clearTimeout(this.searchTimeout)
+  showLoading() {
+    if (this.hasSearchButtonTarget) this.searchButtonTarget.classList.add("hidden")
+    if (this.hasLoadingTarget) this.loadingTarget.classList.remove("hidden")
+    if (this.hasLoadingTarget) this.loadingTarget.classList.add("inline-flex")
   }
 }
