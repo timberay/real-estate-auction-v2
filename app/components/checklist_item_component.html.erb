@@ -4,7 +4,7 @@
      data-resolution-input-source-value="<%= auto_source? ? 'auto' : 'manual' %>">
   <div class="flex items-start justify-between">
     <div class="flex items-center gap-2">
-      <span data-source-badge class="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold <%= source_badge_classes %>"><%= source_badge_text %></span>
+      <span data-source-badge class="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-semibold <%= source_badge_classes %>"><%= source_badge_text %></span>
       <p class="text-sm font-medium text-slate-900 dark:text-slate-100"><%= @checklist_item.question %></p>
     </div>
     <span class="ml-2 shrink-0 text-xs font-semibold <%= status_color %>" data-resolution-input-target="statusLabel"><%= status_text %></span>
@@ -26,7 +26,7 @@
       </div>
       <%= text_field_tag "resolutions[#{@result.id}][resolution_note]", @result.resolution_note,
           placeholder: "해결 방안 메모",
-          class: "mt-2 w-full rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500" %>
+          class: "mt-2 w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-500 dark:focus:border-blue-400 transition-colors duration-150" %>
     </div>
   <% end %>
 
@@ -57,7 +57,7 @@
         </div>
         <%= text_field_tag "resolutions[#{@result.id}][resolution_note]", @result.resolution_note,
             placeholder: "해결 방안 메모",
-            class: "mt-2 w-full rounded-md border-yellow-300 dark:border-yellow-600 dark:bg-slate-700 dark:text-slate-200 text-sm placeholder:text-slate-400 dark:placeholder:text-slate-500" %>
+            class: "mt-2 w-full h-10 rounded-md border border-yellow-300 dark:border-yellow-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20 focus:border-blue-500 dark:focus:border-blue-400 transition-colors duration-150" %>
       </div>
     </div>
   <% end %>
