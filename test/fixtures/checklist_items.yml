@@ -30,3 +30,14 @@ property_004:
   data_source_name: "건축물대장"
   priority: "상"
   position: 15
+
+manual_001:
+  code: "manual-001"
+  category: "권리분석"
+  risk_axis: 0
+  question: "전입신고가 되어 있는 임차인이 존재합니까? (채무자/소유자만 거주 시 No)"
+  description: "대항력 있는 임차인이 있으면 보증금 인수 리스크가 생깁니다."
+  logic: '{"yes": "임차인 보증금 인수 리스크가 있습니다.", "no": "안전합니다."}'
+  data_source_name: ""
+  priority: "상"
+  position: 8
