@@ -10,8 +10,8 @@
     <div class="flex items-center gap-2">
       <%= f.text_field :case_number,
           placeholder: "예: 2026타경1234",
-          class: "flex-1 rounded-md border px-3 py-2.5 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" %>
-      <%= render ButtonComponent.new(type: "submit", icon: "plus") { "추가" } %>
+          class: "flex-1 h-8 rounded-md border px-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" %>
+      <%= render ButtonComponent.new(type: "submit", icon: "plus", size: :sm) { "추가" } %>
     </div>
     <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">법원 경매 사건번호를 입력하세요</p>
   <% end %>
@@ -22,7 +22,7 @@
       <%= form_with url: properties_path, method: :get, data: { property_filter_target: "form" }, class: "flex flex-col sm:flex-row items-stretch sm:items-center gap-2" do %>
         <%= select_tag :safety_rating,
             options_for_select([["전체", ""], ["안전", "safe"], ["주의", "caution"], ["경고", "danger"]], params[:safety_rating]),
-            class: "rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 text-sm px-3 py-1.5 focus:ring-2 focus:ring-blue-500/20 focus:outline-none",
+            class: "h-8 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 text-sm px-3 focus:ring-2 focus:ring-blue-500/20 focus:outline-none",
             data: { property_filter_target: "ratingSelect", action: "change->property-filter#filter" } %>
         <div class="relative flex-1 sm:max-w-xs">
           <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -32,7 +32,7 @@
           </div>
           <%= text_field_tag :search, params[:search],
               placeholder: "주소, 사건번호, 법원명 검색",
-              class: "w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 text-sm pl-9 pr-3 py-1.5 focus:ring-2 focus:ring-blue-500/20 focus:outline-none" %>
+              class: "w-full h-8 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 text-sm pl-9 pr-3 focus:ring-2 focus:ring-blue-500/20 focus:outline-none" %>
         </div>
         <%= render ButtonComponent.new(type: "submit", icon: "magnifying-glass", size: :sm, data: { property_filter_target: "searchButton" }) { "검색" } %>
         <div class="hidden items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400" data-property-filter-target="loading">
