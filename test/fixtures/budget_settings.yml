@@ -1,5 +1,5 @@
 completed:
-  user: guest
+  user: budget_user
   available_cash: 30000
   property_type: apartment
   loan_policy: auction_bank_apartment

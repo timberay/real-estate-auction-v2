@@ -1,3 +1,7 @@
 guest:
   email: "guest@auction.local"
   password_digest: <%= BCrypt::Password.create("123456") %>
+
+budget_user:
+  email: "budget@auction.local"
+  password_digest: <%= BCrypt::Password.create("123456") %>
