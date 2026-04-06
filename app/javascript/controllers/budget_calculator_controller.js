@@ -13,6 +13,15 @@ export default class extends Controller {
     this.calculate()
   }
 
+  applyPolicy(event) {
+    const loanRatio = event.target.dataset.loanRatio
+    const loanRatioInput = this.element.querySelector("input[name*='[loan_ratio]']")
+    if (loanRatioInput && loanRatio) {
+      loanRatioInput.value = loanRatio
+    }
+    this.calculate()
+  }
+
   calculate() {
     const availableCash = this.fieldValue("available_cash")
     const reserves = this.totalReserves()
