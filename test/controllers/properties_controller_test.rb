@@ -69,4 +69,30 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_no_match "예산 초과", response.body
   end
+
+  test "GET show redirects to rating when analysis complete" do
+    property = properties(:safe_apartment)
+    user_property = user_properties(:guest_safe_apartment)
+    user_property.update!(safety_rating: "safe", analyzed_at: Time.current)
+
+    get property_url(property)
+    assert_redirected_to property_analyses_rating_path(property)
+  end
+
+  test "GET show redirects to checklist when analysis started but no rating" do
+    property = properties(:safe_apartment)
+    user_property = user_properties(:guest_safe_apartment)
+    user_property.update!(safety_rating: nil, analyzed_at: Time.current)
+
+    get property_url(property)
+    assert_redirected_to edit_property_analyses_checklist_path(property)
+  end
+
+  test "GET show renders pre-analysis state when no analysis" do
+    property = properties(:unanalyzed_officetel)
+
+    get property_url(property)
+    assert_response :success
+    assert_select "button", text: "분석 시작"
+  end
 end
