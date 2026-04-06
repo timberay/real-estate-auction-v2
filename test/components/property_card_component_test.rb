@@ -34,4 +34,28 @@ class PropertyCardComponentTest < ViewComponent::TestCase
     assert_selector "[data-price-type='min-bid']", text: "56,000만원"
     assert_text "최저매각가"
   end
+
+  test "renders budget exceeded badge when appraisal_price exceeds max_bid_amount" do
+    property = properties(:safe_apartment) # appraisal_price: 80000
+    render_inline(PropertyCardComponent.new(property: property, max_bid_amount: 50000))
+    assert_selector ".inline-flex", text: "예산 초과"
+  end
+
+  test "does not render budget exceeded badge when within budget" do
+    property = properties(:safe_apartment) # appraisal_price: 80000
+    render_inline(PropertyCardComponent.new(property: property, max_bid_amount: 100000))
+    assert_no_text "예산 초과"
+  end
+
+  test "does not render budget exceeded badge when max_bid_amount is nil" do
+    property = properties(:safe_apartment)
+    render_inline(PropertyCardComponent.new(property: property, max_bid_amount: nil))
+    assert_no_text "예산 초과"
+  end
+
+  test "does not render budget exceeded badge when max_bid_amount not provided" do
+    property = properties(:safe_apartment)
+    render_inline(PropertyCardComponent.new(property: property))
+    assert_no_text "예산 초과"
+  end
 end
