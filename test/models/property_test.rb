@@ -25,26 +25,18 @@ class PropertyTest < ActiveSupport::TestCase
     assert_includes duplicate.errors[:case_number], "has already been taken"
   end
 
-  test "safety_rating enum values" do
-    property = properties(:safe_apartment)
-    property.safety_rating = "safe"
-    assert_equal "safe", property.safety_rating
-    assert property.safe?
-
-    property.safety_rating = "caution"
-    assert property.caution?
-
-    property.safety_rating = "danger"
-    assert property.danger?
-  end
-
   test "has_many property_check_results" do
     property = properties(:safe_apartment)
     assert_respond_to property, :property_check_results
   end
 
-  test "safety_rating defaults to nil (unanalyzed)" do
-    property = Property.new(case_number: "2026타경99999", court_name: "서울중앙", address: "서울시", appraisal_price: 50000, min_bid_price: 35000)
-    assert_nil property.safety_rating
+  test "has_many user_properties" do
+    property = properties(:safe_apartment)
+    assert_respond_to property, :user_properties
+  end
+
+  test "has_many users through user_properties" do
+    property = properties(:safe_apartment)
+    assert_respond_to property, :users
   end
 end

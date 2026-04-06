@@ -6,7 +6,6 @@ safe_apartment:
   appraisal_price: 80000
   min_bid_price: 56000
   status: "진행중"
-  safety_rating: 0
 
 risky_villa:
   case_number: "2026타경10002"
@@ -16,7 +15,6 @@ risky_villa:
   appraisal_price: 30000
   min_bid_price: 21000
   status: "진행중"
-  safety_rating: 2
 
 unanalyzed_officetel:
   case_number: "2026타경10003"
