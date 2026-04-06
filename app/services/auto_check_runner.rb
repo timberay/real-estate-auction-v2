@@ -25,12 +25,13 @@ class AutoCheckRunner
     "property-002" => ->(raw) { raw.dig("court_auction", "wall_partition_issue") == true }
   }.freeze
 
-  def self.call(property:)
-    new(property:).call
+  def self.call(property:, user:)
+    new(property:, user:).call
   end
 
-  def initialize(property:)
+  def initialize(property:, user:)
     @property = property
+    @user = user
   end
 
   def call
@@ -38,7 +39,7 @@ class AutoCheckRunner
 
     ChecklistItem.ordered.map do |item|
       rule = DETECTION_RULES[item.code]
-      result = @property.property_check_results.find_or_initialize_by(checklist_item: item)
+      result = @property.property_check_results.find_or_initialize_by(checklist_item: item, user: @user)
 
       if rule.nil?
         result.assign_attributes(source_type: nil, has_risk: nil)
