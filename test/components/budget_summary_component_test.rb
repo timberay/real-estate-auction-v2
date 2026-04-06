@@ -12,6 +12,7 @@ class BudgetSummaryComponentTest < ViewComponent::TestCase
 
     assert_selector "div[class*='bg-blue-50']"
     assert_selector "div[class*='border-blue-200']"
+    assert_no_selector "div[class*='border-dashed']"
     assert_text "최대입찰가"
     assert_text "96,200만원"
   end
@@ -37,9 +38,7 @@ class BudgetSummaryComponentTest < ViewComponent::TestCase
     assert_selector "div[class*='bg-slate-50']"
     assert_selector "div[class*='border-dashed']"
     assert_text "최대입찰가"
-    # Em dash for empty values
-    page_html = page.native.inner_html
-    assert_includes page_html, "—"
+    assert_selector "p", text: "—", minimum: 4
   end
 
   test "renders uncalculated state when max_bid_amount is nil" do
