@@ -4,6 +4,7 @@ class PropertiesController < ApplicationController
       .includes(:property)
       .order(created_at: :desc)
     @user_properties = @user_properties.where(safety_rating: params[:safety_rating]) if params[:safety_rating].present?
+    @max_bid_amount = current_user.budget_setting&.max_bid_amount
   end
 
   def show
