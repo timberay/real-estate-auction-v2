@@ -4,6 +4,13 @@ class PropertiesController < ApplicationController
       .includes(:property)
       .order(created_at: :desc)
     @user_properties = @user_properties.where(safety_rating: params[:safety_rating]) if params[:safety_rating].present?
+    if params[:search].present?
+      search_term = "%#{params[:search]}%"
+      @user_properties = @user_properties.joins(:property).where(
+        "properties.case_number LIKE :q OR properties.address LIKE :q OR properties.court_name LIKE :q",
+        q: search_term
+      )
+    end
     @max_bid_amount = current_user.budget_setting&.max_bid_amount
   end
 

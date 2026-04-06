@@ -3,19 +3,19 @@
 require "test_helper"
 
 class SafetyBadgeComponentTest < ViewComponent::TestCase
-  test "renders safe badge" do
+  test "renders safe badge in Korean" do
     render_inline(SafetyBadgeComponent.new(rating: "safe"))
-    assert_selector ".inline-flex", text: "Safe"
+    assert_selector ".inline-flex", text: "안전"
   end
 
-  test "renders caution badge" do
+  test "renders caution badge in Korean" do
     render_inline(SafetyBadgeComponent.new(rating: "caution"))
-    assert_selector ".inline-flex", text: "Caution"
+    assert_selector ".inline-flex", text: "주의"
   end
 
-  test "renders danger badge" do
+  test "renders danger badge in Korean" do
     render_inline(SafetyBadgeComponent.new(rating: "danger"))
-    assert_selector ".inline-flex", text: "Danger"
+    assert_selector ".inline-flex", text: "경고"
   end
 
   test "renders unanalyzed badge for nil rating" do

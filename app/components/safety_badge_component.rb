@@ -2,9 +2,9 @@
 
 class SafetyBadgeComponent < ViewComponent::Base
   RATING_CONFIG = {
-    "safe" => { variant: :success, label: "Safe" },
-    "caution" => { variant: :warning, label: "Caution" },
-    "danger" => { variant: :danger, label: "Danger" },
+    "safe" => { variant: :success, label: "안전" },
+    "caution" => { variant: :warning, label: "주의" },
+    "danger" => { variant: :danger, label: "경고" },
     nil => { variant: :default, label: "미분석" }
   }.freeze
 

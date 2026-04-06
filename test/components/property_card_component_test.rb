@@ -12,7 +12,7 @@ class PropertyCardComponentTest < ViewComponent::TestCase
   test "renders safety badge" do
     property = properties(:safe_apartment)
     render_inline(PropertyCardComponent.new(property: property, safety_rating: "safe"))
-    assert_selector ".inline-flex", text: "Safe"
+    assert_selector ".inline-flex", text: "안전"
   end
 
   test "renders address" do
