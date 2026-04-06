@@ -1,4 +1,5 @@
 <turbo-frame id="onboarding_wizard">
+  <%= render BudgetSummaryComponent.new(setting: @setting) %>
   <%= render WizardStepComponent.new(
     title: "투자 가능한 유용자금을 입력하세요",
     description: "유용자금이란 현재 투자에 사용할 수 있는 현금을 말합니다",
