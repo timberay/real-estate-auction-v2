@@ -1,5 +1,29 @@
 <div class="space-y-3">
-  <%= link_to "← 목록", properties_path, class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300" %>
+  <div class="flex items-center justify-between">
+    <%= link_to "← 목록", properties_path, class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300" %>
+    <div class="flex items-center gap-2 flex-wrap">
+      <% if property.appraisal_price.present? %>
+        <div class="inline-flex items-center gap-1.5 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 h-8">
+          <span class="text-xs text-amber-600 dark:text-amber-400">감정가</span>
+          <span class="text-sm font-bold tabular-nums text-amber-700 dark:text-amber-300"><%= format_price_in_eok(property.appraisal_price) %></span>
+        </div>
+      <% end %>
+      <% if property.min_bid_price.present? %>
+        <div class="inline-flex items-center gap-1.5 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 h-8">
+          <span class="text-xs text-amber-600 dark:text-amber-400">최저매각가</span>
+          <span class="text-sm font-bold tabular-nums text-amber-700 dark:text-amber-300"><%= format_price_in_eok(property.min_bid_price) %></span>
+        </div>
+      <% end %>
+      <% budget = current_user.budget_setting %>
+      <% if budget&.max_bid_amount.present? %>
+        <%= link_to settings_budget_path,
+            class: "inline-flex items-center gap-1.5 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 px-3 h-8 hover:bg-blue-100 dark:hover:bg-blue-800/30 transition-colors duration-150" do %>
+          <span class="text-xs text-slate-500 dark:text-slate-400">최대입찰가</span>
+          <span class="text-sm font-bold tabular-nums text-blue-700 dark:text-blue-300"><%= format_price_in_eok(budget.max_bid_amount) %></span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
   <%= render InspectionTabsComponent.new(property: property, user: current_user, active_tab: active_tab) %>
   <%= yield %>
 </div>
