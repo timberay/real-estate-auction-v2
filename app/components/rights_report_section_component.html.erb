@@ -1,0 +1,10 @@
+<% if @report %>
+  <div class="space-y-4">
+    <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">권리 분석 리포트</h3>
+    <%= render ReportSummaryComponent.new(report: @report) %>
+    <%= render RegistryTimelineComponent.new(report: @report) %>
+    <%= render DividendSimulatorComponent.new(report: @report, property: @property) %>
+    <%= render SourceDocViewerComponent.new(property: @property) %>
+    <%= render LegalDisclaimerComponent.new %>
+  </div>
+<% end %>

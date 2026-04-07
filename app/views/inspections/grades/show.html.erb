@@ -1,1 +1,17 @@
-<h1>Grade: <%= @rating %></h1>
+<%= render layout: "inspections/layout", locals: { property: @property, user_property: @user_property, active_tab: "grade" } do %>
+  <div class="space-y-6">
+    <%= render GradeSummaryComponent.new(rating: @rating) %>
+    <%= render TabSummaryTableComponent.new(results_by_tab: @results_by_tab, property: @property) %>
+
+    <% if @risk_results.any? %>
+      <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">위험 항목 상세</h3>
+      <%= render RiskItemsListComponent.new(risk_results: @risk_results) %>
+    <% end %>
+
+    <%= render RightsReportSectionComponent.new(report: @report, property: @property) %>
+
+    <div class="flex gap-3">
+      <%= link_to "목록으로 돌아가기", properties_path, class: "flex-1 rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm font-semibold text-center text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" %>
+    </div>
+  </div>
+<% end %>

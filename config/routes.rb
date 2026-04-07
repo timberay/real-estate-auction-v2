@@ -28,15 +28,6 @@ Rails.application.routes.draw do
   end
 
   resources :properties, only: [ :index, :show, :create ] do
-    namespace :analyses do
-      resource :start, only: [ :create ], controller: "start"
-      resource :checklist, only: [ :edit, :update ], controller: "checklists"
-      resource :report, only: [ :show, :update ], controller: "reports" do
-        patch :confirm
-      end
-      resource :rating, only: [ :show ], controller: "ratings"
-    end
-
     namespace :inspections do
       resource :start, only: [ :create ], controller: "start"
       resources :tabs, only: [ :edit, :update ], param: :tab_key

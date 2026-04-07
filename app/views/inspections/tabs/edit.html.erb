@@ -1,2 +1,12 @@
-<h1>Inspection Tab: <%= @tab_key %></h1>
-<p><%= @results.size %> items</p>
+<%= render layout: "inspections/layout", locals: { property: @property, user_property: @user_property, active_tab: @tab_key } do %>
+  <%= form_with url: property_inspections_tab_path(@property, tab_key: @tab_key), method: :patch, data: { turbo: false } do |f| %>
+    <div class="space-y-6">
+      <% @results.group_by { |r| r.inspection_item.category }.each do |category, results| %>
+        <%= render InspectionGroupComponent.new(category: category, results: results) %>
+      <% end %>
+    </div>
+    <div class="mt-6">
+      <%= f.submit "저장", class: "w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition-colors" %>
+    </div>
+  <% end %>
+<% end %>

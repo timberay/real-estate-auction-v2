@@ -1,0 +1,13 @@
+<div class="space-y-3">
+  <div class="flex items-center justify-between">
+    <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100"><%= @category %></h3>
+    <% if risk_count > 0 %>
+      <span class="text-xs font-medium text-red-600 dark:text-red-400"><%= risk_count %>건 위험</span>
+    <% end %>
+  </div>
+  <div class="space-y-2">
+    <% @results.each do |result| %>
+      <%= render InspectionItemComponent.new(result: result, show_resolution: true) %>
+    <% end %>
+  </div>
+</div>
