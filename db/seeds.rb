@@ -56,44 +56,46 @@ User.find_or_create_by!(email: "guest@auction.local") do |u|
 end
 puts "  -> Guest user ready"
 
-puts "Seeding checklist items..."
+puts "Seeding inspection items..."
 
-# Position defines display order within F02 analysis flow
-F02_POSITIONS = {
-  "rights-011" => 1, "rights-002" => 2, "rights-019" => 3, "rights-020" => 4,
-  "rights-003" => 5, "rights-006" => 6, "rights-014" => 7, "manual-001" => 8,
-  "property-001" => 9, "property-005" => 10, "resale-001" => 11, "resale-002" => 12,
-  "resale-003" => 13, "resale-004" => 14, "property-004" => 15, "rights-005" => 16,
-  "property-002" => 17
+TAB_MAP = {
+  "매각물건명세서" => "sale_document",
+  "등기부등본" => "registry",
+  "건축물대장" => "building_ledger",
+  "온라인조회" => "online",
+  "현장임장" => "field_visit",
+  "기타" => "etc"
 }.freeze
 
-checklist_data = JSON.parse(File.read(Rails.root.join("db/seeds/checklist_items_summary.json")))
-checklist_data.each do |attrs|
+inspection_data = JSON.parse(File.read(Rails.root.join("db/seeds/checklist_items_summary.json")))
+inspection_data.each do |attrs|
   code = attrs["id"]
   next unless code
-  next unless attrs["f02_risk_axis"]
 
-  position = F02_POSITIONS[code]
-  next unless position
+  tab_key = TAB_MAP[attrs["tab"]]
+  next unless tab_key
 
-  ChecklistItem.find_or_create_by!(code: code) do |item|
+  InspectionItem.find_or_create_by!(code: code) do |item|
+    item.tab = tab_key
+    item.tab_position = attrs["tab_position"]
     item.category = attrs["category"]
-    item.risk_axis = attrs["f02_risk_axis"]
     item.question = attrs["question"]
     item.description = attrs["description"]
     item.logic = attrs["logic"]
     item.data_source_name = attrs.dig("data_source", 0, "name") || "수동 입력"
     item.priority = attrs["priority"]
-    item.position = position
+    item.merged_from = attrs["merged_from"]
   end
 end
-puts "  -> #{ChecklistItem.count} checklist items (expected: 17)"
+puts "  -> #{InspectionItem.count} inspection items (expected: 89)"
 
 puts "Seeding mock properties..."
+guest = User.find_by!(email: "guest@auction.local")
 mock_properties = JSON.parse(File.read(Rails.root.join("db/seeds/mock_properties.json")))
 mock_properties.each do |attrs|
-  PropertyDataSyncService.call(case_number: attrs["case_number"])
+  property = PropertyDataSyncService.call(case_number: attrs["case_number"])
+  guest.user_properties.find_or_create_by!(property: property) if property
 end
-puts "  -> #{Property.count} properties"
+puts "  -> #{Property.count} properties (#{guest.user_properties.count} linked to guest)"
 
 puts "Seed complete!"
