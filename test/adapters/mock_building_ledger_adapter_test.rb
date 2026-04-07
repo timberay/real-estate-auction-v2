@@ -13,8 +13,8 @@ class MockBuildingLedgerAdapterTest < ActiveSupport::TestCase
   test "generates data for unknown case numbers" do
     data = @adapter.fetch_data(case_number: "2026타경99999")
     assert_not_nil data
-    assert_includes ["아파트", "빌라", "오피스텔", "근린생활시설", "사무소"], data[:usage_type]
-    assert_includes [true, false], data[:violation_flag]
+    assert_includes [ "아파트", "빌라", "오피스텔", "근린생활시설", "사무소" ], data[:usage_type]
+    assert_includes [ true, false ], data[:violation_flag]
   end
 
   test "generates deterministic data for same case number" do

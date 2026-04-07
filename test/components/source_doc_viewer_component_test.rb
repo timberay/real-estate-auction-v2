@@ -11,7 +11,7 @@ class SourceDocViewerComponentTest < ViewComponent::TestCase
 
   test "renders registry transcript data" do
     property = properties(:safe_apartment)
-    property.raw_data = { "court_auction" => {}, "registry_transcript" => { "rights" => [{ "type" => "근저당" }], "tenants" => [], "hug_waiver" => false, "seizures" => [] } }
+    property.raw_data = { "court_auction" => {}, "registry_transcript" => { "rights" => [ { "type" => "근저당" } ], "tenants" => [], "hug_waiver" => false, "seizures" => [] } }
     render_inline(SourceDocViewerComponent.new(property: property))
     assert_text "등기부등본"
     assert_text "1건"

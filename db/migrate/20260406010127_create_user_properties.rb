@@ -7,6 +7,6 @@ class CreateUserProperties < ActiveRecord::Migration[8.1]
       t.datetime :analyzed_at
       t.timestamps
     end
-    add_index :user_properties, [:user_id, :property_id], unique: true
+    add_index :user_properties, [ :user_id, :property_id ], unique: true
   end
 end

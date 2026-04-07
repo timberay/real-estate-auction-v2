@@ -2,7 +2,7 @@ require "test_helper"
 
 class RightsAnalysis::DividendSimulatorTest < ActiveSupport::TestCase
   test "distributes to auction costs first" do
-    rights = [{ "type" => "근저당", "date" => "2024-01-15", "holder" => "국민은행", "amount" => 200_000_000 }]
+    rights = [ { "type" => "근저당", "date" => "2024-01-15", "holder" => "국민은행", "amount" => 200_000_000 } ]
     tenants = []
     seizures = []
     result = RightsAnalysis::DividendSimulator.call(
@@ -14,7 +14,7 @@ class RightsAnalysis::DividendSimulatorTest < ActiveSupport::TestCase
   end
 
   test "mortgage receives remainder after costs" do
-    rights = [{ "type" => "근저당", "date" => "2024-01-15", "holder" => "국민은행", "amount" => 200_000_000 }]
+    rights = [ { "type" => "근저당", "date" => "2024-01-15", "holder" => "국민은행", "amount" => 200_000_000 } ]
     result = RightsAnalysis::DividendSimulator.call(
       rights: rights, tenants: [], seizures: [],
       expected_bid: 150_000_000, auction_cost: 3_000_000
@@ -25,7 +25,7 @@ class RightsAnalysis::DividendSimulatorTest < ActiveSupport::TestCase
   end
 
   test "small sum tenant gets priority repayment" do
-    rights = [{ "type" => "근저당", "date" => "2024-01-15", "holder" => "국민은행", "amount" => 200_000_000 }]
+    rights = [ { "type" => "근저당", "date" => "2024-01-15", "holder" => "국민은행", "amount" => 200_000_000 } ]
     tenants = [
       { name: "소액임차인", deposit: 16_500_000, has_opposing_power: true,
         dividend_requested: true, confirmed_date: "2024-03-05", is_small_sum_tenant: true }
@@ -39,7 +39,7 @@ class RightsAnalysis::DividendSimulatorTest < ActiveSupport::TestCase
   end
 
   test "bidder burden shows safe when no assumed amount" do
-    rights = [{ "type" => "근저당", "date" => "2024-01-15", "holder" => "국민은행", "amount" => 100_000_000 }]
+    rights = [ { "type" => "근저당", "date" => "2024-01-15", "holder" => "국민은행", "amount" => 100_000_000 } ]
     result = RightsAnalysis::DividendSimulator.call(
       rights: rights, tenants: [], seizures: [],
       expected_bid: 150_000_000, auction_cost: 3_000_000
@@ -49,7 +49,7 @@ class RightsAnalysis::DividendSimulatorTest < ActiveSupport::TestCase
   end
 
   test "bidder burden shows danger when assumed amount exists" do
-    rights = [{ "type" => "근저당", "date" => "2024-01-15", "holder" => "국민은행", "amount" => 100_000_000 }]
+    rights = [ { "type" => "근저당", "date" => "2024-01-15", "holder" => "국민은행", "amount" => 100_000_000 } ]
     tenants = [
       { name: "임차인A", deposit: 30_000_000, has_opposing_power: true,
         dividend_requested: false, confirmed_date: nil, is_small_sum_tenant: false }

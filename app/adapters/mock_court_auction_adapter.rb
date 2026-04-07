@@ -106,12 +106,12 @@ class MockCourtAuctionAdapter < CourtAuctionAdapter
     partial_share = rng.rand < 0.05
 
     tenants = if has_tenant
-      [{
+      [ {
         name: "임차인#{rng.rand(100..999)}",
         deposit: rng.rand(2) == 0 ? nil : rng.rand(1..10) * 1000,
         move_in_date: "202#{rng.rand(3..5)}-#{format('%02d', rng.rand(1..12))}-#{format('%02d', rng.rand(1..28))}",
         dividend_requested: rng.rand < 0.5
-      }]
+      } ]
     else
       []
     end

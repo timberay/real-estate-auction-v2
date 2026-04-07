@@ -15,7 +15,7 @@ class MockCourtAuctionAdapterTest < ActiveSupport::TestCase
     data = @adapter.fetch_data(case_number: "2026타경99999")
     assert_not_nil data
     assert_equal "2026타경99999", data[:case_number]
-    assert_includes ["아파트", "빌라", "오피스텔"], data[:property_type]
+    assert_includes [ "아파트", "빌라", "오피스텔" ], data[:property_type]
     assert data[:appraisal_price].is_a?(Integer)
     assert data[:appraisal_price] > 0
   end

@@ -3,7 +3,7 @@ require "test_helper"
 class RightsAnalysis::OpportunityDetectorTest < ActiveSupport::TestCase
   test "detects HUG waiver opportunity" do
     registry_data = { "hug_waiver" => true }
-    tenants = [{ name: "임차인A", deposit: 50_000_000, has_opposing_power: true }]
+    tenants = [ { name: "임차인A", deposit: 50_000_000, has_opposing_power: true } ]
     result = RightsAnalysis::OpportunityDetector.call(
       registry_data: registry_data, tenants: tenants, check_results: []
     )
