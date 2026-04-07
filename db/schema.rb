@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_07_003017) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_07_003249) do
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.integer "area_range_max"
@@ -96,6 +96,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_003017) do
     t.datetime "updated_at", null: false
     t.index ["code"], name: "index_inspection_items_on_code", unique: true
     t.index ["tab", "tab_position"], name: "index_inspection_items_on_tab_and_tab_position"
+  end
+
+  create_table "inspection_results", force: :cascade do |t|
+    t.text "auto_value"
+    t.datetime "created_at", null: false
+    t.boolean "has_risk"
+    t.integer "inspection_item_id", null: false
+    t.text "manual_value"
+    t.integer "property_id", null: false
+    t.text "resolution_note"
+    t.boolean "resolvable"
+    t.integer "source_type"
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["inspection_item_id"], name: "index_inspection_results_on_inspection_item_id"
+    t.index ["property_id", "inspection_item_id", "user_id"], name: "idx_inspection_results_unique", unique: true
+    t.index ["property_id"], name: "index_inspection_results_on_property_id"
+    t.index ["user_id"], name: "index_inspection_results_on_user_id"
   end
 
   create_table "loan_policies", force: :cascade do |t|
@@ -219,6 +237,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_003017) do
   add_foreign_key "budget_settings", "users"
   add_foreign_key "budget_snapshots", "budget_snapshots", column: "parent_snapshot_id"
   add_foreign_key "budget_snapshots", "users"
+  add_foreign_key "inspection_results", "inspection_items"
+  add_foreign_key "inspection_results", "properties"
+  add_foreign_key "inspection_results", "users"
   add_foreign_key "loan_policies", "property_types"
   add_foreign_key "property_check_results", "checklist_items"
   add_foreign_key "property_check_results", "properties"
