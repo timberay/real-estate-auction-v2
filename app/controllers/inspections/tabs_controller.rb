@@ -47,7 +47,7 @@ module Inspections
         end
       end
 
-      redirect_to edit_property_inspections_tab_url(@property, tab_key: @tab_key)
+      redirect_to edit_property_inspections_tab_url(@property, tab_key: @tab_key, anchor: "top")
     end
   end
 end

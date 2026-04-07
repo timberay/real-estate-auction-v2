@@ -1,4 +1,5 @@
 <%= render layout: "inspections/layout", locals: { property: @property, user_property: @user_property, active_tab: @tab_key } do %>
+  <div id="top"></div>
   <%= form_with url: property_inspections_tab_path(@property, tab_key: @tab_key), method: :patch, data: { turbo: false } do |f| %>
     <div class="space-y-6">
       <% @results.group_by { |r| r.inspection_item.category }.each do |category, results| %>
