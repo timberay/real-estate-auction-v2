@@ -1,7 +1,5 @@
 <div class="space-y-3">
   <%= link_to "← 목록", properties_path, class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300" %>
   <%= render InspectionTabsComponent.new(property: property, user: current_user, active_tab: active_tab) %>
-  <%= turbo_frame_tag "tab_content" do %>
-    <%= yield %>
-  <% end %>
+  <%= yield %>
 </div>
