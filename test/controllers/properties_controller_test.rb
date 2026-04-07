@@ -76,7 +76,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     user_property.update!(safety_rating: "safe", analyzed_at: Time.current)
 
     get property_url(property)
-    assert_redirected_to property_analyses_rating_path(property)
+    assert_redirected_to property_inspections_grade_path(property)
   end
 
   test "GET show redirects to checklist when analysis started but no rating" do
@@ -85,7 +85,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     user_property.update!(safety_rating: nil, analyzed_at: Time.current)
 
     get property_url(property)
-    assert_redirected_to edit_property_analyses_checklist_path(property)
+    assert_redirected_to edit_property_inspections_tab_path(property, tab_key: "sale_document")
   end
 
   test "GET show renders pre-analysis state when no analysis" do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_06_113000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_07_100002) do
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.integer "area_range_max"
@@ -64,21 +64,39 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_113000) do
     t.index ["user_id"], name: "index_budget_snapshots_on_user_id"
   end
 
-  create_table "checklist_items", force: :cascade do |t|
+  create_table "inspection_items", force: :cascade do |t|
     t.string "category", null: false
     t.string "code", null: false
     t.datetime "created_at", null: false
     t.string "data_source_name"
     t.text "description"
     t.json "logic"
-    t.integer "position", default: 0, null: false
+    t.string "merged_from"
     t.string "priority", default: "상", null: false
     t.text "question", null: false
-    t.integer "risk_axis", null: false
+    t.integer "tab", null: false
+    t.integer "tab_position", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.index ["code"], name: "index_checklist_items_on_code", unique: true
-    t.index ["position"], name: "index_checklist_items_on_position"
-    t.index ["risk_axis"], name: "index_checklist_items_on_risk_axis"
+    t.index ["code"], name: "index_inspection_items_on_code", unique: true
+    t.index ["tab", "tab_position"], name: "index_inspection_items_on_tab_and_tab_position"
+  end
+
+  create_table "inspection_results", force: :cascade do |t|
+    t.text "auto_value"
+    t.datetime "created_at", null: false
+    t.boolean "has_risk"
+    t.integer "inspection_item_id", null: false
+    t.text "manual_value"
+    t.integer "property_id", null: false
+    t.text "resolution_note"
+    t.boolean "resolvable"
+    t.integer "source_type"
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["inspection_item_id"], name: "index_inspection_results_on_inspection_item_id"
+    t.index ["property_id", "inspection_item_id", "user_id"], name: "idx_inspection_results_unique", unique: true
+    t.index ["property_id"], name: "index_inspection_results_on_property_id"
+    t.index ["user_id"], name: "index_inspection_results_on_user_id"
   end
 
   create_table "loan_policies", force: :cascade do |t|
@@ -108,24 +126,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_113000) do
     t.string "status"
     t.datetime "updated_at", null: false
     t.index ["case_number"], name: "index_properties_on_case_number", unique: true
-  end
-
-  create_table "property_check_results", force: :cascade do |t|
-    t.text "api_value"
-    t.integer "checklist_item_id", null: false
-    t.datetime "created_at", null: false
-    t.boolean "has_risk"
-    t.text "manual_value"
-    t.integer "property_id", null: false
-    t.text "resolution_note"
-    t.boolean "resolvable"
-    t.integer "source_type"
-    t.datetime "updated_at", null: false
-    t.integer "user_id", null: false
-    t.index ["checklist_item_id"], name: "index_property_check_results_on_checklist_item_id"
-    t.index ["property_id", "checklist_item_id", "user_id"], name: "idx_check_results_property_item_user", unique: true
-    t.index ["property_id"], name: "index_property_check_results_on_property_id"
-    t.index ["user_id"], name: "index_property_check_results_on_user_id"
   end
 
   create_table "property_types", force: :cascade do |t|
@@ -202,10 +202,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_113000) do
   add_foreign_key "budget_settings", "users"
   add_foreign_key "budget_snapshots", "budget_snapshots", column: "parent_snapshot_id"
   add_foreign_key "budget_snapshots", "users"
+  add_foreign_key "inspection_results", "inspection_items"
+  add_foreign_key "inspection_results", "properties"
+  add_foreign_key "inspection_results", "users"
   add_foreign_key "loan_policies", "property_types"
-  add_foreign_key "property_check_results", "checklist_items"
-  add_foreign_key "property_check_results", "properties"
-  add_foreign_key "property_check_results", "users"
   add_foreign_key "reserve_fund_defaults", "property_types"
   add_foreign_key "rights_analysis_reports", "properties"
   add_foreign_key "rights_analysis_reports", "users"

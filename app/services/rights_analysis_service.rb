@@ -10,7 +10,7 @@ class RightsAnalysisService
 
   def call
     registry_data = @property.raw_data&.dig("registry_transcript")
-    check_results = @property.property_check_results.where(user: @user).includes(:checklist_item)
+    check_results = @property.inspection_results.where(user: @user).includes(:inspection_item)
 
     # Step 1: Extract base right
     base_right = RightsAnalysis::ExtinguishmentBaseRightExtractor.call(registry_data)
@@ -80,12 +80,12 @@ class RightsAnalysisService
   def find_checklist_references(check_results)
     relevant_codes = %w[rights-003 rights-006 rights-009 rights-011]
     check_results
-      .select { |r| relevant_codes.include?(r.checklist_item.code) && r.has_risk == true }
-      .map { |r| r.checklist_item.code }
+      .select { |r| relevant_codes.include?(r.inspection_item.code) && r.has_risk == true }
+      .map { |r| r.inspection_item.code }
   end
 
   def compute_verdict(base_right, tenants, assumed, check_results)
-    has_lien = check_results.any? { |r| r.checklist_item.code == "rights-011" && r.has_risk == true }
+    has_lien = check_results.any? { |r| r.inspection_item.code == "rights-011" && r.has_risk == true }
 
     verdict = if has_lien || assumed[:assumed_amount] > 0
       :danger

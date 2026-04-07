@@ -81,7 +81,7 @@ class ButtonComponentTest < ViewComponent::TestCase
     render_inline(ButtonComponent.new(size: :sm)) { "Small" }
 
     assert_selector "button.px-3"
-    assert_selector "button[class*='py-1.5']"
+    assert_selector "button[class*='h-8']"
     assert_selector "button[class*='text-xs']"
   end
 
@@ -89,7 +89,7 @@ class ButtonComponentTest < ViewComponent::TestCase
     render_inline(ButtonComponent.new) { "Medium" }
 
     assert_selector "button.px-4"
-    assert_selector "button.py-2"
+    assert_selector "button[class*='h-10']"
     assert_selector "button[class*='text-sm']"
   end
 
@@ -97,7 +97,7 @@ class ButtonComponentTest < ViewComponent::TestCase
     render_inline(ButtonComponent.new(size: :lg)) { "Large" }
 
     assert_selector "button.px-6"
-    assert_selector "button.py-3"
+    assert_selector "button[class*='h-12']"
     assert_selector "button[class*='text-base']"
   end
 

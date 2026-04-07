@@ -4,7 +4,7 @@
     <span class="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded">⚠️ 추정치 — 실제 배당과 다를 수 있습니다</span>
   </div>
 
-  <%= form_with url: helpers.property_analyses_report_path(@property), method: :patch, class: "flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700 p-3",
+  <%= form_with url: helpers.property_inspections_dividend_path(@property), method: :patch, class: "flex items-center gap-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700 p-3",
       data: { controller: "dividend-simulator" } do |f| %>
     <label class="text-sm font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">예상 낙찰가</label>
     <input type="text" value="<%= expected_bid %>"

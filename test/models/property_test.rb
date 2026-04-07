@@ -25,9 +25,9 @@ class PropertyTest < ActiveSupport::TestCase
     assert_includes duplicate.errors[:case_number], "has already been taken"
   end
 
-  test "has_many property_check_results" do
+  test "has_many inspection_results" do
     property = properties(:safe_apartment)
-    assert_respond_to property, :property_check_results
+    assert_respond_to property, :inspection_results
   end
 
   test "has_many user_properties" do

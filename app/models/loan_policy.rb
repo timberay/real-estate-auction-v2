@@ -1,4 +1,5 @@
 class LoanPolicy < ApplicationRecord
+  has_many :budget_settings, dependent: :nullify
   belongs_to :property_type
   validates :policy_name, presence: true
   validates :loan_ratio, presence: true,

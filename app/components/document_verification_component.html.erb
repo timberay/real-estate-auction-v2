@@ -24,7 +24,7 @@
     </ul>
 
     <div class="flex gap-3">
-      <%= form_with url: helpers.confirm_property_analyses_report_path(@property), method: :patch do |f| %>
+      <%= form_with url: helpers.property_inspections_grade_path(@property), method: :patch do |f| %>
         <%= f.submit "예, 동일합니다",
             class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 cursor-pointer" %>
       <% end %>

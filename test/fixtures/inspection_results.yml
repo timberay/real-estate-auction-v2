@@ -1,0 +1,35 @@
+safe_apartment_rights_002:
+  property: safe_apartment
+  inspection_item: rights_002
+  user: guest
+  source_type: 0
+  has_risk: false
+
+safe_apartment_rights_011:
+  property: safe_apartment
+  inspection_item: rights_011
+  user: guest
+  source_type: 0
+  has_risk: false
+
+risky_villa_rights_011:
+  property: risky_villa
+  inspection_item: rights_011
+  user: guest
+  source_type: 0
+  has_risk: true
+  resolvable: false
+
+manual_unanswered:
+  property: safe_apartment
+  inspection_item: manual_001
+  user: guest
+
+manual_risk:
+  property: risky_villa
+  inspection_item: manual_001
+  user: guest
+  source_type: 1
+  has_risk: true
+  resolvable: true
+  resolution_note: "임차인과 협의 완료"

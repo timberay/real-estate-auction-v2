@@ -51,6 +51,7 @@ class LoanPolicyTest < ActiveSupport::TestCase
   end
 
   test "scope for_property_type filters by property type" do
+    BudgetSetting.delete_all
     LoanPolicy.delete_all
     apt = property_types(:apartment)
     villa = property_types(:villa)

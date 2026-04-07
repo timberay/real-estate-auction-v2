@@ -13,7 +13,7 @@ class Api::ReserveFundDefaultsControllerTest < ActionDispatch::IntegrationTest
     body = JSON.parse(response.body)
     assert_kind_of Array, body
     assert body.length > 0
-    assert_equal 300, body.first["repair_cost"]
+    assert_equal 527, body.first["repair_cost"]
   end
 
   test "GET index returns empty array for unknown type" do

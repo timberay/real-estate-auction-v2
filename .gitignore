@@ -36,5 +36,15 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+# Ignore IDE and AI tool local state.
 .superpowers/
 .worktrees/
+.claude/
+.ruby-lsp/
+.vscode/
+.idea/
+
+# Ignore OS files.
+.DS_Store
+Thumbs.db

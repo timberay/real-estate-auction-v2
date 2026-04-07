@@ -2,6 +2,7 @@ require "test_helper"
 
 class LoanPolicySyncJobTest < ActiveSupport::TestCase
   test "performs loan policy sync" do
+    BudgetSetting.delete_all
     LoanPolicy.delete_all
     LoanPolicySyncJob.perform_now
     assert LoanPolicy.count > 0

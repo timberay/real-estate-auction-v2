@@ -1,6 +1,10 @@
 require "test_helper"
 
 class LoanPolicySyncServiceTest < ActiveSupport::TestCase
+  setup do
+    BudgetSetting.delete_all
+  end
+
   test "syncs policies from adapter to database" do
     # Clear existing loan policies from fixtures
     LoanPolicy.delete_all

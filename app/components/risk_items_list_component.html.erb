@@ -1,0 +1,30 @@
+<div class="space-y-4">
+  <% if @unresolvable.any? %>
+    <div>
+      <h4 class="text-sm font-semibold text-red-700 dark:text-red-400 mb-2">해결 불가능 (<%= @unresolvable.size %>건)</h4>
+      <div class="space-y-2">
+        <% @unresolvable.each do |result| %>
+          <div class="rounded-md border border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20 p-3">
+            <p class="text-sm font-medium text-slate-900 dark:text-slate-100"><%= result.inspection_item.question %></p>
+            <p class="text-xs text-slate-500 mt-1"><%= result.inspection_item.data_source_name %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+  <% if @resolvable.any? %>
+    <div>
+      <h4 class="text-sm font-semibold text-yellow-700 dark:text-yellow-400 mb-2">해결 가능 (<%= @resolvable.size %>건)</h4>
+      <div class="space-y-2">
+        <% @resolvable.each do |result| %>
+          <div class="rounded-md border border-yellow-300 dark:border-yellow-700 bg-yellow-50 dark:bg-yellow-900/20 p-3">
+            <p class="text-sm font-medium text-slate-900 dark:text-slate-100"><%= result.inspection_item.question %></p>
+            <% if result.resolution_note.present? %>
+              <p class="text-xs text-slate-600 dark:text-slate-400 mt-1"><%= result.resolution_note %></p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

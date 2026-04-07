@@ -22,9 +22,9 @@ class PropertiesController < ApplicationController
     @user_property = current_user.user_properties.find_by(property: @property)
 
     if @user_property&.safety_rating.present?
-      redirect_to property_analyses_rating_path(@property)
+      redirect_to property_inspections_grade_path(@property)
     elsif @user_property&.analyzed_at.present?
-      redirect_to edit_property_analyses_checklist_path(@property)
+      redirect_to edit_property_inspections_tab_path(@property, tab_key: "sale_document")
     end
   end
 
