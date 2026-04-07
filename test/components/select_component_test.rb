@@ -64,28 +64,28 @@ class SelectComponentTest < ViewComponent::TestCase
 
   # --- Size ---
 
-  test "renders default md size with py-2.5" do
+  test "renders default md size with h-10" do
     render_inline(SelectComponent.new(label: "지역", name: "region")) do |select|
       select.with_option(value: "seoul", label: "서울")
     end
 
-    assert_selector "select[class*='py-2.5']"
+    assert_selector "select[class*='h-10']"
   end
 
-  test "renders sm size with py-1.5" do
+  test "renders sm size with h-8" do
     render_inline(SelectComponent.new(label: "지역", name: "region", size: :sm)) do |select|
       select.with_option(value: "seoul", label: "서울")
     end
 
-    assert_selector "select[class*='py-1.5']"
+    assert_selector "select[class*='h-8']"
   end
 
-  test "renders lg size with py-3" do
+  test "renders lg size with h-12" do
     render_inline(SelectComponent.new(label: "지역", name: "region", size: :lg)) do |select|
       select.with_option(value: "seoul", label: "서울")
     end
 
-    assert_selector "select[class*='py-3']"
+    assert_selector "select[class*='h-12']"
   end
 
   # --- Dark mode ---
