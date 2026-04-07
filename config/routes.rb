@@ -36,6 +36,13 @@ Rails.application.routes.draw do
       end
       resource :rating, only: [ :show ], controller: "ratings"
     end
+
+    namespace :inspections do
+      resource :start, only: [ :create ], controller: "start"
+      resources :tabs, only: [ :edit, :update ], param: :tab_key
+      resource :grade, only: [ :show ], controller: "grades"
+      resource :dividend, only: [ :update ], controller: "dividends"
+    end
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
