@@ -1,0 +1,76 @@
+rights_002:
+  code: "rights-002"
+  tab: 0
+  tab_position: 1
+  category: "권리분석"
+  question: "매각물건명세서의 '소멸되지 아니하는 것' 비고란에 기재된 인수 권리가 있습니까?"
+  description: "법원이 직접 '이 권리는 낙찰자가 떠안는다'고 명시한 것입니다."
+  logic: '{"yes": "법원이 인수 권리를 명시했으므로 초보자는 입찰을 피해야 합니다.", "no": "안전합니다."}'
+  data_source_name: "매각물건명세서"
+  priority: "상"
+
+rights_011:
+  code: "rights-011"
+  tab: 0
+  tab_position: 2
+  category: "권리분석"
+  question: "매각물건명세서 비고란에 유치권 또는 법정지상권이 적혀 있습니까?"
+  description: "유치권은 공사대금 미지급 등으로 점유를 주장하는 것이고, 법정지상권은 토지와 건물 소유자가 달라질 때 발생합니다."
+  logic: '{"yes": "인수해야 할 중대 권리가 명시되어 있습니다.", "no": "치명적인 특수 권리가 없습니다."}'
+  data_source_name: "매각물건명세서"
+  priority: "상"
+
+rights_001:
+  code: "rights-001"
+  tab: 1
+  tab_position: 1
+  category: "권리분석"
+  question: "등기부에 말소기준권리보다 앞선 '선순위 가처분'이 있습니까?"
+  description: "선순위 가처분은 소유권 분쟁 중이라는 뜻입니다."
+  logic: '{"yes": "소유권 자체가 바뀔 수 있어 매우 위험합니다.", "no": "가처분 리스크가 없습니다."}'
+  data_source_name: "등기부등본"
+  priority: "상"
+
+property_004:
+  code: "property-004"
+  tab: 2
+  tab_position: 1
+  category: "물건 기본 필터링"
+  question: "건축물대장에 '위반건축물'이라고 표시되어 있습니까?"
+  description: "위반건축물은 대출 제한 등 심각한 불이익이 있습니다."
+  logic: '{"yes": "대출이 안 나오고 이행강제금이 발생합니다.", "no": "위반 사항이 없습니다."}'
+  data_source_name: "건축물대장"
+  priority: "상"
+
+property_001:
+  code: "property-001"
+  tab: 3
+  tab_position: 1
+  category: "물건 기본 필터링"
+  question: "해당 물건이 지분 입찰 물건입니까?"
+  description: "지분 경매는 완전한 소유권을 취득하지 못합니다."
+  logic: '{"yes": "지분만 취득하게 됩니다.", "no": "안전합니다."}'
+  data_source_name: "대법원 법원경매정보"
+  priority: "상"
+
+inspect_007:
+  code: "inspect-007"
+  tab: 4
+  tab_position: 1
+  category: "현장조사·서류검증"
+  question: "현장 우편함의 공과금 통지서 수신인이 소유자(채무자) 이름입니까?"
+  description: "우편함 확인으로 실제 거주자를 파악할 수 있습니다."
+  logic: '{"yes": "소유자가 거주 중일 가능성이 높습니다.", "no": "제3자가 점유 중일 수 있습니다."}'
+  data_source_name: "현장 임장"
+  priority: "상"
+
+manual_001:
+  code: "manual-001"
+  tab: 5
+  tab_position: 10
+  category: "권리분석"
+  question: "분묘기지권(묘지 사용 권리)이 존재합니까?"
+  description: "분묘기지권은 토지 위에 묘지가 있는 경우 발생합니다."
+  logic: '{"yes": "분묘기지권이 있으면 토지 사용에 제한이 있습니다.", "no": "안전합니다."}'
+  data_source_name: "수동 입력"
+  priority: "상"

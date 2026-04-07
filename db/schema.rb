@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_06_113000) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_07_003017) do
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.integer "area_range_max"
@@ -79,6 +79,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_06_113000) do
     t.index ["code"], name: "index_checklist_items_on_code", unique: true
     t.index ["position"], name: "index_checklist_items_on_position"
     t.index ["risk_axis"], name: "index_checklist_items_on_risk_axis"
+  end
+
+  create_table "inspection_items", force: :cascade do |t|
+    t.string "category", null: false
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.string "data_source_name"
+    t.text "description"
+    t.json "logic"
+    t.string "merged_from"
+    t.string "priority", default: "상", null: false
+    t.text "question", null: false
+    t.integer "tab", null: false
+    t.integer "tab_position", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_inspection_items_on_code", unique: true
+    t.index ["tab", "tab_position"], name: "index_inspection_items_on_tab_and_tab_position"
   end
 
   create_table "loan_policies", force: :cascade do |t|
