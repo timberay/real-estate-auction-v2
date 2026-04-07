@@ -9,6 +9,7 @@ class InspectionItemComponent < ViewComponent::Base
 
   def auto_source? = @result.source_type == "auto"
   def manual_source? = !auto_source?
+  def overridden? = manual_source? && @result.auto_value.present?
 
   def risk_classes
     if manual_source? && @result.has_risk.nil?
@@ -20,7 +21,15 @@ class InspectionItemComponent < ViewComponent::Base
     end
   end
 
-  def source_badge_text = auto_source? ? "AUTO" : "직접 확인"
+  def source_badge_text
+    if auto_source?
+      "AUTO"
+    elsif overridden?
+      "수정됨"
+    else
+      "직접 확인"
+    end
+  end
 
   def status_text
     if manual_source? && @result.has_risk.nil? then "미입력"
@@ -31,4 +40,11 @@ class InspectionItemComponent < ViewComponent::Base
 
   def show_auto_resolution? = @show_resolution && auto_source? && @result.has_risk
   def show_manual_input? = @show_resolution && manual_source?
+
+  def logic_present? = @item.logic.present? && @item.logic["yes"].present?
+
+  def selected_answer
+    return nil if @result.has_risk.nil?
+    @result.has_risk ? "no" : "yes"
+  end
 end
