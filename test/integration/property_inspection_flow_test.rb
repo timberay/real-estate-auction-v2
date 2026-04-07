@@ -16,7 +16,7 @@ class PropertyInspectionFlowTest < ActionDispatch::IntegrationTest
     assert_equal InspectionItem.count, InspectionResult.where(property: @property, user: @user).count
 
     # Visit each tab
-    %w[sale_document registry building_ledger online field_visit etc].each do |tab|
+    %w[ sale_document registry building_ledger online field_visit etc ].each do |tab|
       get edit_property_inspections_tab_url(@property, tab_key: tab)
       assert_response :success
     end
