@@ -26,6 +26,7 @@ class PropertyTypeTest < ActiveSupport::TestCase
   end
 
   test "scope enabled returns only enabled types" do
+    BudgetSetting.delete_all
     LoanPolicy.delete_all
     ReserveFundDefault.delete_all
     PropertyType.delete_all
@@ -37,6 +38,7 @@ class PropertyTypeTest < ActiveSupport::TestCase
   end
 
   test "scope ordered sorts by sort_order" do
+    BudgetSetting.delete_all
     LoanPolicy.delete_all
     ReserveFundDefault.delete_all
     PropertyType.delete_all
