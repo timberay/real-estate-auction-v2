@@ -39,7 +39,7 @@ module Sidebar
     private
 
     def active?(item)
-      item.path.present? && item.path == @current_path
+      item.path.present? && @current_path.start_with?(item.path)
     end
 
     def item_classes(item)
