@@ -16,8 +16,7 @@
         "url": "https://www.courtauction.go.kr"
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "legal"
+    "priority": "상"
   },
   {
     "id": "rights-011",
@@ -40,8 +39,7 @@
         "url": "https://www.courtauction.go.kr"
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "legal"
+    "priority": "상"
   },
   {
     "id": "rights-005",
@@ -60,8 +58,7 @@
         "url": "https://www.courtauction.go.kr"
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "loan"
+    "priority": "상"
   },
   {
     "id": "rights-003",
@@ -96,8 +93,7 @@
         "url": "https://www.courtauction.go.kr"
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "legal"
+    "priority": "상"
   },
   {
     "id": "rights-009",
@@ -139,8 +135,7 @@
         "url": "https://www.courtauction.go.kr"
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "legal"
+    "priority": "상"
   },
   {
     "id": "rights-010",
@@ -182,8 +177,7 @@
         "url": null
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "legal"
+    "priority": "상"
   },
   {
     "id": "property-002",
@@ -202,8 +196,7 @@
         "url": "https://www.courtauction.go.kr"
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "loan"
+    "priority": "상"
   },
   {
     "id": "rights-015",
@@ -284,8 +277,7 @@
         "url": "https://www.courtauction.go.kr"
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "legal"
+    "priority": "상"
   },
   {
     "id": "rights-020",
@@ -312,8 +304,7 @@
         "url": null
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "legal"
+    "priority": "상"
   },
   {
     "id": "property-006",
@@ -423,7 +414,6 @@
       }
     ],
     "priority": "상",
-    "f02_risk_axis": "resale",
     "merged_from": "location-002"
   },
   {
@@ -679,8 +669,7 @@
         "url": "https://www.gov.kr"
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "loan"
+    "priority": "상"
   },
   {
     "id": "property-005",
@@ -699,8 +688,7 @@
         "url": "https://www.gov.kr"
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "resale"
+    "priority": "상"
   },
   {
     "id": "property-003",
@@ -829,7 +817,6 @@
       }
     ],
     "priority": "상",
-    "f02_risk_axis": "resale",
     "merged_from": "location-005"
   },
   {
@@ -849,8 +836,7 @@
         "url": "https://www.gov.kr"
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "resale"
+    "priority": "상"
   },
   {
     "id": "property-001",
@@ -869,8 +855,7 @@
         "url": "https://www.courtauction.go.kr"
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "legal"
+    "priority": "상"
   },
   {
     "id": "rights-021",
@@ -1904,7 +1889,6 @@
         "url": null
       }
     ],
-    "priority": "상",
-    "f02_risk_axis": "legal"
+    "priority": "상"
   }
 ]
