@@ -68,6 +68,8 @@ TAB_MAP = {
 }.freeze
 
 inspection_data = JSON.parse(File.read(Rails.root.join("db/seeds/checklist_items_summary.json")))
+seeded_codes = []
+
 inspection_data.each do |attrs|
   code = attrs["id"]
   next unless code
@@ -75,19 +77,25 @@ inspection_data.each do |attrs|
   tab_key = TAB_MAP[attrs["tab"]]
   next unless tab_key
 
-  InspectionItem.find_or_create_by!(code: code) do |item|
-    item.tab = tab_key
-    item.tab_position = attrs["tab_position"]
-    item.category = attrs["category"]
-    item.question = attrs["question"]
-    item.description = attrs["description"]
-    item.logic = attrs["logic"]
-    item.data_source_name = attrs.dig("data_source", 0, "name") || "수동 입력"
-    item.priority = attrs["priority"]
-    item.merged_from = attrs["merged_from"]
-  end
+  item = InspectionItem.find_or_initialize_by(code: code)
+  item.assign_attributes(
+    tab: tab_key,
+    tab_position: attrs["tab_position"],
+    category: attrs["category"],
+    question: attrs["question"],
+    description: attrs["description"],
+    logic: attrs["logic"],
+    data_source_name: attrs.dig("data_source", 0, "name") || "수동 입력",
+    priority: attrs["priority"],
+    merged_from: attrs["merged_from"],
+    answer_type: attrs["answer_type"]
+  )
+  item.save!
+  seeded_codes << code
 end
-puts "  -> #{InspectionItem.count} inspection items (expected: 89)"
+
+removed = InspectionItem.where.not(code: seeded_codes).destroy_all
+puts "  -> #{InspectionItem.count} inspection items (removed #{removed.size} stale)"
 
 puts "Seeding mock properties..."
 guest = User.find_by!(email: "guest@auction.local")

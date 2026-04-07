@@ -23,11 +23,21 @@ class InspectionItemComponent < ViewComponent::Base
 
   def source_badge_text
     if auto_source?
-      "AUTO"
+      "자동"
     elsif overridden?
       "수정됨"
     else
       "직접 확인"
+    end
+  end
+
+  def source_badge_classes
+    if auto_source?
+      "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+    elsif overridden?
+      "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+    else
+      "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
     end
   end
 
@@ -39,7 +49,8 @@ class InspectionItemComponent < ViewComponent::Base
   end
 
   def show_auto_resolution? = @show_resolution && auto_source? && @result.has_risk
-  def show_manual_input? = @show_resolution && manual_source?
+  def show_manual_input? = @show_resolution && manual_source? && !overridden?
+  def show_edit_mode? = @show_resolution && (auto_source? || overridden?)
 
   def logic_present? = @item.logic.present? && @item.logic["yes"].present?
 

@@ -1,16 +1,19 @@
 <div class="rounded-lg border p-4 <%= risk_classes %>"
      data-controller="inspection-item"
      data-inspection-item-result-id-value="<%= @result.id %>"
-     data-inspection-item-auto-value="<%= auto_source? %>">
+     data-inspection-item-auto-value="<%= auto_source? %>"
+     data-inspection-item-original-has-risk-value="<%= @result.has_risk.nil? ? '' : @result.has_risk %>"
+     data-inspection-item-original-badge-text-value="<%= source_badge_text %>"
+     data-inspection-item-original-badge-classes-value="<%= source_badge_classes %>">
   <div class="flex items-start justify-between">
     <div class="flex items-center gap-2">
-      <span class="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-semibold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+      <span class="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-semibold <%= source_badge_classes %>"
             data-inspection-item-target="sourceBadge"><%= source_badge_text %></span>
       <p class="text-sm font-medium text-slate-900 dark:text-slate-100"><%= @item.question %></p>
     </div>
     <div class="ml-2 flex shrink-0 items-center gap-2">
       <span class="text-xs font-semibold" data-inspection-item-target="statusLabel"><%= status_text %></span>
-      <% if @show_resolution && auto_source? %>
+      <% if show_edit_mode? %>
         <button type="button"
                 class="rounded border border-slate-300 px-2 py-0.5 text-xs text-slate-600 hover:bg-slate-100 dark:border-slate-500 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors"
                 data-inspection-item-target="editButton"
@@ -30,21 +33,23 @@
     <div class="mt-2 space-y-1 text-xs" data-logic-section>
       <div class="flex items-start gap-1.5 rounded px-2 py-1
                   <%= selected_answer == 'yes' ? 'bg-green-50 dark:bg-green-900/20 font-semibold text-green-800 dark:text-green-300' : 'text-slate-400 dark:text-slate-500' %>"
+           data-inspection-item-target="logicYes"
            <% if selected_answer == 'yes' %>data-logic-selected="yes"<% end %>>
-        <span class="shrink-0"><%= selected_answer == "yes" ? "✔" : "○" %></span>
+        <span class="shrink-0" data-inspection-item-target="logicYesIcon"><%= selected_answer == "yes" ? "✔" : "○" %></span>
         <span>Yes: <%= @item.logic["yes"] %></span>
       </div>
       <div class="flex items-start gap-1.5 rounded px-2 py-1
                   <%= selected_answer == 'no' ? 'bg-red-50 dark:bg-red-900/20 font-semibold text-red-800 dark:text-red-300' : 'text-slate-400 dark:text-slate-500' %>"
+           data-inspection-item-target="logicNo"
            <% if selected_answer == 'no' %>data-logic-selected="no"<% end %>>
-        <span class="shrink-0"><%= selected_answer == "no" ? "✔" : "○" %></span>
+        <span class="shrink-0" data-inspection-item-target="logicNoIcon"><%= selected_answer == "no" ? "✔" : "○" %></span>
         <span>No: <%= @item.logic["no"] %></span>
       </div>
     </div>
   <% end %>
 
   <%# Edit mode: radio buttons for overriding AUTO answer (hidden by default) %>
-  <% if @show_resolution && auto_source? %>
+  <% if show_edit_mode? %>
     <div class="mt-3 hidden border-t border-slate-200 dark:border-slate-600 pt-3"
          data-inspection-item-target="editSection">
       <p class="mb-2 text-xs font-medium text-slate-600 dark:text-slate-300">자동 수집 결과를 수정합니다:</p>
@@ -110,11 +115,11 @@
     <div class="mt-3 border-t border-slate-200 dark:border-slate-600 pt-3">
       <div class="flex items-center gap-4">
         <label class="inline-flex items-center text-sm text-slate-700 dark:text-slate-200">
-          <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", "true", @result.has_risk == true,
+          <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", "false", @result.has_risk == false,
               data: { action: "change->inspection-item#toggleManualRisk" }, class: "mr-1.5" %> 예
         </label>
         <label class="inline-flex items-center text-sm text-slate-700 dark:text-slate-200">
-          <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", "false", @result.has_risk == false,
+          <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", "true", @result.has_risk == true,
               data: { action: "change->inspection-item#toggleManualRisk" }, class: "mr-1.5" %> 아니오
         </label>
       </div>

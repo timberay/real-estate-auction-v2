@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_07_100002) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_07_200001) do
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.integer "area_range_max"
@@ -65,6 +65,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_100002) do
   end
 
   create_table "inspection_items", force: :cascade do |t|
+    t.string "answer_type"
     t.string "category", null: false
     t.string "code", null: false
     t.datetime "created_at", null: false

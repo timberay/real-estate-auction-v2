@@ -10,10 +10,13 @@ class InspectionItem < ApplicationRecord
     etc: 5              # 기타
   }
 
+  ANSWER_TYPES = %w[action_confirm].freeze
+
   validates :code, presence: true, uniqueness: true
   validates :tab, presence: true
   validates :question, presence: true
   validates :category, presence: true
+  validates :answer_type, inclusion: { in: ANSWER_TYPES }, allow_nil: true
 
   scope :ordered, -> { order(:tab, :tab_position) }
   scope :for_tab, ->(tab) { where(tab: tab).order(:tab_position) }
