@@ -26,6 +26,37 @@ class PropertyInspectionFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "override auto result preserves auto_value and shows as manual" do
+    PropertyInspectionService.call(property: @property, user: @user)
+
+    auto_result = @property.inspection_results
+      .where(user: @user, source_type: "auto")
+      .first
+
+    assert_not_nil auto_result, "Expected at least one auto result"
+    original_risk = auto_result.has_risk
+    tab_key = auto_result.inspection_item.tab
+
+    patch property_inspections_tab_url(@property, tab_key: tab_key), params: {
+      resolutions: {
+        auto_result.id => {
+          override: "true",
+          has_risk: (!original_risk).to_s
+        }
+      }
+    }
+
+    auto_result.reload
+    assert_equal "manual", auto_result.source_type
+    assert_equal !original_risk, auto_result.has_risk
+    assert_equal original_risk.to_s, auto_result.auto_value
+
+    # Verify it appears correctly on the tab page
+    get edit_property_inspections_tab_url(@property, tab_key: tab_key)
+    assert_response :success
+    assert_select "span", text: "수정됨"
+  end
+
   test "manual input updates result" do
     PropertyInspectionService.call(property: @property, user: @user)
 
