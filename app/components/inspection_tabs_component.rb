@@ -18,13 +18,15 @@ class InspectionTabsComponent < ViewComponent::Base
   private
 
   def tabs
+    rating_service = InspectionRatingService.new(property: @property, user: @user)
     TAB_CONFIG.map do |tab|
       counts = tab_counts(tab[:key])
       tab.merge(
         active: tab[:key] == @active_tab,
         url: tab_url(tab[:key]),
         checked: counts[:checked],
-        total: counts[:total]
+        total: counts[:total],
+        rating: tab[:key] == "grade" ? nil : rating_service.tab_rating(tab[:key])
       )
     end
   end
@@ -47,5 +49,15 @@ class InspectionTabsComponent < ViewComponent::Base
     else
       helpers.edit_property_inspections_tab_path(@property, tab_key: key)
     end
+  end
+
+  RATING_BADGE = {
+    safe: { label: "안전", classes: "bg-green-800 text-green-200" },
+    caution: { label: "주의", classes: "bg-yellow-800 text-yellow-200" },
+    danger: { label: "경고", classes: "bg-red-800 text-red-200" }
+  }.freeze
+
+  def rating_badge(rating)
+    RATING_BADGE[rating]
   end
 end
