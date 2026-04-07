@@ -1,4 +1,4 @@
-# RORSPEC.md
+# STANDARDS.md
 
 * This file provides guidance to all AI-agents when working with code in this project.
 
