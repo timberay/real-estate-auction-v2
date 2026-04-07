@@ -1,0 +1,64 @@
+- generic [active] [ref=e1]:
+  - link "본문으로 건너뛰기" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e3]:
+    - generic [ref=e5]: Oh My Auction
+    - generic [ref=e6]:
+      - button [ref=e8]:
+        - img [ref=e10]
+      - button [ref=e12]:
+        - img [ref=e13]
+      - button [ref=e15]:
+        - img [ref=e16]
+  - navigation [ref=e18]:
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - generic [ref=e22]:
+          - link "예산 설정" [ref=e23] [cursor=pointer]:
+            - /url: /onboarding
+            - img [ref=e24]
+          - link "물건 목록" [ref=e26] [cursor=pointer]:
+            - /url: /properties
+            - img [ref=e27]
+          - button "시세 조회" [disabled] [ref=e29]:
+            - img [ref=e30]
+        - generic [ref=e33]:
+          - button "권리분석 리포트" [disabled] [ref=e34]:
+            - img [ref=e35]
+          - button "수익 계산기" [disabled] [ref=e37]:
+            - img [ref=e38]
+          - button "대출 매칭" [disabled] [ref=e40]:
+            - img [ref=e41]
+        - generic [ref=e44]:
+          - button "진행 체크리스트" [disabled] [ref=e45]:
+            - img [ref=e46]
+          - button "가상 입찰" [disabled] [ref=e48]
+          - button "사전 임장" [disabled] [ref=e49]:
+            - img [ref=e50]
+        - generic [ref=e54]:
+          - button "명도 가이드" [disabled] [ref=e55]:
+            - img [ref=e56]
+          - button "전문가 연결" [disabled] [ref=e58]:
+            - img [ref=e59]
+      - button "사이드바 접기/펼치기" [ref=e62]:
+        - img [ref=e64]
+  - generic [ref=e66]:
+    - main [ref=e67]:
+      - generic [ref=e68]:
+        - link "← 목록" [ref=e70] [cursor=pointer]:
+          - /url: /properties
+        - generic [ref=e71]:
+          - heading "2026타경10001" [level=3] [ref=e73]
+          - generic [ref=e75]:
+            - generic [ref=e77]: 서울중앙지방법원
+            - paragraph [ref=e78]: 서울특별시 강남구 역삼동 100-1
+            - generic [ref=e79]:
+              - generic [ref=e80]:
+                - text: 감정가
+                - paragraph [ref=e81]: 8억
+              - generic [ref=e82]:
+                - text: 최저매각가
+                - paragraph [ref=e83]: 5억 6,000만원
+            - button "분석 시작" [ref=e86]
+    - contentinfo [ref=e87]:
+      - paragraph [ref=e88]: © 2026 Oh My Auction. All rights reserved.

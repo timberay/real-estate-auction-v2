@@ -1,0 +1,412 @@
+- generic [active] [ref=e89]:
+  - link "본문으로 건너뛰기" [ref=e90] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e91]:
+    - generic [ref=e93]: Oh My Auction
+    - generic [ref=e94]:
+      - button [ref=e96]:
+        - img [ref=e98]
+      - button [ref=e100]:
+        - img [ref=e101]
+      - button [ref=e103]:
+        - img [ref=e104]
+  - navigation [ref=e106]:
+    - generic [ref=e107]:
+      - generic [ref=e108]:
+        - generic [ref=e110]:
+          - link "예산 설정" [ref=e111] [cursor=pointer]:
+            - /url: /onboarding
+            - img [ref=e112]
+          - link "물건 목록" [ref=e114] [cursor=pointer]:
+            - /url: /properties
+            - img [ref=e115]
+          - button "시세 조회" [disabled] [ref=e117]:
+            - img [ref=e118]
+        - generic [ref=e121]:
+          - button "권리분석 리포트" [disabled] [ref=e122]:
+            - img [ref=e123]
+          - button "수익 계산기" [disabled] [ref=e125]:
+            - img [ref=e126]
+          - button "대출 매칭" [disabled] [ref=e128]:
+            - img [ref=e129]
+        - generic [ref=e132]:
+          - button "진행 체크리스트" [disabled] [ref=e133]:
+            - img [ref=e134]
+          - button "가상 입찰" [disabled] [ref=e136]
+          - button "사전 임장" [disabled] [ref=e137]:
+            - img [ref=e138]
+        - generic [ref=e142]:
+          - button "명도 가이드" [disabled] [ref=e143]:
+            - img [ref=e144]
+          - button "전문가 연결" [disabled] [ref=e146]:
+            - img [ref=e147]
+      - button "사이드바 접기/펼치기" [ref=e150]:
+        - img [ref=e152]
+  - generic [ref=e154]:
+    - main [ref=e155]:
+      - generic [ref=e156]:
+        - generic [ref=e157]:
+          - link "← 목록" [ref=e158] [cursor=pointer]:
+            - /url: /properties
+          - generic [ref=e159]:
+            - generic [ref=e160]:
+              - generic [ref=e161]: 감정가
+              - generic [ref=e162]: 8억
+            - generic [ref=e163]:
+              - generic [ref=e164]: 최저매각가
+              - generic [ref=e165]: 5억 6,000만원
+            - link "최대입찰가 1억 8,810만원" [ref=e166] [cursor=pointer]:
+              - /url: /settings/budget
+              - generic [ref=e167]: 최대입찰가
+              - generic [ref=e168]: 1억 8,810만원
+        - navigation [ref=e169]:
+          - generic [ref=e170]:
+            - link "안전 매각물건명세서 18/18" [ref=e171] [cursor=pointer]:
+              - /url: /properties/1/inspections/tabs/sale_document/edit
+            - link "경고 등기부등본 10/10" [ref=e172] [cursor=pointer]:
+              - /url: /properties/1/inspections/tabs/registry/edit
+            - link "주의 건축물대장 9/9" [ref=e173] [cursor=pointer]:
+              - /url: /properties/1/inspections/tabs/building_ledger/edit
+            - link "온라인조회 1/22" [ref=e174] [cursor=pointer]:
+              - /url: /properties/1/inspections/tabs/online/edit
+            - link "현장임장 0/21" [ref=e175] [cursor=pointer]:
+              - /url: /properties/1/inspections/tabs/field_visit/edit
+            - link "기타 0/9" [ref=e176] [cursor=pointer]:
+              - /url: /properties/1/inspections/tabs/etc/edit
+            - link "최종등급" [ref=e177] [cursor=pointer]:
+              - /url: /properties/1/inspections/grade
+        - generic [ref=e178]:
+          - generic [ref=e179]:
+            - generic [ref=e180]:
+              - heading "권리분석" [level=3] [ref=e182]
+              - generic [ref=e183]:
+                - generic [ref=e184]:
+                  - generic [ref=e185]:
+                    - generic [ref=e186]:
+                      - generic [ref=e187]: 자동
+                      - paragraph [ref=e188]: 매각물건명세서 '소멸되지 아니하는 것' 비고란에 낙찰자가 인수할 권리(가등기, 가처분, 전세권 등) 기재가 없는 깨끗한 물건입니까?
+                    - generic [ref=e189]:
+                      - generic [ref=e190]: 안전
+                      - button "수정" [ref=e191]
+                  - paragraph [ref=e192]: 법원이 직접 '이 권리는 낙찰자가 떠안는다'고 명시한 것으로, 초보자에게 가장 위험한 함정입니다.
+                  - generic [ref=e193]:
+                    - generic [ref=e194]:
+                      - generic [ref=e195]: ✔
+                      - generic [ref=e196]: "Yes: 낙찰자에게 인수되는 제3자 권리가 없어 안전합니다."
+                    - generic [ref=e197]:
+                      - generic [ref=e198]: ○
+                      - generic [ref=e199]: "No: 법원이 인수 권리를 명시했으므로 초보자는 입찰을 피해야 합니다."
+                - generic [ref=e200]:
+                  - generic [ref=e201]:
+                    - generic [ref=e202]:
+                      - generic [ref=e203]: 자동
+                      - paragraph [ref=e204]: 매각물건명세서 비고란에 유치권 또는 법정지상권 기재가 없습니까?
+                    - generic [ref=e205]:
+                      - generic [ref=e206]: 안전
+                      - button "수정" [ref=e207]
+                  - paragraph [ref=e208]: 유치권은 공사대금 미지급 등으로 점유를 주장하는 것이고, 법정지상권은 토지와 건물 소유자가 달라질 때 발생합니다. 둘 다 낙찰 후 큰 분쟁 요소입니다.
+                  - generic [ref=e209]:
+                    - generic [ref=e210]:
+                      - generic [ref=e211]: ✔
+                      - generic [ref=e212]: "Yes: 치명적인 특수 권리가 없습니다."
+                    - generic [ref=e213]:
+                      - generic [ref=e214]: ○
+                      - generic [ref=e215]: "No: 인수해야 할 중대 권리가 명시되어 있습니다."
+                - generic [ref=e216]:
+                  - generic [ref=e217]:
+                    - generic [ref=e218]:
+                      - generic [ref=e219]: 자동
+                      - paragraph [ref=e220]: 매각물건명세서에 건축법상 사용 승인을 받은 정상 건물로 기재되어 있습니까?
+                    - generic [ref=e221]:
+                      - generic [ref=e222]: 안전
+                      - button "수정" [ref=e223]
+                  - paragraph [ref=e224]: 사용승인 미취득 건물은 대출 불가, 전입신고 불가 등 활용에 심각한 제약이 생깁니다.
+                  - generic [ref=e225]:
+                    - generic [ref=e226]:
+                      - generic [ref=e227]: ✔
+                      - generic [ref=e228]: "Yes: 건물 자체의 하자가 없습니다."
+                    - generic [ref=e229]:
+                      - generic [ref=e230]: ○
+                      - generic [ref=e231]: "No: 건축물에 치명적인 하자가 있는 비정상적인 물건입니다."
+                - generic [ref=e232]:
+                  - generic [ref=e233]:
+                    - generic [ref=e234]:
+                      - generic [ref=e235]: 자동
+                      - paragraph [ref=e236]: 채무자/소유자만 거주 중이며, 전입신고된 제3자 임차인이 없습니까?
+                    - generic [ref=e237]:
+                      - generic [ref=e238]: 안전
+                      - button "수정" [ref=e239]
+                  - paragraph [ref=e240]: 대항력 있는 임차인이 있으면 보증금 인수 리스크가 생깁니다. 경매 투자의 핵심 확인 사항입니다.
+                  - generic [ref=e241]:
+                    - generic [ref=e242]:
+                      - generic [ref=e243]: ✔
+                      - generic [ref=e244]: "Yes: 인수할 임차인 보증금이 없어 안전합니다."
+                    - generic [ref=e245]:
+                      - generic [ref=e246]: ○
+                      - generic [ref=e247]: "No: 임차인의 미배당 보증금은 낙찰자가 전액 인수해야 합니다."
+                - generic [ref=e248]:
+                  - generic [ref=e249]:
+                    - generic [ref=e250]:
+                      - generic [ref=e251]: 직접 확인
+                      - paragraph [ref=e252]: 대항력 있는 임차인이 없거나, 있더라도 HUG 등 채권자의 대항력 포기 확약서가 제출되어 있습니까?
+                    - generic [ref=e254]: 안전
+                  - paragraph [ref=e255]: 전세보증보험(HUG)이 개입된 물건에서 확약서 제출 여부에 따라 인수 리스크가 크게 달라집니다. 최근 전세사기 이슈로 중요도가 높아진 항목입니다.
+                  - generic [ref=e256]:
+                    - generic [ref=e257]:
+                      - generic [ref=e258]: ✔
+                      - generic [ref=e259]: "Yes: 대항력이 있더라도 인수 금액이 사라집니다."
+                    - generic [ref=e260]:
+                      - generic [ref=e261]: ○
+                      - generic [ref=e262]: "No: 대항력 있는 임차인의 미배당 금액을 낙찰자가 모두 떠안아야 합니다."
+                  - generic [ref=e264]:
+                    - generic [ref=e265]:
+                      - radio "예" [checked] [ref=e266]
+                      - text: 예
+                    - generic [ref=e267]:
+                      - radio "아니오" [ref=e268]
+                      - text: 아니오
+                - generic [ref=e269]:
+                  - generic [ref=e270]:
+                    - generic [ref=e271]:
+                      - generic [ref=e272]: 자동
+                      - paragraph [ref=e273]: 대항력 있는 임차인이 없거나, 있더라도 배당요구 종기일 이전에 배당요구를 신청했습니까?
+                    - generic [ref=e274]:
+                      - generic [ref=e275]: 안전
+                      - button "수정" [ref=e276]
+                  - paragraph [ref=e277]: 배당요구를 했으면 배당으로 보증금을 받고 퇴거하므로 낙찰자가 안전하고, 안 했으면 보증금 인수 리스크가 남습니다.
+                  - generic [ref=e278]:
+                    - generic [ref=e279]:
+                      - generic [ref=e280]: ✔
+                      - generic [ref=e281]: "Yes: 임차인이 없거나 배당을 통해 보증금이 해결될 가능성이 있습니다."
+                    - generic [ref=e282]:
+                      - generic [ref=e283]: ○
+                      - generic [ref=e284]: "No: 배당요구를 하지 않아 낙찰자가 보증금 전액을 떠안아야 합니다."
+                - generic [ref=e285]:
+                  - generic [ref=e286]:
+                    - generic [ref=e287]:
+                      - generic [ref=e288]: 직접 확인
+                      - paragraph [ref=e289]: 대항력 있는 임차인이 없거나, 보증금이 전액 배당되어 미배당 금액이 없습니까?
+                    - generic [ref=e291]: 안전
+                  - paragraph [ref=e292]: 미배당 보증금은 낙찰자가 인수해야 할 수 있어, 실질 투자비용이 크게 늘어납니다. 배당표 분석의 핵심입니다.
+                  - generic [ref=e293]:
+                    - generic [ref=e294]:
+                      - generic [ref=e295]: ✔
+                      - generic [ref=e296]: "Yes: 보증금을 전액 배당받아 나가므로 추가 부담이 없습니다."
+                    - generic [ref=e297]:
+                      - generic [ref=e298]: ○
+                      - generic [ref=e299]: "No: 미배당 보증금 전액을 낙찰자가 추가로 물어줘야 합니다."
+                  - generic [ref=e301]:
+                    - generic [ref=e302]:
+                      - radio "예" [checked] [ref=e303]
+                      - text: 예
+                    - generic [ref=e304]:
+                      - radio "아니오" [ref=e305]
+                      - text: 아니오
+                - generic [ref=e306]:
+                  - generic [ref=e307]:
+                    - generic [ref=e308]:
+                      - generic [ref=e309]: 자동
+                      - paragraph [ref=e310]: 대항력 있는 임차인이 없거나, 있더라도 보증금·확정일자·배당요구 정보가 모두 확인되었습니까?
+                    - generic [ref=e311]:
+                      - generic [ref=e312]: 안전
+                      - button "수정" [ref=e313]
+                  - paragraph [ref=e314]: 임차인 정보가 불완전하면 보증금 규모를 예측할 수 없어 리스크 산정이 불가능합니다.
+                  - generic [ref=e315]:
+                    - generic [ref=e316]:
+                      - generic [ref=e317]: ✔
+                      - generic [ref=e318]: "Yes: 미상 보증금 인수 위험이 없습니다."
+                    - generic [ref=e319]:
+                      - generic [ref=e320]: ○
+                      - generic [ref=e321]: "No: 인수할 보증금 규모를 알 수 없어 절대 입찰해서는 안 됩니다."
+                - generic [ref=e322]:
+                  - generic [ref=e323]:
+                    - generic [ref=e324]:
+                      - generic [ref=e325]: 직접 확인
+                      - paragraph [ref=e326]: 임차권/전세권이 없거나, 모두 말소기준권리 이후(후순위)여서 소멸 대상입니까?
+                    - generic [ref=e328]: 안전
+                  - paragraph [ref=e329]: 선순위 임차권·전세권은 낙찰 후에도 소멸하지 않아 낙찰자가 보증금 전액을 인수해야 합니다.
+                  - generic [ref=e330]:
+                    - generic [ref=e331]:
+                      - generic [ref=e332]: ✔
+                      - generic [ref=e333]: "Yes: 뒤에 있는 권리는 원칙적으로 소멸됩니다."
+                    - generic [ref=e334]:
+                      - generic [ref=e335]: ○
+                      - generic [ref=e336]: "No: 말소기준권리보다 앞설 경우 낙찰자가 인수할 위험이 있습니다."
+                  - generic [ref=e338]:
+                    - generic [ref=e339]:
+                      - radio "예" [checked] [ref=e340]
+                      - text: 예
+                    - generic [ref=e341]:
+                      - radio "아니오" [ref=e342]
+                      - text: 아니오
+                - generic [ref=e343]:
+                  - generic [ref=e344]:
+                    - generic [ref=e345]:
+                      - generic [ref=e346]: 직접 확인
+                      - paragraph [ref=e347]: 임차인이 없거나, 전입신고일이 말소기준일 이후여서 대항력이 없습니까?
+                    - generic [ref=e349]: 안전
+                  - paragraph [ref=e350]: 전입신고 대항력 발생 시점과 말소기준권리 설정일의 선후관계가 임차인 인수 여부를 결정짓습니다. 경매 권리분석의 가장 기술적인 판단 포인트입니다.
+                  - generic [ref=e351]:
+                    - generic [ref=e352]:
+                      - generic [ref=e353]: ✔
+                      - generic [ref=e354]: "Yes: 대항력이 없는 임차인이므로 안전합니다."
+                    - generic [ref=e355]:
+                      - generic [ref=e356]: ○
+                      - generic [ref=e357]: "No: 대항력이 있는 임차인이므로 추가 확인이 필요합니다."
+                  - generic [ref=e359]:
+                    - generic [ref=e360]:
+                      - radio "예" [checked] [ref=e361]
+                      - text: 예
+                    - generic [ref=e362]:
+                      - radio "아니오" [ref=e363]
+                      - text: 아니오
+                - generic [ref=e364]:
+                  - generic [ref=e365]:
+                    - generic [ref=e366]:
+                      - generic [ref=e367]: 자동
+                      - paragraph [ref=e368]: 아파트이거나, 토지와 건물이 일체로 매각되는 물건입니까?
+                    - generic [ref=e369]:
+                      - generic [ref=e370]: 안전
+                      - button "수정" [ref=e371]
+                  - paragraph [ref=e372]: 토지·건물이 분리 매각되면 법정지상권 문제가 발생하거나, 토지 소유자와의 분쟁이 생길 수 있습니다. 빌라·상가 투자 시 반드시 확인해야 합니다.
+                  - generic [ref=e373]:
+                    - generic [ref=e374]:
+                      - generic [ref=e375]: ✔
+                      - generic [ref=e376]: "Yes: 법정지상권 성립 위험이 낮습니다."
+                    - generic [ref=e377]:
+                      - generic [ref=e378]: ○
+                      - generic [ref=e379]: "No: 법정지상권 성립 가능성이 높아 토지 활용이 제한될 수 있습니다."
+                - generic [ref=e380]:
+                  - generic [ref=e381]:
+                    - generic [ref=e382]:
+                      - generic [ref=e383]: 자동
+                      - paragraph [ref=e384]: 현황조사서에 유치권 신고 표시가 없습니까?
+                    - generic [ref=e385]:
+                      - generic [ref=e386]: 안전
+                      - button "수정" [ref=e387]
+                  - paragraph [ref=e388]: 유치권은 공사비·수리비 등을 이유로 물건을 점유하는 권리로, 금액이 크면 낙찰 후 분쟁이 장기화됩니다. Stage 1의 매각물건명세서와 다른 서류(현황조사서)에서 교차 확인합니다.
+                  - generic [ref=e389]:
+                    - generic [ref=e390]:
+                      - generic [ref=e391]: ✔
+                      - generic [ref=e392]: "Yes: 신고된 유치권이 없습니다."
+                    - generic [ref=e393]:
+                      - generic [ref=e394]: ○
+                      - generic [ref=e395]: "No: 실제 공사 내역과 점유 내역을 반드시 확인해야 합니다."
+            - generic [ref=e396]:
+              - heading "물건 기본 필터링" [level=3] [ref=e398]
+              - generic [ref=e399]:
+                - generic [ref=e400]:
+                  - generic [ref=e401]:
+                    - generic [ref=e402]:
+                      - generic [ref=e403]: 자동
+                      - paragraph [ref=e404]: 호실 간 벽체 구분이 명확하고 불법 구조변경이 없습니까?
+                    - generic [ref=e405]:
+                      - generic [ref=e406]: 안전
+                      - button "수정" [ref=e407]
+                  - paragraph [ref=e408]: 불법 구조변경된 물건은 원상복구 비용이 발생하고, 인접 호실 소유자와 분쟁이 생길 수 있습니다.
+                  - generic [ref=e409]:
+                    - generic [ref=e410]:
+                      - generic [ref=e411]: ✔
+                      - generic [ref=e412]: "Yes: 호실 구분이 명확합니다."
+                    - generic [ref=e413]:
+                      - generic [ref=e414]: ○
+                      - generic [ref=e415]: "No: 대출이 거절될 수 있는 매우 위험한 물건입니다."
+                - generic [ref=e416]:
+                  - generic [ref=e417]:
+                    - generic [ref=e418]:
+                      - generic [ref=e419]: 직접 확인
+                      - paragraph [ref=e420]: 입찰하려는 경매 물건의 종류가 '아파트'입니까?
+                    - generic [ref=e422]: 안전
+                  - paragraph [ref=e423]: 물건 종류에 따라 이후 점검 항목의 분기(아파트 전용 vs 빌라/상가 전용)가 달라집니다. 조건부 플로우의 핵심 분기점입니다.
+                  - generic [ref=e424]:
+                    - generic [ref=e425]:
+                      - generic [ref=e426]: ✔
+                      - generic [ref=e427]: "Yes: 아파트는 데이터가 가장 명확하고 초보자에게 적합합니다."
+                    - generic [ref=e428]:
+                      - generic [ref=e429]: ○
+                      - generic [ref=e430]: "No: 아파트 외의 물건은 변수가 많고 정보가 불투명합니다."
+                  - generic [ref=e432]:
+                    - generic [ref=e433]:
+                      - radio "예" [checked] [ref=e434]
+                      - text: 예
+                    - generic [ref=e435]:
+                      - radio "아니오" [ref=e436]
+                      - text: 아니오
+                - generic [ref=e437]:
+                  - generic [ref=e438]:
+                    - generic [ref=e439]:
+                      - generic [ref=e440]: 자동
+                      - paragraph [ref=e441]: 해당 물건이 지상층에 위치합니까?
+                    - generic [ref=e442]:
+                      - generic [ref=e443]: 안전
+                      - button "수정" [ref=e444]
+                  - paragraph [ref=e445]: 반지하 빌라는 침수 위험, 채광 불량, 매매 난이도가 높아 초보 투자자에게 부적합합니다.
+                  - generic [ref=e446]:
+                    - generic [ref=e447]:
+                      - generic [ref=e448]: ✔
+                      - generic [ref=e449]: "Yes: 반지하가 아닙니다."
+                    - generic [ref=e450]:
+                      - generic [ref=e451]: ○
+                      - generic [ref=e452]: "No: 매매/임대가 매우 어렵습니다."
+            - generic [ref=e453]:
+              - heading "명도 난이도" [level=3] [ref=e455]
+              - generic [ref=e456]:
+                - generic [ref=e457]:
+                  - generic [ref=e458]:
+                    - generic [ref=e459]:
+                      - generic [ref=e460]: 직접 확인
+                      - paragraph [ref=e461]: 현재 부동산을 점유하고 있는 사람의 유형은 무엇입니까?
+                    - generic [ref=e463]: 안전
+                  - paragraph [ref=e464]: 채무자 본인 / 임차인 / 가족 / 불법점유자 등 유형에 따라 법적 대응 방법과 명도 난이도가 완전히 다릅니다.
+                  - generic [ref=e466]:
+                    - generic [ref=e467]:
+                      - radio "예" [checked] [ref=e468]
+                      - text: 예
+                    - generic [ref=e469]:
+                      - radio "아니오" [ref=e470]
+                      - text: 아니오
+                - generic [ref=e471]:
+                  - generic [ref=e472]:
+                    - generic [ref=e473]:
+                      - generic [ref=e474]: 직접 확인
+                      - paragraph [ref=e475]: 임차인이 없거나, 소액임차인 요건을 충족하여 최우선변제금을 배당받습니까?
+                    - generic [ref=e477]: 안전
+                  - paragraph [ref=e478]: 소액임차인은 보증금 중 일정액을 최우선으로 배당받을 수 있어, 배당 계산과 명도 협상에 영향을 줍니다.
+                  - generic [ref=e479]:
+                    - generic [ref=e480]:
+                      - generic [ref=e481]: ✔
+                      - generic [ref=e482]: "Yes: 명도확인서가 필수이므로 명도가 수월해집니다."
+                    - generic [ref=e483]:
+                      - generic [ref=e484]: ○
+                      - generic [ref=e485]: "No: 배당 순서가 밀려 명도 저항이 있을 수 있습니다."
+                  - generic [ref=e487]:
+                    - generic [ref=e488]:
+                      - radio "예" [checked] [ref=e489]
+                      - text: 예
+                    - generic [ref=e490]:
+                      - radio "아니오" [ref=e491]
+                      - text: 아니오
+                - generic [ref=e492]:
+                  - generic [ref=e493]:
+                    - generic [ref=e494]:
+                      - generic [ref=e495]: 직접 확인
+                      - paragraph [ref=e496]: 점유자가 없거나, 배당금 수령을 위해 명도확인서가 필수적인 상황입니까?
+                    - generic [ref=e498]: 안전
+                  - paragraph [ref=e499]: 배당금 수령 조건으로 명도확인서가 필요한 점유자는 협조적으로 퇴거할 가능성이 높습니다. 반대로 배당을 포기하면 버틸 수 있어 명도가 어려워집니다.
+                  - generic [ref=e500]:
+                    - generic [ref=e501]:
+                      - generic [ref=e502]: ✔
+                      - generic [ref=e503]: "Yes: 명도확인서 발급권을 레버리지로 명도 기간을 단축할 수 있습니다."
+                    - generic [ref=e504]:
+                      - generic [ref=e505]: ○
+                      - generic [ref=e506]: "No: 강제 집행과 법적 집행 비용을 미리 대비해야 합니다."
+                  - generic [ref=e508]:
+                    - generic [ref=e509]:
+                      - radio "예" [checked] [ref=e510]
+                      - text: 예
+                    - generic [ref=e511]:
+                      - radio "아니오" [ref=e512]
+                      - text: 아니오
+          - button "저장" [ref=e514]
+    - contentinfo [ref=e515]:
+      - paragraph [ref=e516]: © 2026 Oh My Auction. All rights reserved.

@@ -1,0 +1,290 @@
+- generic [active] [ref=e517]:
+  - link "본문으로 건너뛰기" [ref=e518] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e519]:
+    - generic [ref=e521]: Oh My Auction
+    - generic [ref=e522]:
+      - button [ref=e524]:
+        - img [ref=e526]
+      - button [ref=e528]:
+        - img [ref=e529]
+      - button [ref=e531]:
+        - img [ref=e532]
+  - navigation [ref=e534]:
+    - generic [ref=e535]:
+      - generic [ref=e536]:
+        - generic [ref=e538]:
+          - link "예산 설정" [ref=e539] [cursor=pointer]:
+            - /url: /onboarding
+            - img [ref=e540]
+          - link "물건 목록" [ref=e542] [cursor=pointer]:
+            - /url: /properties
+            - img [ref=e543]
+          - button "시세 조회" [disabled] [ref=e545]:
+            - img [ref=e546]
+        - generic [ref=e549]:
+          - button "권리분석 리포트" [disabled] [ref=e550]:
+            - img [ref=e551]
+          - button "수익 계산기" [disabled] [ref=e553]:
+            - img [ref=e554]
+          - button "대출 매칭" [disabled] [ref=e556]:
+            - img [ref=e557]
+        - generic [ref=e560]:
+          - button "진행 체크리스트" [disabled] [ref=e561]:
+            - img [ref=e562]
+          - button "가상 입찰" [disabled] [ref=e564]
+          - button "사전 임장" [disabled] [ref=e565]:
+            - img [ref=e566]
+        - generic [ref=e570]:
+          - button "명도 가이드" [disabled] [ref=e571]:
+            - img [ref=e572]
+          - button "전문가 연결" [disabled] [ref=e574]:
+            - img [ref=e575]
+      - button "사이드바 접기/펼치기" [ref=e578]:
+        - img [ref=e580]
+  - generic [ref=e582]:
+    - main [ref=e583]:
+      - generic [ref=e584]:
+        - generic [ref=e585]:
+          - link "← 목록" [ref=e586] [cursor=pointer]:
+            - /url: /properties
+          - generic [ref=e587]:
+            - generic [ref=e588]:
+              - generic [ref=e589]: 감정가
+              - generic [ref=e590]: 8억
+            - generic [ref=e591]:
+              - generic [ref=e592]: 최저매각가
+              - generic [ref=e593]: 5억 6,000만원
+            - link "최대입찰가 1억 8,810만원" [ref=e594] [cursor=pointer]:
+              - /url: /settings/budget
+              - generic [ref=e595]: 최대입찰가
+              - generic [ref=e596]: 1억 8,810만원
+        - navigation [ref=e597]:
+          - generic [ref=e598]:
+            - link "안전 매각물건명세서 18/18" [ref=e599] [cursor=pointer]:
+              - /url: /properties/1/inspections/tabs/sale_document/edit
+            - link "경고 등기부등본 10/10" [ref=e600] [cursor=pointer]:
+              - /url: /properties/1/inspections/tabs/registry/edit
+            - link "주의 건축물대장 9/9" [ref=e601] [cursor=pointer]:
+              - /url: /properties/1/inspections/tabs/building_ledger/edit
+            - link "온라인조회 1/22" [ref=e602] [cursor=pointer]:
+              - /url: /properties/1/inspections/tabs/online/edit
+            - link "현장임장 0/21" [ref=e603] [cursor=pointer]:
+              - /url: /properties/1/inspections/tabs/field_visit/edit
+            - link "기타 0/9" [ref=e604] [cursor=pointer]:
+              - /url: /properties/1/inspections/tabs/etc/edit
+            - link "최종등급" [ref=e605] [cursor=pointer]:
+              - /url: /properties/1/inspections/grade
+        - generic [ref=e606]:
+          - generic [ref=e607]:
+            - generic [ref=e608]:
+              - generic [ref=e609]:
+                - heading "권리분석" [level=3] [ref=e610]
+                - generic [ref=e611]: 1건 위험
+              - generic [ref=e612]:
+                - generic [ref=e613]:
+                  - generic [ref=e614]:
+                    - generic [ref=e615]:
+                      - generic [ref=e616]: 자동
+                      - paragraph [ref=e617]: 등기부에 말소기준권리보다 앞선 선순위 가처분이 없습니까?
+                    - generic [ref=e618]:
+                      - generic [ref=e619]: 안전
+                      - button "수정" [ref=e620]
+                  - paragraph [ref=e621]: 선순위 가처분은 소유권 분쟁 중이라는 뜻으로, 낙찰받아도 소유권이 뒤집힐 수 있는 가장 치명적인 리스크입니다.
+                  - generic [ref=e622]:
+                    - generic [ref=e623]:
+                      - generic [ref=e624]: ✔
+                      - generic [ref=e625]: "Yes: 가처분 리스크가 없습니다."
+                    - generic [ref=e626]:
+                      - generic [ref=e627]: ○
+                      - generic [ref=e628]: "No: 소유권 자체가 바뀔 수 있어 매우 위험합니다."
+                - generic [ref=e629]:
+                  - generic [ref=e630]:
+                    - generic [ref=e631]:
+                      - generic [ref=e632]: 직접 확인
+                      - paragraph [ref=e633]: 선순위 가등기가 없거나, 있다면 종류는 무엇입니까?
+                    - generic [ref=e635]: 안전
+                  - paragraph [ref=e636]: 소유권이전청구권 가등기는 본등기 시 낙찰자 소유권을 앗아갈 수 있고, 담보가등기는 금전 채권이라 상대적으로 안전합니다. 종류에 따라 리스크가 완전히 다릅니다.
+                  - generic [ref=e638]:
+                    - generic [ref=e639]:
+                      - radio "예" [checked] [ref=e640]
+                      - text: 예
+                    - generic [ref=e641]:
+                      - radio "아니오" [ref=e642]
+                      - text: 아니오
+                - generic [ref=e643]:
+                  - generic [ref=e644]:
+                    - generic [ref=e645]:
+                      - generic [ref=e646]: 자동
+                      - paragraph [ref=e647]: 등기부등본에 예고등기가 없습니까?
+                    - generic [ref=e648]:
+                      - generic [ref=e649]: 안전
+                      - button "수정" [ref=e650]
+                  - paragraph [ref=e651]: 예고등기는 소송이 진행 중이라는 경고 표시로, 소유권 변동 가능성을 시사합니다.
+                  - generic [ref=e652]:
+                    - generic [ref=e653]:
+                      - generic [ref=e654]: ✔
+                      - generic [ref=e655]: "Yes: 예고등기에 의한 심각한 권리 하자가 없습니다."
+                    - generic [ref=e656]:
+                      - generic [ref=e657]: ○
+                      - generic [ref=e658]: "No: 예고등기가 있는 물건은 무조건 입찰을 피해야 합니다."
+                - generic [ref=e659]:
+                  - generic [ref=e660]:
+                    - generic [ref=e661]:
+                      - generic [ref=e662]: 자동
+                      - paragraph [ref=e663]: 말소기준권리보다 앞선 선순위 세금 압류가 없습니까?
+                    - generic [ref=e664]:
+                      - generic [ref=e665]: 안전
+                      - button "수정" [ref=e666]
+                  - paragraph [ref=e667]: 선순위 세금 압류는 낙찰자가 인수할 수 있어 체납 규모에 따라 투자비가 크게 늘어날 수 있습니다.
+                  - generic [ref=e668]:
+                    - generic [ref=e669]:
+                      - generic [ref=e670]: ✔
+                      - generic [ref=e671]: "Yes: 압류 우선 배당 리스크가 없습니다."
+                    - generic [ref=e672]:
+                      - generic [ref=e673]: ○
+                      - generic [ref=e674]: "No: 대항력 있는 임차인과 압류가 같이 있으면 보증금 전액 인수 위험이 매우 큽니다."
+                - generic [ref=e675]:
+                  - generic [ref=e676]:
+                    - generic [ref=e677]:
+                      - generic [ref=e678]: 직접 확인
+                      - paragraph [ref=e679]: 선순위 임차권 등기가 없거나, 등기 이후 새로 전입한 미상 임차인이 없습니까?
+                    - generic [ref=e681]: 안전
+                  - paragraph [ref=e682]: 임차권등기 후 새 임차인이 들어온 경우, 대항력 유무 판단이 복잡해지고 위장 임차인 리스크도 있습니다.
+                  - generic [ref=e683]:
+                    - generic [ref=e684]:
+                      - generic [ref=e685]: ✔
+                      - generic [ref=e686]: "Yes: 해당 리스크가 없습니다. 기존 임차인의 확정일자 및 배당 요구 여부를 확인하세요."
+                    - generic [ref=e687]:
+                      - generic [ref=e688]: ○
+                      - generic [ref=e689]: "No: 임대차보호법 제3조의4 6항에 따라 우선변제권이 없어 배당을 받을 수 없으나 대항력은 존재하므로 보증금 전액을 낙찰자가 떠안아야 합니다."
+                  - generic [ref=e691]:
+                    - generic [ref=e692]:
+                      - radio "예" [checked] [ref=e693]
+                      - text: 예
+                    - generic [ref=e694]:
+                      - radio "아니오" [ref=e695]
+                      - text: 아니오
+                - generic [ref=e696]:
+                  - generic [ref=e697]:
+                    - generic [ref=e698]:
+                      - generic [ref=e699]: 직접 확인
+                      - paragraph [ref=e700]: 대항력 있는 임차인이 없거나, 임차권 등기가 설정되어 있지 않습니까?
+                    - generic [ref=e702]: 안전
+                  - paragraph [ref=e703]: 임차권등기는 임차인이 보증금을 못 돌려받아 설정한 것으로, 전세사기 관련 물건일 가능성이 높습니다.
+                  - generic [ref=e704]:
+                    - generic [ref=e705]:
+                      - generic [ref=e706]: ✔
+                      - generic [ref=e707]: "Yes: 임차권 등기에 의한 인수 리스크가 없습니다."
+                    - generic [ref=e708]:
+                      - generic [ref=e709]: ○
+                      - generic [ref=e710]: "No: 접수 일자가 늦더라도 낙찰자 인수 사항이 됩니다."
+                  - generic [ref=e712]:
+                    - generic [ref=e713]:
+                      - radio "예" [checked] [ref=e714]
+                      - text: 예
+                    - generic [ref=e715]:
+                      - radio "아니오" [ref=e716]
+                      - text: 아니오
+                - generic [ref=e717]:
+                  - generic [ref=e718]:
+                    - generic [ref=e719]:
+                      - generic [ref=e720]: 직접 확인
+                      - paragraph [ref=e721]: 경매정보지에 질권 표시가 없습니까?
+                    - generic [ref=e723]: 위험 확인
+                  - paragraph [ref=e724]: 질권은 드물지만 임대차보증금반환채권에 질권이 설정된 경우, 배당 관계가 복잡해질 수 있습니다.
+                  - generic [ref=e725]:
+                    - generic [ref=e726]:
+                      - generic [ref=e727]: ○
+                      - generic [ref=e728]: "Yes: 해당 사항이 없습니다."
+                    - generic [ref=e729]:
+                      - generic [ref=e730]: ✔
+                      - generic [ref=e731]: "No: 대상이 부동산 자체인지, 권리에 설정된 것인지 파악해야 합니다."
+                  - generic [ref=e732]:
+                    - generic [ref=e733]:
+                      - generic [ref=e734]:
+                        - radio "예" [ref=e735]
+                        - text: 예
+                      - generic [ref=e736]:
+                        - radio "아니오" [checked] [ref=e737]
+                        - text: 아니오
+                    - generic [ref=e738]:
+                      - paragraph [ref=e739]: "해결 가능 여부를 선택해주세요:"
+                      - generic [ref=e740]:
+                        - generic [ref=e741]:
+                          - radio "해결 가능" [ref=e742]
+                          - text: 해결 가능
+                        - generic [ref=e743]:
+                          - radio "해결 불가" [checked] [ref=e744]
+                          - text: 해결 불가
+                      - textbox "해결 방안 메모" [ref=e745]
+                - generic [ref=e746]:
+                  - generic [ref=e747]:
+                    - generic [ref=e748]:
+                      - generic [ref=e749]: 직접 확인
+                      - paragraph [ref=e750]: 등기부등본에 기재된 권리가 모두 '금전 채권(근저당, 가압류, 압류)'으로만 구성되어 있습니까?
+                    - generic [ref=e752]: 안전
+                  - paragraph [ref=e753]: 모두 금전 채권이면 말소기준권리 이후 전부 소멸하므로 '깨끗한 물건'입니다. 하나라도 비금전 권리가 있으면 추가 분석이 필요합니다.
+                  - generic [ref=e754]:
+                    - generic [ref=e755]:
+                      - generic [ref=e756]: ✔
+                      - generic [ref=e757]: "Yes: 금전 채권은 경매 시 모두 소멸되므로 낙찰자가 인수할 권리가 없습니다."
+                    - generic [ref=e758]:
+                      - generic [ref=e759]: ○
+                      - generic [ref=e760]: "No: 비금전채권 등기가 포함되어 있어 추가 서류 확인이 필요합니다."
+                  - generic [ref=e762]:
+                    - generic [ref=e763]:
+                      - radio "예" [checked] [ref=e764]
+                      - text: 예
+                    - generic [ref=e765]:
+                      - radio "아니오" [ref=e766]
+                      - text: 아니오
+            - generic [ref=e767]:
+              - heading "현장조사·서류검증" [level=3] [ref=e769]
+              - generic [ref=e771]:
+                - generic [ref=e772]:
+                  - generic [ref=e773]:
+                    - generic [ref=e774]: 직접 확인
+                    - paragraph [ref=e775]: 인터넷 등기소에서 유사 사례의 등기부등본을 떼어 실제 매도 가격을 교차 검증했습니까?
+                  - generic [ref=e777]: 안전
+                - paragraph [ref=e778]: 감정가·시세만 믿으면 안 되고, 같은 단지/인근의 실제 매매 등기를 확인해야 진짜 시장가를 알 수 있습니다.
+                - generic [ref=e779]:
+                  - generic [ref=e780]:
+                    - generic [ref=e781]: ✔
+                    - generic [ref=e782]: "Yes: 정확한 실제 거래가를 바탕으로 안전한 분석이 가능합니다."
+                  - generic [ref=e783]:
+                    - generic [ref=e784]: ○
+                    - generic [ref=e785]: "No: 정보가 왜곡될 수 있으므로 직접 확인 전 입찰해서는 안 됩니다."
+                - generic [ref=e787]:
+                  - generic [ref=e788]:
+                    - radio "예" [checked] [ref=e789]
+                    - text: 예
+                  - generic [ref=e790]:
+                    - radio "아니오" [ref=e791]
+                    - text: 아니오
+            - generic [ref=e792]:
+              - heading "자금·대출 분석" [level=3] [ref=e794]
+              - generic [ref=e796]:
+                - generic [ref=e797]:
+                  - generic [ref=e798]:
+                    - generic [ref=e799]: 직접 확인
+                    - paragraph [ref=e800]: 등기부등본에 해당 아파트에 근저당을 설정해준 이력이 있는 작은 은행 지점이 명시되어 있습니까?
+                  - generic [ref=e802]: 안전
+                - paragraph [ref=e803]: 이전에 해당 물건에 대출해준 은행은 담보 가치를 이미 인정한 것이므로, 같은 지점에 문의하면 대출 승인 가능성이 높습니다.
+                - generic [ref=e804]:
+                  - generic [ref=e805]:
+                    - generic [ref=e806]: ✔
+                    - generic [ref=e807]: "Yes: 대출 승인 확률이 높아 자금 융통에 유리합니다."
+                  - generic [ref=e808]:
+                    - generic [ref=e809]: ○
+                    - generic [ref=e810]: "No: 시중 은행 대출이 거절될 수 있습니다."
+                - generic [ref=e812]:
+                  - generic [ref=e813]:
+                    - radio "예" [checked] [ref=e814]
+                    - text: 예
+                  - generic [ref=e815]:
+                    - radio "아니오" [ref=e816]
+                    - text: 아니오
+          - button "저장" [ref=e818]
+    - contentinfo [ref=e819]:
+      - paragraph [ref=e820]: © 2026 Oh My Auction. All rights reserved.
