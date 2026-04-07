@@ -208,14 +208,16 @@ Replace the entire `app/components/inspection_item_component.html.erb` with:
     <div class="mt-2 space-y-1 text-xs" data-logic-section>
       <div class="flex items-start gap-1.5 rounded px-2 py-1
                   <%= selected_answer == 'yes' ? 'bg-green-50 dark:bg-green-900/20 font-semibold text-green-800 dark:text-green-300' : 'text-slate-400 dark:text-slate-500' %>"
-           data-logic-selected="<%= 'yes' if selected_answer == 'yes' %>">
-        <span class="shrink-0"><%= selected_answer == "yes" ? "✔" : "○" %></span>
+           data-logic-selected="<%= 'yes' if selected_answer == 'yes' %>"
+           data-inspection-item-target="logicYes">
+        <span class="shrink-0" data-inspection-item-target="logicYesIcon"><%= selected_answer == "yes" ? "✔" : "○" %></span>
         <span>Yes: <%= @item.logic["yes"] %></span>
       </div>
       <div class="flex items-start gap-1.5 rounded px-2 py-1
                   <%= selected_answer == 'no' ? 'bg-red-50 dark:bg-red-900/20 font-semibold text-red-800 dark:text-red-300' : 'text-slate-400 dark:text-slate-500' %>"
-           data-logic-selected="<%= 'no' if selected_answer == 'no' %>">
-        <span class="shrink-0"><%= selected_answer == "no" ? "✔" : "○" %></span>
+           data-logic-selected="<%= 'no' if selected_answer == 'no' %>"
+           data-inspection-item-target="logicNo">
+        <span class="shrink-0" data-inspection-item-target="logicNoIcon"><%= selected_answer == "no" ? "✔" : "○" %></span>
         <span>No: <%= @item.logic["no"] %></span>
       </div>
     </div>
@@ -347,9 +349,15 @@ export default class extends Controller {
     "resolutionSection", "statusLabel", "sourceBadge",
     "editButton", "cancelButton", "editSection",
     "overrideRadio", "overrideFlag", "overrideInput",
-    "overrideResolutionSection"
+    "overrideResolutionSection",
+    "logicYes", "logicNo", "logicYesIcon", "logicNoIcon"
   ]
   static values = { resultId: Number, auto: Boolean }
+
+  // CSS class constants for logic highlight
+  static LOGIC_YES_ACTIVE = "bg-green-50 dark:bg-green-900/20 font-semibold text-green-800 dark:text-green-300".split(" ")
+  static LOGIC_NO_ACTIVE = "bg-red-50 dark:bg-red-900/20 font-semibold text-red-800 dark:text-red-300".split(" ")
+  static LOGIC_DIMMED = "text-slate-400 dark:text-slate-500".split(" ")
 
   enterEditMode() {
     this.editButtonTarget.classList.add("hidden")
@@ -383,6 +391,9 @@ export default class extends Controller {
   toggleManualRisk(event) {
     const hasRisk = event.target.value === "true"
 
+    // Update logic highlight to reflect the new selection
+    this.#updateLogicHighlight(hasRisk)
+
     // Handle manual input section (existing behavior)
     if (this.hasResolutionSectionTarget) {
       if (hasRisk) {
@@ -403,6 +414,38 @@ export default class extends Controller {
         this.overrideResolutionSectionTarget.querySelectorAll("input[type='radio']").forEach(r => r.checked = false)
         this.overrideResolutionSectionTarget.querySelectorAll("input[type='text']").forEach(t => t.value = "")
       }
+    }
+  }
+
+  // Private: update logic yes/no row highlighting based on selection
+  #updateLogicHighlight(hasRisk) {
+    if (!this.hasLogicYesTarget || !this.hasLogicNoTarget) return
+
+    const yesEl = this.logicYesTarget
+    const noEl = this.logicNoTarget
+    const allActive = [...this.constructor.LOGIC_YES_ACTIVE, ...this.constructor.LOGIC_NO_ACTIVE]
+    const dimmed = this.constructor.LOGIC_DIMMED
+
+    // Reset both rows
+    yesEl.classList.remove(...allActive, ...dimmed)
+    noEl.classList.remove(...allActive, ...dimmed)
+    yesEl.removeAttribute("data-logic-selected")
+    noEl.removeAttribute("data-logic-selected")
+
+    if (hasRisk) {
+      // No selected (risk) — highlight No row, dim Yes row
+      noEl.classList.add(...this.constructor.LOGIC_NO_ACTIVE)
+      noEl.setAttribute("data-logic-selected", "no")
+      yesEl.classList.add(...dimmed)
+      this.logicNoIconTarget.textContent = "✔"
+      this.logicYesIconTarget.textContent = "○"
+    } else {
+      // Yes selected (safe) — highlight Yes row, dim No row
+      yesEl.classList.add(...this.constructor.LOGIC_YES_ACTIVE)
+      yesEl.setAttribute("data-logic-selected", "yes")
+      noEl.classList.add(...dimmed)
+      this.logicYesIconTarget.textContent = "✔"
+      this.logicNoIconTarget.textContent = "○"
     }
   }
 }
