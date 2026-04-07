@@ -111,6 +111,16 @@ class OnboardingsController < ApplicationController
     @reserve_defaults = ReserveFundDefault.where(
       property_type_id: @property_types.pluck(:id)
     ).group_by(&:property_type_id)
+    apply_step2_defaults
+  end
+
+  def apply_step2_defaults
+    return if @setting.area_range_min.present?
+
+    @setting.area_unit ||= "pyeong"
+    @setting.area_range_min = 18
+    @setting.area_range_max = 25
+    @setting.property_type_id ||= @property_types.first&.id
   end
 
   def load_step3_data
