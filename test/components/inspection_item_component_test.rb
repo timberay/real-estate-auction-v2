@@ -1,11 +1,11 @@
 require "test_helper"
 
 class InspectionItemComponentTest < ViewComponent::TestCase
-  test "renders AUTO badge for auto source" do
+  test "renders 자동 badge for auto source" do
     result = inspection_results(:safe_apartment_rights_002)
     render_inline(InspectionItemComponent.new(result: result))
 
-    assert_selector "span", text: "AUTO"
+    assert_selector "span", text: "자동"
   end
 
   test "renders 직접 확인 badge for manual source without auto_value" do
