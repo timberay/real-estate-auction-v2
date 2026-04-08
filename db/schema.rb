@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_08_054003) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_08_090733) do
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.integer "area_range_max"
@@ -18,7 +18,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_054003) do
     t.integer "available_cash"
     t.datetime "completed_at"
     t.datetime "created_at", null: false
-    t.integer "failed_auction_rounds", default: 0, null: false
     t.integer "loan_policy_id"
     t.decimal "loan_ratio", precision: 3, scale: 2
     t.integer "maintenance_fee"
@@ -27,7 +26,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_054003) do
     t.integer "property_type_id"
     t.integer "repair_cost"
     t.integer "scrivener_fee"
-    t.integer "searchable_appraisal_limit"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["loan_policy_id"], name: "index_budget_settings_on_loan_policy_id"
@@ -42,7 +40,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_054003) do
     t.integer "available_cash"
     t.datetime "calculated_at", null: false
     t.datetime "created_at", null: false
-    t.integer "failed_auction_rounds"
     t.string "loan_policy_name"
     t.decimal "loan_ratio", precision: 3, scale: 2
     t.integer "maintenance_fee"
@@ -53,7 +50,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_054003) do
     t.string "property_type_name"
     t.integer "repair_cost"
     t.integer "scrivener_fee"
-    t.integer "searchable_appraisal_limit"
     t.string "trigger", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
@@ -144,6 +140,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_054003) do
     t.decimal "acquisition_tax_rate", precision: 5, scale: 4, null: false
     t.integer "area_range_max", null: false
     t.integer "area_range_min", null: false
+    t.integer "average_price", default: 0, null: false
     t.datetime "created_at", null: false
     t.integer "maintenance_fee", null: false
     t.integer "moving_cost", null: false
