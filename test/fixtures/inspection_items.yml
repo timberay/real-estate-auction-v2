@@ -8,6 +8,7 @@ rights_002:
   logic: '{"yes": "법원이 인수 권리를 명시했으므로 초보자는 입찰을 피해야 합니다.", "no": "안전합니다."}'
   data_source_name: "매각물건명세서"
   priority: "상"
+  yes_means_safe: true
 
 rights_011:
   code: "rights-011"
@@ -19,6 +20,7 @@ rights_011:
   logic: '{"yes": "인수해야 할 중대 권리가 명시되어 있습니다.", "no": "치명적인 특수 권리가 없습니다."}'
   data_source_name: "매각물건명세서"
   priority: "상"
+  yes_means_safe: false
 
 rights_001:
   code: "rights-001"
@@ -30,6 +32,7 @@ rights_001:
   logic: '{"yes": "소유권 자체가 바뀔 수 있어 매우 위험합니다.", "no": "가처분 리스크가 없습니다."}'
   data_source_name: "등기부등본"
   priority: "상"
+  yes_means_safe: false
 
 property_004:
   code: "property-004"
@@ -41,6 +44,7 @@ property_004:
   logic: '{"yes": "대출이 안 나오고 이행강제금이 발생합니다.", "no": "위반 사항이 없습니다."}'
   data_source_name: "건축물대장"
   priority: "상"
+  yes_means_safe: false
 
 property_001:
   code: "property-001"
@@ -52,6 +56,7 @@ property_001:
   logic: '{"yes": "지분만 취득하게 됩니다.", "no": "안전합니다."}'
   data_source_name: "대법원 법원경매정보"
   priority: "상"
+  yes_means_safe: false
 
 inspect_007:
   code: "inspect-007"
@@ -63,6 +68,7 @@ inspect_007:
   logic: '{"yes": "소유자가 거주 중일 가능성이 높습니다.", "no": "제3자가 점유 중일 수 있습니다."}'
   data_source_name: "현장 임장"
   priority: "상"
+  yes_means_safe: true
 
 manual_001:
   code: "manual-001"
@@ -74,3 +80,4 @@ manual_001:
   logic: '{"yes": "분묘기지권이 있으면 토지 사용에 제한이 있습니다.", "no": "안전합니다."}'
   data_source_name: "수동 입력"
   priority: "상"
+  yes_means_safe: false
