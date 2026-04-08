@@ -56,6 +56,30 @@ class InspectionItemComponent < ViewComponent::Base
 
   def selected_answer
     return nil if @result.has_risk.nil?
-    @result.has_risk ? "no" : "yes"
+    if @item.yes_means_safe?
+      @result.has_risk ? "no" : "yes"
+    else
+      @result.has_risk ? "yes" : "no"
+    end
+  end
+
+  def logic_yes_classes
+    return "" unless selected_answer
+    if selected_answer == "yes"
+      answer_means_safe = @item.yes_means_safe?
+      answer_means_safe ? "bg-green-50 dark:bg-green-900/20 font-semibold text-green-800 dark:text-green-300" : "bg-red-50 dark:bg-red-900/20 font-semibold text-red-800 dark:text-red-300"
+    else
+      "text-slate-400 dark:text-slate-500"
+    end
+  end
+
+  def logic_no_classes
+    return "" unless selected_answer
+    if selected_answer == "no"
+      answer_means_safe = !@item.yes_means_safe?
+      answer_means_safe ? "bg-green-50 dark:bg-green-900/20 font-semibold text-green-800 dark:text-green-300" : "bg-red-50 dark:bg-red-900/20 font-semibold text-red-800 dark:text-red-300"
+    else
+      "text-slate-400 dark:text-slate-500"
+    end
   end
 end

@@ -31,15 +31,13 @@
 
   <% if logic_present? %>
     <div class="mt-2 space-y-1 text-xs" data-logic-section>
-      <div class="flex items-start gap-1.5 rounded px-2 py-1
-                  <%= selected_answer == 'yes' ? 'bg-green-50 dark:bg-green-900/20 font-semibold text-green-800 dark:text-green-300' : 'text-slate-400 dark:text-slate-500' %>"
+      <div class="flex items-start gap-1.5 rounded px-2 py-1 <%= logic_yes_classes %>"
            data-inspection-item-target="logicYes"
            <% if selected_answer == 'yes' %>data-logic-selected="yes"<% end %>>
         <span class="shrink-0" data-inspection-item-target="logicYesIcon"><%= selected_answer == "yes" ? "✔" : "○" %></span>
         <span>Yes: <%= @item.logic["yes"] %></span>
       </div>
-      <div class="flex items-start gap-1.5 rounded px-2 py-1
-                  <%= selected_answer == 'no' ? 'bg-red-50 dark:bg-red-900/20 font-semibold text-red-800 dark:text-red-300' : 'text-slate-400 dark:text-slate-500' %>"
+      <div class="flex items-start gap-1.5 rounded px-2 py-1 <%= logic_no_classes %>"
            data-inspection-item-target="logicNo"
            <% if selected_answer == 'no' %>data-logic-selected="no"<% end %>>
         <span class="shrink-0" data-inspection-item-target="logicNoIcon"><%= selected_answer == "no" ? "✔" : "○" %></span>

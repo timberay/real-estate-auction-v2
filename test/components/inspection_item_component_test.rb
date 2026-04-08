@@ -41,9 +41,10 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     refute_selector "[data-logic-selected='no']"
   end
 
-  test "highlights selected answer — no when has_risk is true" do
-    result = inspection_results(:risky_villa_rights_011)
-    assert_equal true, result.has_risk
+  test "highlights selected answer — no when has_risk is true (normal polarity)" do
+    result = inspection_results(:manual_risk)
+    result.inspection_item.update!(yes_means_safe: true, logic: '{"yes": "safe", "no": "risky"}')
+    result.update!(has_risk: true, source_type: "auto")
     render_inline(InspectionItemComponent.new(result: result))
 
     assert_selector "[data-logic-selected='no']"
@@ -63,5 +64,55 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     render_inline(InspectionItemComponent.new(result: result))
 
     refute_selector "[data-logic-section]"
+  end
+
+  # --- Inverted polarity (yes_means_safe: false) tests ---
+
+  test "inverted polarity: highlights YES when has_risk is true" do
+    result = inspection_results(:risky_villa_rights_011)
+    assert_equal true, result.has_risk
+    assert_equal false, result.inspection_item.yes_means_safe
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-logic-selected='yes']"
+    refute_selector "[data-logic-selected='no']"
+  end
+
+  test "inverted polarity: highlights NO when has_risk is false" do
+    result = inspection_results(:safe_apartment_rights_011)
+    assert_equal false, result.has_risk
+    assert_equal false, result.inspection_item.yes_means_safe
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-logic-selected='no']"
+    refute_selector "[data-logic-selected='yes']"
+  end
+
+  test "inverted polarity: YES row uses red (danger) classes when selected" do
+    result = inspection_results(:risky_villa_rights_011)
+    render_inline(InspectionItemComponent.new(result: result))
+
+    yes_row = page.find("[data-inspection-item-target='logicYes']")
+    assert_includes yes_row[:class], "bg-red-50"
+    assert_includes yes_row[:class], "text-red-800"
+  end
+
+  test "inverted polarity: NO row uses green (safe) classes when selected" do
+    result = inspection_results(:safe_apartment_rights_011)
+    render_inline(InspectionItemComponent.new(result: result))
+
+    no_row = page.find("[data-inspection-item-target='logicNo']")
+    assert_includes no_row[:class], "bg-green-50"
+    assert_includes no_row[:class], "text-green-800"
+  end
+
+  test "normal polarity: YES row uses green (safe) classes when selected" do
+    result = inspection_results(:safe_apartment_rights_002)
+    assert_equal true, result.inspection_item.yes_means_safe
+    render_inline(InspectionItemComponent.new(result: result))
+
+    yes_row = page.find("[data-inspection-item-target='logicYes']")
+    assert_includes yes_row[:class], "bg-green-50"
+    assert_includes yes_row[:class], "text-green-800"
   end
 end
