@@ -61,4 +61,29 @@ class InspectionItemTest < ActiveSupport::TestCase
     sale_items = InspectionItem.for_tab(:sale_document)
     assert sale_items.all?(&:sale_document?)
   end
+
+  test "yes_means_safe defaults to true" do
+    item = InspectionItem.new(
+      code: "default-test",
+      tab: "sale_document",
+      tab_position: 1,
+      category: "권리분석",
+      question: "기본값 테스트?",
+      priority: "상"
+    )
+    assert_equal true, item.yes_means_safe
+  end
+
+  test "yes_means_safe can be set to false" do
+    item = InspectionItem.new(
+      code: "inverted-test",
+      tab: "sale_document",
+      tab_position: 1,
+      category: "권리분석",
+      question: "반전 테스트?",
+      priority: "상",
+      yes_means_safe: false
+    )
+    assert_equal false, item.yes_means_safe
+  end
 end
