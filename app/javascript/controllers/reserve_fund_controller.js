@@ -1,61 +1,24 @@
 import { Controller } from "@hotwired/stimulus"
 
 // Manages Step 2 reserve fund form:
-// - Area unit toggle (평/㎡) auto-converts min/max values
+// - Area dropdown change triggers auto-recalculation of reserve defaults
 // - "자동 계산" checkbox: when checked, fills reserve items based on average area
-// - Area or property type change triggers auto-recalculation
 // - Maintains running total of all reserve items
-//
-// 1평 = 3.305785㎡
-const SQM_PER_PYEONG = 3.305785
-
 export default class extends Controller {
   static targets = [
     "autoCalc", "propertyType",
-    "areaMin", "areaMax", "areaMinLabel", "areaMaxLabel",
+    "areaMin", "areaMax",
     "repairCost", "acquisitionTax", "scrivenerFee",
-    "movingCost", "maintenanceFee", "total"
+    "movingCost", "maintenanceFee", "total",
+    "repairCostHint", "acquisitionTaxHint", "scrivenerFeeHint",
+    "movingCostHint", "maintenanceFeeHint"
   ]
   static values = {
-    defaults: Object, // reserve_fund_defaults grouped by property_type_id
-    unit: { type: String, default: "pyeong" } // current area unit
+    defaults: Object // reserve_fund_defaults grouped by property_type_id
   }
 
   connect() {
     this.updateTotal()
-    if (this.hasAutoCalcTarget && this.autoCalcTarget.checked) {
-      this.applyDefaults()
-    }
-  }
-
-  // Called when 평/㎡ radio changes
-  unitChanged(event) {
-    const newUnit = event.target.value
-    const oldUnit = this.unitValue
-
-    if (newUnit === oldUnit) return
-
-    // Convert existing min/max values
-    const minVal = parseFloat(this.areaMinTarget.value) || 0
-    const maxVal = parseFloat(this.areaMaxTarget.value) || 0
-
-    if (newUnit === "sqm" && oldUnit === "pyeong") {
-      // 평 → ㎡
-      this.areaMinTarget.value = minVal > 0 ? Math.round(minVal * SQM_PER_PYEONG) : ""
-      this.areaMaxTarget.value = maxVal > 0 ? Math.round(maxVal * SQM_PER_PYEONG) : ""
-      this.areaMinLabelTarget.textContent = "면적 최소 (㎡)"
-      this.areaMaxLabelTarget.textContent = "면적 최대 (㎡)"
-    } else if (newUnit === "pyeong" && oldUnit === "sqm") {
-      // ㎡ → 평
-      this.areaMinTarget.value = minVal > 0 ? Math.round(minVal / SQM_PER_PYEONG) : ""
-      this.areaMaxTarget.value = maxVal > 0 ? Math.round(maxVal / SQM_PER_PYEONG) : ""
-      this.areaMinLabelTarget.textContent = "면적 최소 (평)"
-      this.areaMaxLabelTarget.textContent = "면적 최대 (평)"
-    }
-
-    this.unitValue = newUnit
-
-    // Re-apply defaults with new unit conversion
     if (this.hasAutoCalcTarget && this.autoCalcTarget.checked) {
       this.applyDefaults()
     }
@@ -66,10 +29,9 @@ export default class extends Controller {
     if (this.autoCalcTarget.checked) {
       this.applyDefaults()
     }
-    // When unchecked, user can freely edit values
   }
 
-  // Called when property type or area changes
+  // Called when property type changes
   propertyTypeChanged() {
     if (this.hasAutoCalcTarget && this.autoCalcTarget.checked) {
       this.applyDefaults()
@@ -77,6 +39,7 @@ export default class extends Controller {
     this.updateTotal()
   }
 
+  // Called when area dropdown changes
   areaChanged() {
     if (this.hasAutoCalcTarget && this.autoCalcTarget.checked) {
       this.applyDefaults()
@@ -91,16 +54,9 @@ export default class extends Controller {
 
     if (!defaults || defaults.length === 0) return
 
-    // Calculate average area in ㎡ (DB stores ㎡)
-    let minVal = parseFloat(this.areaMinTarget.value) || 0
-    let maxVal = parseFloat(this.areaMaxTarget.value) || 0
-
-    // Convert to ㎡ if current unit is 평
-    if (this.unitValue === "pyeong") {
-      minVal = minVal * SQM_PER_PYEONG
-      maxVal = maxVal * SQM_PER_PYEONG
-    }
-
+    // Dropdown values are already in ㎡
+    const minVal = parseInt(this.areaMinTarget.value, 10) || 0
+    const maxVal = parseInt(this.areaMaxTarget.value, 10) || 0
     const avgArea = (minVal + maxVal) / 2
 
     // Find matching default by average area
@@ -115,7 +71,24 @@ export default class extends Controller {
       this.movingCostTarget.value = match.moving_cost
       this.maintenanceFeeTarget.value = match.maintenance_fee
       this.updateTotal()
+      this.updateHints(match)
     }
+  }
+
+  updateHints(match) {
+    const areaLabel = `${match.area_range_min}~${match.area_range_max}㎡`
+    const taxPercent = (match.acquisition_tax_rate * 100).toFixed(1)
+
+    if (this.hasRepairCostHintTarget)
+      this.repairCostHintTarget.textContent = `${areaLabel} 기준 수선비`
+    if (this.hasAcquisitionTaxHintTarget)
+      this.acquisitionTaxHintTarget.textContent = `감정가 × ${taxPercent}% (취득세율)`
+    if (this.hasScrivenerFeeHintTarget)
+      this.scrivenerFeeHintTarget.textContent = `${areaLabel} 기준 법무사 수수료`
+    if (this.hasMovingCostHintTarget)
+      this.movingCostHintTarget.textContent = `${areaLabel} 기준 이사비`
+    if (this.hasMaintenanceFeeHintTarget)
+      this.maintenanceFeeHintTarget.textContent = `미납 관리비 (없으면 0)`
   }
 
   updateTotal() {
