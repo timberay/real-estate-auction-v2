@@ -18,7 +18,6 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
       loan_policy: loan_policies(:auction_bank_apartment),
       loan_ratio: 0.7,
       max_bid_amount: 96200,
-      area_unit: "pyeong",
       failed_auction_rounds: 0,
       searchable_appraisal_limit: 96200,
       completed_at: Time.current
@@ -35,9 +34,8 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
       budget_setting: {
         available_cash: 40000,
         property_type_id: property_types(:apartment).id,
-        area_range_min: 59,
-        area_range_max: 84,
-        area_unit: "pyeong",
+        area_range_min: 40,
+        area_range_max: 85,
         repair_cost: 500,
         acquisition_tax: 360,
         scrivener_fee: 80,
