@@ -10,12 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_08_024139) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_08_054003) do
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.integer "area_range_max"
     t.integer "area_range_min"
-    t.string "area_unit", default: "pyeong", null: false
     t.integer "available_cash"
     t.datetime "completed_at"
     t.datetime "created_at", null: false

@@ -18,7 +18,7 @@ class BudgetSettingTest < ActiveSupport::TestCase
   test "invalid with duplicate user_id" do
     BudgetSetting.create!(
       user: users(:guest), available_cash: 30000, loan_ratio: 0.7,
-      area_unit: "pyeong", failed_auction_rounds: 0
+      failed_auction_rounds: 0
     )
     bs = BudgetSetting.new(user: users(:guest), available_cash: 20000)
     assert_not bs.valid?
