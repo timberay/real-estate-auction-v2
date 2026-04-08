@@ -17,7 +17,6 @@ class BudgetSnapshotServiceTest < ActiveSupport::TestCase
       loan_policy: loan_policies(:auction_bank_apartment),
       loan_ratio: 0.7,
       max_bid_amount: 96200,
-      area_unit: "pyeong",
       failed_auction_rounds: 0,
       searchable_appraisal_limit: 96200,
       completed_at: Time.current

@@ -12,7 +12,6 @@ completed:
   maintenance_fee: 50
   max_bid_amount: 96200
   searchable_appraisal_limit: 150312
-  area_unit: pyeong
   area_range_min: 59
   area_range_max: 84
   completed_at: <%= Time.current %>
