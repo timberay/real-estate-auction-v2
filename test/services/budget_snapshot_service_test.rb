@@ -17,8 +17,6 @@ class BudgetSnapshotServiceTest < ActiveSupport::TestCase
       loan_policy: loan_policies(:auction_bank_apartment),
       loan_ratio: 0.7,
       max_bid_amount: 96200,
-      failed_auction_rounds: 0,
-      searchable_appraisal_limit: 96200,
       completed_at: Time.current
     )
   end
@@ -49,8 +47,7 @@ class BudgetSnapshotServiceTest < ActiveSupport::TestCase
   test "recalculate creates new snapshot with parent reference" do
     original = BudgetSnapshotService.create(user: @user, trigger: "onboarding")
 
-    # Change the live settings
-    @setting.update!(loan_ratio: 0.6, max_bid_amount: 72150, searchable_appraisal_limit: 72150)
+    @setting.update!(loan_ratio: 0.6, max_bid_amount: 72150)
 
     recalculated = BudgetSnapshotService.recalculate(user: @user, parent_snapshot: original)
 
@@ -64,7 +61,7 @@ class BudgetSnapshotServiceTest < ActiveSupport::TestCase
   test "compare returns diff between two snapshots" do
     s1 = BudgetSnapshotService.create(user: @user, trigger: "onboarding")
 
-    @setting.update!(loan_ratio: 0.6, max_bid_amount: 72150, searchable_appraisal_limit: 72150)
+    @setting.update!(loan_ratio: 0.6, max_bid_amount: 72150)
     s2 = BudgetSnapshotService.create(user: @user, trigger: "manual_edit")
 
     diff = BudgetSnapshotService.compare(snapshot_a: s1, snapshot_b: s2)

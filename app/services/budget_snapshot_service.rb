@@ -2,13 +2,11 @@ class BudgetSnapshotService
   COMPARABLE_FIELDS = %i[
     available_cash repair_cost acquisition_tax scrivener_fee
     moving_cost maintenance_fee loan_ratio max_bid_amount
-    failed_auction_rounds searchable_appraisal_limit
   ].freeze
 
   NUMERIC_FIELDS = %i[
     available_cash repair_cost acquisition_tax scrivener_fee
     moving_cost maintenance_fee max_bid_amount
-    failed_auction_rounds searchable_appraisal_limit
   ].freeze
 
   def self.create(user:, trigger:)
@@ -46,8 +44,6 @@ class BudgetSnapshotService
       loan_policy_name: setting.loan_policy&.policy_name,
       loan_ratio: setting.loan_ratio,
       max_bid_amount: setting.max_bid_amount,
-      failed_auction_rounds: setting.failed_auction_rounds,
-      searchable_appraisal_limit: setting.searchable_appraisal_limit,
       calculated_at: Time.current
     )
   end
@@ -72,8 +68,6 @@ class BudgetSnapshotService
       loan_policy_name: setting.loan_policy&.policy_name,
       loan_ratio: setting.loan_ratio,
       max_bid_amount: setting.max_bid_amount,
-      failed_auction_rounds: setting.failed_auction_rounds,
-      searchable_appraisal_limit: setting.searchable_appraisal_limit,
       calculated_at: Time.current
     )
   end
