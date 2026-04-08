@@ -6,8 +6,7 @@
     total_steps: 3
   ) do %>
     <div data-controller="reserve-fund"
-         data-reserve-fund-defaults-value="<%= @reserve_defaults.to_json %>"
-         data-reserve-fund-unit-value="<%= @setting.area_unit || 'pyeong' %>">
+         data-reserve-fund-defaults-value="<%= @reserve_defaults.to_json %>">
       <%= form_with model: @setting, url: step2_onboarding_path, method: :post, data: { turbo_frame: "onboarding_wizard" } do |f| %>
         <%# 부동산 유형 %>
         <div class="mb-4">
@@ -19,46 +18,23 @@
                       action: "change->reserve-fund#propertyTypeChanged" } } %>
         </div>
 
-        <%# 면적 단위 선택 %>
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">면적 단위</label>
-          <div class="flex gap-4">
-            <label class="flex items-center gap-1 text-slate-700 dark:text-slate-300">
-              <%= f.radio_button :area_unit, "pyeong",
-                checked: (@setting.area_unit || "pyeong") == "pyeong",
-                data: { action: "change->reserve-fund#unitChanged" } %>
-              <span>평</span>
-            </label>
-            <label class="flex items-center gap-1 text-slate-700 dark:text-slate-300">
-              <%= f.radio_button :area_unit, "sqm",
-                checked: @setting.area_unit == "sqm",
-                data: { action: "change->reserve-fund#unitChanged" } %>
-              <span>㎡</span>
-            </label>
-          </div>
-        </div>
-
         <%# 면적 범위 %>
         <div class="mb-4 grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-                   data-reserve-fund-target="areaMinLabel">
-              면적 최소 (<%= (@setting.area_unit || "pyeong") == "pyeong" ? "평" : "㎡" %>)
-            </label>
-            <%= f.number_field :area_range_min, inputmode: "numeric",
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">면적 최소</label>
+            <%= select_tag "budget_setting[area_range_min]",
+              options_for_select(BudgetSetting.area_min_options, @setting.area_range_min),
               class: "w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
               data: { reserve_fund_target: "areaMin",
-                      action: "input->reserve-fund#areaChanged" } %>
+                      action: "change->reserve-fund#areaChanged" } %>
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
-                   data-reserve-fund-target="areaMaxLabel">
-              면적 최대 (<%= (@setting.area_unit || "pyeong") == "pyeong" ? "평" : "㎡" %>)
-            </label>
-            <%= f.number_field :area_range_max, inputmode: "numeric",
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">면적 최대</label>
+            <%= select_tag "budget_setting[area_range_max]",
+              options_for_select(BudgetSetting.area_max_options, @setting.area_range_max),
               class: "w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
               data: { reserve_fund_target: "areaMax",
-                      action: "input->reserve-fund#areaChanged" } %>
+                      action: "change->reserve-fund#areaChanged" } %>
           </div>
         </div>
 
@@ -71,25 +47,29 @@
                    class="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500">
             <span class="text-sm font-medium text-slate-700 dark:text-slate-300">면적/유형에 따라 자동 계산</span>
           </label>
-          <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 ml-6">체크 해제 시 직접 입력할 수 있습니다</p>
+          <p class="text-sm text-slate-400 dark:text-slate-500 mt-1 ml-6">체크 해제 시 직접 입력할 수 있습니다</p>
         </div>
 
         <%# 예비비 항목 %>
         <div class="space-y-3">
           <% [
-            [:repair_cost, "수선비", "repairCost"],
-            [:acquisition_tax, "취득세", "acquisitionTax"],
-            [:scrivener_fee, "법무사비", "scrivenerFee"],
-            [:moving_cost, "이사비", "movingCost"],
-            [:maintenance_fee, "관리비", "maintenanceFee"]
-          ].each do |field, label, target| %>
-            <div class="flex items-center gap-2">
-              <label class="w-24 text-sm font-medium text-slate-700 dark:text-slate-300"><%= label %></label>
-              <%= f.number_field field, inputmode: "numeric",
-                class: "flex-1 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
-                data: { reserve_fund_target: target,
-                        action: "input->reserve-fund#updateTotal" } %>
-              <span class="text-slate-600 dark:text-slate-400 text-sm whitespace-nowrap">만원</span>
+            [:repair_cost, "수선비", "repairCost", "평균면적 기준 수선비"],
+            [:acquisition_tax, "취득세", "acquisitionTax", "취득세율 적용"],
+            [:scrivener_fee, "법무사비", "scrivenerFee", "등기 대행 비용"],
+            [:moving_cost, "이사비", "movingCost", "면적 기준 이사비"],
+            [:maintenance_fee, "미납 관리비", "maintenanceFee", "미납 관리비 (없으면 0)"]
+          ].each do |field, label, target, hint_default| %>
+            <div>
+              <div class="flex items-center gap-2">
+                <label class="w-24 text-sm font-medium text-slate-700 dark:text-slate-300 shrink-0"><%= label %></label>
+                <%= f.number_field field, inputmode: "numeric",
+                  class: "flex-1 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
+                  data: { reserve_fund_target: target,
+                          action: "input->reserve-fund#updateTotal" } %>
+                <span class="text-slate-600 dark:text-slate-400 text-sm whitespace-nowrap">만원</span>
+              </div>
+              <p class="ml-24 pl-2 mt-1 text-sm text-slate-400 dark:text-slate-500"
+                 data-reserve-fund-target="<%= target %>Hint"><%= hint_default %></p>
             </div>
           <% end %>
         </div>

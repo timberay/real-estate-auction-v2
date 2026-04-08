@@ -33,9 +33,8 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     post step2_onboarding_url, params: {
       budget_setting: {
         property_type_id: apt.id,
-        area_range_min: 59,
-        area_range_max: 84,
-        area_unit: "pyeong",
+        area_range_min: 40,
+        area_range_max: 85,
         repair_cost: 500,
         acquisition_tax: 360,
         scrivener_fee: 80,
@@ -58,8 +57,8 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     policy = loan_policies(:auction_bank_apartment)
     post step2_onboarding_url, params: {
       budget_setting: {
-        property_type_id: apt.id, area_range_min: 59, area_range_max: 84,
-        area_unit: "pyeong", repair_cost: 500, acquisition_tax: 360,
+        property_type_id: apt.id, area_range_min: 40, area_range_max: 85,
+        repair_cost: 500, acquisition_tax: 360,
         scrivener_fee: 80, moving_cost: 150, maintenance_fee: 50
       }
     }
@@ -101,7 +100,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
       repair_cost: 500, acquisition_tax: 360, scrivener_fee: 80,
       moving_cost: 150, maintenance_fee: 50,
       max_bid_amount: 96200, searchable_appraisal_limit: 96200,
-      area_unit: "pyeong", completed_at: Time.current
+      completed_at: Time.current
     )
 
     get start_onboarding_url
@@ -116,7 +115,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     guest = User.find_by(email: "guest@auction.local")
     BudgetSetting.create!(
       user: guest, available_cash: 30000, loan_ratio: 0.7,
-      max_bid_amount: 96200, area_unit: "pyeong",
+      max_bid_amount: 96200,
       failed_auction_rounds: 0, searchable_appraisal_limit: 96200,
       completed_at: Time.current
     )
