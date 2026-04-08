@@ -14,7 +14,6 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
       user: user,
       available_cash: 30000,
       loan_ratio: 0.7,
-      failed_auction_rounds: 0,
       completed_at: Time.current
     )
 

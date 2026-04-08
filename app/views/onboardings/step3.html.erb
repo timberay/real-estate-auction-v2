@@ -63,25 +63,6 @@
 
         <div data-loan-slider-target="roundBreakdown" class="mb-6"></div>
 
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">유찰 회차</label>
-          <input type="range" min="0" max="3" step="1"
-                 value="<%= @setting.failed_auction_rounds %>"
-                 name="budget_setting[failed_auction_rounds]"
-                 class="w-full accent-blue-600"
-                 data-loan-slider-target="roundsSlider"
-                 data-action="input->loan-slider#slideRounds">
-          <div class="flex justify-between text-sm text-slate-500 dark:text-slate-400 mt-1">
-            <span>0회차 (신건)</span>
-            <span data-loan-slider-target="roundsDisplay"><%= @setting.failed_auction_rounds %>회차</span>
-            <span>3회차</span>
-          </div>
-        </div>
-
-        <div class="mb-6 p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg">
-          <p class="text-sm text-slate-600 dark:text-slate-400">검색 가능 감정가 상한</p>
-          <p class="text-xl font-bold text-slate-700 dark:text-slate-300 tabular-nums" data-loan-slider-target="limitPreview">계산 중...</p>
-        </div>
 
         <p class="text-sm text-slate-400 dark:text-slate-500 mb-6">
           ※ 이 계산은 추정치입니다. 정확한 대출 한도는 금융기관에 확인하세요.

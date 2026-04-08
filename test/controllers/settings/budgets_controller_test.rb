@@ -18,8 +18,6 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
       loan_policy: loan_policies(:auction_bank_apartment),
       loan_ratio: 0.7,
       max_bid_amount: 96200,
-      failed_auction_rounds: 0,
-      searchable_appraisal_limit: 96200,
       completed_at: Time.current
     )
   end
@@ -41,8 +39,7 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
         moving_cost: 150,
         maintenance_fee: 50,
         loan_policy_id: loan_policies(:auction_bank_apartment).id,
-        loan_ratio: 0.7,
-        failed_auction_rounds: 0
+        loan_ratio: 0.7
       }
     }
 

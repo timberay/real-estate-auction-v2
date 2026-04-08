@@ -59,12 +59,10 @@ class OnboardingsController < ApplicationController
         moving: @setting.moving_cost.to_i,
         maintenance: @setting.maintenance_fee.to_i
       },
-      loan_ratio: @setting.loan_ratio.to_f,
-      failed_auction_rounds: @setting.failed_auction_rounds
+      loan_ratio: @setting.loan_ratio.to_f
     )
 
     @setting.max_bid_amount = result[:max_bid_amount]
-    @setting.searchable_appraisal_limit = result[:searchable_appraisal_limit]
     @setting.completed_at = Time.current
 
     if @setting.save
@@ -98,7 +96,7 @@ class OnboardingsController < ApplicationController
   end
 
   def step3_params
-    params.expect(budget_setting: [ :loan_policy_id, :loan_ratio, :failed_auction_rounds ])
+    params.expect(budget_setting: [ :loan_policy_id, :loan_ratio ])
   end
 
   def load_step2_data

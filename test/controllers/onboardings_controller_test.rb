@@ -67,8 +67,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     post step3_onboarding_url, params: {
       budget_setting: {
         loan_policy_id: policy.id,
-        loan_ratio: 0.7,
-        failed_auction_rounds: 2
+        loan_ratio: 0.7
       }
     }
     assert_redirected_to complete_onboarding_url
@@ -97,10 +96,10 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
 
     BudgetSetting.create!(
       user: guest, available_cash: 30000, property_type: apt,
-      loan_policy: policy, loan_ratio: 0.7, failed_auction_rounds: 0,
+      loan_policy: policy, loan_ratio: 0.7,
       repair_cost: 500, acquisition_tax: 360, scrivener_fee: 80,
       moving_cost: 150, maintenance_fee: 50,
-      max_bid_amount: 96200, searchable_appraisal_limit: 96200,
+      max_bid_amount: 96200,
       completed_at: Time.current
     )
 
@@ -117,7 +116,6 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     BudgetSetting.create!(
       user: guest, available_cash: 30000, loan_ratio: 0.7,
       max_bid_amount: 96200,
-      failed_auction_rounds: 0, searchable_appraisal_limit: 96200,
       completed_at: Time.current
     )
     BudgetSnapshot.create!(

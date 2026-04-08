@@ -26,12 +26,10 @@ module Settings
           moving: @setting.moving_cost.to_i,
           maintenance: @setting.maintenance_fee.to_i
         },
-        loan_ratio: @setting.loan_ratio.to_f,
-        failed_auction_rounds: @setting.failed_auction_rounds
+        loan_ratio: @setting.loan_ratio.to_f
       )
 
       @setting.max_bid_amount = result[:max_bid_amount]
-      @setting.searchable_appraisal_limit = result[:searchable_appraisal_limit]
 
       if @setting.save
         BudgetSnapshotService.create(user: current_user, trigger: "manual_edit")
@@ -54,8 +52,7 @@ module Settings
       params.expect(budget_setting: [
         :available_cash, :property_type_id, :area_category,
         :repair_cost, :acquisition_tax, :scrivener_fee,
-        :moving_cost, :maintenance_fee, :loan_policy_id, :loan_ratio,
-        :failed_auction_rounds
+        :moving_cost, :maintenance_fee, :loan_policy_id, :loan_ratio
       ])
     end
   end

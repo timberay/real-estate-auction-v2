@@ -10,14 +10,6 @@
       value: format_price_in_eok(@setting.max_bid_amount)
     ) %>
 
-    <% if @setting.failed_auction_rounds.to_i > 0 %>
-      <div class="mt-6 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
-        <p class="text-sm text-amber-800 dark:text-amber-400">
-          유찰 <%= @setting.failed_auction_rounds %>회차 기준 검색 가능 감정가:
-          <strong class="tabular-nums"><%= format_price_in_eok(@setting.searchable_appraisal_limit) %></strong>
-        </p>
-      </div>
-    <% end %>
 
     <div class="mt-6">
       <%= render SummaryTableComponent.new(
@@ -36,7 +28,7 @@
     </div>
 
     <% if @snapshot %>
-      <p class="text-xs text-slate-400 dark:text-slate-500 text-center mt-4 mb-6">
+      <p class="text-sm text-slate-400 dark:text-slate-500 text-center mt-4 mb-6">
         적용 정책: <%= @setting.loan_policy&.policy_name || "직접 설정" %> |
         계산일: <%= @snapshot.calculated_at.strftime("%Y-%m-%d %H:%M") %>
       </p>

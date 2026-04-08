@@ -12,7 +12,7 @@
       else :default
       end %>
     <%= render BadgeComponent.new(variant: badge_variant) { @snapshot.trigger.humanize } %>
-    <span class="text-xs text-slate-400 dark:text-slate-500"><%= @snapshot.calculated_at&.strftime("%Y-%m-%d %H:%M") %></span>
+    <span class="text-sm text-slate-400 dark:text-slate-500"><%= @snapshot.calculated_at&.strftime("%Y-%m-%d %H:%M") %></span>
   </div>
 
   <% if @snapshot.max_bid_amount %>
@@ -35,11 +35,9 @@
         { label: "취득세", value: format_price_in_eok(@snapshot.acquisition_tax) },
         { label: "법무사비", value: format_price_in_eok(@snapshot.scrivener_fee) },
         { label: "이사비", value: format_price_in_eok(@snapshot.moving_cost) },
-        { label: "관리비", value: format_price_in_eok(@snapshot.maintenance_fee) },
+        { label: "미납 관리비", value: format_price_in_eok(@snapshot.maintenance_fee) },
         { label: "대출 정책", value: @snapshot.loan_policy_name || "-" },
-        { label: "대출 비율 (LTV)", value: @snapshot.loan_ratio ? "#{(@snapshot.loan_ratio.to_f * 100).round}%" : "-" },
-        { label: "유찰 회차", value: "#{@snapshot.failed_auction_rounds}회차" },
-        { label: "검색 가능 감정가", value: format_price_in_eok(@snapshot.searchable_appraisal_limit) }
+        { label: "대출 비율 (LTV)", value: @snapshot.loan_ratio ? "#{(@snapshot.loan_ratio.to_f * 100).round}%" : "-" }
       ]
     ) %>
   </div>

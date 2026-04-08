@@ -7,7 +7,6 @@ class Settings::BudgetSnapshotsControllerTest < ActionDispatch::IntegrationTest
     BudgetSetting.create!(
       user: @user, available_cash: 30000, loan_ratio: 0.7,
       max_bid_amount: 96200,
-      failed_auction_rounds: 0, searchable_appraisal_limit: 96200,
       completed_at: Time.current
     )
     @snapshot1 = BudgetSnapshot.create!(
