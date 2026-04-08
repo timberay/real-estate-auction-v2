@@ -88,7 +88,8 @@ inspection_data.each do |attrs|
     data_source_name: attrs.dig("data_source", 0, "name") || "수동 입력",
     priority: attrs["priority"],
     merged_from: attrs["merged_from"],
-    answer_type: attrs["answer_type"]
+    answer_type: attrs["answer_type"],
+    yes_means_safe: attrs.fetch("yes_means_safe", true)
   )
   item.save!
   seeded_codes << code
