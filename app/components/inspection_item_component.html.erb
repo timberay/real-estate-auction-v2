@@ -4,7 +4,8 @@
      data-inspection-item-auto-value="<%= auto_source? %>"
      data-inspection-item-original-has-risk-value="<%= @result.has_risk.nil? ? '' : @result.has_risk %>"
      data-inspection-item-original-badge-text-value="<%= source_badge_text %>"
-     data-inspection-item-original-badge-classes-value="<%= source_badge_classes %>">
+     data-inspection-item-original-badge-classes-value="<%= source_badge_classes %>"
+     data-inspection-item-yes-means-safe-value="<%= @item.yes_means_safe? %>">
   <div class="flex items-start justify-between">
     <div class="flex items-center gap-2">
       <span class="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-semibold <%= source_badge_classes %>"
@@ -53,16 +54,16 @@
       <p class="mb-2 text-xs font-medium text-slate-600 dark:text-slate-300">자동 수집 결과를 수정합니다:</p>
       <div class="flex items-center gap-4">
         <label class="inline-flex items-center text-sm text-slate-700 dark:text-slate-200">
-          <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", "false", @result.has_risk == false,
+          <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", yes_radio_value, @result.has_risk == (yes_radio_value == "true"),
               disabled: true,
               data: { action: "change->inspection-item#toggleManualRisk", inspection_item_target: "overrideRadio" },
-              class: "mr-1.5" %> Yes (안전)
+              class: "mr-1.5" %> <%= @item.yes_means_safe? ? "Yes (안전)" : "Yes (위험)" %>
         </label>
         <label class="inline-flex items-center text-sm text-slate-700 dark:text-slate-200">
-          <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", "true", @result.has_risk == true,
+          <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", no_radio_value, @result.has_risk == (no_radio_value == "true"),
               disabled: true,
               data: { action: "change->inspection-item#toggleManualRisk", inspection_item_target: "overrideRadio" },
-              class: "mr-1.5" %> No (위험)
+              class: "mr-1.5" %> <%= @item.yes_means_safe? ? "No (위험)" : "No (안전)" %>
         </label>
       </div>
       <%# Hidden field to signal this is an override %>
@@ -113,11 +114,11 @@
     <div class="mt-3 border-t border-slate-200 dark:border-slate-600 pt-3">
       <div class="flex items-center gap-4">
         <label class="inline-flex items-center text-sm text-slate-700 dark:text-slate-200">
-          <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", "false", @result.has_risk == false,
+          <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", yes_radio_value, @result.has_risk == (yes_radio_value == "true"),
               data: { action: "change->inspection-item#toggleManualRisk" }, class: "mr-1.5" %> 예
         </label>
         <label class="inline-flex items-center text-sm text-slate-700 dark:text-slate-200">
-          <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", "true", @result.has_risk == true,
+          <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", no_radio_value, @result.has_risk == (no_radio_value == "true"),
               data: { action: "change->inspection-item#toggleManualRisk" }, class: "mr-1.5" %> 아니오
         </label>
       </div>

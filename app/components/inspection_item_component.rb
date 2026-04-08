@@ -52,6 +52,14 @@ class InspectionItemComponent < ViewComponent::Base
   def show_manual_input? = @show_resolution && manual_source? && !overridden?
   def show_edit_mode? = @show_resolution && (auto_source? || overridden?)
 
+  def yes_radio_value
+    @item.yes_means_safe? ? "false" : "true"
+  end
+
+  def no_radio_value
+    @item.yes_means_safe? ? "true" : "false"
+  end
+
   def logic_present? = @item.logic.present? && @item.logic["yes"].present?
 
   def selected_answer
