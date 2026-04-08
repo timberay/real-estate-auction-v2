@@ -17,7 +17,7 @@ Replace free-text number inputs with two dropdown selects (min/max) using predef
 |----------|-------------|-------------|---------|----------------|----------------|
 | 소형 (초소형) | 소형 (10~15평 / ~40㎡) | 10~15평 | ~40㎡ | 0 | 40 |
 | 중소형 | 중소형 (20~25평 / 40~60㎡) | 20~25평 | 40~60㎡ | 40 | 60 |
-| 중형 · 국평 | 중형 · 국평 (30~34평 / 60~85㎡) | 30~34평 | 60~85㎡ | 60 | 85 |
+| 중형 | 중형 (30~34평 / 60~85㎡) | 30~34평 | 60~85㎡ | 60 | 85 |
 | 중대형 | 중대형 (38~42평 / 85~102㎡) | 38~42평 | 85~102㎡ | 85 | 102 |
 | 대형 | 대형 (45평~ / 102㎡~) | 45평~ | 102㎡~ | 102 | 150 |
 
@@ -37,14 +37,14 @@ Replace free-text number inputs with two dropdown selects (min/max) using predef
 **Min dropdown (면적 최소):**
 - 소형 (10~15평 / ~40㎡) → saves 0
 - 중소형 (20~25평 / 40~60㎡) → saves 40
-- 중형 · 국평 (30~34평 / 60~85㎡) → saves 60
+- 중형 (30~34평 / 60~85㎡) → saves 60
 - 중대형 (38~42평 / 85~102㎡) → saves 85
 - 대형 (45평~ / 102㎡~) → saves 102
 
 **Max dropdown (면적 최대):**
 - 소형 (10~15평 / ~40㎡) → saves 40
 - 중소형 (20~25평 / 40~60㎡) → saves 60
-- 중형 · 국평 (30~34평 / 60~85㎡) → saves 85
+- 중형 (30~34평 / 60~85㎡) → saves 85
 - 중대형 (38~42평 / 85~102㎡) → saves 102
 - 대형 (45평~ / 102㎡~) → saves 150
 
@@ -75,4 +75,4 @@ Replace free-text number inputs with two dropdown selects (min/max) using predef
 
 ## Default Values
 
-- Onboarding step2 defaults: min=60 (중형 · 국평), max=85 (중형 · 국평) — the most popular "국민평수" category pre-selected
+- Onboarding step2 defaults: min=60 (중형), max=85 (중형) — the most popular "국민평수" category pre-selected

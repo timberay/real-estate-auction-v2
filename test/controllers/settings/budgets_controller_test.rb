@@ -34,8 +34,7 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
       budget_setting: {
         available_cash: 40000,
         property_type_id: property_types(:apartment).id,
-        area_range_min: 40,
-        area_range_max: 85,
+        area_categories: %w[mid_small mid],
         repair_cost: 500,
         acquisition_tax: 360,
         scrivener_fee: 80,

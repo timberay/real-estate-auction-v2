@@ -7,7 +7,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [
     "autoCalc", "propertyType",
-    "areaMin", "areaMax",
+    "areaCheckbox",
     "repairCost", "acquisitionTax", "scrivenerFee",
     "movingCost", "maintenanceFee", "total",
     "repairCostHint", "acquisitionTaxHint", "scrivenerFeeHint",
@@ -54,9 +54,12 @@ export default class extends Controller {
 
     if (!defaults || defaults.length === 0) return
 
-    // Dropdown values are already in ㎡
-    const minVal = parseInt(this.areaMinTarget.value, 10) || 0
-    const maxVal = parseInt(this.areaMaxTarget.value, 10) || 0
+    // Compute area range from checked checkboxes
+    const checked = this.areaCheckboxTargets.filter(cb => cb.checked)
+    if (checked.length === 0) return
+
+    const minVal = Math.min(...checked.map(cb => parseInt(cb.dataset.minSqm, 10)))
+    const maxVal = Math.max(...checked.map(cb => parseInt(cb.dataset.maxSqm, 10)))
     const avgArea = (minVal + maxVal) / 2
 
     // Find matching default by average area

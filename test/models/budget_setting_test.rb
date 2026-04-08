@@ -59,44 +59,31 @@ class BudgetSettingTest < ActiveSupport::TestCase
   test "AREA_CATEGORIES has 5 categories with correct structure" do
     cats = BudgetSetting::AREA_CATEGORIES
     assert_equal 5, cats.length
-    assert_equal :small, cats.first[:key]
+    assert_equal "small", cats.first[:key]
     assert_equal 0, cats.first[:min_sqm]
     assert_equal 40, cats.first[:max_sqm]
-    assert_equal :large, cats.last[:key]
+    assert_equal "large", cats.last[:key]
     assert_equal 102, cats.last[:min_sqm]
     assert_equal 150, cats.last[:max_sqm]
   end
 
-  test "area_min_options returns categories with min_sqm values" do
-    options = BudgetSetting.area_min_options
-    assert_equal 5, options.length
-    assert_equal [ "소형 (10~15평 / ~40㎡)", 0 ], options.first
-    assert_equal [ "대형 (45평~ / 102㎡~)", 102 ], options.last
+  test "area_range_from_categories computes min and max from selected keys" do
+    range = BudgetSetting.area_range_from_categories(%w[mid_small mid])
+    assert_equal 40, range[:min]
+    assert_equal 85, range[:max]
   end
 
-  test "area_max_options returns categories with max_sqm values" do
-    options = BudgetSetting.area_max_options
-    assert_equal 5, options.length
-    assert_equal [ "소형 (10~15평 / ~40㎡)", 40 ], options.first
-    assert_equal [ "대형 (45평~ / 102㎡~)", 150 ], options.last
+  test "area_range_from_categories returns empty hash for no selection" do
+    assert_equal({}, BudgetSetting.area_range_from_categories([]))
   end
 
-  test "invalid when area_range_min exceeds area_range_max" do
-    bs = BudgetSetting.new(
-      user: users(:guest), available_cash: 30000,
-      area_range_min: 85, area_range_max: 40,
-      failed_auction_rounds: 0
-    )
-    assert_not bs.valid?
-    assert_includes bs.errors[:area_range_min], "은(는) 면적 최대 이하여야 합니다"
+  test "selected_area_categories derives keys from stored min/max" do
+    bs = BudgetSetting.new(area_range_min: 40, area_range_max: 85)
+    assert_equal %w[mid_small mid], bs.selected_area_categories
   end
 
-  test "valid when area_range_min equals area_range_max" do
-    bs = BudgetSetting.new(
-      user: users(:guest), available_cash: 30000,
-      area_range_min: 85, area_range_max: 85,
-      failed_auction_rounds: 0
-    )
-    assert bs.valid?
+  test "mid category label does not contain 국평" do
+    mid = BudgetSetting::AREA_CATEGORIES.find { |c| c[:key] == "mid" }
+    assert_equal "중형 (30~34평 / 60~85㎡)", mid[:label]
   end
 end
