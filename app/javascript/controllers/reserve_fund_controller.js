@@ -11,10 +11,12 @@ export default class extends Controller {
     "repairCost", "acquisitionTax", "scrivenerFee",
     "movingCost", "maintenanceFee", "total",
     "repairCostHint", "acquisitionTaxHint", "scrivenerFeeHint",
-    "movingCostHint", "maintenanceFeeHint"
+    "movingCostHint", "maintenanceFeeHint",
+    "summaryBox", "warning", "submitBtn"
   ]
   static values = {
-    defaults: Object // reserve_fund_defaults grouped by property_type_id
+    defaults: Object, // reserve_fund_defaults grouped by property_type_id
+    availableCash: { type: Number, default: 0 }
   }
 
   connect() {
@@ -111,5 +113,28 @@ export default class extends Controller {
     }, 0)
 
     this.totalTarget.textContent = total.toLocaleString("ko-KR")
+
+    // Compare with available cash
+    const exceeded = this.availableCashValue > 0 && total > this.availableCashValue
+
+    if (this.hasWarningTarget)
+      this.warningTarget.classList.toggle("hidden", !exceeded)
+
+    if (this.hasSummaryBoxTarget) {
+      this.summaryBoxTarget.classList.toggle("bg-red-50", exceeded)
+      this.summaryBoxTarget.classList.toggle("dark:bg-red-900/20", exceeded)
+      this.summaryBoxTarget.classList.toggle("border-red-300", exceeded)
+      this.summaryBoxTarget.classList.toggle("dark:border-red-700", exceeded)
+      this.summaryBoxTarget.classList.toggle("bg-slate-50", !exceeded)
+      this.summaryBoxTarget.classList.toggle("dark:bg-slate-800", !exceeded)
+      this.summaryBoxTarget.classList.toggle("border-slate-200", !exceeded)
+      this.summaryBoxTarget.classList.toggle("dark:border-slate-700", !exceeded)
+    }
+
+    if (this.hasSubmitBtnTarget) {
+      this.submitBtnTarget.disabled = exceeded
+      this.submitBtnTarget.classList.toggle("opacity-50", exceeded)
+      this.submitBtnTarget.classList.toggle("cursor-not-allowed", exceeded)
+    }
   }
 }

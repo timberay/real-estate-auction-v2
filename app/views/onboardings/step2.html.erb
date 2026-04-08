@@ -6,7 +6,8 @@
     total_steps: 3
   ) do %>
     <div data-controller="reserve-fund"
-         data-reserve-fund-defaults-value="<%= @reserve_defaults.to_json %>">
+         data-reserve-fund-defaults-value="<%= @reserve_defaults.to_json %>"
+         data-reserve-fund-available-cash-value="<%= @setting.available_cash.to_i %>">
       <%= form_with model: @setting, url: step2_onboarding_path, method: :post, data: { turbo_frame: "onboarding_wizard" } do |f| %>
         <%# 부동산 유형 %>
         <div class="mb-4">
@@ -65,17 +66,31 @@
           <% end %>
         </div>
 
-        <%# 합계 %>
-        <div class="mt-4 p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg">
-          <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
-            예비비 합계: <span class="tabular-nums" data-reserve-fund-target="total">0</span>만원
+        <%# 합계 + 유용자금 비교 %>
+        <div class="mt-4 p-3 rounded-lg border transition-colors"
+             data-reserve-fund-target="summaryBox">
+          <div class="flex justify-between items-center">
+            <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
+              예비비 합계: <span class="tabular-nums" data-reserve-fund-target="total">0</span>만원
+            </p>
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+              유용자금: <span class="tabular-nums"><%= number_with_delimiter(@setting.available_cash.to_i) %></span>만원
+            </p>
+          </div>
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400 hidden" data-reserve-fund-target="warning">
+            예비비가 유용자금을 초과합니다. 예비비를 조정해 주세요.
           </p>
         </div>
 
         <%# 네비게이션 %>
         <div class="mt-8 flex gap-4">
           <%= render ButtonComponent.new(variant: :outline, tag: :a, href: start_onboarding_path, icon: "arrow-left", data: { turbo_frame: "onboarding_wizard" }, class: "flex-1 justify-center") { "이전" } %>
-          <%= render ButtonComponent.new(icon: "arrow-right", class: "flex-1 justify-center", type: "submit") { "다음" } %>
+          <button type="submit"
+                  data-reserve-fund-target="submitBtn"
+                  class="flex-1 justify-center inline-flex items-center gap-2 font-medium rounded-md transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900 bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-400 h-10 px-4 text-base">
+            <%= raw Heroicon::Icon.render(name: "arrow-right", variant: :outline, options: { class: "w-5 h-5" }, path_options: {}) %>
+            다음
+          </button>
         </div>
       <% end %>
     </div>
