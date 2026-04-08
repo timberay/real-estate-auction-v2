@@ -6,15 +6,15 @@
 
   <div class="flex gap-4 mb-6 items-stretch">
     <%= render CardComponent.new(class: "flex-1 text-center") do %>
-      <p class="text-xs text-slate-500 dark:text-slate-400">기준</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400">기준</p>
       <p class="font-semibold text-slate-900 dark:text-slate-100">v<%= @snapshot_a.version %> (<%= @snapshot_a.trigger %>)</p>
-      <p class="text-xs text-slate-400 dark:text-slate-500"><%= @snapshot_a.calculated_at&.strftime("%Y-%m-%d") %></p>
+      <p class="text-sm text-slate-400 dark:text-slate-500"><%= @snapshot_a.calculated_at&.strftime("%Y-%m-%d") %></p>
     <% end %>
     <div class="flex items-center text-slate-400 dark:text-slate-500 font-medium">vs</div>
     <%= render CardComponent.new(class: "flex-1 text-center") do %>
-      <p class="text-xs text-slate-500 dark:text-slate-400">비교 대상</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400">비교 대상</p>
       <p class="font-semibold text-slate-900 dark:text-slate-100">v<%= @snapshot_b.version %> (<%= @snapshot_b.trigger %>)</p>
-      <p class="text-xs text-slate-400 dark:text-slate-500"><%= @snapshot_b.calculated_at&.strftime("%Y-%m-%d") %></p>
+      <p class="text-sm text-slate-400 dark:text-slate-500"><%= @snapshot_b.calculated_at&.strftime("%Y-%m-%d") %></p>
     <% end %>
   </div>
 
@@ -32,11 +32,9 @@
         acquisition_tax: "취득세",
         scrivener_fee: "법무사비",
         moving_cost: "이사비",
-        maintenance_fee: "관리비",
+        maintenance_fee: "미납 관리비",
         loan_ratio: "대출 비율",
-        max_bid_amount: "최대입찰가",
-        failed_auction_rounds: "유찰 회차",
-        searchable_appraisal_limit: "검색 가능 감정가"
+        max_bid_amount: "최대입찰가"
       }
 
       diff_rows = @diff.map do |field, change|

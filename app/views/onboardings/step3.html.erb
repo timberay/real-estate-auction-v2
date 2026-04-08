@@ -1,7 +1,7 @@
 <turbo-frame id="onboarding_wizard">
   <%= render WizardStepComponent.new(
     title: "대출 및 낙찰가 설정",
-    description: "대출 정책과 유찰 회차를 설정하여 최대 입찰가를 계산합니다",
+    description: "대출 정책을 설정하여 최대 입찰가를 계산합니다",
     current_step: 3,
     total_steps: 3
   ) do %>
@@ -60,9 +60,6 @@
           <p class="text-sm text-slate-600 dark:text-slate-400">예상 최대입찰가</p>
           <p class="text-2xl font-bold text-blue-700 dark:text-blue-400 tabular-nums" data-loan-slider-target="maxBidPreview">계산 중...</p>
         </div>
-
-        <div data-loan-slider-target="roundBreakdown" class="mb-6"></div>
-
 
         <p class="text-sm text-slate-400 dark:text-slate-500 mb-6">
           ※ 이 계산은 추정치입니다. 정확한 대출 한도는 금융기관에 확인하세요.
