@@ -3,8 +3,7 @@ module Settings
     def show
       @setting = current_user.budget_setting
       redirect_to start_onboarding_url unless @setting&.completed?
-      @property_types = PropertyType.enabled.ordered
-      @loan_policies = LoanPolicy.active.for_property_type(@setting.property_type_id)
+      load_show_data
     end
 
     def update
@@ -35,18 +34,24 @@ module Settings
         BudgetSnapshotService.create(user: current_user, trigger: "manual_edit")
         redirect_to settings_budget_url, notice: "예산 설정이 업데이트되었습니다."
       else
-        @property_types = PropertyType.enabled.ordered
-        @loan_policies = LoanPolicy.active.for_property_type(@setting.property_type_id)
+        load_show_data
         render :show, status: :unprocessable_entity
       end
     rescue BudgetCalculationService::InsufficientFundsError
       @setting.errors.add(:available_cash, "이(가) 예비비 합계보다 작습니다")
-      @property_types = PropertyType.enabled.ordered
-      @loan_policies = LoanPolicy.active.for_property_type(@setting.property_type_id)
+      load_show_data
       render :show, status: :unprocessable_entity
     end
 
     private
+
+    def load_show_data
+      @property_types = PropertyType.enabled.ordered
+      @loan_policies = LoanPolicy.active.for_property_type(@setting.property_type_id)
+      @reserve_defaults = ReserveFundDefault.where(
+        property_type_id: @property_types.pluck(:id)
+      ).group_by(&:property_type_id)
+    end
 
     def budget_params
       params.expect(budget_setting: [

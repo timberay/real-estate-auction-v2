@@ -33,32 +33,76 @@
 
     <%# Section 2: Reserve Funds %>
     <%= render CardComponent.new(title: "예비비", class: "mb-6") do %>
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">부동산 유형</label>
-        <%= f.collection_select :property_type_id, @property_types, :id, :name,
-          { prompt: "선택하세요" },
-          { class: "w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" } %>
-      </div>
+      <div data-controller="reserve-fund"
+           data-reserve-fund-defaults-value="<%= @reserve_defaults.to_json %>"
+           data-reserve-fund-available-cash-value="<%= @setting.available_cash.to_i %>">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">부동산 유형</label>
+          <%= f.collection_select :property_type_id, @property_types, :id, :name,
+            { prompt: "선택하세요" },
+            { class: "w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
+              data: { reserve_fund_target: "propertyType",
+                      action: "change->reserve-fund#propertyTypeChanged" } } %>
+        </div>
 
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">관심 면적</label>
-        <%= select_tag "budget_setting[area_category]",
-          options_for_select(BudgetSetting.area_category_options, @setting.selected_area_category),
-          prompt: "선택하세요",
-          class: "w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" %>
-      </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">관심 면적</label>
+          <%= select_tag "budget_setting[area_category]",
+            options_for_select(BudgetSetting.area_category_options, @setting.selected_area_category),
+            prompt: "선택하세요",
+            class: "w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
+            data: { reserve_fund_target: "areaCategory",
+                    action: "change->reserve-fund#areaChanged" } %>
+        </div>
 
-      <div class="space-y-3">
-        <% [ [:repair_cost, "수선비"], [:acquisition_tax, "취득세"], [:scrivener_fee, "법무사비"],
-             [:moving_cost, "이사비"], [:maintenance_fee, "미납 관리비"] ].each do |field, label| %>
-          <div class="flex items-center gap-2">
-            <label class="w-24 text-sm font-medium text-slate-700 dark:text-slate-300"><%= label %></label>
-            <%= f.number_field field, inputmode: "numeric",
-              data: { action: "input->budget-calculator#calculate" },
-              class: "flex-1 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" %>
-            <span class="text-slate-600 dark:text-slate-400 text-sm">만원</span>
+        <div class="mb-4">
+          <label class="flex items-center gap-2">
+            <input type="checkbox"
+                   data-reserve-fund-target="autoCalc"
+                   data-action="change->reserve-fund#toggleAutoCalc"
+                   class="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500">
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">면적/유형에 따라 자동 계산</span>
+          </label>
+          <p class="text-sm text-slate-400 dark:text-slate-500 mt-1 ml-6">체크 시 부동산 유형과 면적에 따라 예비비가 자동 반영됩니다</p>
+        </div>
+
+        <div class="space-y-3">
+          <% [
+            [:repair_cost, "수선비", "repairCost", "수선비"],
+            [:acquisition_tax, "취득세", "acquisitionTax", "취득세"],
+            [:scrivener_fee, "법무사비", "scrivenerFee", "법무사비"],
+            [:moving_cost, "이사비", "movingCost", "이사비"],
+            [:maintenance_fee, "미납 관리비", "maintenanceFee", "미납 관리비"]
+          ].each do |field, label, target, hint_default| %>
+            <div>
+              <div class="flex items-center gap-2">
+                <label class="w-24 text-sm font-medium text-slate-700 dark:text-slate-300 shrink-0"><%= label %></label>
+                <%= f.number_field field, inputmode: "numeric",
+                  class: "flex-1 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
+                  data: { reserve_fund_target: target,
+                          action: "input->reserve-fund#updateTotal input->budget-calculator#calculate" } %>
+                <span class="text-slate-600 dark:text-slate-400 text-sm whitespace-nowrap">만원</span>
+              </div>
+              <p class="ml-24 pl-2 mt-1 text-sm text-slate-400 dark:text-slate-500"
+                 data-reserve-fund-target="<%= target %>Hint"><%= hint_default %></p>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="mt-4 p-3 rounded-lg border transition-colors bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+             data-reserve-fund-target="summaryBox">
+          <div class="flex justify-between items-center">
+            <p class="text-sm font-medium text-slate-700 dark:text-slate-300">
+              예비비 합계: <span class="tabular-nums" data-reserve-fund-target="total">0</span>만원
+            </p>
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+              유용자금: <span class="tabular-nums"><%= number_with_delimiter(@setting.available_cash.to_i) %></span>만원
+            </p>
           </div>
-        <% end %>
+          <p class="mt-1 text-sm text-red-600 dark:text-red-400 hidden" data-reserve-fund-target="warning">
+            예비비가 유용자금을 초과합니다. 예비비를 조정해 주세요.
+          </p>
+        </div>
       </div>
     <% end %>
 
