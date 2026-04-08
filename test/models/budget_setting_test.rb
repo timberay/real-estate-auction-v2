@@ -61,4 +61,48 @@ class BudgetSettingTest < ActiveSupport::TestCase
     )
     assert_equal 1140, bs.total_reserves
   end
+
+  test "AREA_CATEGORIES has 5 categories with correct structure" do
+    cats = BudgetSetting::AREA_CATEGORIES
+    assert_equal 5, cats.length
+    assert_equal :small, cats.first[:key]
+    assert_equal 0, cats.first[:min_sqm]
+    assert_equal 40, cats.first[:max_sqm]
+    assert_equal :large, cats.last[:key]
+    assert_equal 102, cats.last[:min_sqm]
+    assert_equal 150, cats.last[:max_sqm]
+  end
+
+  test "area_min_options returns categories with min_sqm values" do
+    options = BudgetSetting.area_min_options
+    assert_equal 5, options.length
+    assert_equal [ "소형 (10~15평 / ~40㎡)", 0 ], options.first
+    assert_equal [ "대형 (45평~ / 102㎡~)", 102 ], options.last
+  end
+
+  test "area_max_options returns categories with max_sqm values" do
+    options = BudgetSetting.area_max_options
+    assert_equal 5, options.length
+    assert_equal [ "소형 (10~15평 / ~40㎡)", 40 ], options.first
+    assert_equal [ "대형 (45평~ / 102㎡~)", 150 ], options.last
+  end
+
+  test "invalid when area_range_min exceeds area_range_max" do
+    bs = BudgetSetting.new(
+      user: users(:guest), available_cash: 30000,
+      area_range_min: 85, area_range_max: 40,
+      failed_auction_rounds: 0
+    )
+    assert_not bs.valid?
+    assert_includes bs.errors[:area_range_min], "은(는) 면적 최대 이하여야 합니다"
+  end
+
+  test "valid when area_range_min equals area_range_max" do
+    bs = BudgetSetting.new(
+      user: users(:guest), available_cash: 30000,
+      area_range_min: 60, area_range_max: 85,
+      failed_auction_rounds: 0
+    )
+    assert bs.valid?
+  end
 end
