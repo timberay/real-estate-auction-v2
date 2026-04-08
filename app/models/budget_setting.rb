@@ -9,7 +9,6 @@ class BudgetSetting < ApplicationRecord
   validates :failed_auction_rounds, numericality: {
     only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 3
   }
-  validates :area_unit, inclusion: { in: %w[pyeong sqm] }
   validate :area_range_min_not_exceeding_max
 
   RESERVE_FIELDS = %i[repair_cost acquisition_tax scrivener_fee moving_cost maintenance_fee].freeze

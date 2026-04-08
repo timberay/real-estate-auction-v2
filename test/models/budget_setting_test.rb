@@ -9,7 +9,7 @@ class BudgetSettingTest < ActiveSupport::TestCase
       repair_cost: 500, acquisition_tax: 360, scrivener_fee: 80,
       moving_cost: 150, maintenance_fee: 50,
       loan_policy: loan_policies(:auction_bank_apartment), loan_ratio: 0.7,
-      max_bid_amount: 85333, area_unit: "pyeong",
+      max_bid_amount: 85333,
       failed_auction_rounds: 0, searchable_appraisal_limit: 85333
     )
     assert bs.valid?
@@ -39,12 +39,6 @@ class BudgetSettingTest < ActiveSupport::TestCase
   test "failed_auction_rounds must be 0-3" do
     bs = BudgetSetting.new(user: users(:guest), available_cash: 30000, failed_auction_rounds: 5)
     assert_not bs.valid?
-  end
-
-  test "area_unit must be pyeong or sqm" do
-    bs = BudgetSetting.new(user: users(:guest), available_cash: 30000, area_unit: "invalid")
-    assert_not bs.valid?
-    assert_includes bs.errors[:area_unit], "is not included in the list"
   end
 
   test "completed? returns true when completed_at is set" do
