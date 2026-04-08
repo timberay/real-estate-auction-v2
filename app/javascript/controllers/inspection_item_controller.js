@@ -1,9 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
-const LOGIC_YES_ACTIVE = ["bg-green-50", "dark:bg-green-900/20", "font-semibold", "text-green-800", "dark:text-green-300"]
-const LOGIC_NO_ACTIVE = ["bg-red-50", "dark:bg-red-900/20", "font-semibold", "text-red-800", "dark:text-red-300"]
 const LOGIC_DIMMED = ["text-slate-400", "dark:text-slate-500"]
-const ALL_LOGIC_CLASSES = [...LOGIC_YES_ACTIVE, ...LOGIC_NO_ACTIVE, ...LOGIC_DIMMED]
+const ALL_HIGHLIGHT_CLASSES = ["bg-green-50", "dark:bg-green-900/20", "font-semibold", "text-green-800", "dark:text-green-300", "bg-red-50", "dark:bg-red-900/20", "text-red-800", "dark:text-red-300"]
+const ALL_LOGIC_CLASSES = [...ALL_HIGHLIGHT_CLASSES, ...LOGIC_DIMMED]
 
 const BADGE_AUTO = ["bg-blue-100", "text-blue-700", "dark:bg-blue-900/30", "dark:text-blue-300"]
 const BADGE_OVERRIDDEN = ["bg-amber-100", "text-amber-700", "dark:bg-amber-900/30", "dark:text-amber-300"]
@@ -18,7 +17,7 @@ export default class extends Controller {
     "overrideResolutionSection",
     "logicYes", "logicNo", "logicYesIcon", "logicNoIcon"
   ]
-  static values = { resultId: Number, auto: Boolean, originalHasRisk: String, originalBadgeText: String, originalBadgeClasses: String }
+  static values = { resultId: Number, auto: Boolean, originalHasRisk: String, originalBadgeText: String, originalBadgeClasses: String, yesMeansSafe: Boolean }
 
   enterEditMode() {
     this.editButtonTarget.classList.add("hidden")
@@ -120,6 +119,12 @@ export default class extends Controller {
 
     const yesEl = this.logicYesTarget
     const noEl = this.logicNoTarget
+    const yesMeansSafe = this.yesMeansSafeValue
+
+    // Determine which answer is selected based on polarity
+    const yesSelected = yesMeansSafe ? !hasRisk : hasRisk
+    const safeClasses = ["bg-green-50", "dark:bg-green-900/20", "font-semibold", "text-green-800", "dark:text-green-300"]
+    const dangerClasses = ["bg-red-50", "dark:bg-red-900/20", "font-semibold", "text-red-800", "dark:text-red-300"]
 
     // Reset both rows
     yesEl.classList.remove(...ALL_LOGIC_CLASSES)
@@ -127,20 +132,22 @@ export default class extends Controller {
     yesEl.removeAttribute("data-logic-selected")
     noEl.removeAttribute("data-logic-selected")
 
-    if (hasRisk) {
-      // No selected (risk) — highlight No row, dim Yes row
-      noEl.classList.add(...LOGIC_NO_ACTIVE)
-      noEl.setAttribute("data-logic-selected", "no")
-      yesEl.classList.add(...LOGIC_DIMMED)
-      this.logicNoIconTarget.textContent = "✔"
-      this.logicYesIconTarget.textContent = "○"
-    } else {
-      // Yes selected (safe) — highlight Yes row, dim No row
-      yesEl.classList.add(...LOGIC_YES_ACTIVE)
+    if (yesSelected) {
+      // Yes is the selected answer
+      const yesColor = yesMeansSafe ? safeClasses : dangerClasses
+      yesEl.classList.add(...yesColor)
       yesEl.setAttribute("data-logic-selected", "yes")
       noEl.classList.add(...LOGIC_DIMMED)
       this.logicYesIconTarget.textContent = "✔"
       this.logicNoIconTarget.textContent = "○"
+    } else {
+      // No is the selected answer
+      const noColor = yesMeansSafe ? dangerClasses : safeClasses
+      noEl.classList.add(...noColor)
+      noEl.setAttribute("data-logic-selected", "no")
+      yesEl.classList.add(...LOGIC_DIMMED)
+      this.logicNoIconTarget.textContent = "✔"
+      this.logicYesIconTarget.textContent = "○"
     }
   }
 }
