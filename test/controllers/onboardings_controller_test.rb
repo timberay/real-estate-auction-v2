@@ -87,8 +87,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "div[class*='grid-cols-2']"
   end
 
-  test "GET step1 renders budget summary with values for returning user" do
-    # First complete onboarding to establish a calculated setting
+  test "GET step1 redirects to budget settings for returning user" do
     get start_onboarding_url
     guest = User.find_by(email: "guest@auction.local")
     apt = property_types(:apartment)
@@ -104,10 +103,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     )
 
     get start_onboarding_url
-    assert_response :success
-    # Summary grid is rendered with solid border (calculated)
-    assert_select "div[class*='bg-blue-50']"
-    assert_select "div[class*='border-blue-200']"
+    assert_redirected_to settings_budget_url
   end
 
   test "GET complete shows results" do

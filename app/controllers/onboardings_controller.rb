@@ -1,5 +1,6 @@
 class OnboardingsController < ApplicationController
   before_action :find_or_initialize_budget_setting, except: [ :complete ]
+  before_action :redirect_if_completed, only: [ :step1 ]
 
   def step1
     render :step1
@@ -79,6 +80,10 @@ class OnboardingsController < ApplicationController
   end
 
   private
+
+  def redirect_if_completed
+    redirect_to settings_budget_path if @setting&.completed?
+  end
 
   def find_or_initialize_budget_setting
     @setting = current_user.budget_setting || current_user.build_budget_setting
