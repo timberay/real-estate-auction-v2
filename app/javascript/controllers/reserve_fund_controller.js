@@ -54,14 +54,11 @@ export default class extends Controller {
 
     if (!defaults || defaults.length === 0) return
 
-    // Read selected category from dropdown
-    const select = this.areaCategoryTarget
-    const option = select.selectedOptions[0]
-    if (!option || !option.value) return
+    // Read selected category key from dropdown
+    const key = this.areaCategoryTarget.value
+    if (!key) return
 
-    // Category options have data attributes with sqm values
-    // Use AREA_CATEGORIES mapping: find matching default by category midpoint
-    const key = option.value
+    // Find matching default by category key → area range
     const categories = {
       small: { min: 0, max: 40 }, mid_small: { min: 40, max: 60 },
       mid: { min: 60, max: 85 }, mid_large: { min: 85, max: 102 },
@@ -70,16 +67,13 @@ export default class extends Controller {
     const cat = categories[key]
     if (!cat) return
 
-    const avgArea = (cat.min + cat.max) / 2
-
-    // Find matching default by average area
     const match = defaults.find(d =>
-      avgArea >= d.area_range_min && avgArea <= d.area_range_max
+      d.area_range_min === cat.min && d.area_range_max === cat.max
     )
 
     if (match) {
       this.repairCostTarget.value = match.repair_cost
-      this.acquisitionTaxTarget.value = Math.round(match.acquisition_tax_rate * 10000)
+      this.acquisitionTaxTarget.value = Math.round(match.acquisition_tax_rate * match.average_price)
       this.scrivenerFeeTarget.value = match.scrivener_fee
       this.movingCostTarget.value = match.moving_cost
       this.maintenanceFeeTarget.value = match.maintenance_fee
@@ -89,17 +83,17 @@ export default class extends Controller {
   }
 
   updateHints(match) {
-    const areaLabel = `${match.area_range_min}~${match.area_range_max}㎡`
+    const priceLabel = `평균 ${(match.average_price / 10000).toFixed(1)}억`
     const taxPercent = (match.acquisition_tax_rate * 100).toFixed(1)
 
     if (this.hasRepairCostHintTarget)
-      this.repairCostHintTarget.textContent = `${areaLabel} 기준 수선비`
+      this.repairCostHintTarget.textContent = `${priceLabel} 기준 수선비`
     if (this.hasAcquisitionTaxHintTarget)
-      this.acquisitionTaxHintTarget.textContent = `감정가 × ${taxPercent}% (취득세율)`
+      this.acquisitionTaxHintTarget.textContent = `${priceLabel} × ${taxPercent}%`
     if (this.hasScrivenerFeeHintTarget)
-      this.scrivenerFeeHintTarget.textContent = `${areaLabel} 기준 법무사 수수료`
+      this.scrivenerFeeHintTarget.textContent = `${priceLabel} 기준 법무사 수수료`
     if (this.hasMovingCostHintTarget)
-      this.movingCostHintTarget.textContent = `${areaLabel} 기준 이사비`
+      this.movingCostHintTarget.textContent = `면적 기준 이사비`
     if (this.hasMaintenanceFeeHintTarget)
       this.maintenanceFeeHintTarget.textContent = `미납 관리비 (없으면 0)`
   }

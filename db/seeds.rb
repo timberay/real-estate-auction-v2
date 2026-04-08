@@ -15,18 +15,19 @@ puts "Seeding reserve fund defaults..."
 reserve_data = JSON.parse(File.read(Rails.root.join("db/seeds/reserve_fund_defaults.json")))
 reserve_data.each do |group|
   pt = PropertyType.find_by!(code: group["property_type_code"])
+  ReserveFundDefault.where(property_type: pt).destroy_all
   group["defaults"].each do |attrs|
-    ReserveFundDefault.find_or_create_by!(
+    ReserveFundDefault.create!(
       property_type: pt,
       area_range_min: attrs["area_range_min"],
-      area_range_max: attrs["area_range_max"]
-    ) do |rfd|
-      rfd.repair_cost = attrs["repair_cost"]
-      rfd.acquisition_tax_rate = attrs["acquisition_tax_rate"]
-      rfd.scrivener_fee = attrs["scrivener_fee"]
-      rfd.moving_cost = attrs["moving_cost"]
-      rfd.maintenance_fee = attrs["maintenance_fee"]
-    end
+      area_range_max: attrs["area_range_max"],
+      average_price: attrs["average_price"],
+      repair_cost: attrs["repair_cost"],
+      acquisition_tax_rate: attrs["acquisition_tax_rate"],
+      scrivener_fee: attrs["scrivener_fee"],
+      moving_cost: attrs["moving_cost"],
+      maintenance_fee: attrs["maintenance_fee"]
+    )
   end
 end
 puts "  -> #{ReserveFundDefault.count} reserve fund defaults"
