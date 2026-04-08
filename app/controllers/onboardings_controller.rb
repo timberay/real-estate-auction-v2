@@ -112,8 +112,8 @@ class OnboardingsController < ApplicationController
   def apply_step2_defaults
     return if @setting.area_range_min.present?
 
-    @setting.area_range_min = 60  # 중형 lower bound
-    @setting.area_range_max = 85  # 중형 upper bound
+    @setting.area_range_min = 0   # 소형 lower bound
+    @setting.area_range_max = 40  # 소형 upper bound
     @setting.property_type_id ||= @property_types.first&.id
   end
 
