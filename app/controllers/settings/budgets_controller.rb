@@ -11,9 +11,9 @@ module Settings
       @setting = current_user.budget_setting
 
       permitted = budget_params
-      area_keys = permitted.delete(:area_categories) || []
+      area_key = permitted.delete(:area_category)
       @setting.assign_attributes(permitted)
-      range = BudgetSetting.area_range_from_categories(area_keys)
+      range = BudgetSetting.area_range_for(area_key)
       @setting.area_range_min = range[:min] if range[:min]
       @setting.area_range_max = range[:max] if range[:max]
 
@@ -52,11 +52,10 @@ module Settings
 
     def budget_params
       params.expect(budget_setting: [
-        :available_cash, :property_type_id,
+        :available_cash, :property_type_id, :area_category,
         :repair_cost, :acquisition_tax, :scrivener_fee,
         :moving_cost, :maintenance_fee, :loan_policy_id, :loan_ratio,
-        :failed_auction_rounds,
-        area_categories: []
+        :failed_auction_rounds
       ])
     end
   end

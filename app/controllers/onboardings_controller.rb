@@ -26,9 +26,9 @@ class OnboardingsController < ApplicationController
   # POST /onboarding/step2 — saves reserves, renders step3
   def create_step2
     permitted = step2_params
-    area_keys = permitted.delete(:area_categories) || []
+    area_key = permitted.delete(:area_category)
     @setting.assign_attributes(permitted)
-    range = BudgetSetting.area_range_from_categories(area_keys)
+    range = BudgetSetting.area_range_for(area_key)
     @setting.area_range_min = range[:min] if range[:min]
     @setting.area_range_max = range[:max] if range[:max]
 
@@ -92,9 +92,8 @@ class OnboardingsController < ApplicationController
 
   def step2_params
     params.expect(budget_setting: [
-      :property_type_id,
-      :repair_cost, :acquisition_tax, :scrivener_fee, :moving_cost, :maintenance_fee,
-      area_categories: []
+      :property_type_id, :area_category,
+      :repair_cost, :acquisition_tax, :scrivener_fee, :moving_cost, :maintenance_fee
     ])
   end
 

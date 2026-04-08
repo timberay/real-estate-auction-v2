@@ -67,19 +67,25 @@ class BudgetSettingTest < ActiveSupport::TestCase
     assert_equal 150, cats.last[:max_sqm]
   end
 
-  test "area_range_from_categories computes min and max from selected keys" do
-    range = BudgetSetting.area_range_from_categories(%w[mid_small mid])
-    assert_equal 40, range[:min]
+  test "area_category_options returns label-key pairs" do
+    options = BudgetSetting.area_category_options
+    assert_equal 5, options.length
+    assert_equal ["소형 (10~15평 / ~40㎡)", "small"], options.first
+  end
+
+  test "area_range_for returns min and max for a category key" do
+    range = BudgetSetting.area_range_for("mid")
+    assert_equal 60, range[:min]
     assert_equal 85, range[:max]
   end
 
-  test "area_range_from_categories returns empty hash for no selection" do
-    assert_equal({}, BudgetSetting.area_range_from_categories([]))
+  test "area_range_for returns empty hash for unknown key" do
+    assert_equal({}, BudgetSetting.area_range_for("unknown"))
   end
 
-  test "selected_area_categories derives keys from stored min/max" do
-    bs = BudgetSetting.new(area_range_min: 40, area_range_max: 85)
-    assert_equal %w[mid_small mid], bs.selected_area_categories
+  test "selected_area_category derives key from stored min/max" do
+    bs = BudgetSetting.new(area_range_min: 60, area_range_max: 85)
+    assert_equal "mid", bs.selected_area_category
   end
 
   test "mid category label does not contain 국평" do

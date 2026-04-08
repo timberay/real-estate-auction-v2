@@ -33,7 +33,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     post step2_onboarding_url, params: {
       budget_setting: {
         property_type_id: apt.id,
-        area_categories: %w[mid_small mid],
+        area_category: "mid",
         repair_cost: 500,
         acquisition_tax: 360,
         scrivener_fee: 80,
@@ -46,7 +46,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     user = User.find_by(email: "guest@auction.local")
     assert_equal apt.id, user.budget_setting.property_type_id
     assert_equal 500, user.budget_setting.repair_cost
-    assert_equal 40, user.budget_setting.area_range_min
+    assert_equal 60, user.budget_setting.area_range_min
     assert_equal 85, user.budget_setting.area_range_max
   end
 
@@ -58,7 +58,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     policy = loan_policies(:auction_bank_apartment)
     post step2_onboarding_url, params: {
       budget_setting: {
-        property_type_id: apt.id, area_categories: %w[mid_small mid],
+        property_type_id: apt.id, area_category: "mid",
         repair_cost: 500, acquisition_tax: 360,
         scrivener_fee: 80, moving_cost: 150, maintenance_fee: 50
       }

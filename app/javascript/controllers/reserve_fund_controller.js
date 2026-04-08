@@ -7,7 +7,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [
     "autoCalc", "propertyType",
-    "areaCheckbox",
+    "areaCategory",
     "repairCost", "acquisitionTax", "scrivenerFee",
     "movingCost", "maintenanceFee", "total",
     "repairCostHint", "acquisitionTaxHint", "scrivenerFeeHint",
@@ -54,13 +54,23 @@ export default class extends Controller {
 
     if (!defaults || defaults.length === 0) return
 
-    // Compute area range from checked checkboxes
-    const checked = this.areaCheckboxTargets.filter(cb => cb.checked)
-    if (checked.length === 0) return
+    // Read selected category from dropdown
+    const select = this.areaCategoryTarget
+    const option = select.selectedOptions[0]
+    if (!option || !option.value) return
 
-    const minVal = Math.min(...checked.map(cb => parseInt(cb.dataset.minSqm, 10)))
-    const maxVal = Math.max(...checked.map(cb => parseInt(cb.dataset.maxSqm, 10)))
-    const avgArea = (minVal + maxVal) / 2
+    // Category options have data attributes with sqm values
+    // Use AREA_CATEGORIES mapping: find matching default by category midpoint
+    const key = option.value
+    const categories = {
+      small: { min: 0, max: 40 }, mid_small: { min: 40, max: 60 },
+      mid: { min: 60, max: 85 }, mid_large: { min: 85, max: 102 },
+      large: { min: 102, max: 150 }
+    }
+    const cat = categories[key]
+    if (!cat) return
+
+    const avgArea = (cat.min + cat.max) / 2
 
     // Find matching default by average area
     const match = defaults.find(d =>

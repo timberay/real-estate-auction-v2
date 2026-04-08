@@ -18,20 +18,25 @@ class BudgetSetting < ApplicationRecord
     { key: "large",     label: "대형 (45평~ / 102㎡~)",      min_sqm: 102, max_sqm: 150 }
   ].freeze
 
-  # Compute area_range_min/max from an array of selected category keys.
-  def self.area_range_from_categories(keys)
-    selected = AREA_CATEGORIES.select { |c| keys.include?(c[:key]) }
-    return {} if selected.empty?
-
-    { min: selected.min_by { |c| c[:min_sqm] }[:min_sqm],
-      max: selected.max_by { |c| c[:max_sqm] }[:max_sqm] }
+  # Return options for a single select dropdown: [[label, key], ...]
+  def self.area_category_options
+    AREA_CATEGORIES.map { |c| [c[:label], c[:key]] }
   end
 
-  # Derive selected category keys from stored min/max values.
-  def selected_area_categories
-    return [] unless area_range_min.present? && area_range_max.present?
+  # Find category by key and return its min/max sqm.
+  def self.area_range_for(key)
+    cat = AREA_CATEGORIES.find { |c| c[:key] == key }
+    return {} unless cat
 
-    AREA_CATEGORIES.select { |c| c[:min_sqm] >= area_range_min && c[:max_sqm] <= area_range_max }.map { |c| c[:key] }
+    { min: cat[:min_sqm], max: cat[:max_sqm] }
+  end
+
+  # Derive the selected category key from stored min/max values.
+  def selected_area_category
+    return nil unless area_range_min.present? && area_range_max.present?
+
+    match = AREA_CATEGORIES.find { |c| c[:min_sqm] == area_range_min && c[:max_sqm] == area_range_max }
+    match&.dig(:key)
   end
 
   def completed?
