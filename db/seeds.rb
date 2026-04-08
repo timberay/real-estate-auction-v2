@@ -14,6 +14,7 @@ puts "  -> #{PropertyType.count} property types"
 puts "Seeding reserve fund defaults..."
 reserve_data = JSON.parse(File.read(Rails.root.join("db/seeds/reserve_fund_defaults.json")))
 reserve_data.each do |group|
+  next unless group["property_type_code"]
   pt = PropertyType.find_by!(code: group["property_type_code"])
   ReserveFundDefault.where(property_type: pt).destroy_all
   group["defaults"].each do |attrs|
