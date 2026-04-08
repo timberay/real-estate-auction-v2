@@ -2,17 +2,15 @@ class BudgetCalculationService
   class InsufficientFundsError < StandardError; end
 
   RESERVE_KEYS = %i[repair acquisition_tax scrivener moving maintenance].freeze
-  PRICE_REDUCTION_PER_ROUND = 0.8
 
-  def self.call(available_cash:, reserve_funds:, loan_ratio:, failed_auction_rounds:)
-    new(available_cash:, reserve_funds:, loan_ratio:, failed_auction_rounds:).call
+  def self.call(available_cash:, reserve_funds:, loan_ratio:)
+    new(available_cash:, reserve_funds:, loan_ratio:).call
   end
 
-  def initialize(available_cash:, reserve_funds:, loan_ratio:, failed_auction_rounds:)
+  def initialize(available_cash:, reserve_funds:, loan_ratio:)
     @available_cash = available_cash
     @reserve_funds = reserve_funds
     @loan_ratio = loan_ratio.to_d
-    @failed_auction_rounds = failed_auction_rounds
   end
 
   def call
@@ -26,17 +24,9 @@ class BudgetCalculationService
     divisor = 1 - @loan_ratio
     max_bid_amount = (net_cash / divisor).floor
 
-    searchable_appraisal_limit = if @failed_auction_rounds > 0
-      reduction_factor = PRICE_REDUCTION_PER_ROUND**@failed_auction_rounds
-      (max_bid_amount / reduction_factor).floor
-    else
-      max_bid_amount
-    end
-
     {
       total_reserves: total_reserves,
       max_bid_amount: max_bid_amount,
-      searchable_appraisal_limit: searchable_appraisal_limit,
       breakdown: {
         available_cash: @available_cash,
         repair: @reserve_funds.fetch(:repair, 0).to_i,

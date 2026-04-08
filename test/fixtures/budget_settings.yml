@@ -4,14 +4,12 @@ completed:
   property_type: apartment
   loan_policy: auction_bank_apartment
   loan_ratio: 0.7
-  failed_auction_rounds: 2
   repair_cost: 500
   acquisition_tax: 360
   scrivener_fee: 80
   moving_cost: 150
   maintenance_fee: 50
   max_bid_amount: 96200
-  searchable_appraisal_limit: 150312
   area_range_min: 59
   area_range_max: 84
   completed_at: <%= Time.current %>
