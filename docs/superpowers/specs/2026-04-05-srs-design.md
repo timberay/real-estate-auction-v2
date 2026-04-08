@@ -41,7 +41,7 @@ Each feature is treated as an independent deliverable. A feature must be fully c
 | DSR | Debt Service Ratio | Total annual debt repayments divided by annual income. Used to determine loan eligibility. |
 | LTV | Loan-to-Value | Loan amount as a percentage of the property's appraised value. |
 | 감정평가액 | Appraisal Value | Court-appointed appraiser's valuation of the property, used as the starting price basis. |
-| 최저매각가격 | Minimum Sale Price | The minimum bid amount for an auction round (typically 80% of appraisal, reduced 20% each failed round). |
+| 최저매각가격 | Minimum Sale Price | The minimum bid amount for an auction round. The court provides this value directly (`min_bid_price`); the app uses the court-provided value rather than calculating it from appraisal price formulas. |
 | 유치권 | Lien (Retention Right) | Right to retain possession of property until payment for improvements/repairs is made. High risk for beginners. |
 | 법정지상권 | Statutory Superficies | Legal right to use land when building and land owners differ. Complex and risky for beginners. |
 | 근린생활시설 | Neighborhood Living Facility | Commercial-zoned property often disguised as residential. Carries tax disadvantages and loan restrictions. |
@@ -100,7 +100,7 @@ Upon signup, the user answers a 3-step questionnaire to determine "what properti
 - Step 2: Reserve fund setup — enter amounts per item or select "Use defaults"
   - Default values auto-applied by property type and size (sqm range)
   - Items: repair costs, acquisition tax, judicial scrivener fee, moving costs, unpaid maintenance fees
-- Step 3: Expected loan ratio (%) — slider or presets: 60% / 70% / 80% / 90%
+- Step 3: Select loan policy and set loan ratio (%) — slider or presets: 60% / 70% / 80% / 90%
 
 **(B) Calculation:**
 

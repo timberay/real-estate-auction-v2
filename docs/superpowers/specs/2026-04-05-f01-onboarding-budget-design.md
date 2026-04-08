@@ -20,7 +20,6 @@ Design the first feature (F01) of the real estate auction service: an onboarding
 - **All property types from day one**: Apartment, Villa, Officetel enabled; others pre-defined but disabled
 - **Live/Snapshot separation**: Active settings reference live DB; completed reports are immutable point-in-time snapshots
 - **Snapshot versioning**: Recalculate with current conditions to produce a new version, compare with previous
-- **Failed auction round adjustment**: Factor in 20% price reduction per failed round to expand searchable property range
 - **Unit conventions**: Amounts in 만원 (10,000 KRW), area in 평 or ㎡ (user selectable)
 - **UI implementation**: MUST use `/rails-ui` skill for all screen/component work to ensure design token compliance
 
@@ -97,8 +96,6 @@ budget_settings
   loan_ratio            :decimal
   max_bid_amount        :integer              # 만원 (calculated)
   area_unit             :string, default: "pyeong"  # "pyeong" | "sqm"
-  failed_auction_rounds :integer, default: 0  # 0~3
-  searchable_appraisal_limit :integer         # 만원 (calculated)
   completed_at          :datetime
   created_at            :datetime
   updated_at            :datetime
@@ -128,8 +125,6 @@ budget_snapshots
   loan_policy_name      :string
   loan_ratio            :decimal
   max_bid_amount        :integer            # 만원
-  failed_auction_rounds :integer
-  searchable_appraisal_limit :integer       # 만원
   calculated_at         :datetime, not null
 
   # Indexes
@@ -205,14 +200,12 @@ BudgetCalculationService.call(
   reserve_funds: {          # 만원 each
     repair:, acquisition_tax:, scrivener:, moving:, maintenance:
   },
-  loan_ratio:,              # decimal (0.6 ~ 0.9)
-  failed_auction_rounds:    # 0~3
+  loan_ratio:               # decimal (0.6 ~ 0.9)
 )
 # Returns:
 # {
 #   total_reserves: Integer,
 #   max_bid_amount: Integer,  # (cash - reserves) / (1 - ratio)
-#   searchable_appraisal_limit: Integer,  # max_bid / (0.8 ^ rounds)
 #   breakdown: { ... }
 # }
 ```
@@ -330,10 +323,6 @@ All 3 steps render inside `<turbo-frame id="onboarding_wizard">`. Step transitio
 │  ── 예상 결과 (실시간) ──             │
 │  최대입찰가: 85,333만원                │
 │                                     │
-│  유찰 고려: [====●====] 2회차         │
-│  → 감정평가액 133,333만원 이하          │
-│    물건까지 검색 가능                   │
-│                                     │
 │  ⚠️ 이 계산은 추정치입니다.             │
 │     정확한 대출 한도는 금융기관에          │
 │     확인하세요.                        │
@@ -343,7 +332,6 @@ All 3 steps render inside `<turbo-frame id="onboarding_wizard">`. Step transitio
 ```
 - Loan policies loaded from `loan_policies` (enabled, non-expired, matching property type)
 - Stimulus `loan_slider_controller`: slider drag updates real-time preview
-- Stimulus `failed_rounds_controller`: slider for 0~3 rounds, updates `searchable_appraisal_limit` preview
 - Preview calculation runs client-side (same formula as server) for instant feedback
 - Final calculation validated server-side on submit
 
@@ -356,9 +344,6 @@ All 3 steps render inside `<turbo-frame id="onboarding_wizard">`. Step transitio
 │  │ 최대입찰가  85,333만원      │     │
 │  │ (약 8억 5,333만원)         │     │
 │  └───────────────────────────┘     │
-│                                     │
-│  유찰 2회 고려 시:                    │
-│  감정평가액 133,333만원 이하 물건 검색 가능│
 │                                     │
 │  ── 비용 내역 ──                     │
 │  유용자금          30,000만원         │
@@ -437,7 +422,6 @@ end
 | `reserve_fund_controller` | Step 2 | "기본값 사용" toggle, auto-fill defaults |
 | `area_unit_controller` | Step 2 | 평/㎡ toggle with live conversion |
 | `loan_slider_controller` | Step 3 | Loan ratio slider with real-time max bid preview |
-| `failed_rounds_controller` | Step 3 | Failed auction rounds slider with appraisal limit preview |
 | `navigation_controller` | All steps | Browser back button handling within wizard |
 
 ---
@@ -470,7 +454,6 @@ From SRS + brainstorming additions:
 - [ ] Area unit toggleable between 평 and ㎡
 - [ ] Loan policies loaded dynamically from DB (seeded via Mock adapter)
 - [ ] Loan policy adapter switches between Mock and real based on `USE_MOCK` env var
-- [ ] Failed auction round slider (0~3) adjusts searchable appraisal limit
 - [ ] Budget snapshots are immutable — recalculation creates new version
 - [ ] Snapshot comparison shows per-field diff with delta values
 - [ ] Disclaimer text displayed on calculation results
@@ -483,6 +466,5 @@ From SRS + brainstorming additions:
 These are **optional integrations** that activate when F02 is deployed:
 
 - `budget_settings.max_bid_amount` → F02 search filter upper bound
-- `budget_settings.searchable_appraisal_limit` → F02 filter for appraisal-based search (including failed auction consideration)
 - `budget_settings.property_type_id` → F02 default property type filter
 - `budget_snapshots` → F02 property case linkage via `property_case_id`
