@@ -31,12 +31,15 @@ class BudgetSetting < ApplicationRecord
     { min: cat[:min_sqm], max: cat[:max_sqm] }
   end
 
+  DEFAULT_AREA_CATEGORY = "small"
+
   # Derive the selected category key from stored min/max values.
+  # Falls back to DEFAULT_AREA_CATEGORY when no exact match found.
   def selected_area_category
-    return nil unless area_range_min.present? && area_range_max.present?
+    return DEFAULT_AREA_CATEGORY unless area_range_min.present? && area_range_max.present?
 
     match = AREA_CATEGORIES.find { |c| c[:min_sqm] == area_range_min && c[:max_sqm] == area_range_max }
-    match&.dig(:key)
+    match&.dig(:key) || DEFAULT_AREA_CATEGORY
   end
 
   def completed?
