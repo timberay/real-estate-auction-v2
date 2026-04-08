@@ -5,50 +5,50 @@
       {
         "area_range_min": 0,
         "area_range_max": 40,
-        "average_price": 70000,
+        "average_price": 48000,
         "repair_cost": 400,
         "acquisition_tax_rate": 0.011,
-        "scrivener_fee": 90,
+        "scrivener_fee": 60,
         "moving_cost": 50,
         "maintenance_fee": 0
       },
       {
         "area_range_min": 40,
         "area_range_max": 60,
-        "average_price": 105000,
+        "average_price": 72000,
         "repair_cost": 550,
-        "acquisition_tax_rate": 0.033,
-        "scrivener_fee": 120,
+        "acquisition_tax_rate": 0.020,
+        "scrivener_fee": 90,
         "moving_cost": 80,
         "maintenance_fee": 0
       },
       {
         "area_range_min": 60,
         "area_range_max": 85,
-        "average_price": 140000,
+        "average_price": 96000,
         "repair_cost": 760,
         "acquisition_tax_rate": 0.033,
-        "scrivener_fee": 150,
+        "scrivener_fee": 110,
         "moving_cost": 150,
         "maintenance_fee": 0
       },
       {
         "area_range_min": 85,
         "area_range_max": 102,
-        "average_price": 200000,
+        "average_price": 138000,
         "repair_cost": 1000,
         "acquisition_tax_rate": 0.033,
-        "scrivener_fee": 200,
+        "scrivener_fee": 150,
         "moving_cost": 230,
         "maintenance_fee": 0
       },
       {
         "area_range_min": 102,
         "area_range_max": 150,
-        "average_price": 250000,
+        "average_price": 207000,
         "repair_cost": 1500,
         "acquisition_tax_rate": 0.033,
-        "scrivener_fee": 250,
+        "scrivener_fee": 220,
         "moving_cost": 350,
         "maintenance_fee": 0
       }
@@ -60,50 +60,50 @@
       {
         "area_range_min": 0,
         "area_range_max": 40,
-        "average_price": 28000,
+        "average_price": 45000,
         "repair_cost": 130,
         "acquisition_tax_rate": 0.011,
-        "scrivener_fee": 50,
+        "scrivener_fee": 55,
         "moving_cost": 50,
         "maintenance_fee": 0
       },
       {
         "area_range_min": 40,
         "area_range_max": 60,
-        "average_price": 42000,
+        "average_price": 68000,
         "repair_cost": 180,
-        "acquisition_tax_rate": 0.011,
-        "scrivener_fee": 60,
+        "acquisition_tax_rate": 0.017,
+        "scrivener_fee": 85,
         "moving_cost": 80,
         "maintenance_fee": 0
       },
       {
         "area_range_min": 60,
         "area_range_max": 85,
-        "average_price": 56000,
+        "average_price": 91000,
         "repair_cost": 250,
-        "acquisition_tax_rate": 0.011,
-        "scrivener_fee": 80,
+        "acquisition_tax_rate": 0.033,
+        "scrivener_fee": 100,
         "moving_cost": 150,
         "maintenance_fee": 0
       },
       {
         "area_range_min": 85,
         "area_range_max": 102,
-        "average_price": 80000,
+        "average_price": 130000,
         "repair_cost": 400,
-        "acquisition_tax_rate": 0.011,
-        "scrivener_fee": 100,
+        "acquisition_tax_rate": 0.033,
+        "scrivener_fee": 140,
         "moving_cost": 230,
         "maintenance_fee": 0
       },
       {
         "area_range_min": 102,
         "area_range_max": 150,
-        "average_price": 100000,
+        "average_price": 195000,
         "repair_cost": 600,
         "acquisition_tax_rate": 0.033,
-        "scrivener_fee": 120,
+        "scrivener_fee": 200,
         "moving_cost": 350,
         "maintenance_fee": 0
       }
@@ -115,7 +115,7 @@
       {
         "area_range_min": 0,
         "area_range_max": 40,
-        "average_price": 35000,
+        "average_price": 42000,
         "repair_cost": 200,
         "acquisition_tax_rate": 0.044,
         "scrivener_fee": 50,
@@ -125,40 +125,40 @@
       {
         "area_range_min": 40,
         "area_range_max": 60,
-        "average_price": 52000,
+        "average_price": 63000,
         "repair_cost": 350,
         "acquisition_tax_rate": 0.044,
-        "scrivener_fee": 70,
+        "scrivener_fee": 80,
         "moving_cost": 80,
         "maintenance_fee": 0
       },
       {
         "area_range_min": 60,
         "area_range_max": 85,
-        "average_price": 70000,
+        "average_price": 84000,
         "repair_cost": 500,
         "acquisition_tax_rate": 0.044,
-        "scrivener_fee": 90,
+        "scrivener_fee": 95,
         "moving_cost": 130,
         "maintenance_fee": 0
       },
       {
         "area_range_min": 85,
         "area_range_max": 102,
-        "average_price": 100000,
+        "average_price": 120000,
         "repair_cost": 700,
         "acquisition_tax_rate": 0.044,
-        "scrivener_fee": 110,
+        "scrivener_fee": 130,
         "moving_cost": 230,
         "maintenance_fee": 0
       },
       {
         "area_range_min": 102,
         "area_range_max": 150,
-        "average_price": 125000,
+        "average_price": 180000,
         "repair_cost": 900,
         "acquisition_tax_rate": 0.044,
-        "scrivener_fee": 130,
+        "scrivener_fee": 190,
         "moving_cost": 350,
         "maintenance_fee": 0
       }
