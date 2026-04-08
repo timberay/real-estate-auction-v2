@@ -9,16 +9,14 @@ class BudgetSettingTest < ActiveSupport::TestCase
       repair_cost: 500, acquisition_tax: 360, scrivener_fee: 80,
       moving_cost: 150, maintenance_fee: 50,
       loan_policy: loan_policies(:auction_bank_apartment), loan_ratio: 0.7,
-      max_bid_amount: 85333,
-      failed_auction_rounds: 0, searchable_appraisal_limit: 85333
+      max_bid_amount: 85333
     )
     assert bs.valid?
   end
 
   test "invalid with duplicate user_id" do
     BudgetSetting.create!(
-      user: users(:guest), available_cash: 30000, loan_ratio: 0.7,
-      failed_auction_rounds: 0
+      user: users(:guest), available_cash: 30000, loan_ratio: 0.7
     )
     bs = BudgetSetting.new(user: users(:guest), available_cash: 20000)
     assert_not bs.valid?
@@ -33,11 +31,6 @@ class BudgetSettingTest < ActiveSupport::TestCase
 
   test "loan_ratio must be between 0 and 1" do
     bs = BudgetSetting.new(user: users(:guest), available_cash: 30000, loan_ratio: 1.5)
-    assert_not bs.valid?
-  end
-
-  test "failed_auction_rounds must be 0-3" do
-    bs = BudgetSetting.new(user: users(:guest), available_cash: 30000, failed_auction_rounds: 5)
     assert_not bs.valid?
   end
 

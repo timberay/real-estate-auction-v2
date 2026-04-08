@@ -22,15 +22,4 @@ module ApplicationHelper
       "#{number_with_delimiter(amount)}만원"
     end
   end
-
-  # Returns an array of { round:, limit: } hashes for each failed auction round.
-  # limit = floor(max_bid_amount / 0.8^round)
-  def appraisal_limits_by_round(max_bid_amount, failed_auction_rounds)
-    return [] if max_bid_amount.nil? || failed_auction_rounds < 1
-
-    (1..failed_auction_rounds).map do |round|
-      reduction = BigDecimal("0.8")**round
-      { round: round, limit: (max_bid_amount / reduction).floor }
-    end
-  end
 end
