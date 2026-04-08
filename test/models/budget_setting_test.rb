@@ -100,7 +100,7 @@ class BudgetSettingTest < ActiveSupport::TestCase
   test "valid when area_range_min equals area_range_max" do
     bs = BudgetSetting.new(
       user: users(:guest), available_cash: 30000,
-      area_range_min: 60, area_range_max: 85,
+      area_range_min: 85, area_range_max: 85,
       failed_auction_rounds: 0
     )
     assert bs.valid?
