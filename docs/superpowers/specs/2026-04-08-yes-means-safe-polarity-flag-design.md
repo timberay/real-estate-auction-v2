@@ -4,7 +4,7 @@
 
 The checklist display system has a hardcoded assumption: "Yes" always means safe (green) and "No" always means danger (red). This is encoded in `selected_answer`, logic highlight colors, and manual radio button values.
 
-However, ~15 questions are phrased where "Yes" indicates danger (e.g., "전입신고된 제3자 임차인이 거주하고 있습니까?" — answering "Yes" means a risky tenant exists). For these questions:
+However, 19 questions are phrased where "Yes" indicates danger (e.g., "전입신고된 제3자 임차인이 거주하고 있습니까?" — answering "Yes" means a risky tenant exists). For these questions:
 
 - Auto-detected `has_risk: true` highlights "No" in red instead of "Yes"
 - Manual "예" selection sets `has_risk: false` (safe), displaying a green border for a dangerous condition
@@ -45,6 +45,10 @@ t.boolean :yes_means_safe, null: false, default: true
 | rights-021 | 전세사기 우선매수권 행사 가능성이 있습니까? |
 | inspect-001 | 감정평가서에 중대한 문제가 기재되어 있습니까? |
 | tax-005 | 인구 감소 지역이면서 공시가격이 4억 원 이상입니까? |
+| eviction-001 | 화재·누수·크랙 등 치명적 하자가 있습니까? |
+| exit-001 | 집 내부에 악취나 환기 문제가 있습니까? |
+| inspect-013 | 누수 흔적이 있습니까? |
+| manual-001 | 토지에 분묘기지권이 있습니까? |
 
 All other questions remain `yes_means_safe: true` (default).
 
