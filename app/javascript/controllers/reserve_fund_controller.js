@@ -81,6 +81,7 @@ export default class extends Controller {
       this.maintenanceFeeTarget.value = match.maintenance_fee
       this.updateTotal()
       this.updateHints(match)
+      this.dispatch("changed")
     }
   }
 

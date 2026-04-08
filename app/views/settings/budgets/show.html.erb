@@ -35,7 +35,8 @@
     <%= render CardComponent.new(title: "예비비", class: "mb-6") do %>
       <div data-controller="reserve-fund"
            data-reserve-fund-defaults-value="<%= @reserve_defaults.to_json %>"
-           data-reserve-fund-available-cash-value="<%= @setting.available_cash.to_i %>">
+           data-reserve-fund-available-cash-value="<%= @setting.available_cash.to_i %>"
+           data-action="reserve-fund:changed->budget-calculator#calculate">
         <div class="mb-4">
           <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">부동산 유형</label>
           <%= f.collection_select :property_type_id, @property_types, :id, :name,
