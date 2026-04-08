@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_07_200001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_08_024139) do
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.integer "area_range_max"
@@ -78,6 +78,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_200001) do
     t.integer "tab", null: false
     t.integer "tab_position", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.boolean "yes_means_safe", default: true, null: false
     t.index ["code"], name: "index_inspection_items_on_code", unique: true
     t.index ["tab", "tab_position"], name: "index_inspection_items_on_tab_and_tab_position"
   end
