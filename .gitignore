@@ -4,40 +4,47 @@
 # belong in git's global ignore instead:
 # `$XDG_CONFIG_HOME/git/ignore` or `~/.config/git/ignore`
 
-# Ignore bundler config.
+# Bundler config.
 /.bundle
 
-# Ignore all environment files.
+# Environment files (keep .env.example as reference).
 /.env*
+!/.env.example
 
-# Ignore all logfiles and tempfiles.
+# Logs and temp files.
 /log/*
 /tmp/*
 !/log/.keep
 !/tmp/.keep
-
-# Ignore pidfiles, but keep the directory.
 /tmp/pids/*
 !/tmp/pids/
 !/tmp/pids/.keep
-
-# Ignore storage (uploaded files in development and any SQLite databases).
-/storage/*
-!/storage/.keep
 /tmp/storage/*
 !/tmp/storage/
 !/tmp/storage/.keep
 
+# Storage (uploaded files and SQLite databases in development).
+/storage/*
+!/storage/.keep
+
+# Asset builds (Propshaft + TailwindCSS).
 /public/assets
-
-# Ignore key files for decrypting credentials and more.
-/config/*.key
-
-
 /app/assets/builds/*
 !/app/assets/builds/.keep
 
-# Ignore IDE and AI tool local state.
+# Rails credentials key files.
+/config/*.key
+
+# Bootsnap cache.
+/tmp/cache/bootsnap/
+
+# Kamal deployment secrets.
+/.kamal/secrets
+
+# Playwright MCP artifacts.
+/.playwright-mcp/
+
+# IDE and AI tool local state.
 .superpowers/
 .worktrees/
 .claude/
@@ -45,6 +52,6 @@
 .vscode/
 .idea/
 
-# Ignore OS files.
+# OS files.
 .DS_Store
 Thumbs.db
