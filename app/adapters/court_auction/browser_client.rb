@@ -75,7 +75,7 @@ module CourtAuction
     end
 
     def navigate_to_search(page)
-      page.goto(SEARCH_URL, wait_until: "networkidle", timeout: @timeout * 1000)
+      page.goto(SEARCH_URL, waitUntil: "networkidle", timeout: @timeout * 1000)
       page.wait_for_timeout(PAGE_LOAD_WAIT * 1000)
     rescue Playwright::Error => e
       raise DataProvider::ServiceUnavailableError, "Court auction site unreachable: #{e.message}"
