@@ -8,12 +8,16 @@ module DataProvider
 
   # External service errors — transient, retry may help
   class ConnectionError < Error; end
+  class TimeoutError < Error; end
   class RateLimitError < Error; end
   class ServiceUnavailableError < Error; end
 
   # Data errors — request-specific
   class DataNotFoundError < Error; end
   class ParseError < Error; end
+
+  # Configuration errors — setup required
+  class ConfigurationError < Error; end
 
   # Scraping-specific
   class ConsentRequiredError < Error; end
