@@ -3,8 +3,35 @@ require "test_helper"
 class RightsAnalysisServiceTest < ActiveSupport::TestCase
   setup do
     @user = users(:guest)
-    @safe_property = PropertyDataSyncService.call(case_number: "2026타경10001").property
-    @risky_property = PropertyDataSyncService.call(case_number: "2026타경10002").property
+
+    @safe_property = properties(:safe_apartment)
+    @safe_property.update!(raw_data: {
+      "registry_transcript" => {
+        "rights" => [
+          { "type" => "근저당", "date" => "2023-06-01", "holder" => "국민은행", "amount" => 500_000_000, "status" => "active", "registry_section" => "을구" }
+        ],
+        "tenants" => [],
+        "hug_waiver" => false,
+        "seizures" => []
+      }
+    })
+
+    @risky_property = properties(:risky_villa)
+    @risky_property.update!(raw_data: {
+      "registry_transcript" => {
+        "rights" => [
+          { "type" => "근저당", "date" => "2023-06-01", "holder" => "신한은행", "amount" => 200_000_000, "status" => "active", "registry_section" => "을구" },
+          { "type" => "가압류", "date" => "2024-01-15", "holder" => "김철수", "amount" => 30_000_000, "status" => "active", "registry_section" => "을구" }
+        ],
+        "tenants" => [
+          { "name" => "이영희", "move_in_date" => "2023-03-01", "deposit" => 100_000_000, "confirmed_date" => "2023-03-15", "dividend_requested" => true }
+        ],
+        "hug_waiver" => false,
+        "seizures" => [
+          { "type" => "압류", "date" => "2024-02-01", "holder" => "국세청", "amount" => 10_000_000 }
+        ]
+      }
+    })
   end
 
   test "creates a RightsAnalysisReport for safe property" do
@@ -54,7 +81,19 @@ class RightsAnalysisServiceTest < ActiveSupport::TestCase
   end
 
   test "detects HUG opportunity for officetel mock" do
-    hug_property = PropertyDataSyncService.call(case_number: "2026타경10003").property
+    hug_property = properties(:unanalyzed_officetel)
+    hug_property.update!(raw_data: {
+      "registry_transcript" => {
+        "rights" => [
+          { "type" => "근저당", "date" => "2024-01-01", "holder" => "우리은행", "amount" => 150_000_000, "status" => "active", "registry_section" => "을구" }
+        ],
+        "tenants" => [
+          { "name" => "박민수", "move_in_date" => "2023-06-01", "deposit" => 80_000_000, "confirmed_date" => "2023-06-15", "dividend_requested" => false }
+        ],
+        "hug_waiver" => true,
+        "seizures" => []
+      }
+    })
     RightsAnalysisService.call(property: hug_property, user: @user)
 
     report = RightsAnalysisReport.find_by(property: hug_property, user: @user)
@@ -62,7 +101,8 @@ class RightsAnalysisServiceTest < ActiveSupport::TestCase
   end
 
   test "compute_verdict handles nil and false field values gracefully" do
-    property = PropertyDataSyncService.call(case_number: "2026타경10001").property
+    property = properties(:safe_apartment)
+    # raw_data already set in setup
     report = RightsAnalysisService.call(property: property, user: @user)
 
     assert_not_includes report.verdict_summary, "false"

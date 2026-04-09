@@ -2,7 +2,7 @@ require "test_helper"
 
 class PropertyInspectionFlowTest < ActionDispatch::IntegrationTest
   setup do
-    @property = PropertyDataSyncService.call(case_number: "2026타경10001").property
+    @property = properties(:safe_apartment)
     @user = users(:guest)
     UserProperty.find_or_create_by!(user: @user, property: @property)
   end
