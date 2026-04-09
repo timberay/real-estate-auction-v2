@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_09_015133) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_09_064643) do
   create_table "api_credentials", force: :cascade do |t|
     t.string "api_key"
     t.string "api_secret"
@@ -22,6 +22,33 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_015133) do
     t.integer "user_id", null: false
     t.index ["user_id", "provider_name"], name: "index_api_credentials_on_user_id_and_provider_name", unique: true
     t.index ["user_id"], name: "index_api_credentials_on_user_id"
+  end
+
+  create_table "appraisal_points", force: :cascade do |t|
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.string "item_code"
+    t.integer "property_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["property_id", "item_code"], name: "index_appraisal_points_on_property_id_and_item_code"
+    t.index ["property_id"], name: "index_appraisal_points_on_property_id"
+  end
+
+  create_table "auction_schedules", force: :cascade do |t|
+    t.date "bid_end_date"
+    t.date "bid_start_date"
+    t.datetime "created_at", null: false
+    t.bigint "min_price"
+    t.string "place"
+    t.integer "property_id", null: false
+    t.string "result_code"
+    t.bigint "sale_amount"
+    t.date "schedule_date"
+    t.string "schedule_time"
+    t.string "schedule_type"
+    t.datetime "updated_at", null: false
+    t.index ["property_id", "schedule_date"], name: "index_auction_schedules_on_property_id_and_schedule_date"
+    t.index ["property_id"], name: "index_auction_schedules_on_property_id"
   end
 
   create_table "budget_settings", force: :cascade do |t|
@@ -109,6 +136,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_015133) do
     t.index ["user_id"], name: "index_inspection_results_on_user_id"
   end
 
+  create_table "land_details", force: :cascade do |t|
+    t.string "address"
+    t.datetime "created_at", null: false
+    t.string "land_area"
+    t.string "land_category"
+    t.string "land_type"
+    t.string "lot_number"
+    t.integer "property_id", null: false
+    t.string "share_ratio"
+    t.datetime "updated_at", null: false
+    t.index ["property_id"], name: "index_land_details_on_property_id"
+  end
+
   create_table "loan_policies", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -126,16 +166,53 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_015133) do
 
   create_table "properties", force: :cascade do |t|
     t.string "address"
-    t.integer "appraisal_price"
+    t.bigint "appraisal_price"
+    t.string "building_detail"
+    t.string "building_name"
+    t.string "building_structure"
     t.string "case_number", null: false
-    t.string "court_name"
+    t.string "case_type"
+    t.bigint "claim_amount"
     t.datetime "created_at", null: false
-    t.integer "min_bid_price"
+    t.string "dong"
+    t.decimal "exclusive_area"
+    t.integer "failed_bid_count", default: 0
+    t.integer "interest_count", default: 0
+    t.string "land_category"
+    t.decimal "latitude", precision: 10, scale: 7
+    t.decimal "longitude", precision: 10, scale: 7
+    t.bigint "min_bid_price"
     t.string "property_type"
+    t.string "property_usage_code"
     t.json "raw_data"
+    t.text "remarks"
+    t.string "sido"
+    t.string "sigungu"
+    t.string "special_conditions_code"
     t.string "status"
     t.datetime "updated_at", null: false
+    t.integer "view_count", default: 0
     t.index ["case_number"], name: "index_properties_on_case_number", unique: true
+    t.index ["property_type"], name: "index_properties_on_property_type"
+    t.index ["sido", "sigungu", "dong"], name: "idx_properties_location"
+  end
+
+  create_table "property_sale_details", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "dividend_demand_deadline"
+    t.text "goods_remarks"
+    t.text "non_extinguished_rights"
+    t.bigint "price_round_1"
+    t.bigint "price_round_2"
+    t.bigint "price_round_3"
+    t.bigint "price_round_4"
+    t.integer "property_id", null: false
+    t.string "senior_mortgage_basis"
+    t.text "share_description"
+    t.text "specification_remarks"
+    t.text "superficies_details"
+    t.datetime "updated_at", null: false
+    t.index ["property_id"], name: "index_property_sale_details_on_property_id", unique: true
   end
 
   create_table "property_types", force: :cascade do |t|
@@ -209,6 +286,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_015133) do
   end
 
   add_foreign_key "api_credentials", "users"
+  add_foreign_key "appraisal_points", "properties"
+  add_foreign_key "auction_schedules", "properties"
   add_foreign_key "budget_settings", "loan_policies"
   add_foreign_key "budget_settings", "property_types"
   add_foreign_key "budget_settings", "users"
@@ -217,7 +296,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_015133) do
   add_foreign_key "inspection_results", "inspection_items"
   add_foreign_key "inspection_results", "properties"
   add_foreign_key "inspection_results", "users"
+  add_foreign_key "land_details", "properties"
   add_foreign_key "loan_policies", "property_types"
+  add_foreign_key "property_sale_details", "properties"
   add_foreign_key "reserve_fund_defaults", "property_types"
   add_foreign_key "rights_analysis_reports", "properties"
   add_foreign_key "rights_analysis_reports", "users"

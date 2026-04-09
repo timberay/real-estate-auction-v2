@@ -1,26 +1,64 @@
 safe_apartment:
   case_number: "2026타경10001"
-  court_name: "서울중앙지방법원"
+  case_type: "부동산임의경매"
   property_type: "아파트"
   address: "서울특별시 강남구 역삼동 100-1"
-  appraisal_price: 80000
-  min_bid_price: 56000
+  sido: "서울특별시"
+  sigungu: "강남구"
+  dong: "역삼동"
+  building_name: "테스트아파트"
+  building_detail: "101동 5층501호"
+  building_structure: "철근콩크리트조 84.50㎡"
+  exclusive_area: 84.5
+  land_category: "전유"
+  appraisal_price: 800000000
+  min_bid_price: 560000000
+  failed_bid_count: 0
+  view_count: 5
+  interest_count: 2
+  latitude: 37.5012
+  longitude: 127.0396
   status: "진행중"
+  remarks: ""
 
 risky_villa:
   case_number: "2026타경10002"
-  court_name: "수원지방법원"
+  case_type: "부동산임의경매"
   property_type: "빌라"
   address: "경기도 수원시 영통구 200-2"
-  appraisal_price: 30000
-  min_bid_price: 21000
+  sido: "경기도"
+  sigungu: "수원시"
+  dong: "영통구"
+  building_name: "테스트빌라"
+  building_detail: "3층301호"
+  building_structure: "철근콩크리트조 60.00㎡"
+  exclusive_area: 60.0
+  land_category: "전유"
+  appraisal_price: 300000000
+  min_bid_price: 210000000
+  failed_bid_count: 2
+  view_count: 15
+  interest_count: 5
   status: "진행중"
+  remarks: "유치권 신고 있음"
 
 unanalyzed_officetel:
   case_number: "2026타경10003"
-  court_name: "인천지방법원"
+  case_type: "부동산임의경매"
   property_type: "오피스텔"
   address: "인천광역시 연수구 300-3"
-  appraisal_price: 25000
-  min_bid_price: 17500
+  sido: "인천광역시"
+  sigungu: "연수구"
+  dong: ""
+  building_name: "테스트오피스텔"
+  building_detail: "10층1001호"
+  building_structure: "철근콩크리트조 45.00㎡"
+  exclusive_area: 45.0
+  land_category: "전유"
+  appraisal_price: 250000000
+  min_bid_price: 175000000
+  failed_bid_count: 0
+  view_count: 0
+  interest_count: 0
   status: "진행중"
+  remarks: ""

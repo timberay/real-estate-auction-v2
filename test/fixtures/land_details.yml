@@ -1,0 +1,8 @@
+safe_apartment_land:
+  property: safe_apartment
+  land_type: "전유"
+  land_area: "5000.0㎡"
+  land_category: "대"
+  share_ratio: "84.5/5000.0"
+  address: "서울특별시강남구역삼동100"
+  lot_number: "100"

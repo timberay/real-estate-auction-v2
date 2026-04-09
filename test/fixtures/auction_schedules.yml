@@ -1,0 +1,8 @@
+safe_apartment_schedule_1:
+  property: safe_apartment
+  schedule_date: "2026-04-16"
+  schedule_time: "1000"
+  place: "경매법정"
+  schedule_type: "01"
+  min_price: 560000000
+  sale_amount: 0

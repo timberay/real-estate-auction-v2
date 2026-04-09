@@ -1,0 +1,9 @@
+safe_apartment_location:
+  property: safe_apartment
+  item_code: "00083001"
+  content: "역삼역 인근에 위치하며 주위는 아파트단지 및 상가 등이 소재함."
+
+safe_apartment_lease:
+  property: safe_apartment
+  item_code: "00083026"
+  content: "임대관계 미상임."

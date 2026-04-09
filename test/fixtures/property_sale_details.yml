@@ -1,0 +1,17 @@
+safe_apartment_detail:
+  property: safe_apartment
+  non_extinguished_rights: ""
+  specification_remarks: ""
+  senior_mortgage_basis: "2020.5.27. 근저당권"
+  goods_remarks: ""
+  dividend_demand_deadline: "2026-07-01"
+  share_description: ""
+
+risky_villa_detail:
+  property: risky_villa
+  non_extinguished_rights: "을구 1번 주택임차권등기 — 배당에서 전액 변제받지 않으면 매수인이 인수"
+  specification_remarks: "유치권 신고 있음"
+  senior_mortgage_basis: "2021.3.31. 근저당권"
+  goods_remarks: "유치권 신고"
+  dividend_demand_deadline: "2026-06-01"
+  share_description: ""
