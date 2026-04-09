@@ -21,6 +21,12 @@ Rails.application.routes.draw do
         get :compare
       end
     end
+    resource :data_sources, only: [ :show ]
+    resources :api_credentials, only: [ :create, :update, :destroy ] do
+      member do
+        post :verify
+      end
+    end
   end
 
   namespace :api do
