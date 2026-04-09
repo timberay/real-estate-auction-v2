@@ -116,12 +116,6 @@ GEM
     erubi (1.13.1)
     et-orbi (1.4.0)
       tzinfo
-    ferrum (0.17.2)
-      addressable (~> 2.5)
-      base64 (~> 0.2)
-      concurrent-ruby (~> 1.1)
-      webrick (~> 1.7)
-      websocket-driver (~> 0.7)
     ffi (1.17.4-aarch64-linux-gnu)
     ffi (1.17.4-aarch64-linux-musl)
     ffi (1.17.4-arm-linux-gnu)
@@ -193,6 +187,10 @@ GEM
       net-smtp
     marcel (1.1.0)
     matrix (0.4.3)
+    mime-types (3.7.0)
+      logger
+      mime-types-data (~> 3.2025, >= 3.2025.0507)
+    mime-types-data (3.2026.0407)
     mini_magick (5.3.1)
       logger
     mini_mime (1.1.5)
@@ -232,6 +230,10 @@ GEM
     parser (3.3.11.1)
       ast (~> 2.4.1)
       racc
+    playwright-ruby-client (1.59.0)
+      base64
+      concurrent-ruby (>= 1.1.6)
+      mime-types (>= 3.0)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
@@ -402,7 +404,6 @@ GEM
       actionview (>= 8.0.0)
       bindex (>= 0.4.0)
       railties (>= 8.0.0)
-    webrick (1.9.2)
     websocket (1.2.11)
     websocket-driver (0.8.0)
       base64
@@ -430,13 +431,13 @@ DEPENDENCIES
   bundler-audit
   capybara
   debug
-  ferrum
   heroicon
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
   kamal
   lookbook
+  playwright-ruby-client
   propshaft
   puma (>= 5.0)
   rails (~> 8.1.3)
