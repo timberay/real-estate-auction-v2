@@ -18,17 +18,14 @@
         <div class="flex items-center gap-2">
           <input type="text" id="available_cash_display"
             inputmode="numeric"
-            class="w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+            class="flex-1 h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             placeholder="3,000"
             data-number-format-target="display"
             data-action="input->number-format#format blur->number-format#formatDisplay">
           <%= f.hidden_field :available_cash, data: { number_format_target: "hidden" } %>
           <span class="text-slate-600 dark:text-slate-400 font-medium whitespace-nowrap">만원</span>
+          <%= render ButtonComponent.new(icon: "arrow-right", size: :md, type: "submit") { "다음" } %>
         </div>
-      </div>
-
-      <div class="mt-8">
-        <%= render ButtonComponent.new(icon: "arrow-right", class: "w-full justify-center", type: "submit") { "다음" } %>
       </div>
     <% end %>
   <% end %>

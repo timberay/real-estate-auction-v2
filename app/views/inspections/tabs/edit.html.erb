@@ -1,13 +1,23 @@
 <%= render layout: "inspections/layout", locals: { property: @property, user_property: @user_property, active_tab: @tab_key } do %>
   <div id="top"></div>
-  <%= form_with url: property_inspections_tab_path(@property, tab_key: @tab_key), method: :patch, data: { turbo: false } do |f| %>
+  <%= form_with url: property_inspections_tab_path(@property, tab_key: @tab_key), method: :patch,
+      data: { turbo: false, controller: "unified-form", unified_form_total_value: @results.size,
+              action: "change->unified-form#validate" } do |f| %>
     <div class="space-y-6">
       <% @results.group_by { |r| r.inspection_item.category }.each do |category, results| %>
         <%= render InspectionGroupComponent.new(category: category, results: results) %>
       <% end %>
     </div>
-    <div class="mt-6">
-      <%= f.submit "저장", class: "w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition-colors" %>
+    <div class="sticky bottom-0 z-10 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-sm border-t border-slate-200 dark:border-slate-700 mt-6 -mx-4 px-4 py-4 md:-mx-6 md:px-6">
+      <div class="flex items-center justify-between gap-4">
+        <span class="text-sm text-slate-500 dark:text-slate-400">
+          완료 <span class="font-semibold text-slate-900 dark:text-slate-100" data-unified-form-target="progress"><%= @results.count { |r| r.has_risk != nil } %>/<%= @results.size %></span>
+        </span>
+        <% has_incomplete = @results.any? { |r| !r.auto? && r.has_risk.nil? } %>
+        <%= f.submit "저장하기", disabled: has_incomplete,
+            class: "h-10 px-4 rounded-md bg-blue-600 dark:bg-blue-500 text-base font-semibold text-white transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900 #{has_incomplete ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700 dark:hover:bg-blue-400'}",
+            data: { unified_form_target: "submitButton" } %>
+      </div>
     </div>
   <% end %>
 <% end %>

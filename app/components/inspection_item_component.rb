@@ -13,11 +13,11 @@ class InspectionItemComponent < ViewComponent::Base
 
   def risk_classes
     if manual_source? && @result.has_risk.nil?
-      "border-slate-300 bg-slate-50 dark:border-slate-600 dark:bg-slate-800/50"
+      "border-slate-400 bg-slate-100 dark:border-slate-600 dark:bg-slate-800/50"
     elsif @result.has_risk
-      auto_source? ? "border-red-300 bg-red-50 dark:border-red-600 dark:bg-red-900/20" : "border-yellow-300 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-900/20"
+      auto_source? ? "border-red-400 bg-red-100 dark:border-red-600 dark:bg-red-900/20" : "border-yellow-400 bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900/20"
     else
-      "border-green-300 bg-green-50 dark:border-green-600 dark:bg-green-900/20"
+      "border-green-400 bg-green-100 dark:border-green-600 dark:bg-green-900/20"
     end
   end
 
@@ -33,11 +33,11 @@ class InspectionItemComponent < ViewComponent::Base
 
   def source_badge_classes
     if auto_source?
-      "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+      "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400"
     elsif overridden?
-      "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+      "bg-amber-100 text-amber-700 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-300 dark:ring-amber-400/20"
     else
-      "bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300"
+      "bg-amber-100 text-amber-700 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-300 dark:ring-amber-400/20"
     end
   end
 
@@ -45,6 +45,16 @@ class InspectionItemComponent < ViewComponent::Base
     if manual_source? && @result.has_risk.nil? then "미입력"
     elsif @result.has_risk then auto_source? ? "위험" : "위험 확인"
     else "안전"
+    end
+  end
+
+  def status_classes
+    if manual_source? && @result.has_risk.nil?
+      "text-slate-400 dark:text-slate-500"
+    elsif @result.has_risk
+      "text-red-600 dark:text-red-400"
+    else
+      "text-green-600 dark:text-green-400"
     end
   end
 
@@ -75,7 +85,7 @@ class InspectionItemComponent < ViewComponent::Base
     return "" unless selected_answer
     if selected_answer == "yes"
       answer_means_safe = @item.yes_means_safe?
-      answer_means_safe ? "bg-green-50 dark:bg-green-900/20 font-semibold text-green-800 dark:text-green-300" : "bg-red-50 dark:bg-red-900/20 font-semibold text-red-800 dark:text-red-300"
+      answer_means_safe ? "bg-green-100 dark:bg-green-900/20 font-semibold text-green-800 dark:text-green-300" : "bg-red-100 dark:bg-red-900/20 font-semibold text-red-800 dark:text-red-300"
     else
       "text-slate-400 dark:text-slate-500"
     end
@@ -85,7 +95,7 @@ class InspectionItemComponent < ViewComponent::Base
     return "" unless selected_answer
     if selected_answer == "no"
       answer_means_safe = !@item.yes_means_safe?
-      answer_means_safe ? "bg-green-50 dark:bg-green-900/20 font-semibold text-green-800 dark:text-green-300" : "bg-red-50 dark:bg-red-900/20 font-semibold text-red-800 dark:text-red-300"
+      answer_means_safe ? "bg-green-100 dark:bg-green-900/20 font-semibold text-green-800 dark:text-green-300" : "bg-red-100 dark:bg-red-900/20 font-semibold text-red-800 dark:text-red-300"
     else
       "text-slate-400 dark:text-slate-500"
     end

@@ -6,7 +6,7 @@ class InspectionTabsComponent < ViewComponent::Base
     { key: "online",        label: "온라인조회" },
     { key: "field_visit",   label: "현장임장" },
     { key: "etc",           label: "기타" },
-    { key: "grade",         label: "최종등급" }
+    { key: "grade",         label: "종합 판정" }
   ].freeze
 
   def initialize(property:, user:, active_tab:)
@@ -52,9 +52,9 @@ class InspectionTabsComponent < ViewComponent::Base
   end
 
   RATING_BADGE = {
-    safe: { label: "안전", classes: "bg-green-800 text-green-200" },
-    caution: { label: "주의", classes: "bg-yellow-800 text-yellow-200" },
-    danger: { label: "경고", classes: "bg-red-800 text-red-200" }
+    safe: { label: "안전", classes: "bg-green-200 text-green-800 dark:bg-green-900/40 dark:text-green-300" },
+    caution: { label: "주의", classes: "bg-yellow-200 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300" },
+    danger: { label: "경고", classes: "bg-red-200 text-red-800 dark:bg-red-900/40 dark:text-red-300" }
   }.freeze
 
   def rating_badge(rating)

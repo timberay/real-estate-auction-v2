@@ -11,8 +11,8 @@ class ButtonComponent < ViewComponent::Base
   }.freeze
 
   SIZES = {
-    sm: "h-8 px-3 text-xs",
-    md: "h-10 px-4 text-sm",
+    sm: "h-8 px-3 text-sm",
+    md: "h-10 px-4 text-base",
     lg: "h-12 px-6 text-base"
   }.freeze
 

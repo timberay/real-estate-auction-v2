@@ -1,14 +1,27 @@
 <nav class="mb-4 overflow-x-auto">
-  <div class="flex gap-1 text-sm min-w-max">
+  <div class="flex items-center gap-1 text-sm min-w-max">
     <% tabs.each do |tab| %>
-      <%= link_to tab[:url],
-          class: "px-3 py-2 rounded-md transition-colors whitespace-nowrap #{tab[:active] ? 'bg-blue-600 text-white font-semibold' : 'bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200'}" do %>
-        <% if (badge = rating_badge(tab[:rating])) %>
-          <span class="<%= badge[:classes] %> text-[10px] font-semibold px-1.5 py-0.5 rounded"><%= badge[:label] %></span>
-        <% end %>
-        <span><%= tab[:label] %></span>
-        <% if tab[:total] > 0 %>
-          <span class="ml-1 text-xs <%= tab[:active] ? 'text-blue-200' : 'text-slate-500' %>"><%= tab[:checked] %>/<%= tab[:total] %></span>
+      <% if tab[:key] == "grade" %>
+        <%# Separator: double chevron %>
+        <div class="flex items-center ml-2">
+          <svg class="w-5 h-5 text-slate-400 dark:text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+          </svg>
+          <%= link_to tab[:url],
+              class: "px-3 py-2 rounded-md transition-colors whitespace-nowrap font-semibold #{tab[:active] ? 'bg-blue-600 text-white dark:bg-blue-500' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100'}" do %>
+            <span><%= tab[:label] %></span>
+          <% end %>
+        </div>
+      <% else %>
+        <%= link_to tab[:url],
+            class: "px-3 py-2 rounded-md transition-colors whitespace-nowrap #{tab[:active] ? 'bg-blue-600 text-white font-semibold dark:bg-blue-500' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-200'}" do %>
+          <% if (badge = rating_badge(tab[:rating])) %>
+            <span class="<%= badge[:classes] %> text-sm font-semibold px-1.5 py-0.5 rounded"><%= badge[:label] %></span>
+          <% end %>
+          <span><%= tab[:label] %></span>
+          <% if tab[:total] > 0 %>
+            <span class="ml-1 text-sm <%= tab[:active] ? 'text-blue-200' : 'text-slate-400 dark:text-slate-500' %>"><%= tab[:checked] %>/<%= tab[:total] %></span>
+          <% end %>
         <% end %>
       <% end %>
     <% end %>

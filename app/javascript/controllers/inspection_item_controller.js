@@ -1,12 +1,12 @@
 import { Controller } from "@hotwired/stimulus"
 
 const LOGIC_DIMMED = ["text-slate-400", "dark:text-slate-500"]
-const ALL_HIGHLIGHT_CLASSES = ["bg-green-50", "dark:bg-green-900/20", "font-semibold", "text-green-800", "dark:text-green-300", "bg-red-50", "dark:bg-red-900/20", "text-red-800", "dark:text-red-300"]
+const ALL_HIGHLIGHT_CLASSES = ["bg-green-100", "dark:bg-green-900/20", "font-semibold", "text-green-800", "dark:text-green-300", "bg-red-100", "dark:bg-red-900/20", "text-red-800", "dark:text-red-300"]
 const ALL_LOGIC_CLASSES = [...ALL_HIGHLIGHT_CLASSES, ...LOGIC_DIMMED]
 
-const BADGE_AUTO = ["bg-blue-100", "text-blue-700", "dark:bg-blue-900/30", "dark:text-blue-300"]
-const BADGE_OVERRIDDEN = ["bg-amber-100", "text-amber-700", "dark:bg-amber-900/30", "dark:text-amber-300"]
-const BADGE_MANUAL = ["bg-slate-100", "text-slate-600", "dark:bg-slate-700", "dark:text-slate-300"]
+const BADGE_AUTO = ["bg-slate-200", "text-slate-600", "dark:bg-slate-700", "dark:text-slate-400"]
+const BADGE_OVERRIDDEN = ["bg-amber-100", "text-amber-700", "ring-1", "ring-inset", "ring-amber-600/20", "dark:bg-amber-900/30", "dark:text-amber-300", "dark:ring-amber-400/20"]
+const BADGE_MANUAL = ["bg-amber-100", "text-amber-700", "ring-1", "ring-inset", "ring-amber-600/20", "dark:bg-amber-900/30", "dark:text-amber-300", "dark:ring-amber-400/20"]
 const ALL_BADGE_CLASSES = [...BADGE_AUTO, ...BADGE_OVERRIDDEN, ...BADGE_MANUAL]
 
 export default class extends Controller {

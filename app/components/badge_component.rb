@@ -10,7 +10,7 @@ class BadgeComponent < ViewComponent::Base
     accent: "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-400 dark:ring-amber-400/20"
   }.freeze
 
-  COMMON_CLASSES = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+  COMMON_CLASSES = "inline-flex items-center rounded-full px-2.5 py-1 text-sm font-medium"
 
   def initialize(variant: :default, **html_options)
     @variant = variant

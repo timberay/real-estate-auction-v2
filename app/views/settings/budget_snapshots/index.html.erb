@@ -28,7 +28,7 @@
       <%= render CardComponent.new(title: "스냅샷 비교", class: "mt-6") do %>
         <%= form_tag compare_settings_budget_snapshots_path, method: :get, class: "flex gap-2 items-end" do %>
           <div class="flex-1">
-            <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">기준</label>
+            <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">기준</label>
             <select name="ids[]" class="w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
               <% @snapshots.each do |s| %>
                 <option value="<%= s.id %>">v<%= s.version %> (<%= s.trigger %>)</option>
@@ -36,7 +36,7 @@
             </select>
           </div>
           <div class="flex-1">
-            <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">비교 대상</label>
+            <label class="block text-sm text-slate-500 dark:text-slate-400 mb-1">비교 대상</label>
             <select name="ids[]" class="w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
               <% @snapshots.each_with_index do |s, i| %>
                 <option value="<%= s.id %>" <%= "selected" if i == 1 %>>v<%= s.version %> (<%= s.trigger %>)</option>

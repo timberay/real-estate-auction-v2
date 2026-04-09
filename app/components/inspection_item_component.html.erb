@@ -8,30 +8,30 @@
      data-inspection-item-yes-means-safe-value="<%= @item.yes_means_safe? %>">
   <div class="flex items-start justify-between">
     <div class="flex items-center gap-2">
-      <span class="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-semibold <%= source_badge_classes %>"
+      <span class="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-semibold <%= source_badge_classes %>"
             data-inspection-item-target="sourceBadge"><%= source_badge_text %></span>
       <p class="text-sm font-medium text-slate-900 dark:text-slate-100"><%= @item.question %></p>
     </div>
     <div class="ml-2 flex shrink-0 items-center gap-2">
-      <span class="text-xs font-semibold" data-inspection-item-target="statusLabel"><%= status_text %></span>
+      <span class="text-sm font-semibold <%= status_classes %>" data-inspection-item-target="statusLabel"><%= status_text %></span>
       <% if show_edit_mode? %>
         <button type="button"
-                class="rounded border border-slate-300 px-2 py-0.5 text-xs text-slate-600 hover:bg-slate-100 dark:border-slate-500 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors"
+                class="rounded border border-slate-300 px-2 py-0.5 text-sm text-slate-600 hover:bg-slate-100 dark:border-slate-500 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors"
                 data-inspection-item-target="editButton"
                 data-action="click->inspection-item#enterEditMode">수정</button>
         <button type="button"
-                class="hidden rounded border border-slate-300 px-2 py-0.5 text-xs text-slate-600 hover:bg-slate-100 dark:border-slate-500 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors"
+                class="hidden rounded border border-slate-300 px-2 py-0.5 text-sm text-slate-600 hover:bg-slate-100 dark:border-slate-500 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors"
                 data-inspection-item-target="cancelButton"
                 data-action="click->inspection-item#cancelEditMode">취소</button>
       <% end %>
     </div>
   </div>
   <% if @item.description.present? %>
-    <p class="mt-1 text-xs text-slate-500 dark:text-slate-400"><%= @item.description %></p>
+    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= @item.description %></p>
   <% end %>
 
   <% if logic_present? %>
-    <div class="mt-2 space-y-1 text-xs" data-logic-section>
+    <div class="mt-2 space-y-1 text-sm" data-logic-section>
       <div class="flex items-start gap-1.5 rounded px-2 py-1 <%= logic_yes_classes %>"
            data-inspection-item-target="logicYes"
            <% if selected_answer == 'yes' %>data-logic-selected="yes"<% end %>>
@@ -51,7 +51,7 @@
   <% if show_edit_mode? %>
     <div class="mt-3 hidden border-t border-slate-200 dark:border-slate-600 pt-3"
          data-inspection-item-target="editSection">
-      <p class="mb-2 text-xs font-medium text-slate-600 dark:text-slate-300">자동 수집 결과를 수정합니다:</p>
+      <p class="mb-2 text-sm font-medium text-slate-600 dark:text-slate-300">자동 수집 결과를 수정합니다:</p>
       <div class="flex items-center gap-4">
         <label class="inline-flex items-center text-sm text-slate-700 dark:text-slate-200">
           <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", yes_radio_value, @result.has_risk == (yes_radio_value == "true"),
@@ -70,7 +70,7 @@
       <input type="hidden" name="resolutions[<%= @result.id %>][override]" value="true" disabled
              data-inspection-item-target="overrideFlag">
       <div data-inspection-item-target="overrideResolutionSection" class="hidden mt-3 rounded-md border border-dashed border-yellow-400 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-900/20 p-3">
-        <p class="mb-2 text-xs font-medium text-yellow-800 dark:text-yellow-300">해결 가능 여부를 선택해주세요:</p>
+        <p class="mb-2 text-sm font-medium text-yellow-800 dark:text-yellow-300">해결 가능 여부를 선택해주세요:</p>
         <div class="flex items-center gap-4">
           <label class="inline-flex items-center text-sm text-yellow-900 dark:text-yellow-200">
             <%= radio_button_tag "resolutions[#{@result.id}][resolvable]", "true", @result.resolvable == true,
@@ -123,7 +123,7 @@
         </label>
       </div>
       <div data-inspection-item-target="resolutionSection" class="<%= 'hidden' unless @result.has_risk %> mt-3 rounded-md border border-dashed border-yellow-400 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-900/20 p-3">
-        <p class="mb-2 text-xs font-medium text-yellow-800 dark:text-yellow-300">해결 가능 여부를 선택해주세요:</p>
+        <p class="mb-2 text-sm font-medium text-yellow-800 dark:text-yellow-300">해결 가능 여부를 선택해주세요:</p>
         <div class="flex items-center gap-4">
           <label class="inline-flex items-center text-sm text-yellow-900 dark:text-yellow-200"><%= radio_button_tag "resolutions[#{@result.id}][resolvable]", "true", @result.resolvable == true, class: "mr-1.5" %> 해결 가능</label>
           <label class="inline-flex items-center text-sm text-yellow-900 dark:text-yellow-200"><%= radio_button_tag "resolutions[#{@result.id}][resolvable]", "false", @result.resolvable == false, class: "mr-1.5" %> 해결 불가</label>

@@ -37,9 +37,9 @@ class StatCardComponent < ViewComponent::Base
 
   def sublabel_classes
     if @variant == :primary
-      "text-xs opacity-70 mt-1"
+      "text-sm opacity-70 mt-1"
     else
-      "text-xs text-slate-400 dark:text-slate-500 mt-1"
+      "text-sm text-slate-400 dark:text-slate-500 mt-1"
     end
   end
 end

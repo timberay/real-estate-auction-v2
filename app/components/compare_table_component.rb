@@ -2,7 +2,7 @@
 
 class CompareTableComponent < ViewComponent::Base
   HEADER_CLASSES = "bg-slate-50 dark:bg-slate-800/80"
-  HEADER_CELL_CLASSES = "px-4 py-2 text-xs font-medium text-slate-500 dark:text-slate-400"
+  HEADER_CELL_CLASSES = "px-4 py-2 text-sm font-medium text-slate-500 dark:text-slate-400"
   CELL_CLASSES = "px-4 py-3 text-sm text-slate-700 dark:text-slate-300"
 
   def initialize(diff:)

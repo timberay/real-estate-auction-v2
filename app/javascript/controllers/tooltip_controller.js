@@ -12,7 +12,7 @@ export default class extends Controller {
 
     this.tooltipElement = document.createElement("div")
     this.tooltipElement.className =
-      "absolute z-10 px-2.5 py-1.5 text-xs font-medium text-white bg-slate-800 rounded-md shadow-sm dark:bg-slate-600 whitespace-nowrap pointer-events-none"
+      "absolute z-10 px-2.5 py-1.5 text-sm font-medium text-white bg-slate-800 rounded-md shadow-sm dark:bg-slate-600 whitespace-nowrap pointer-events-none"
     this.tooltipElement.textContent = this.contentValue
 
     this.element.appendChild(this.tooltipElement)

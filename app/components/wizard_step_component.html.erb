@@ -1,9 +1,20 @@
 <div class="max-w-lg mx-auto">
-  <div class="flex items-center justify-center mb-6">
+  <div class="flex items-center mb-8">
     <% (1..@total_steps).each do |step| %>
-      <div class="<%= dot_class(step) %>"></div>
+      <div class="flex flex-col items-center gap-1">
+        <div class="<%= circle_classes(step) %>">
+          <% if step < @current_step %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+            </svg>
+          <% else %>
+            <%= step %>
+          <% end %>
+        </div>
+        <span class="<%= label_classes(step) %> whitespace-nowrap"><%= step_label(step) %></span>
+      </div>
       <% if step < @total_steps %>
-        <div class="<%= line_class(step) %>"></div>
+        <div class="<%= line_classes(step) %> mt-[-1.25rem]"></div>
       <% end %>
     <% end %>
   </div>

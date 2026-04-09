@@ -95,8 +95,8 @@ class BadgeComponentTest < ViewComponent::TestCase
     assert_selector "span[class*='items-center']"
     assert_selector "span[class*='rounded-full']"
     assert_selector "span[class*='px-2.5']"
-    assert_selector "span[class*='py-0.5']"
-    assert_selector "span[class*='text-xs']"
+    assert_selector "span[class*='py-1']"
+    assert_selector "span[class*='text-sm']"
     assert_selector "span[class*='font-medium']"
   end
 

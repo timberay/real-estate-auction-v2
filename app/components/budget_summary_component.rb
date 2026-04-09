@@ -56,9 +56,9 @@ class BudgetSummaryComponent < ViewComponent::Base
 
   def label_classes
     if calculated?
-      "text-xs text-slate-500 dark:text-slate-400"
+      "text-sm text-slate-500 dark:text-slate-400"
     else
-      "text-xs text-slate-400 dark:text-slate-500"
+      "text-sm text-slate-400 dark:text-slate-500"
     end
   end
 end
