@@ -21,6 +21,21 @@
 
   <%# Case number input + criteria search %>
   <div data-controller="criteria-search" class="max-w-md">
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">관심 지역</label>
+      <div class="flex items-center gap-2">
+        <select name="budget_setting[region]"
+                class="flex-1 h-8 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                data-controller="region-select"
+                data-region-select-url-value="<%= update_region_settings_budget_path %>"
+                data-action="change->region-select#save">
+          <% BudgetSetting::REGIONS.each do |region| %>
+            <option value="<%= region %>" <%= "selected" if region == @setting&.effective_region %>><%= region %></option>
+          <% end %>
+        </select>
+        <span class="text-sm text-slate-500 dark:text-slate-400 transition-opacity duration-300 opacity-0" data-region-select-target="feedback"></span>
+      </div>
+    </div>
     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">사건번호로 물건 추가</label>
     <div class="flex items-center gap-2">
       <%= form_with url: properties_path, method: :post, class: "contents", data: { action: "submit->criteria-search#submitCaseNumber" } do |f| %>
@@ -53,8 +68,15 @@
     </div>
     <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">법원 경매 사건번호를 입력하세요</p>
 
-    <%# Criteria search results appear here via Turbo Stream %>
-    <div data-criteria-search-target="resultsContainer" id="criteria-search-results"></div>
+    <%# Criteria search results — persisted from DB on load, updated via Turbo Stream %>
+    <div id="criteria-search-results">
+      <% if @search_results&.any? %>
+        <%= render "search_results/inline_results",
+                   search_results: @search_results,
+                   user_property_case_numbers: @user_property_case_numbers,
+                   pagy: @pagy_search %>
+      <% end %>
+    </div>
   </div>
 
   <% if @user_properties.any? || params[:safety_rating].present? || params[:search].present? || params[:within_budget].present? %>
