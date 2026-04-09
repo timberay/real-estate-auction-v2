@@ -111,6 +111,30 @@ class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end
 
+  test "excludes case numbers with multiple properties" do
+    mock_response = {
+      items: [
+        { "srnSaNo" => "2024타경1000", "printSt" => "주소A", "mulJinYn" => "Y" },
+        { "srnSaNo" => "2024타경1000", "printSt" => "주소B", "mulJinYn" => "Y" },
+        { "srnSaNo" => "2024타경2000", "printSt" => "주소C", "mulJinYn" => "Y" }
+      ],
+      total: 3
+    }
+
+    adapter = Object.new
+    adapter.define_singleton_method(:search_by_criteria) { |**_args| mock_response }
+
+    original_new = GovernmentCourtAuctionAdapter.method(:new)
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
+
+    CourtAuctionSearchService.call(user: @user)
+
+    assert_equal 1, @user.search_results.count
+    assert_equal "2024타경2000", @user.search_results.first.case_number
+  ensure
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
+  end
+
   test "captures DataProvider errors" do
     adapter = Object.new
     adapter.define_singleton_method(:search_by_criteria) { |**_| raise DataProvider::TimeoutError, "timeout" }

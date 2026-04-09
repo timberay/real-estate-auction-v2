@@ -36,7 +36,9 @@ class CourtAuctionSearchService
   def persist_results(items)
     @user.search_results.destroy_all
 
-    items.each do |item|
+    single_items = exclude_multi_property_cases(items)
+
+    single_items.each do |item|
       @user.search_results.create!(
         case_number: item["srnSaNo"],
         court_name: item["jiwonNm"],
@@ -49,9 +51,11 @@ class CourtAuctionSearchService
         auction_date: item["maeGiil"],
         remarks: item["mulBigo"]
       )
-    rescue ActiveRecord::RecordNotUnique
-      # Skip duplicate case numbers within same search
-      next
     end
+  end
+
+  def exclude_multi_property_cases(items)
+    counts = items.group_by { |i| i["srnSaNo"] }
+    counts.select { |_, v| v.size == 1 }.values.flatten
   end
 end
