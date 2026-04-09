@@ -6,5 +6,6 @@ class User < ApplicationRecord
   has_many :properties, through: :user_properties
   has_many :inspection_results, dependent: :destroy
   has_many :rights_analysis_reports, dependent: :destroy
+  has_many :api_credentials, dependent: :destroy
   validates :email, presence: true, uniqueness: true
 end

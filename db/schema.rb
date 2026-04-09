@@ -10,7 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_08_090733) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_09_015133) do
+  create_table "api_credentials", force: :cascade do |t|
+    t.string "api_key"
+    t.string "api_secret"
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: true, null: false
+    t.datetime "last_verified_at"
+    t.string "provider_name", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id", "provider_name"], name: "index_api_credentials_on_user_id_and_provider_name", unique: true
+    t.index ["user_id"], name: "index_api_credentials_on_user_id"
+  end
+
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.integer "area_range_max"
@@ -195,6 +208,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_08_090733) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "api_credentials", "users"
   add_foreign_key "budget_settings", "loan_policies"
   add_foreign_key "budget_settings", "property_types"
   add_foreign_key "budget_settings", "users"
