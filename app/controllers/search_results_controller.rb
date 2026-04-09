@@ -69,6 +69,7 @@ class SearchResultsController < ApplicationController
 
     result = PropertyDataSyncService.call(case_number: case_number, user: current_user)
     if result.property
+      result.property.update!(property_count: search_result.property_count) if search_result.property_count > 1
       current_user.user_properties.create!(property: result.property)
       { success: true }
     else
@@ -87,7 +88,8 @@ class SearchResultsController < ApplicationController
       min_bid_price: search_result.min_bid_price,
       property_type: search_result.property_type,
       status: search_result.status,
-      failed_bid_count: search_result.failed_bid_count
+      failed_bid_count: search_result.failed_bid_count,
+      property_count: search_result.property_count
     )
   end
 

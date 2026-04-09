@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_09_131950) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_09_134053) do
   create_table "api_credentials", force: :cascade do |t|
     t.string "api_key"
     t.string "api_secret"
@@ -183,6 +183,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_131950) do
     t.decimal "latitude", precision: 10, scale: 7
     t.decimal "longitude", precision: 10, scale: 7
     t.bigint "min_bid_price"
+    t.integer "property_count", default: 1, null: false
     t.string "property_type"
     t.string "property_usage_code"
     t.json "raw_data"
