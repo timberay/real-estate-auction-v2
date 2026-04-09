@@ -7,7 +7,7 @@ class PropertiesController < ApplicationController
     if params[:search].present?
       search_term = "%#{params[:search]}%"
       @user_properties = @user_properties.joins(:property).where(
-        "properties.case_number LIKE :q OR properties.address LIKE :q OR properties.court_name LIKE :q",
+        "properties.case_number LIKE :q OR properties.address LIKE :q OR properties.building_name LIKE :q",
         q: search_term
       )
     end
