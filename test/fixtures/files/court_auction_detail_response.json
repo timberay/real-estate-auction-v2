@@ -1,0 +1,20 @@
+{
+  "cortOfcNm": "서울중앙지방법원",
+  "csYr": "2026",
+  "csCdNm": "타경",
+  "csNo": "10001",
+  "bkgsRmk": "해당사항 없음",
+  "sprtLandRgstYn": "N",
+  "lienRptYn": "N",
+  "useAprYn": "Y",
+  "wlpttIsuYn": "N",
+  "dlt_neRghts": [],
+  "dlt_tenants": [],
+  "dlt_dxdyDts": [
+    {
+      "dxdyDt": "20260501",
+      "lwstSaleAmt": "560000000",
+      "dxdyRslt": ""
+    }
+  ]
+}
