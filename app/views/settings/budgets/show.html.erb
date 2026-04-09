@@ -17,6 +17,18 @@
 
   <%= form_with model: @setting, url: settings_budget_path, method: :patch,
       data: { controller: "budget-calculator" } do |f| %>
+    <%# Section 0: Region %>
+    <%= render CardComponent.new(title: "관심 지역", class: "mb-6") do %>
+      <div class="flex items-center gap-2">
+        <%= f.select :region,
+          options_for_select(BudgetSetting::REGIONS, @setting.effective_region),
+          {},
+          class: "flex-1 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
+          data: { controller: "region-select", region_select_url_value: update_region_settings_budget_path, region_select_target: "select", action: "change->region-select#save" } %>
+        <span class="text-sm text-slate-500 dark:text-slate-400 transition-opacity duration-300 opacity-0" data-region-select-target="feedback"></span>
+      </div>
+    <% end %>
+
     <%# Section 1: Available Cash %>
     <%= render CardComponent.new(title: "유용자금", class: "mb-6") do %>
       <div class="flex items-center gap-2" data-controller="number-format" data-number-format-initial-value="<%= @setting.available_cash %>">
