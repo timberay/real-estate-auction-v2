@@ -17,7 +17,7 @@ module Sidebar
       ],
       "입찰" => [
         MenuItem.new(label: "진행 체크리스트", icon: "clipboard-document-check", path: nil, enabled: false),
-        MenuItem.new(label: "가상 입찰", icon: "play-circle", path: nil, enabled: false),
+        MenuItem.new(label: "가상 입찰", icon: "play", path: nil, enabled: false),
         MenuItem.new(label: "사전 임장", icon: "map-pin", path: nil, enabled: false)
       ],
       "낙찰" => [

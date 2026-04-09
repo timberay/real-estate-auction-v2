@@ -47,10 +47,7 @@ class SearchResultsController < ApplicationController
     import_result = perform_import(search_result)
 
     if import_result[:success]
-      render turbo_stream: turbo_stream.replace(
-        dom_id(search_result, :inline),
-        partial: "search_results/inline_result_item",
-        locals: { search_result: search_result, already_added: true })
+      redirect_to properties_path, notice: "#{search_result.case_number} 물건이 추가되었습니다."
     else
       render turbo_stream: turbo_stream.replace(
         dom_id(search_result, :inline),

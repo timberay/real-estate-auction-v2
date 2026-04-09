@@ -98,7 +98,7 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end
 
-  test "POST inline_import adds property and returns turbo stream" do
+  test "POST inline_import adds property and redirects" do
     property = properties(:safe_apartment)
     UserProperty.where(user: @user, property: property).destroy_all
 
@@ -112,12 +112,10 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     assert_difference "UserProperty.count", 1 do
       post inline_import_search_result_url(sr), as: :turbo_stream
     end
-    assert_response :success
-    assert_includes response.content_type, "text/vnd.turbo-stream.html"
-    assert_match "추가됨", response.body
+    assert_redirected_to properties_path
   end
 
-  test "POST inline_import for already-added property shows added state" do
+  test "POST inline_import for already-added property redirects" do
     property = properties(:safe_apartment)
     @user.user_properties.find_or_create_by!(property: property)
 
@@ -131,8 +129,7 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     assert_no_difference "UserProperty.count" do
       post inline_import_search_result_url(sr), as: :turbo_stream
     end
-    assert_response :success
-    assert_match "추가됨", response.body
+    assert_redirected_to properties_path
   end
 
   test "POST inline_import falls back to search result data when detail fetch fails" do
@@ -154,8 +151,7 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     assert_difference [ "Property.count", "UserProperty.count" ], 1 do
       post inline_import_search_result_url(sr), as: :turbo_stream
     end
-    assert_response :success
-    assert_match "추가됨", response.body
+    assert_redirected_to properties_path
 
     property = Property.find_by(case_number: "2026타경88888")
     assert_equal "서울특별시", property.address
