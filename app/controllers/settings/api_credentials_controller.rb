@@ -36,7 +36,7 @@ module Settings
     end
 
     def credential_params
-      params.expect(api_credential: [:provider_name, :api_key, :api_secret, :enabled])
+      params.expect(api_credential: [ :provider_name, :api_key, :api_secret, :enabled ])
     end
   end
 end

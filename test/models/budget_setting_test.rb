@@ -63,7 +63,7 @@ class BudgetSettingTest < ActiveSupport::TestCase
   test "area_category_options returns label-key pairs" do
     options = BudgetSetting.area_category_options
     assert_equal 5, options.length
-    assert_equal ["소형 (10~15평 / ~40㎡)", "small"], options.first
+    assert_equal [ "소형 (10~15평 / ~40㎡)", "small" ], options.first
   end
 
   test "area_range_for returns min and max for a category key" do

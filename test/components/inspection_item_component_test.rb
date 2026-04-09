@@ -93,7 +93,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     render_inline(InspectionItemComponent.new(result: result))
 
     yes_row = page.find("[data-inspection-item-target='logicYes']")
-    assert_includes yes_row[:class], "bg-red-50"
+    assert_includes yes_row[:class], "bg-red-100"
     assert_includes yes_row[:class], "text-red-800"
   end
 
@@ -102,7 +102,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     render_inline(InspectionItemComponent.new(result: result))
 
     no_row = page.find("[data-inspection-item-target='logicNo']")
-    assert_includes no_row[:class], "bg-green-50"
+    assert_includes no_row[:class], "bg-green-100"
     assert_includes no_row[:class], "text-green-800"
   end
 
@@ -112,7 +112,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     render_inline(InspectionItemComponent.new(result: result))
 
     yes_row = page.find("[data-inspection-item-target='logicYes']")
-    assert_includes yes_row[:class], "bg-green-50"
+    assert_includes yes_row[:class], "bg-green-100"
     assert_includes yes_row[:class], "text-green-800"
   end
 end

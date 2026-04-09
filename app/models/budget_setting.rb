@@ -17,7 +17,7 @@ class BudgetSetting < ApplicationRecord
 
   # Return options for a single select dropdown: [[label, key], ...]
   def self.area_category_options
-    AREA_CATEGORIES.map { |c| [c[:label], c[:key]] }
+    AREA_CATEGORIES.map { |c| [ c[:label], c[:key] ] }
   end
 
   # Find category by key and return its min/max sqm.

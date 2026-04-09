@@ -90,7 +90,7 @@ class ButtonComponentTest < ViewComponent::TestCase
 
     assert_selector "button.px-4"
     assert_selector "button[class*='h-10']"
-    assert_selector "button[class*='text-sm']"
+    assert_selector "button[class*='text-base']"
   end
 
   test "renders lg size with correct classes" do
