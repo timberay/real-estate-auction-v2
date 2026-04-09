@@ -4,9 +4,29 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [
     "submitButton", "buttonText", "buttonSpinner",
-    "caseInput", "addButton", "addButtonText", "addButtonSpinner",
-    "resultsContainer"
+    "caseInput", "addButton", "addButtonText", "addButtonSpinner"
   ]
+
+  connect() {
+    this.handleSubmitStart = this.handleSubmitStart.bind(this)
+    this.handleSubmitEnd = this.handleSubmitEnd.bind(this)
+    this.element.addEventListener("turbo:submit-start", this.handleSubmitStart)
+    this.element.addEventListener("turbo:submit-end", this.handleSubmitEnd)
+  }
+
+  disconnect() {
+    this.element.removeEventListener("turbo:submit-start", this.handleSubmitStart)
+    this.element.removeEventListener("turbo:submit-end", this.handleSubmitEnd)
+  }
+
+  handleSubmitStart() {
+    this.element.classList.add("pointer-events-none", "cursor-wait")
+  }
+
+  handleSubmitEnd() {
+    this.element.classList.remove("pointer-events-none", "cursor-wait")
+    this.enable()
+  }
 
   // Criteria search form submit
   submit() {
@@ -42,12 +62,6 @@ export default class extends Controller {
     if (this.hasAddButtonTarget) {
       this.addButtonTarget.disabled = false
       this.addButtonTarget.classList.remove("opacity-50", "cursor-not-allowed")
-    }
-  }
-
-  closeResults() {
-    if (this.hasResultsContainerTarget) {
-      this.resultsContainerTarget.innerHTML = ""
     }
   }
 
