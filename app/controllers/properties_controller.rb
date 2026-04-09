@@ -46,9 +46,9 @@ class PropertiesController < ApplicationController
         redirect_to properties_path, notice: "이미 등록된 물건입니다. 내 목록에 추가했습니다."
       end
     else
-      property = PropertyDataSyncService.call(case_number: case_number)
-      if property
-        current_user.user_properties.create!(property: property)
+      result = PropertyDataSyncService.call(case_number: case_number, user: current_user)
+      if result.property
+        current_user.user_properties.create!(property: result.property)
         redirect_to properties_path, notice: "물건이 추가되었습니다."
       else
         redirect_to properties_path, alert: "해당 사건번호의 물건을 찾을 수 없습니다."

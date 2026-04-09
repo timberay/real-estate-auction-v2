@@ -104,8 +104,8 @@ puts "Seeding mock properties..."
 guest = User.find_by!(email: "guest@auction.local")
 mock_properties = JSON.parse(File.read(Rails.root.join("db/seeds/mock_properties.json")))
 mock_properties.each do |attrs|
-  property = PropertyDataSyncService.call(case_number: attrs["case_number"])
-  guest.user_properties.find_or_create_by!(property: property) if property
+  result = PropertyDataSyncService.call(case_number: attrs["case_number"])
+  guest.user_properties.find_or_create_by!(property: result.property) if result.property
 end
 puts "  -> #{Property.count} properties (#{guest.user_properties.count} linked to guest)"
 

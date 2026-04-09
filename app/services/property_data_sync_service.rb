@@ -1,19 +1,60 @@
 class PropertyDataSyncService
-  def self.call(case_number:)
-    new(case_number:).call
+  Result = Data.define(:court_data, :building_data, :registry_data, :errors, :property)
+
+  def self.call(case_number:, user: nil)
+    new(case_number:, user:).call
   end
 
-  def initialize(case_number:)
+  def initialize(case_number:, user: nil)
     @case_number = case_number
+    @user = user
   end
 
   def call
-    court_data = CourtAuctionAdapter.for.fetch_data(case_number: @case_number)
-    building_data = BuildingLedgerAdapter.for.fetch_data(case_number: @case_number)
-    registry_data = RegistryTranscriptAdapter.for.fetch_data(case_number: @case_number)
+    errors = {}
 
-    return nil unless court_data
+    court_data = fetch_source(:court_auction, errors, :court) do |config|
+      CourtAuctionAdapter.for(config).fetch_data(case_number: @case_number)
+    end
 
+    building_data = fetch_source(:data_go_kr, errors, :building) do |config|
+      BuildingLedgerAdapter.for(config).fetch_data(case_number: @case_number)
+    end
+
+    registry_data = fetch_source_by_category(:registry, errors, :registry) do |config|
+      RegistryTranscriptAdapter.for(config).fetch_data(case_number: @case_number)
+    end
+
+    property = persist_property(court_data, building_data, registry_data) if court_data
+
+    Result.new(
+      court_data: court_data,
+      building_data: building_data,
+      registry_data: registry_data,
+      errors: errors,
+      property: property
+    )
+  end
+
+  private
+
+  def fetch_source(provider_name, errors, error_key)
+    config = CredentialResolver.new(user: @user, provider_name: provider_name).resolve
+    yield(config)
+  rescue DataProvider::Error => e
+    errors[error_key] = e
+    nil
+  end
+
+  def fetch_source_by_category(category, errors, error_key)
+    config = CredentialResolver.new(user: @user, category: category).resolve
+    yield(config)
+  rescue DataProvider::Error => e
+    errors[error_key] = e
+    nil
+  end
+
+  def persist_property(court_data, building_data, registry_data)
     property = Property.find_or_initialize_by(case_number: @case_number)
     property.assign_attributes(
       court_name: court_data[:court_name],

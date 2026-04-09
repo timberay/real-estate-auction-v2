@@ -2,8 +2,8 @@ require "test_helper"
 
 class InspectionRunnerTest < ActiveSupport::TestCase
   setup do
-    @safe_property = PropertyDataSyncService.call(case_number: "2026타경10001")
-    @risky_property = PropertyDataSyncService.call(case_number: "2026타경10002")
+    @safe_property = PropertyDataSyncService.call(case_number: "2026타경10001").property
+    @risky_property = PropertyDataSyncService.call(case_number: "2026타경10002").property
     @user = users(:guest)
   end
 

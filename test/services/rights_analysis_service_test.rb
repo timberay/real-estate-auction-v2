@@ -3,8 +3,8 @@ require "test_helper"
 class RightsAnalysisServiceTest < ActiveSupport::TestCase
   setup do
     @user = users(:guest)
-    @safe_property = PropertyDataSyncService.call(case_number: "2026타경10001")
-    @risky_property = PropertyDataSyncService.call(case_number: "2026타경10002")
+    @safe_property = PropertyDataSyncService.call(case_number: "2026타경10001").property
+    @risky_property = PropertyDataSyncService.call(case_number: "2026타경10002").property
   end
 
   test "creates a RightsAnalysisReport for safe property" do
@@ -54,7 +54,7 @@ class RightsAnalysisServiceTest < ActiveSupport::TestCase
   end
 
   test "detects HUG opportunity for officetel mock" do
-    hug_property = PropertyDataSyncService.call(case_number: "2026타경10003")
+    hug_property = PropertyDataSyncService.call(case_number: "2026타경10003").property
     RightsAnalysisService.call(property: hug_property, user: @user)
 
     report = RightsAnalysisReport.find_by(property: hug_property, user: @user)
@@ -62,7 +62,7 @@ class RightsAnalysisServiceTest < ActiveSupport::TestCase
   end
 
   test "compute_verdict handles nil and false field values gracefully" do
-    property = PropertyDataSyncService.call(case_number: "2026타경10001")
+    property = PropertyDataSyncService.call(case_number: "2026타경10001").property
     report = RightsAnalysisService.call(property: property, user: @user)
 
     assert_not_includes report.verdict_summary, "false"
