@@ -62,3 +62,45 @@ unanalyzed_officetel:
   interest_count: 0
   status: "진행중"
   remarks: ""
+
+basement_villa:
+  case_number: "2026타경10004"
+  case_type: "부동산임의경매"
+  property_type: "빌라"
+  address: "서울특별시 관악구 신림동 400-4"
+  sido: "서울특별시"
+  sigungu: "관악구"
+  dong: "신림동"
+  building_name: ""
+  building_detail: "지하1층101호"
+  building_structure: "철근콩크리트조 33.00㎡"
+  exclusive_area: 33.0
+  land_category: "대지"
+  appraisal_price: 150000000
+  min_bid_price: 105000000
+  failed_bid_count: 1
+  view_count: 800
+  interest_count: 10
+  status: "진행중"
+  remarks: "전세사기 특별법 우선매수 대상"
+
+high_view_apartment:
+  case_number: "2026타경10005"
+  case_type: "부동산임의경매"
+  property_type: "아파트"
+  address: "서울특별시 송파구 잠실동 500-5"
+  sido: "서울특별시"
+  sigungu: "송파구"
+  dong: "잠실동"
+  building_name: "잠실아파트"
+  building_detail: "201동 15층1501호"
+  building_structure: "철근콩크리트조 120.00㎡"
+  exclusive_area: 120.0
+  land_category: "전유"
+  appraisal_price: 1500000000
+  min_bid_price: 1050000000
+  failed_bid_count: 0
+  view_count: 1200
+  interest_count: 50
+  status: "진행중"
+  remarks: ""

@@ -15,3 +15,12 @@ risky_villa_detail:
   goods_remarks: "유치권 신고"
   dividend_demand_deadline: "2026-06-01"
   share_description: ""
+
+basement_villa_detail:
+  property: basement_villa
+  non_extinguished_rights: ""
+  specification_remarks: "무허가 증축 부분 있음"
+  senior_mortgage_basis: "2022.1.15. 근저당권"
+  goods_remarks: ""
+  dividend_demand_deadline: "2026-08-01"
+  share_description: "1/2 지분"
