@@ -52,7 +52,33 @@ class SearchResultsController < ApplicationController
     import_result = perform_import(search_result)
 
     if import_result[:success]
-      redirect_to properties_path, notice: "#{search_result.case_number} 물건이 추가되었습니다."
+      property = import_result[:property]
+      user_property = import_result[:user_property]
+      existing_case_numbers = current_user.properties.pluck(:case_number)
+      remaining_count = current_user.search_results
+        .where.not(case_number: existing_case_numbers)
+        .count
+
+      streams = [
+        turbo_stream.replace(
+          dom_id(search_result, :inline),
+          partial: "search_results/inline_result_fade_out",
+          locals: { search_result: search_result }
+        ),
+        turbo_stream.append(
+          "property-cards-grid",
+          partial: "search_results/inline_imported_card",
+          locals: { property: property, user_property: user_property, max_bid_amount: current_user.budget_setting&.max_bid_amount }
+        )
+      ]
+
+      if remaining_count == 0
+        streams << turbo_stream.update("criteria-search-results", "")
+      else
+        streams << turbo_stream.update("criteria-search-count", html: "#{remaining_count}건")
+      end
+
+      render turbo_stream: streams
     else
       render turbo_stream: turbo_stream.replace(
         dom_id(search_result, :inline),
@@ -79,20 +105,20 @@ class SearchResultsController < ApplicationController
 
     property = Property.find_by(case_number: case_number)
     if property
-      current_user.user_properties.find_or_create_by!(property: property)
-      return { success: true }
+      user_property = current_user.user_properties.find_or_create_by!(property: property)
+      return { success: true, property: property, user_property: user_property }
     end
 
     result = PropertyDataSyncService.call(case_number: case_number, user: current_user)
     if result.property
       result.property.update!(property_count: search_result.property_count) if search_result.property_count > 1
-      current_user.user_properties.create!(property: result.property)
-      { success: true }
+      user_property = current_user.user_properties.create!(property: result.property)
+      { success: true, property: result.property, user_property: user_property }
     else
       Rails.logger.warn "[InlineImport] Detail fetch failed for #{case_number}, creating from search data"
       property = create_property_from_search_result(search_result)
-      current_user.user_properties.create!(property: property)
-      { success: true }
+      user_property = current_user.user_properties.create!(property: property)
+      { success: true, property: property, user_property: user_property }
     end
   end
 

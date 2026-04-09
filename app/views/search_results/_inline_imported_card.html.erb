@@ -1,0 +1,8 @@
+<%# app/views/search_results/_inline_imported_card.html.erb %>
+<div data-controller="fade-in">
+  <%= render PropertyCardComponent.new(
+    property: property,
+    safety_rating: user_property.safety_rating,
+    max_bid_amount: max_bid_amount
+  ) %>
+</div>
