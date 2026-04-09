@@ -19,10 +19,12 @@ class PropertiesController < ApplicationController
 
     # Load persisted search results for inline display
     existing_case_numbers = current_user.properties.pluck(:case_number)
-    @search_results = current_user.search_results
+    search_results = current_user.search_results
       .where.not(case_number: existing_case_numbers)
       .order(created_at: :desc)
-      .limit(20)
+    total_count = search_results.count
+    @over_limit = total_count > 20
+    @search_results = search_results.limit(20)
   end
 
   def show

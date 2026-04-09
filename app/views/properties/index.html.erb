@@ -72,7 +72,8 @@
     <div id="criteria-search-results">
       <% if @search_results&.any? %>
         <%= render "search_results/inline_results",
-                   search_results: @search_results %>
+                   search_results: @search_results,
+                   over_limit: @over_limit %>
       <% end %>
     </div>
   </div>
