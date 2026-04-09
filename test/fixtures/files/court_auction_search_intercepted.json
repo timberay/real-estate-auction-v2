@@ -34,7 +34,12 @@
         "hjguSigu": "강남구",
         "hjguDong": "역삼동",
         "wgs84Xcordi": "127.0365",
-        "wgs84Ycordi": "37.5012"
+        "wgs84Ycordi": "37.5012",
+        "gwansMulRegCnt": "12",
+        "buldNm": "테스트아파트",
+        "buldList": "101동 1001호",
+        "pjbBuldList": "철근콩크리트조 84.50㎡",
+        "minArea": "84.50"
       }
     ]
   }
