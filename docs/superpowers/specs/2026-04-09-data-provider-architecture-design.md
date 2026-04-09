@@ -40,6 +40,12 @@ This works for development but cannot support production scenarios where:
 | API key UI security | Write-only — keys never rendered back to browser after save | Prevents XSS-based key exfiltration |
 | Key verification | Async via Solid Queue + Turbo Stream status update | Prevents request blocking on external API timeouts |
 | Registry providers | Support both Tilko and Codef behind adapter pattern | Gives users choice; Codef has better stability reputation |
+| Partial data | Fetch-and-collect pattern — each source independent, partial success allowed | One provider failure should not lose data from other providers |
+| Data freshness | Track `data_fetched_at` per source on Property, warn on stale data | Prevents bidding decisions based on outdated legal information |
+| Category-aware resolution | CredentialResolver can resolve by category (e.g., any `:registry` provider) | Supports Tilko↔Codef switching and failover |
+| HTTP resilience | Common timeout, retry, and circuit breaker configuration for all adapters | Prevents cascade failures from slow external APIs |
+| Data normalization | Canonical format for amounts (integer won), addresses, case numbers | Ensures consistency across providers |
+| Log safety | Filter PII and API keys from all logs | Korean PIPA compliance |
 
 ---
 
@@ -179,23 +185,30 @@ Credential resolution is decoupled from adapters. Adapters are **user-agnostic**
 
 #### CredentialResolver (new)
 
-A single class that encapsulates the three-tier resolution logic:
+A single class that encapsulates the three-tier resolution logic. Supports both **direct provider resolution** (by name) and **category-aware resolution** (find any configured provider in a category, e.g., any `:registry` provider).
 
 ```ruby
 class CredentialResolver
-  def initialize(user:, provider_name:)
+  def initialize(user:, provider_name: nil, category: nil)
     @user = user
     @provider_name = provider_name
+    @category = category
+    raise ArgumentError, "provider_name or category required" unless @provider_name || @category
   end
 
   def resolve
     # Tier 1: ENV override (development/test)
     return { adapter: :mock } if mock_mode?
 
-    # Tier 2: User credential check
-    credential = @user&.api_credentials&.active&.for_provider(@provider_name)
+    # Tier 2: User credential check (by name or category)
+    credential = find_credential
     if credential&.configured?
-      { adapter: :real, api_key: credential.api_key, api_secret: credential.api_secret }
+      {
+        adapter: :real,
+        provider: credential.provider_name.to_sym,
+        api_key: credential.api_key,
+        api_secret: credential.api_secret
+      }
     else
       # Tier 3: No credential — mock (dev) or raise (prod)
       if Rails.env.production?
@@ -208,12 +221,35 @@ class CredentialResolver
 
   private
 
+  def find_credential
+    return nil unless @user
+
+    if @provider_name
+      # Direct lookup by provider name
+      @user.api_credentials.active.for_provider(@provider_name)
+    else
+      # Category-aware: find any configured provider in this category
+      providers_in_category = ApiCredential::PROVIDERS
+        .select { |_, v| v[:category] == @category }
+        .keys.map(&:to_s)
+      @user.api_credentials.active
+        .where(provider_name: providers_in_category)
+        .order(:created_at)  # prefer the one configured first
+        .first
+    end
+  end
+
   def mock_mode?
     ENV["USE_MOCK"] != "false"
   end
 
   def error_for_provider
-    config = ApiCredential::PROVIDERS[@provider_name.to_sym]
+    config = if @provider_name
+      ApiCredential::PROVIDERS[@provider_name.to_sym]
+    else
+      ApiCredential::PROVIDERS.values.find { |v| v[:category] == @category }
+    end
+
     if config&.dig(:requires_consent)
       DataProvider::ConsentRequiredError.new("법원경매 데이터 수집에 동의해주세요.")
     else
@@ -222,6 +258,11 @@ class CredentialResolver
   end
 end
 ```
+
+**Category-aware resolution** enables:
+- User has Codef but not Tilko → `resolve(category: :registry)` returns Codef config
+- User switches from Tilko to Codef → just disable Tilko, enable Codef; no code change needed
+- Failover is not automatic (too risky for paid APIs), but manual switching is seamless
 
 #### Adapter Factory (simplified)
 
@@ -305,31 +346,82 @@ end
 
 ### Service Integration
 
-Services resolve credentials and pass config to adapters:
+Services resolve credentials and pass config to adapters. Uses **fetch-and-collect** pattern: each provider is fetched independently, failures are recorded but don't block other providers.
 
 ```ruby
 class PropertyDataSyncService
+  Result = Data.define(:court_data, :building_data, :registry_data, :errors)
+
   def initialize(case_number:, user: nil)
     @case_number = case_number
     @user = user
   end
 
   def call
-    court_config = resolve(:court_auction)
-    building_config = resolve(:data_go_kr)
-    registry_config = resolve(:tilko)
+    errors = {}
 
-    court_data = CourtAuctionAdapter.for(court_config).fetch_data(case_number: @case_number)
-    building_data = BuildingLedgerAdapter.for(building_config).fetch_data(case_number: @case_number)
-    registry_data = RegistryTranscriptAdapter.for(registry_config).fetch_data(case_number: @case_number)
-    # ... rest unchanged
+    court_data = fetch_source(:court_auction) { |config|
+      CourtAuctionAdapter.for(config).fetch_data(case_number: @case_number)
+    } rescue_to errors, :court
+
+    building_data = fetch_source(:data_go_kr) { |config|
+      BuildingLedgerAdapter.for(config).fetch_data(case_number: @case_number)
+    } rescue_to errors, :building
+
+    registry_data = fetch_source_by_category(:registry) { |config|
+      RegistryTranscriptAdapter.for(config).fetch_data(case_number: @case_number)
+    } rescue_to errors, :registry
+
+    Result.new(
+      court_data: court_data,
+      building_data: building_data,
+      registry_data: registry_data,
+      errors: errors
+    )
   end
 
   private
 
-  def resolve(provider_name)
-    CredentialResolver.new(user: @user, provider_name: provider_name).resolve
+  def fetch_source(provider_name)
+    config = CredentialResolver.new(user: @user, provider_name: provider_name).resolve
+    yield(config)
+  rescue DataProvider::Error => e
+    nil  # error captured by rescue_to
   end
+
+  def fetch_source_by_category(category)
+    config = CredentialResolver.new(user: @user, category: category).resolve
+    yield(config)
+  rescue DataProvider::Error => e
+    nil
+  end
+end
+```
+
+> **Note**: The `rescue_to` pattern above is pseudocode illustrating intent. The actual implementation will use begin/rescue blocks to capture errors per source into the `errors` hash while allowing other sources to proceed.
+
+**Partial result handling in controllers:**
+
+```ruby
+def create
+  result = PropertyDataSyncService.new(case_number: params[:case_number], user: current_user).call
+
+  if result.court_data.nil? && result.errors[:court]
+    # Court data is mandatory — cannot create property without it
+    handle_primary_source_error(result.errors[:court])
+    return
+  end
+
+  # Create/update property with whatever data we have
+  property = Property.find_or_initialize_by(case_number: params[:case_number])
+  property.update!(build_attributes(result))
+
+  # Show warnings for failed secondary sources
+  if result.errors.any?
+    flash[:warning] = build_partial_data_warning(result.errors)
+  end
+
+  redirect_to property
 end
 ```
 
@@ -375,6 +467,10 @@ class ApplicationController < ActionController::Base
   rescue_from DataProvider::ConnectionError, with: :handle_connection_error
   rescue_from DataProvider::RateLimitError, with: :handle_rate_limit
   rescue_from DataProvider::DataNotFoundError, with: :handle_data_not_found
+  rescue_from DataProvider::ParseError, with: :handle_parse_error
+  rescue_from DataProvider::SiteStructureChangedError, with: :handle_site_changed
+  rescue_from DataProvider::ServiceUnavailableError, with: :handle_service_unavailable
+  rescue_from DataProvider::Error, with: :handle_generic_provider_error  # catch-all, must be last
 
   private
 
@@ -405,6 +501,29 @@ class ApplicationController < ActionController::Base
 
   def handle_data_not_found(error)
     flash.now[:notice] = "해당 사건번호의 데이터를 찾을 수 없습니다."
+    render_error_state
+  end
+
+  def handle_parse_error(error)
+    flash.now[:alert] = "데이터 형식이 예상과 다릅니다. 관리자에게 문의해주세요."
+    Rails.logger.error("[DataProvider::ParseError] #{error.message}")
+    render_error_state
+  end
+
+  def handle_site_changed(error)
+    flash.now[:alert] = "법원경매 사이트 구조가 변경되었습니다. 업데이트가 필요합니다."
+    Rails.logger.error("[DataProvider::SiteStructureChangedError] #{error.message}")
+    render_error_state
+  end
+
+  def handle_service_unavailable(error)
+    flash.now[:alert] = "외부 서비스가 일시적으로 중단되었습니다. 잠시 후 다시 시도해주세요."
+    render_error_state
+  end
+
+  def handle_generic_provider_error(error)
+    flash.now[:alert] = "데이터 조회 중 오류가 발생했습니다."
+    Rails.logger.error("[DataProvider::Error] #{error.class}: #{error.message}")
     render_error_state
   end
 end
@@ -539,12 +658,17 @@ end
 
 class CredentialVerificationJob < ApplicationJob
   queue_as :default
+  limits_concurrency to: 1, key: ->(credential) { "verify_#{credential.id}" }
 
   def perform(credential)
+    return unless credential.persisted?  # guard: user deleted credential before job ran
+
     adapter_class = adapter_for(credential.provider_name)
     adapter_class.verify_credential(credential)
     credential.update!(last_verified_at: Time.current)
     broadcast_status(credential, :verified)
+  rescue ActiveRecord::RecordNotFound
+    # Credential deleted between enqueue and execution — silently discard
   rescue DataProvider::InvalidCredentialError => e
     broadcast_status(credential, :invalid, message: e.message)
   rescue DataProvider::ConnectionError => e
@@ -555,7 +679,7 @@ class CredentialVerificationJob < ApplicationJob
 
   def broadcast_status(credential, status, message: nil)
     Turbo::StreamsChannel.broadcast_replace_to(
-      "credential_status_#{credential.id}",
+      credential.user, :credential_statuses,  # scoped to user, not credential ID
       target: "credential_status_#{credential.id}",
       partial: "settings/api_credentials/status_badge",
       locals: { status: status, message: message }
@@ -666,3 +790,306 @@ module DataProviderTestHelper
   end
 end
 ```
+
+---
+
+## 7. Data Freshness Tracking
+
+### Problem
+
+Registry transcripts and auction status change frequently. Users may make bidding decisions based on data fetched days ago without realizing it's stale.
+
+### Solution
+
+Track when each data source was last fetched per property. Display freshness warnings in the UI.
+
+```ruby
+# Add to properties table
+add_column :properties, :court_data_fetched_at, :datetime
+add_column :properties, :building_data_fetched_at, :datetime
+add_column :properties, :registry_data_fetched_at, :datetime
+```
+
+**Staleness thresholds:**
+
+| Source | Warning after | Critical after |
+|--------|--------------|----------------|
+| Court auction | 24 hours | 3 days |
+| Building ledger | 7 days | 30 days |
+| Registry transcript | 24 hours | 3 days |
+
+**UI behavior:**
+- Fresh: no indicator
+- Warning: yellow badge "N일 전 데이터" with refresh button
+- Critical: red badge "데이터가 오래되었습니다. 새로고침해주세요." with prominent refresh CTA
+- Registry critical state blocks rights analysis with: "권리분석 전 최신 등기부등본을 조회해주세요."
+
+**Service update:**
+```ruby
+# In PropertyDataSyncService, after successful fetch:
+property.update!(court_data_fetched_at: Time.current) if court_data
+property.update!(building_data_fetched_at: Time.current) if building_data
+property.update!(registry_data_fetched_at: Time.current) if registry_data
+```
+
+---
+
+## 8. HTTP Resilience Standards
+
+### Problem
+
+No timeout, retry, or concurrency configuration exists. A slow external API can block workers indefinitely.
+
+### HTTP Client Configuration
+
+All adapters must use a shared HTTP client configuration:
+
+```ruby
+module DataProvider
+  HTTP_CONFIG = {
+    connect_timeout: 5,      # seconds
+    read_timeout: 30,        # seconds (registry parsing can be slow)
+    write_timeout: 5,        # seconds
+    max_retries: 2,          # for transient errors (5xx, timeout)
+    retry_backoff: 1,        # seconds, exponential (1s, 2s)
+    retry_statuses: [502, 503, 504],  # only retry server errors
+  }.freeze
+end
+```
+
+```ruby
+# Shared Faraday connection builder
+module DataProvider
+  def self.build_connection(base_url:)
+    Faraday.new(url: base_url) do |f|
+      f.request :retry,
+        max: HTTP_CONFIG[:max_retries],
+        interval: HTTP_CONFIG[:retry_backoff],
+        backoff_factor: 2,
+        retry_statuses: HTTP_CONFIG[:retry_statuses]
+      f.options.timeout = HTTP_CONFIG[:read_timeout]
+      f.options.open_timeout = HTTP_CONFIG[:connect_timeout]
+    end
+  end
+end
+```
+
+### Scraping Concurrency
+
+Court auction scraping (Playwright) is resource-intensive. Limits:
+
+```ruby
+# config/queue.yml — dedicated scraping queue
+queues:
+  - name: scraping
+    threads: 1          # max 1 concurrent Playwright session
+    polling_interval: 5
+  - name: default
+    threads: 3
+```
+
+Individual scraper spec must also define:
+- Minimum delay between page loads (politeness): 2 seconds
+- Maximum pages per session: 50
+- Browser context reuse within a session
+
+### Korean Government API Quirks
+
+Individual source specs should handle these common patterns:
+- **EUC-KR encoding**: Detect via Content-Type header or BOM; convert to UTF-8 before parsing
+- **XML error in JSON endpoint**: Check Content-Type before parsing; if XML, parse as XML error
+- **Rate limit via 200 body**: Korean govt APIs often return `{ "resultCode": "99", "resultMsg": "LIMIT_EXCEEDED" }` inside a 200 OK. Adapters must inspect response body, not just HTTP status.
+- **SSL/TLS**: Ensure Docker image includes updated Korean government CA certificates
+
+---
+
+## 9. Data Normalization Standards
+
+### Problem
+
+Different providers use different formats for the same data. Without normalization, downstream services (rights analysis, budget calculation) may produce incorrect results.
+
+### Canonical Formats
+
+All adapters must normalize data to these formats before returning:
+
+| Data type | Canonical format | Example |
+|-----------|-----------------|---------|
+| Monetary amounts | Integer (KRW, 원) | `500000000` (not "5억" or "500,000,000") |
+| Dates | `Date` object or ISO 8601 string | `"2026-03-15"` |
+| Addresses | Separate fields: `road_address`, `jibun_address` | Both formats preserved |
+| Case numbers | Stripped, no spaces, zero-padded | `"2026타경01234"` |
+| Area (면적) | Float, square meters (㎡) | `84.95` (not "84.95㎡" or "25.7평") |
+| Percentages | Float, 0-100 | `70.0` (not 0.7 or "70%") |
+
+### Case Number Normalization
+
+```ruby
+module DataProvider
+  def self.normalize_case_number(input)
+    input.to_s
+      .gsub(/\s+/, "")           # remove spaces
+      .gsub(/(\d{4}\D+)(\d+)/) { "#{$1}#{$2.rjust(5, '0')}" }  # zero-pad
+  end
+end
+```
+
+### Address Matching
+
+Properties from court auction use 지번 addresses; building ledger uses 도로명. The `properties` table stores both:
+
+```ruby
+# Properties should store both address formats
+add_column :properties, :road_address, :string    # 도로명주소
+add_column :properties, :jibun_address, :string   # 지번주소
+```
+
+Cross-provider matching uses case_number (unique identifier from court), not address.
+
+---
+
+## 10. Deployment & Infrastructure
+
+### Playwright in Docker
+
+Court auction scraping requires Playwright/Chromium. This affects the Docker image:
+
+```dockerfile
+# Dockerfile addition for Playwright support
+RUN apt-get update && apt-get install -y \
+    chromium \
+    fonts-nanum \          # Korean font support
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV PLAYWRIGHT_BROWSERS_PATH=/usr/bin
+ENV CHROMIUM_PATH=/usr/bin/chromium
+```
+
+**Memory budget**: Each Chromium instance uses ~200-500MB. With `scraping` queue limited to 1 thread, peak additional memory is ~500MB. Minimum server RAM recommendation: 2GB (app) + 500MB (Chromium) = 2.5GB.
+
+**Kamal configuration**: Both `web` and `job` roles need the same Playwright-capable image if scraping runs in background jobs. Alternative: run scraping inline in web process (simpler, but blocks request).
+
+### Encryption Key Rotation
+
+If `RAILS_MASTER_KEY` is compromised or needs rotation:
+
+1. Add current key to `config.active_record.encryption.previous` in credentials
+2. Set new primary key
+3. Run re-encryption rake task:
+
+```ruby
+# lib/tasks/credentials.rake
+desc "Re-encrypt all API credentials with current master key"
+task reencrypt_credentials: :environment do
+  ApiCredential.find_each do |cred|
+    # Reading decrypts with old/current key; saving re-encrypts with new key
+    cred.api_key = cred.api_key
+    cred.api_secret = cred.api_secret
+    cred.save!
+  end
+end
+```
+
+### SQLite Configuration
+
+Ensure WAL mode and appropriate busy timeout for concurrent credential writes:
+
+```yaml
+# config/database.yml
+production:
+  adapter: sqlite3
+  database: storage/production.sqlite3
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  pragmas:
+    journal_mode: wal
+    busy_timeout: 5000  # 5 second wait on write contention
+```
+
+---
+
+## 11. Log Safety & PII Protection
+
+### Problem
+
+External API calls may log API keys (in headers/params) and PII (property owner names from registry transcripts). Korean PIPA requires protection of personal information.
+
+### Configuration
+
+```ruby
+# config/application.rb
+config.filter_parameters += [
+  :api_key, :api_secret, :password,
+  :owner_name, :holder_name, :tenant_name,  # registry PII
+  :resident_number, :phone                   # Korean PII
+]
+```
+
+### HTTP Client Log Filtering
+
+```ruby
+# Faraday logger must filter sensitive headers
+f.response :logger, Rails.logger, headers: false, bodies: false
+```
+
+- **Never log**: Full API response bodies (may contain owner names, resident numbers)
+- **Always log**: Request URL (with key params redacted), HTTP status, duration
+- **Log on error only**: Truncated response body (first 200 chars) for debugging
+
+### Runtime API Failure → Credential Status Update
+
+When an adapter call fails with `InvalidCredentialError` at runtime (not just during verification), the credential's status should be updated:
+
+```ruby
+# In adapter error wrapping:
+rescue Faraday::ClientError => e
+  if e.response_status == 401
+    update_credential_status(credential_id, :invalid) if credential_id
+    raise DataProvider::InvalidCredentialError, "API key rejected"
+  end
+end
+```
+
+This ensures the Settings UI reflects actual credential health, not just last manual verification.
+
+---
+
+## 12. Provider Health Monitoring
+
+### Problem
+
+External providers may go down without users noticing until they hit an error.
+
+### Solution
+
+A periodic Solid Queue job checks provider availability:
+
+```ruby
+class ProviderHealthCheckJob < ApplicationJob
+  queue_as :default
+
+  # Run daily via Solid Queue recurring schedule
+  def perform
+    ApiCredential::PROVIDERS.each do |name, config|
+      next if config[:requires_consent] && !any_user_consented?(name)
+      next if config[:requires_key] && !any_user_configured?(name)
+
+      check_provider(name, config)
+    end
+  end
+
+  private
+
+  def check_provider(name, config)
+    # Each adapter implements a lightweight .health_check class method
+    adapter_class = adapter_class_for(name)
+    adapter_class.health_check
+    Rails.logger.info("[HealthCheck] #{name}: OK")
+  rescue DataProvider::Error => e
+    Rails.logger.warn("[HealthCheck] #{name}: FAILED - #{e.message}")
+    # Future: notify admin via email/Slack
+  end
+end
+```
+
+This is a best-effort monitor — it doesn't block users, only logs warnings for operators.
