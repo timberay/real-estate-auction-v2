@@ -100,12 +100,76 @@ end
 removed = InspectionItem.where.not(code: seeded_codes).destroy_all
 puts "  -> #{InspectionItem.count} inspection items (removed #{removed.size} stale)"
 
-puts "Seeding mock properties..."
+puts "Seeding properties from live court auction data..."
 guest = User.find_by!(email: "guest@auction.local")
-mock_properties = JSON.parse(File.read(Rails.root.join("db/seeds/mock_properties.json")))
-mock_properties.each do |attrs|
-  result = PropertyDataSyncService.call(case_number: attrs["case_number"])
-  guest.user_properties.find_or_create_by!(property: result.property) if result.property
+Property.destroy_all
+real_properties = JSON.parse(File.read(Rails.root.join("db/seeds/real_properties.json")))
+real_properties.each do |attrs|
+  property = Property.find_or_initialize_by(case_number: attrs["case_number"])
+  property.assign_attributes(
+    case_type: attrs["case_type"],
+    claim_amount: attrs["claim_amount"],
+    property_type: attrs["property_type"],
+    property_usage_code: attrs["property_usage_code"],
+    status: attrs.fetch("status", "진행중"),
+    address: attrs["address"],
+    sido: attrs["sido"],
+    sigungu: attrs["sigungu"],
+    dong: attrs["dong"],
+    building_name: attrs["building_name"],
+    building_detail: attrs["building_detail"],
+    building_structure: attrs["building_structure"],
+    exclusive_area: attrs["exclusive_area"],
+    land_category: attrs["land_category"],
+    appraisal_price: attrs["appraisal_price"],
+    min_bid_price: attrs["min_bid_price"],
+    failed_bid_count: attrs["failed_bid_count"],
+    view_count: attrs.fetch("view_count", 0),
+    interest_count: attrs.fetch("interest_count", 0),
+    latitude: attrs["latitude"],
+    longitude: attrs["longitude"],
+    special_conditions_code: attrs["special_conditions_code"],
+    remarks: attrs["remarks"]
+  )
+  property.save!
+
+  if attrs["sale_detail"]
+    sd = attrs["sale_detail"]
+    detail = property.sale_detail || property.build_sale_detail
+    detail.assign_attributes(
+      non_extinguished_rights: sd["non_extinguished_rights"],
+      superficies_details: sd["superficies_details"],
+      specification_remarks: sd["specification_remarks"],
+      senior_mortgage_basis: sd["senior_mortgage_basis"],
+      goods_remarks: sd["goods_remarks"],
+      dividend_demand_deadline: sd["dividend_demand_deadline"],
+      share_description: sd["share_description"],
+      price_round_1: sd["price_round_1"],
+      price_round_2: sd["price_round_2"],
+      price_round_3: sd["price_round_3"],
+      price_round_4: sd["price_round_4"]
+    )
+    detail.save!
+  end
+
+  (attrs["auction_schedules"] || []).each do |s|
+    property.auction_schedules.create!(s.symbolize_keys.slice(
+      :schedule_date, :schedule_time, :bid_start_date, :bid_end_date,
+      :place, :schedule_type, :result_code, :min_price, :sale_amount
+    ))
+  end
+
+  (attrs["land_details"] || []).each do |l|
+    property.land_details.create!(l.symbolize_keys.slice(
+      :land_type, :land_area, :land_category, :share_ratio, :address, :lot_number
+    ))
+  end
+
+  (attrs["appraisal_points"] || []).each do |p|
+    property.appraisal_points.create!(p.symbolize_keys.slice(:item_code, :content))
+  end
+
+  guest.user_properties.find_or_create_by!(property: property)
 end
 puts "  -> #{Property.count} properties (#{guest.user_properties.count} linked to guest)"
 
