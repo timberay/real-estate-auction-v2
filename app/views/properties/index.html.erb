@@ -21,19 +21,16 @@
 
   <%# Case number input + criteria search %>
   <div data-controller="criteria-search" class="max-w-md">
-    <%= form_with url: properties_path, method: :post do |f| %>
-      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">사건번호로 물건 추가</label>
-      <div class="flex items-center gap-2">
+    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">사건번호로 물건 추가</label>
+    <div class="flex items-center gap-2">
+      <%= form_with url: properties_path, method: :post, class: "contents" do |f| %>
         <%= f.text_field :case_number,
             placeholder: "예: 2026타경1234",
             data: { criteria_search_target: "caseInput" },
-            class: "flex-1 h-8 rounded-md border px-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" %>
+            class: "flex-1 min-w-0 h-8 rounded-md border px-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" %>
         <%= render ButtonComponent.new(type: "submit", icon: "plus", size: :sm, data: { criteria_search_target: "addButton" }) { "추가" } %>
-      </div>
-    <% end %>
-    <div class="flex items-center justify-between mt-1.5">
-      <p class="text-sm text-slate-500 dark:text-slate-400">법원 경매 사건번호를 입력하세요</p>
-      <%= form_with url: search_results_path, method: :post, data: { turbo_stream: true, action: "submit->criteria-search#submit turbo:submit-end->criteria-search#enable" } do %>
+      <% end %>
+      <%= form_with url: search_results_path, method: :post, class: "contents", data: { turbo_stream: true, action: "submit->criteria-search#submit turbo:submit-end->criteria-search#enable" } do %>
         <button type="submit"
                 data-criteria-search-target="submitButton"
                 class="inline-flex items-center justify-center gap-1.5 min-w-[100px] px-5 h-8 rounded-md bg-violet-600 hover:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-500 text-white text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900">
@@ -48,6 +45,7 @@
         </button>
       <% end %>
     </div>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">법원 경매 사건번호를 입력하세요</p>
 
     <%# Criteria search results appear here via Turbo Stream %>
     <div data-criteria-search-target="resultsContainer" id="criteria-search-results"></div>
