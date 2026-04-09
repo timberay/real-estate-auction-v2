@@ -1,5 +1,8 @@
 # CourtAuction Scraper — courtauction.go.kr Integration
 
+> **SUPERSEDED** — This document has been replaced by `2026-04-09-court-auction-playwright-redesign.md`.
+> The Faraday HTTP approach described here is blocked by WAF. See the replacement spec for the Ferrum (CDP) approach.
+
 > **Scope**: HTTP-based scraper for courtauction.go.kr using direct JSON POST calls via Faraday. No Playwright/browser dependency.
 > **Parent spec**: [Data Provider Architecture](2026-04-09-data-provider-architecture-design.md)
 

@@ -1,5 +1,8 @@
 # CourtAuction Scraper Implementation Plan
 
+> **SUPERSEDED** — This plan has been replaced by `2026-04-09-court-auction-playwright-redesign.md`.
+> The Faraday-based implementation was invalidated when WAF blocking was discovered during live testing.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the stub `GovernmentCourtAuctionAdapter` with a real HTTP-based scraper that calls courtauction.go.kr JSON POST endpoints via Faraday.
