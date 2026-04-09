@@ -89,8 +89,8 @@ module CourtAuction
     end
 
     def fill_criteria(page, region:, year:, min_price:, max_price:)
-      # 1. Click "소재지(새주소)" radio
-      page.click("##{REGION_RADIO}")
+      # 1. Click "소재지(새주소)" radio (label intercepts pointer events, so use force)
+      page.click("##{REGION_RADIO}", force: true)
       page.wait_for_timeout(500)
 
       # 2. Set region via DOM dispatchEvent (for cascade)
