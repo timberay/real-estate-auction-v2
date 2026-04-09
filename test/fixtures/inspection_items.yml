@@ -3,10 +3,10 @@ rights_002:
   tab: 0
   tab_position: 1
   category: "권리분석"
-  question: "매각물건명세서의 '소멸되지 아니하는 것' 비고란에 기재된 인수 권리가 있습니까?"
-  description: "법원이 직접 '이 권리는 낙찰자가 떠안는다'고 명시한 것입니다."
-  logic: '{"yes": "법원이 인수 권리를 명시했으므로 초보자는 입찰을 피해야 합니다.", "no": "안전합니다."}'
-  data_source_name: "매각물건명세서"
+  question: "매각물건명세서 '소멸되지 아니하는 것' 비고란에 낙찰자가 인수할 권리(가등기, 가처분, 전세권 등) 기재가 없는 깨끗한 물건입니까?"
+  description: "법원이 직접 '이 권리는 낙찰자가 떠안는다'고 명시한 것으로, 초보자에게 가장 위험한 함정입니다."
+  logic: '{"yes": "낙찰자에게 인수되는 제3자 권리가 없어 안전합니다.", "no": "법원이 인수 권리를 명시했으므로 초보자는 입찰을 피해야 합니다."}'
+  data_source_name: "수동 입력"
   priority: "상"
   yes_means_safe: true
 
@@ -15,70 +15,58 @@ rights_011:
   tab: 0
   tab_position: 2
   category: "권리분석"
-  question: "매각물건명세서 비고란에 유치권 또는 법정지상권이 적혀 있습니까?"
+  question: "매각물건명세서 비고란에 유치권 또는 법정지상권 기재가 있습니까?"
   description: "유치권은 공사대금 미지급 등으로 점유를 주장하는 것이고, 법정지상권은 토지와 건물 소유자가 달라질 때 발생합니다."
   logic: '{"yes": "인수해야 할 중대 권리가 명시되어 있습니다.", "no": "치명적인 특수 권리가 없습니다."}'
-  data_source_name: "매각물건명세서"
+  data_source_name: "수동 입력"
   priority: "상"
   yes_means_safe: false
 
+rights_005:
+  code: "rights-005"
+  tab: 0
+  tab_position: 3
+  category: "권리분석"
+  question: "매각물건명세서에 건축법상 사용 승인을 받은 정상 건물로 기재되어 있습니까?"
+  description: "사용승인 확인"
+  logic: '{"yes": "정상 건물", "no": "비정상 건물"}'
+  data_source_name: "수동 입력"
+  priority: "상"
+  yes_means_safe: true
+
 rights_001:
   code: "rights-001"
-  tab: 1
+  tab: 0
   tab_position: 1
   category: "권리분석"
   question: "등기부에 말소기준권리보다 앞선 '선순위 가처분'이 있습니까?"
   description: "선순위 가처분은 소유권 분쟁 중이라는 뜻입니다."
   logic: '{"yes": "소유권 자체가 바뀔 수 있어 매우 위험합니다.", "no": "가처분 리스크가 없습니다."}'
-  data_source_name: "등기부등본"
+  data_source_name: "수동 입력"
   priority: "상"
   yes_means_safe: false
 
-property_004:
-  code: "property-004"
-  tab: 2
-  tab_position: 1
-  category: "물건 기본 필터링"
-  question: "건축물대장에 '위반건축물'이라고 표시되어 있습니까?"
-  description: "위반건축물은 대출 제한 등 심각한 불이익이 있습니다."
-  logic: '{"yes": "대출이 안 나오고 이행강제금이 발생합니다.", "no": "위반 사항이 없습니다."}'
-  data_source_name: "건축물대장"
-  priority: "상"
-  yes_means_safe: false
-
-property_001:
-  code: "property-001"
-  tab: 3
-  tab_position: 1
-  category: "물건 기본 필터링"
-  question: "해당 물건이 지분 입찰 물건입니까?"
-  description: "지분 경매는 완전한 소유권을 취득하지 못합니다."
-  logic: '{"yes": "지분만 취득하게 됩니다.", "no": "안전합니다."}'
-  data_source_name: "대법원 법원경매정보"
-  priority: "상"
-  yes_means_safe: false
-
-inspect_007:
-  code: "inspect-007"
-  tab: 4
-  tab_position: 1
-  category: "현장조사·서류검증"
-  question: "현장 우편함의 공과금 통지서 수신인이 소유자(채무자) 이름입니까?"
-  description: "우편함 확인으로 실제 거주자를 파악할 수 있습니다."
-  logic: '{"yes": "소유자가 거주 중일 가능성이 높습니다.", "no": "제3자가 점유 중일 수 있습니다."}'
-  data_source_name: "현장 임장"
-  priority: "상"
-  yes_means_safe: true
-
-rights_020:
-  code: "rights-020"
+rights_007:
+  code: "rights-007"
   tab: 0
-  tab_position: 13
+  tab_position: 3
   category: "권리분석"
-  question: "현황조사서에 유치권 신고 표시가 있습니까?"
-  description: "유치권 신고 확인"
-  logic: '{"yes": "유치권 신고 있음", "no": "없음"}'
-  data_source_name: "매각물건명세서"
+  question: "등기부등본에 예고등기가 있습니까?"
+  description: "예고등기 확인"
+  logic: '{"yes": "위험", "no": "안전"}'
+  data_source_name: "수동 입력"
+  priority: "상"
+  yes_means_safe: false
+
+rights_008:
+  code: "rights-008"
+  tab: 0
+  tab_position: 4
+  category: "권리분석"
+  question: "선순위 세금 압류가 있습니까?"
+  description: "세금 압류 확인"
+  logic: '{"yes": "위험", "no": "안전"}'
+  data_source_name: "수동 입력"
   priority: "상"
   yes_means_safe: false
 
@@ -90,43 +78,127 @@ rights_019:
   question: "아파트이거나 토지와 건물이 일체로 매각되는 물건입니까?"
   description: "토지·건물 분리 매각 리스크"
   logic: '{"yes": "안전합니다.", "no": "법정지상권 성립 가능성"}'
-  data_source_name: "매각물건명세서"
+  data_source_name: "수동 입력"
   priority: "상"
   yes_means_safe: true
 
+rights_020:
+  code: "rights-020"
+  tab: 0
+  tab_position: 13
+  category: "권리분석"
+  question: "현황조사서에 유치권 신고 표시가 있습니까?"
+  description: "유치권 신고 확인"
+  logic: '{"yes": "유치권 신고 있음", "no": "없음"}'
+  data_source_name: "수동 입력"
+  priority: "상"
+  yes_means_safe: false
+
+rights_021:
+  code: "rights-021"
+  tab: 0
+  tab_position: 2
+  category: "권리분석"
+  question: "전세사기 피해자의 우선매수권 행사 가능성이 있습니까?"
+  description: "우선매수권 확인"
+  logic: '{"yes": "우선매수권 리스크", "no": "리스크 없음"}'
+  data_source_name: "수동 입력"
+  priority: "중"
+  yes_means_safe: false
+
+manual_001:
+  code: "manual-001"
+  tab: 0
+  tab_position: 9
+  category: "명도 난이도"
+  question: "분묘기지권(묘지 사용 권리)이 존재합니까?"
+  description: "분묘기지권은 토지 위에 묘지가 있는 경우 발생합니다."
+  logic: '{"yes": "분묘기지권이 있으면 토지 사용에 제한이 있습니다.", "no": "안전합니다."}'
+  data_source_name: "수동 입력"
+  priority: "상"
+  yes_means_safe: false
+
+property_001:
+  code: "property-001"
+  tab: 1
+  tab_position: 1
+  category: "물건 기본 필터링"
+  question: "해당 물건이 지분 입찰 물건입니까?"
+  description: "지분 경매는 완전한 소유권을 취득하지 못합니다."
+  logic: '{"yes": "지분만 취득하게 됩니다.", "no": "안전합니다."}'
+  data_source_name: "수동 입력"
+  priority: "상"
+  yes_means_safe: false
+
 property_002:
   code: "property-002"
-  tab: 0
+  tab: 1
   tab_position: 9
   category: "물건 기본 필터링"
   question: "호실 간 벽체 구분이 불명확하거나 불법 구조변경이 있습니까?"
   description: "불법 구조변경 확인"
   logic: '{"yes": "위험합니다.", "no": "정상입니다."}'
-  data_source_name: "매각물건명세서"
+  data_source_name: "수동 입력"
   priority: "상"
   yes_means_safe: false
 
+property_004:
+  code: "property-004"
+  tab: 1
+  tab_position: 1
+  category: "물건 기본 필터링"
+  question: "건축물대장에 '위반건축물'이라고 표시되어 있습니까?"
+  description: "위반건축물은 대출 제한 등 심각한 불이익이 있습니다."
+  logic: '{"yes": "대출이 안 나오고 이행강제금이 발생합니다.", "no": "위반 사항이 없습니다."}'
+  data_source_name: "수동 입력"
+  priority: "상"
+  yes_means_safe: false
+
+property_005:
+  code: "property-005"
+  tab: 1
+  tab_position: 2
+  category: "물건 기본 필터링"
+  question: "건축물대장 상 용도가 주거용으로 확인됩니까?"
+  description: "용도 확인"
+  logic: '{"yes": "주거용", "no": "비주거용"}'
+  data_source_name: "수동 입력"
+  priority: "상"
+  yes_means_safe: true
+
 property_006:
   code: "property-006"
-  tab: 0
+  tab: 1
   tab_position: 14
   category: "물건 기본 필터링"
   question: "입찰하려는 경매 물건의 종류가 아파트입니까?"
   description: "물건 종류 확인"
   logic: '{"yes": "아파트는 초보자에게 적합합니다.", "no": "변수가 많습니다."}'
-  data_source_name: "경매정보지"
+  data_source_name: "수동 입력"
   priority: "중"
+  yes_means_safe: true
+
+resale_002:
+  code: "resale-002"
+  tab: 1
+  tab_position: 8
+  category: "물건 기본 필터링"
+  question: "세대수 대비 주차 공간이 충분합니까?"
+  description: "주차 공간 확인"
+  logic: '{"yes": "충분", "no": "부족"}'
+  data_source_name: "수동 입력"
+  priority: "상"
   yes_means_safe: true
 
 resale_003:
   code: "resale-003"
-  tab: 0
+  tab: 1
   tab_position: 18
   category: "물건 기본 필터링"
   question: "해당 물건이 지상층에 위치합니까?"
   description: "반지하 여부 확인"
   logic: '{"yes": "지상층입니다.", "no": "반지하입니다."}'
-  data_source_name: "경매정보지"
+  data_source_name: "수동 입력"
   priority: "상"
   yes_means_safe: true
 
@@ -138,32 +210,32 @@ tax_006:
   question: "주택의 전용면적이 85㎡ 미만입니까?"
   description: "전용면적 확인"
   logic: '{"yes": "부가세 면제", "no": "부가세 10% 추가"}'
-  data_source_name: "건축물대장"
+  data_source_name: "수동 입력"
   priority: "중"
+  yes_means_safe: true
+
+market_006:
+  code: "market-006"
+  tab: 2
+  tab_position: 10
+  category: "시세·수익성 분석"
+  question: "단독(나홀로) 건물이 아닌 단지형 아파트입니까?"
+  description: "단지형 확인"
+  logic: '{"yes": "단지형입니다.", "no": "나홀로 건물입니다."}'
+  data_source_name: "수동 입력"
+  priority: "상"
   yes_means_safe: true
 
 market_012:
   code: "market-012"
-  tab: 3
+  tab: 2
   tab_position: 13
   category: "시세·수익성 분석"
   question: "경매 사이트에 표시된 해당 물건의 조회수가 500회 미만입니까?"
   description: "경쟁도 확인"
   logic: '{"yes": "경쟁이 적습니다.", "no": "경쟁이 많습니다."}'
-  data_source_name: "대법원 법원경매정보"
+  data_source_name: "수동 입력"
   priority: "중"
-  yes_means_safe: true
-
-rights_005:
-  code: "rights-005"
-  tab: 0
-  tab_position: 3
-  category: "권리분석"
-  question: "매각물건명세서에 건축법상 사용 승인을 받은 정상 건물로 기재되어 있습니까?"
-  description: "사용승인 확인"
-  logic: '{"yes": "정상 건물", "no": "비정상 건물"}'
-  data_source_name: "매각물건명세서"
-  priority: "상"
   yes_means_safe: true
 
 inspect_001:
@@ -174,55 +246,43 @@ inspect_001:
   question: "감정평가서 특이사항에 중대한 문제가 기재되어 있습니까?"
   description: "감정평가서 확인"
   logic: '{"yes": "하자 있음", "no": "정상"}'
-  data_source_name: "감정평가서"
+  data_source_name: "수동 입력"
   priority: "중"
   yes_means_safe: false
 
 inspect_004:
   code: "inspect-004"
-  tab: 4
+  tab: 3
   tab_position: 3
   category: "현장조사·서류검증"
   question: "오피스텔이 아니거나, 관할 구청에서 주거용/업무용을 확인했습니까?"
   description: "오피스텔 용도 확인"
   logic: '{"yes": "확인됨", "no": "미확인"}'
-  data_source_name: "관공서 방문"
+  data_source_name: "수동 입력"
   priority: "상"
   yes_means_safe: true
 
-market_006:
-  code: "market-006"
+inspect_007:
+  code: "inspect-007"
   tab: 3
-  tab_position: 10
-  category: "시세·수익성 분석"
-  question: "단독(나홀로) 건물이 아닌 단지형 아파트입니까?"
-  description: "단지형 확인"
-  logic: '{"yes": "단지형입니다.", "no": "나홀로 건물입니다."}'
-  data_source_name: "네이버 부동산"
+  tab_position: 5
+  category: "현장조사·서류검증"
+  question: "현장 우편함의 공과금 통지서 수신인이 소유자(채무자) 이름입니까?"
+  description: "우편함 확인으로 실제 거주자를 파악할 수 있습니다."
+  logic: '{"yes": "소유자가 거주 중일 가능성이 높습니다.", "no": "제3자가 점유 중일 수 있습니다."}'
+  data_source_name: "수동 입력"
   priority: "상"
   yes_means_safe: true
-
-rights_021:
-  code: "rights-021"
-  tab: 3
-  tab_position: 2
-  category: "권리분석"
-  question: "전세사기 피해자의 우선매수권 행사 가능성이 있습니까?"
-  description: "우선매수권 확인"
-  logic: '{"yes": "우선매수권 리스크", "no": "리스크 없음"}'
-  data_source_name: "법원 서류"
-  priority: "중"
-  yes_means_safe: false
 
 bidding_001:
   code: "bidding-001"
-  tab: 3
+  tab: 4
   tab_position: 22
   category: "입찰 실무"
   question: "해당 경매 사건이 정상적으로 진행 중인지 확인하셨습니까?"
   description: "경매 진행 상태 확인"
   logic: '{"yes": "진행 중", "no": "변경/취하됨"}'
-  data_source_name: "대법원 법원경매정보"
+  data_source_name: "수동 입력"
   priority: "중"
   yes_means_safe: true
 
@@ -234,66 +294,6 @@ bidding_003:
   question: "입찰 보증금으로 최저가의 10% 이상을 자기앞수표 한 장으로 준비하셨습니까?"
   description: "보증금 준비 확인"
   logic: '{"yes": "준비됨", "no": "미준비"}'
-  data_source_name: "경매정보지"
-  priority: "상"
-  yes_means_safe: true
-
-rights_007:
-  code: "rights-007"
-  tab: 1
-  tab_position: 3
-  category: "권리분석"
-  question: "등기부등본에 예고등기가 있습니까?"
-  description: "예고등기 확인"
-  logic: '{"yes": "위험", "no": "안전"}'
-  data_source_name: "등기부등본"
-  priority: "상"
-  yes_means_safe: false
-
-rights_008:
-  code: "rights-008"
-  tab: 1
-  tab_position: 4
-  category: "권리분석"
-  question: "선순위 세금 압류가 있습니까?"
-  description: "세금 압류 확인"
-  logic: '{"yes": "위험", "no": "안전"}'
-  data_source_name: "등기부등본"
-  priority: "상"
-  yes_means_safe: false
-
-property_005:
-  code: "property-005"
-  tab: 2
-  tab_position: 2
-  category: "물건 기본 필터링"
-  question: "건축물대장 상 용도가 주거용으로 확인됩니까?"
-  description: "용도 확인"
-  logic: '{"yes": "주거용", "no": "비주거용"}'
-  data_source_name: "건축물대장"
-  priority: "상"
-  yes_means_safe: true
-
-resale_002:
-  code: "resale-002"
-  tab: 2
-  tab_position: 8
-  category: "물건 기본 필터링"
-  question: "세대수 대비 주차 공간이 충분합니까?"
-  description: "주차 공간 확인"
-  logic: '{"yes": "충분", "no": "부족"}'
-  data_source_name: "건축물대장"
-  priority: "상"
-  yes_means_safe: true
-
-manual_001:
-  code: "manual-001"
-  tab: 5
-  tab_position: 10
-  category: "권리분석"
-  question: "분묘기지권(묘지 사용 권리)이 존재합니까?"
-  description: "분묘기지권은 토지 위에 묘지가 있는 경우 발생합니다."
-  logic: '{"yes": "분묘기지권이 있으면 토지 사용에 제한이 있습니다.", "no": "안전합니다."}'
   data_source_name: "수동 입력"
   priority: "상"
-  yes_means_safe: false
+  yes_means_safe: true

@@ -1,5 +1,33 @@
 # E2E Test Report
 
+## Run 3: Post Playwright Redesign Verification (2026-04-09)
+
+- **Test date:** 2026-04-09T04:41:00Z
+- **Target URL:** http://localhost:3000
+- **Context:** Verified app stability after CourtAuction scraper migration (Faraday → Ferrum CDP)
+- **Total scenarios:** 6
+- **Passed:** 6 | **Failed:** 0 | **Skipped:** 0
+
+### Results Summary
+
+| # | Scenario | Status | Screenshots | Notes |
+|---|----------|--------|-------------|-------|
+| S-001 | Sidebar > 예산 설정 | PASS | before/e2e-s001-properties-list.png, after/e2e-s001-budget-settings.png | Page loads, form renders correctly |
+| S-002 | 물건 상세 (/properties/1) | PASS | after/e2e-s002-property-detail.png | Inspection grade, checklist, registry all render |
+| S-003 | 데이터 소스 설정 페이지 | PASS | after/e2e-s003-data-sources.png | 6 provider cards, consent toggle ON, 5 API key forms |
+| S-004 | 법원경매정보 동의 토글 | PASS | before/e2e-s004-consent-on.png, after/e2e-s004-consent-off.png | Toggle ON→OFF→ON, DB persisted via Turbo |
+| S-005 | Console errors check | PASS | — | 0 JS errors, 7 warnings (normal) |
+| S-006 | 물건 목록 복귀 | PASS | after/e2e-s006-properties-return.png | 4 property cards rendered, search form intact |
+
+### Verification Notes
+
+- **No regressions** from Playwright redesign — all existing UI functionality intact
+- Backend changes (Faraday→Ferrum, ResponseParser rewrite) have zero UI impact
+- Data sources settings page renders all 6 providers correctly
+- Consent toggle for 법원경매정보 works correctly (sr-only checkbox + CSS toggle)
+
+---
+
 ## Run 2: Data Provider Infrastructure (2026-04-09)
 
 - **Test date:** 2026-04-09T02:14:00Z

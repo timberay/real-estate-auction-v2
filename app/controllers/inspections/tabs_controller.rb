@@ -1,6 +1,6 @@
 module Inspections
   class TabsController < ApplicationController
-    VALID_TABS = %w[ sale_document registry building_ledger online field_visit etc ].freeze
+    VALID_TABS = %w[ rights_analysis property_analysis profit_analysis field_check bidding ].freeze
 
     def edit
       @property = Property.find(params[:property_id])

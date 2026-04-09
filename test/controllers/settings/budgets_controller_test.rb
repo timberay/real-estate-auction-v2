@@ -27,6 +27,11 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "GET show renders auto-calc checkbox checked by default" do
+    get settings_budget_url
+    assert_select "input[data-reserve-fund-target='autoCalc'][checked]"
+  end
+
   test "PATCH update saves new settings and creates snapshot" do
     patch settings_budget_url, params: {
       budget_setting: {

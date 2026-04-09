@@ -15,8 +15,8 @@ class PropertyDataSyncService
     errors = {}
 
     court_data = fetch_source(:court_auction, errors, :court) do |config|
-      adapter = CourtAuctionAdapter.for(config)
-      if @with_detail && adapter.respond_to?(:fetch_data_with_detail)
+      adapter = GovernmentCourtAuctionAdapter.new
+      if @with_detail
         adapter.fetch_data_with_detail(case_number: @case_number)
       else
         adapter.fetch_data(case_number: @case_number)

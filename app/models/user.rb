@@ -8,4 +8,21 @@ class User < ApplicationRecord
   has_many :rights_analysis_reports, dependent: :destroy
   has_many :api_credentials, dependent: :destroy
   validates :email, presence: true, uniqueness: true
+
+  # -- Search preference convenience methods --
+
+  def preferred_property_type_code
+    budget_setting&.property_type&.code
+  end
+
+  def preferred_area_range
+    bs = budget_setting
+    return nil unless bs&.area_range_min && bs&.area_range_max
+
+    { min: bs.area_range_min, max: bs.area_range_max }
+  end
+
+  def preferred_area_category
+    budget_setting&.selected_area_category
+  end
 end

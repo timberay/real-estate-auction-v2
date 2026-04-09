@@ -118,9 +118,9 @@ class InspectionRunner
     },
 
     # inspect-004: 오피스텔 주거/업무 용도
+    # Partial: auto-flag risk for 오피스텔 only; non-오피스텔 left for user to confirm
     "inspect-004" => ->(p) {
-      return false if p.property_type != "오피스텔"
-      nil # 오피스텔 needs 구청 confirmation
+      nil
     },
 
     # market-006: 단지형 건물 여부
@@ -141,15 +141,16 @@ class InspectionRunner
     },
 
     # bidding-001: 경매 진행 상태 확인
+    # Partial: status is displayable but user must confirm they checked
     "bidding-001" => ->(p) {
       return nil if p.status.blank?
-      p.status != "진행중"
+      p.status != "진행중" ? true : nil
     },
 
     # bidding-003: 입찰 보증금 준비
+    # Partial: deposit amount is calculable but preparation is user action
     "bidding-003" => ->(p) {
-      return nil if p.min_bid_price.nil? || p.min_bid_price.zero?
-      false # 금액 정보 제공 가능, 준비 여부는 사용자 확인
+      nil
     }
   }.freeze
 
@@ -172,8 +173,8 @@ class InspectionRunner
 
       rule = DETECTION_RULES[item.code]
       if rule.nil?
-        # No detection rule — leave as unanswered unless user already manually answered
-        unless result.persisted? && result.source_type.present?
+        # No detection rule — leave as unanswered unless user manually answered
+        unless user_manually_answered?(result)
           result.assign_attributes(source_type: nil, has_risk: nil)
         end
       else
@@ -183,7 +184,8 @@ class InspectionRunner
           nil
         end
         if detected.nil?
-          unless result.persisted? && result.source_type.present?
+          # Rule returned nil — reset unless user manually answered
+          unless user_manually_answered?(result)
             result.assign_attributes(source_type: nil, has_risk: nil)
           end
         else
@@ -194,5 +196,9 @@ class InspectionRunner
       result.save!
       result
     end
+  end
+
+  def user_manually_answered?(result)
+    result.persisted? && result.manual? && result.auto_value.blank?
   end
 end

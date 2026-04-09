@@ -42,7 +42,7 @@ module CourtAuction
       {
         case_number: item["srnSaNo"],
         property_type: item["dspslUsgNm"],
-        property_usage_code: item["dspslUsgNm"],
+        property_usage_code: item["maemulUtilCd"],
         status: item["mulJinYn"] == "Y" ? "진행중" : "종결",
         address: item["printSt"],
         sido: item["hjguSido"],
@@ -76,14 +76,14 @@ module CourtAuction
       # From dspslGdsDxdyInfo
       rights_text = dxdy["ndstrcRghCtt"]
       result[:non_extinguished_rights] = normalize_empty_text(rights_text)
-      result[:superficies_details] = dxdy["sfciesDetails"]
+      result[:superficies_details] = dxdy["sprfcExstcDts"]
       result[:specification_remarks] = dxdy["gdsSpcfcRmk"]
       result[:senior_mortgage_basis] = dxdy["tprtyRnkHypthcStngDts"]
       result[:goods_remarks] = dxdy["dspslGdsRmk"]
-      result[:price_round_1] = parse_price(dxdy["tsLwsDspslPrc1"])
-      result[:price_round_2] = parse_price(dxdy["tsLwsDspslPrc2"])
-      result[:price_round_3] = parse_price(dxdy["tsLwsDspslPrc3"])
-      result[:price_round_4] = parse_price(dxdy["tsLwsDspslPrc4"])
+      result[:price_round_1] = parse_price(dxdy["fstPbancLwsDspslPrc"])
+      result[:price_round_2] = parse_price(dxdy["scndPbancLwsDspslPrc"])
+      result[:price_round_3] = parse_price(dxdy["thrdPbancLwsDspslPrc"])
+      result[:price_round_4] = parse_price(dxdy["fothPbancLwsDspslPrc"])
 
       # From gdsDspslObjctLst[0] — overrides search values
       result[:land_category] = objct["rletDvsDts"] if objct["rletDvsDts"].present?
@@ -138,11 +138,11 @@ module CourtAuction
         group.map do |l|
           {
             land_type: l["rletDvsDts"],
-            land_area: l["landArea"],
-            land_category: l["ldcgCd"],
-            share_ratio: l["shrRt"],
-            address: l["printSt"],
-            lot_number: l["lotNo"]
+            land_area: l["landArDts"],
+            land_category: l["landLdcgDts"],
+            share_ratio: "#{l['rgltRateNmrtVal']}/#{l['rgltRateDnmnVal']}",
+            address: l["rletIndctDts"],
+            lot_number: l["rgltLandLtnoAddr"]
           }
         end
       end

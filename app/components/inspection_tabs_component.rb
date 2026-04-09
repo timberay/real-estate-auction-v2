@@ -1,12 +1,11 @@
 class InspectionTabsComponent < ViewComponent::Base
   TAB_CONFIG = [
-    { key: "sale_document", label: "매각물건명세서" },
-    { key: "registry",      label: "등기부등본" },
-    { key: "building_ledger", label: "건축물대장" },
-    { key: "online",        label: "온라인조회" },
-    { key: "field_visit",   label: "현장임장" },
-    { key: "etc",           label: "기타" },
-    { key: "grade",         label: "종합 판정" }
+    { key: "rights_analysis",   label: "권리분석" },
+    { key: "property_analysis", label: "물건분석" },
+    { key: "profit_analysis",   label: "수익분석" },
+    { key: "field_check",       label: "현장확인" },
+    { key: "bidding",           label: "입찰&낙찰" },
+    { key: "grade",             label: "종합 판정" }
   ].freeze
 
   def initialize(property:, user:, active_tab:)

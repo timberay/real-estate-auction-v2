@@ -8,7 +8,7 @@ class Inspections::StartControllerTest < ActionDispatch::IntegrationTest
 
   test "creates inspection results and redirects to first tab" do
     post property_inspections_start_url(@property)
-    assert_redirected_to edit_property_inspections_tab_url(@property, tab_key: "sale_document")
+    assert_redirected_to edit_property_inspections_tab_url(@property, tab_key: "rights_analysis")
     assert InspectionResult.where(property: @property, user: users(:guest)).exists?
   end
 end

@@ -82,7 +82,7 @@ class InspectionItemComponent < ViewComponent::Base
   end
 
   def logic_yes_classes
-    return "" unless selected_answer
+    return "text-slate-500 dark:text-slate-400" unless selected_answer
     if selected_answer == "yes"
       answer_means_safe = @item.yes_means_safe?
       answer_means_safe ? "bg-green-100 dark:bg-green-900/20 font-semibold text-green-800 dark:text-green-300" : "bg-red-100 dark:bg-red-900/20 font-semibold text-red-800 dark:text-red-300"
@@ -92,7 +92,7 @@ class InspectionItemComponent < ViewComponent::Base
   end
 
   def logic_no_classes
-    return "" unless selected_answer
+    return "text-slate-500 dark:text-slate-400" unless selected_answer
     if selected_answer == "no"
       answer_means_safe = !@item.yes_means_safe?
       answer_means_safe ? "bg-green-100 dark:bg-green-900/20 font-semibold text-green-800 dark:text-green-300" : "bg-red-100 dark:bg-red-900/20 font-semibold text-red-800 dark:text-red-300"

@@ -4,7 +4,7 @@ class InspectionItemTest < ActiveSupport::TestCase
   test "valid with all required fields" do
     item = InspectionItem.new(
       code: "test-001",
-      tab: "sale_document",
+      tab: "rights_analysis",
       tab_position: 1,
       category: "권리분석",
       question: "테스트 질문입니까?",
@@ -14,33 +14,30 @@ class InspectionItemTest < ActiveSupport::TestCase
   end
 
   test "code is required and unique" do
-    InspectionItem.create!(code: "unique-001", tab: "sale_document", tab_position: 1, category: "권리분석", question: "Q?", priority: "상")
-    dup = InspectionItem.new(code: "unique-001", tab: "sale_document", tab_position: 2, category: "권리분석", question: "Q2?", priority: "상")
+    InspectionItem.create!(code: "unique-001", tab: "rights_analysis", tab_position: 1, category: "권리분석", question: "Q?", priority: "상")
+    dup = InspectionItem.new(code: "unique-001", tab: "rights_analysis", tab_position: 2, category: "권리분석", question: "Q2?", priority: "상")
     assert_not dup.valid?
   end
 
   test "tab enum values" do
-    item = InspectionItem.new(code: "enum-test", tab: "sale_document", tab_position: 1, category: "C", question: "Q?", priority: "상")
-    assert item.sale_document?
+    item = InspectionItem.new(code: "enum-test", tab: "rights_analysis", tab_position: 1, category: "C", question: "Q?", priority: "상")
+    assert item.rights_analysis?
 
-    item.tab = "registry"
-    assert item.registry?
+    item.tab = "property_analysis"
+    assert item.property_analysis?
 
-    item.tab = "building_ledger"
-    assert item.building_ledger?
+    item.tab = "profit_analysis"
+    assert item.profit_analysis?
 
-    item.tab = "online"
-    assert item.online?
+    item.tab = "field_check"
+    assert item.field_check?
 
-    item.tab = "field_visit"
-    assert item.field_visit?
-
-    item.tab = "etc"
-    assert item.etc?
+    item.tab = "bidding"
+    assert item.bidding?
   end
 
   test "question and category are required" do
-    item = InspectionItem.new(code: "test-002", tab: "sale_document", tab_position: 1, question: nil, category: nil, priority: "상")
+    item = InspectionItem.new(code: "test-002", tab: "rights_analysis", tab_position: 1, question: nil, category: nil, priority: "상")
     assert_not item.valid?
     assert_includes item.errors[:question], "can't be blank"
     assert_includes item.errors[:category], "can't be blank"
@@ -58,14 +55,14 @@ class InspectionItemTest < ActiveSupport::TestCase
   end
 
   test "for_tab scope returns items for a specific tab" do
-    sale_items = InspectionItem.for_tab(:sale_document)
-    assert sale_items.all?(&:sale_document?)
+    sale_items = InspectionItem.for_tab(:rights_analysis)
+    assert sale_items.all?(&:rights_analysis?)
   end
 
   test "yes_means_safe defaults to true" do
     item = InspectionItem.new(
       code: "default-test",
-      tab: "sale_document",
+      tab: "rights_analysis",
       tab_position: 1,
       category: "권리분석",
       question: "기본값 테스트?",
@@ -77,7 +74,7 @@ class InspectionItemTest < ActiveSupport::TestCase
   test "yes_means_safe can be set to false" do
     item = InspectionItem.new(
       code: "inverted-test",
-      tab: "sale_document",
+      tab: "rights_analysis",
       tab_position: 1,
       category: "권리분석",
       question: "반전 테스트?",

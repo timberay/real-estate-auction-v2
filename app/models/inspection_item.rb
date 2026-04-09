@@ -2,12 +2,11 @@ class InspectionItem < ApplicationRecord
   has_many :inspection_results, dependent: :destroy
 
   enum :tab, {
-    sale_document: 0,   # 매각물건명세서
-    registry: 1,        # 등기부등본
-    building_ledger: 2, # 건축물대장
-    online: 3,          # 온라인조회
-    field_visit: 4,     # 현장임장
-    etc: 5              # 기타
+    rights_analysis: 0,   # 권리분석
+    property_analysis: 1, # 물건분석
+    profit_analysis: 2,   # 수익분석
+    field_check: 3,       # 현장확인
+    bidding: 4            # 입찰&낙찰
   }
 
   ANSWER_TYPES = %w[action_confirm].freeze

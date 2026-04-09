@@ -8,7 +8,7 @@ class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "edit renders tab items" do
-    get edit_property_inspections_tab_url(@property, tab_key: "sale_document")
+    get edit_property_inspections_tab_url(@property, tab_key: "rights_analysis")
     assert_response :success
   end
 

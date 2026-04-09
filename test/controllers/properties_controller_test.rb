@@ -85,7 +85,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     user_property.update!(safety_rating: nil, analyzed_at: Time.current)
 
     get property_url(property)
-    assert_redirected_to edit_property_inspections_tab_path(property, tab_key: "sale_document")
+    assert_redirected_to edit_property_inspections_tab_path(property, tab_key: "rights_analysis")
   end
 
   test "GET show renders pre-analysis state when no analysis" do

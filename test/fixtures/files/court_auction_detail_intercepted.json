@@ -1,0 +1,80 @@
+{
+  "status": 200,
+  "message": "성공",
+  "data": {
+    "dma_result": {
+      "csBaseInfo": {
+        "csNm": "부동산임의경매",
+        "clmAmt": "350000000"
+      },
+      "dspslGdsDxdyInfo": {
+        "ndstrcRghCtt": "해당사항없음",
+        "sprfcExstcDts": null,
+        "gdsSpcfcRmk": "본건 아파트는 1층에 위치",
+        "tprtyRnkHypthcStngDts": "2024.01.15 근저당 설정",
+        "dspslGdsRmk": null,
+        "fstPbancLwsDspslPrc": "800000000",
+        "scndPbancLwsDspslPrc": "560000000",
+        "thrdPbancLwsDspslPrc": "392000000",
+        "fothPbancLwsDspslPrc": null
+      },
+      "gdsDspslObjctLst": [
+        {
+          "rletDvsDts": "대",
+          "bldDtlDts": "101동 1001호",
+          "bldNm": "테스트아파트",
+          "pjbBuldList": "철근콩크리트조 84.50㎡",
+          "dspslStkCtt": null
+        }
+      ],
+      "dstrtDemnInfo": [
+        {
+          "dstrtDemnLstprdYmd": "20260415"
+        }
+      ],
+      "gdsDspslDxdyLst": [
+        {
+          "dxdyYmd": "20260501",
+          "dxdyHm": "10:00",
+          "dxdyPlcNm": "경매법정4별관211호",
+          "auctnDxdyKndCd": "매각",
+          "auctnDxdyRsltCd": null,
+          "tsLwsDspslPrc": "560000000",
+          "dspslAmt": null
+        },
+        {
+          "dxdyYmd": "20260301",
+          "dxdyHm": "10:00",
+          "dxdyPlcNm": "경매법정4별관211호",
+          "auctnDxdyKndCd": "매각",
+          "auctnDxdyRsltCd": "유찰",
+          "tsLwsDspslPrc": "800000000",
+          "dspslAmt": null
+        }
+      ],
+      "rgltLandLstAll": [
+        [
+          {
+            "rletDvsDts": "대",
+            "landArDts": "45.23",
+            "landLdcgDts": "대",
+            "rgltRateNmrtVal": "4523",
+            "rgltRateDnmnVal": "100000",
+            "rletIndctDts": "서울특별시 강남구 역삼동 100-1",
+            "rgltLandLtnoAddr": "100-1"
+          }
+        ]
+      ],
+      "aeeWevlMnpntLst": [
+        {
+          "aeeWevlMnpntItmCd": "01",
+          "aeeWevlMnpntCtt": "본건은 서울특별시 강남구 역삼동 소재 아파트로서 교통 및 생활편의시설이 양호한 지역에 위치함"
+        },
+        {
+          "aeeWevlMnpntItmCd": "02",
+          "aeeWevlMnpntCtt": "건물 상태는 양호하며 특별한 하자는 발견되지 않음"
+        }
+      ]
+    }
+  }
+}

@@ -24,7 +24,7 @@ class PropertiesController < ApplicationController
     if @user_property&.safety_rating.present?
       redirect_to property_inspections_grade_path(@property)
     elsif @user_property&.analyzed_at.present?
-      redirect_to edit_property_inspections_tab_path(@property, tab_key: "sale_document")
+      redirect_to edit_property_inspections_tab_path(@property, tab_key: "rights_analysis")
     end
   end
 

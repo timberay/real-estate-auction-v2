@@ -268,19 +268,12 @@ class InspectionRunnerTest < ActiveSupport::TestCase
     assert_nil result.has_risk
   end
 
-  test "inspect-004: non-officetel is safe" do
+  test "inspect-004: always nil (field_check tab — user must confirm)" do
     InspectionRunner.call(property: @safe_property, user: @user)
     result = find_result(@safe_property, "inspect-004")
     return unless result
-    assert_equal "auto", result.source_type
-    assert_equal false, result.has_risk
-  end
-
-  test "inspect-004: officetel returns nil (needs manual confirm)" do
-    InspectionRunner.call(property: @officetel, user: @user)
-    result = find_result(@officetel, "inspect-004")
-    return unless result
-    assert_nil result.has_risk, "오피스텔 needs 구청 confirmation"
+    assert_nil result.source_type
+    assert_nil result.has_risk
   end
 
   test "market-006: apartment with building_name is safe" do
@@ -313,21 +306,30 @@ class InspectionRunnerTest < ActiveSupport::TestCase
     assert_nil result.has_risk
   end
 
-  test "bidding-001: 진행중 status provides info (auto)" do
+  test "bidding-001: 진행중 status returns nil (partial — user must confirm)" do
     InspectionRunner.call(property: @safe_property, user: @user)
     result = find_result(@safe_property, "bidding-001")
     return unless result
-    assert_equal "auto", result.source_type
-    assert_equal false, result.has_risk, "진행중 = confirmed active"
+    assert_nil result.source_type
+    assert_nil result.has_risk, "진행중 is partial info, not auto-confirmed"
   end
 
-  test "bidding-003: calculates deposit amount (auto)" do
+  test "bidding-001: non-진행중 status flags risk" do
+    property = @safe_property
+    property.update!(status: "취하")
+    InspectionRunner.call(property: property, user: @user)
+    result = find_result(property, "bidding-001")
+    return unless result
+    assert_equal "auto", result.source_type
+    assert_equal true, result.has_risk
+  end
+
+  test "bidding-003: always nil (partial — user must confirm preparation)" do
     InspectionRunner.call(property: @safe_property, user: @user)
     result = find_result(@safe_property, "bidding-003")
     return unless result
-    assert_equal "auto", result.source_type
-    # min_bid_price is 560000000, 10% = 56000000
-    assert_not_nil result.has_risk
+    assert_nil result.source_type
+    assert_nil result.has_risk
   end
 
   # === Removed rules: registry/building_ledger should not auto-detect ===

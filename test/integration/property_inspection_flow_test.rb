@@ -10,13 +10,13 @@ class PropertyInspectionFlowTest < ActionDispatch::IntegrationTest
   test "full inspection flow: start → tab edit → grade" do
     # Start inspection
     post property_inspections_start_url(@property)
-    assert_redirected_to edit_property_inspections_tab_url(@property, tab_key: "sale_document")
+    assert_redirected_to edit_property_inspections_tab_url(@property, tab_key: "rights_analysis")
 
     # Verify items created
     assert_equal InspectionItem.count, InspectionResult.where(property: @property, user: @user).count
 
     # Visit each tab
-    %w[ sale_document registry building_ledger online field_visit etc ].each do |tab|
+    %w[ rights_analysis property_analysis profit_analysis field_check bidding ].each do |tab|
       get edit_property_inspections_tab_url(@property, tab_key: tab)
       assert_response :success
     end

@@ -61,12 +61,11 @@ puts "  -> Guest user ready"
 puts "Seeding inspection items..."
 
 TAB_MAP = {
-  "매각물건명세서" => "sale_document",
-  "등기부등본" => "registry",
-  "건축물대장" => "building_ledger",
-  "온라인조회" => "online",
-  "현장임장" => "field_visit",
-  "기타" => "etc"
+  "권리분석" => "rights_analysis",
+  "물건분석" => "property_analysis",
+  "수익분석" => "profit_analysis",
+  "현장확인" => "field_check",
+  "입찰&낙찰" => "bidding"
 }.freeze
 
 inspection_data = JSON.parse(File.read(Rails.root.join("db/seeds/checklist_items_summary.json")))

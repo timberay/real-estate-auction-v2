@@ -112,12 +112,12 @@
 
   <% if show_manual_input? %>
     <div class="mt-3 border-t border-slate-200 dark:border-slate-600 pt-3">
-      <div class="flex items-center gap-4">
-        <label class="inline-flex items-center text-sm text-slate-700 dark:text-slate-200">
+      <div class="flex items-center gap-4 rounded-md bg-slate-50 dark:bg-slate-700/50 px-3 py-2">
+        <label class="inline-flex items-center text-sm font-medium text-slate-800 dark:text-slate-100">
           <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", yes_radio_value, @result.has_risk == (yes_radio_value == "true"),
               data: { action: "change->inspection-item#toggleManualRisk" }, class: "mr-1.5" %> 예
         </label>
-        <label class="inline-flex items-center text-sm text-slate-700 dark:text-slate-200">
+        <label class="inline-flex items-center text-sm font-medium text-slate-800 dark:text-slate-100">
           <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", no_radio_value, @result.has_risk == (no_radio_value == "true"),
               data: { action: "change->inspection-item#toggleManualRisk" }, class: "mr-1.5" %> 아니오
         </label>
