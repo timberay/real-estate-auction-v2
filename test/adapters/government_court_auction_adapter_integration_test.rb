@@ -107,7 +107,9 @@ class GovernmentCourtAuctionAdapterIntegrationTest < ActiveSupport::TestCase
     adapter = GovernmentCourtAuctionAdapter.new
 
     mock_client = Object.new
-    mock_client.define_singleton_method(:fetch) { |**_args| browser_response }
+    mock_client.define_singleton_method(:fetch_with_detail) do |**_args|
+      { "search" => browser_response, "detail" => nil }
+    end
 
     adapter.instance_variable_set(:@browser_client, mock_client)
     adapter.instance_variable_set(
@@ -122,7 +124,6 @@ class GovernmentCourtAuctionAdapterIntegrationTest < ActiveSupport::TestCase
     adapter = GovernmentCourtAuctionAdapter.new
 
     mock_client = Object.new
-    mock_client.define_singleton_method(:fetch) { |**_args| search_response }
     mock_client.define_singleton_method(:fetch_with_detail) do |**_args|
       { "search" => search_response, "detail" => detail_response }
     end
