@@ -1,0 +1,7 @@
+<%# app/views/shared/error.html.erb %>
+<div class="mx-auto max-w-lg px-4 py-16 text-center">
+  <h1 class="text-2xl font-bold text-gray-900"><%= flash[:alert] || flash[:notice] %></h1>
+  <p class="mt-4 text-gray-600">
+    <%= link_to "돌아가기", :back, class: "text-blue-600 hover:underline" %>
+  </p>
+</div>
