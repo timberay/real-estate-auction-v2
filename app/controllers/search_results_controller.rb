@@ -4,20 +4,6 @@ class SearchResultsController < ApplicationController
     @search_results = current_user.search_results.order(created_at: :desc)
   end
 
-  def preview
-    bs = current_user.budget_setting
-    criteria = {
-      region: bs&.effective_region || BudgetSetting::DEFAULT_REGION,
-      year: Time.current.year.to_s,
-      min_price: 50_000_000,
-      max_price: bs&.max_price_option || BudgetSetting::DEFAULT_MAX_PRICE
-    }
-
-    render turbo_stream: turbo_stream.update("criteria-debug-popup",
-      partial: "search_results/criteria_preview_popup",
-      locals: { criteria: criteria })
-  end
-
   def create
     result = CourtAuctionSearchService.call(user: current_user)
 
@@ -30,22 +16,17 @@ class SearchResultsController < ApplicationController
         end
       end
       format.turbo_stream do
-        streams = []
         if result.error
-          streams << turbo_stream.update("criteria-search-results",
+          render turbo_stream: turbo_stream.update("criteria-search-results",
             partial: "search_results/inline_error",
             locals: { message: error_message_for(result.error) })
         else
           @search_results = current_user.search_results.order(created_at: :desc)
           @user_property_case_numbers = current_user.properties.pluck(:case_number)
-          streams << turbo_stream.update("criteria-search-results",
+          render turbo_stream: turbo_stream.update("criteria-search-results",
             partial: "search_results/inline_results",
             locals: { search_results: @search_results, user_property_case_numbers: @user_property_case_numbers })
         end
-        streams << turbo_stream.update("criteria-debug-popup",
-          partial: "search_results/criteria_debug_popup",
-          locals: { criteria: result.criteria, count: result.count, error: result.error })
-        render turbo_stream: streams
       end
     end
   end

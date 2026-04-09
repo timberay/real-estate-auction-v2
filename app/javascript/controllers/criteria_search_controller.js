@@ -2,24 +2,10 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["caseInput", "addButton", "resultsContainer",
-                     "searchButton", "searchButtonText", "searchButtonSpinner"]
+  static targets = ["submitButton", "buttonText", "buttonSpinner", "caseInput", "addButton", "resultsContainer"]
 
-  startSearch() {
-    if (this.hasSearchButtonTarget) {
-      this.searchButtonTarget.disabled = true
-      this.searchButtonTarget.classList.add("opacity-50", "cursor-not-allowed")
-    }
-    if (this.hasSearchButtonTextTarget) this.searchButtonTextTarget.classList.add("hidden")
-    if (this.hasSearchButtonSpinnerTarget) this.searchButtonSpinnerTarget.classList.remove("hidden")
-    if (this.hasCaseInputTarget) this.caseInputTarget.disabled = true
-    if (this.hasAddButtonTarget) this.addButtonTarget.disabled = true
-  }
-
-  enable() {
-    this.closeDebug()
-    if (this.hasCaseInputTarget) this.caseInputTarget.disabled = false
-    if (this.hasAddButtonTarget) this.addButtonTarget.disabled = false
+  submit() {
+    this.disable()
   }
 
   closeResults() {
@@ -28,12 +14,25 @@ export default class extends Controller {
     }
   }
 
-  closeDebug() {
-    const popup = document.getElementById("criteria-debug-popup")
-    if (popup) popup.innerHTML = ""
+  disable() {
+    if (this.hasSubmitButtonTarget) {
+      this.submitButtonTarget.disabled = true
+      this.submitButtonTarget.classList.add("opacity-50", "cursor-not-allowed")
+    }
+    if (this.hasButtonTextTarget) this.buttonTextTarget.classList.add("hidden")
+    if (this.hasButtonSpinnerTarget) this.buttonSpinnerTarget.classList.remove("hidden")
+    if (this.hasCaseInputTarget) this.caseInputTarget.disabled = true
+    if (this.hasAddButtonTarget) this.addButtonTarget.disabled = true
   }
 
-  stopPropagation(event) {
-    event.stopPropagation()
+  enable() {
+    if (this.hasSubmitButtonTarget) {
+      this.submitButtonTarget.disabled = false
+      this.submitButtonTarget.classList.remove("opacity-50", "cursor-not-allowed")
+    }
+    if (this.hasButtonTextTarget) this.buttonTextTarget.classList.remove("hidden")
+    if (this.hasButtonSpinnerTarget) this.buttonSpinnerTarget.classList.add("hidden")
+    if (this.hasCaseInputTarget) this.caseInputTarget.disabled = false
+    if (this.hasAddButtonTarget) this.addButtonTarget.disabled = false
   }
 }
