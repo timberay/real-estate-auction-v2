@@ -3,7 +3,7 @@ module CourtAuction
     SEARCH_URL = "https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml"
     API_ENDPOINT = "pgjsearch/searchControllerMain.on"
     DETAIL_API_ENDPOINT = "pgj15B/selectAuctnCsSrchRslt.on"
-    DEFAULT_TIMEOUT = ENV.fetch("BROWSER_TIMEOUT", 60).to_i
+    DEFAULT_TIMEOUT = ENV.fetch("BROWSER_TIMEOUT", 90).to_i
     PAGE_LOAD_WAIT = 3
 
     # WebSquare element IDs

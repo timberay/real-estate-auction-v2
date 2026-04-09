@@ -49,6 +49,9 @@
 
     <%# Criteria search results appear here via Turbo Stream %>
     <div data-criteria-search-target="resultsContainer" id="criteria-search-results"></div>
+
+    <%# Debug popup for search criteria %>
+    <div id="criteria-debug-popup"></div>
   </div>
 
   <% if @user_properties.any? || params[:safety_rating].present? || params[:search].present? || params[:within_budget].present? %>

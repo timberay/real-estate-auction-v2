@@ -14,6 +14,15 @@ export default class extends Controller {
     }
   }
 
+  closeDebug() {
+    const popup = document.getElementById("criteria-debug-popup")
+    if (popup) popup.innerHTML = ""
+  }
+
+  stopPropagation(event) {
+    event.stopPropagation()
+  }
+
   disable() {
     if (this.hasSubmitButtonTarget) {
       this.submitButtonTarget.disabled = true

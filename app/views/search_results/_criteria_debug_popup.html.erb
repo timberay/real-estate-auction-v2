@@ -1,0 +1,35 @@
+<%# app/views/search_results/_criteria_debug_popup.html.erb %>
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" data-action="click->criteria-search#closeDebug">
+  <div class="bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 p-5 max-w-sm w-full mx-4" data-action="click->criteria-search#stopPropagation">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">검색 조건 (Debug)</h3>
+      <button type="button" data-action="click->criteria-search#closeDebug"
+              class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg leading-none">&times;</button>
+    </div>
+    <dl class="space-y-2 text-sm">
+      <div class="flex justify-between">
+        <dt class="text-slate-500 dark:text-slate-400">지역</dt>
+        <dd class="font-medium text-slate-900 dark:text-slate-100"><%= criteria[:region] %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-slate-500 dark:text-slate-400">연도</dt>
+        <dd class="font-medium text-slate-900 dark:text-slate-100"><%= criteria[:year] %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-slate-500 dark:text-slate-400">최소 금액</dt>
+        <dd class="font-medium text-slate-900 dark:text-slate-100"><%= format_price_won(criteria[:min_price]) %></dd>
+      </div>
+      <div class="flex justify-between">
+        <dt class="text-slate-500 dark:text-slate-400">최대 금액</dt>
+        <dd class="font-medium text-slate-900 dark:text-slate-100"><%= format_price_won(criteria[:max_price]) %></dd>
+      </div>
+      <hr class="border-slate-200 dark:border-slate-700">
+      <div class="flex justify-between">
+        <dt class="text-slate-500 dark:text-slate-400">결과</dt>
+        <dd class="font-medium <%= error ? 'text-red-500' : 'text-green-500' %>">
+          <%= error ? "에러: #{error.message}" : "#{count}건" %>
+        </dd>
+      </div>
+    </dl>
+  </div>
+</div>

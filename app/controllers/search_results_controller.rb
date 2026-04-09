@@ -16,17 +16,22 @@ class SearchResultsController < ApplicationController
         end
       end
       format.turbo_stream do
+        streams = []
         if result.error
-          render turbo_stream: turbo_stream.update("criteria-search-results",
+          streams << turbo_stream.update("criteria-search-results",
             partial: "search_results/inline_error",
             locals: { message: error_message_for(result.error) })
         else
           @search_results = current_user.search_results.order(created_at: :desc)
           @user_property_case_numbers = current_user.properties.pluck(:case_number)
-          render turbo_stream: turbo_stream.update("criteria-search-results",
+          streams << turbo_stream.update("criteria-search-results",
             partial: "search_results/inline_results",
             locals: { search_results: @search_results, user_property_case_numbers: @user_property_case_numbers })
         end
+        streams << turbo_stream.update("criteria-debug-popup",
+          partial: "search_results/criteria_debug_popup",
+          locals: { criteria: result.criteria, count: result.count, error: result.error })
+        render turbo_stream: streams
       end
     end
   end

@@ -1,5 +1,5 @@
 class CourtAuctionSearchService
-  Result = Data.define(:count, :error)
+  Result = Data.define(:count, :error, :criteria)
 
   def self.call(user:)
     new(user:).call
@@ -16,19 +16,16 @@ class CourtAuctionSearchService
     year = Time.current.year.to_s
     max_price = bs&.max_price_option || BudgetSetting::DEFAULT_MAX_PRICE
 
+    criteria = { region: region, year: year, min_price: 50_000_000, max_price: max_price }
+
     adapter = GovernmentCourtAuctionAdapter.new
-    response = adapter.search_by_criteria(
-      region: region,
-      year: year,
-      min_price: 50_000_000,
-      max_price: max_price
-    )
+    response = adapter.search_by_criteria(**criteria)
 
     persist_results(response[:items])
 
-    Result.new(count: response[:total], error: nil)
+    Result.new(count: response[:total], error: nil, criteria: criteria)
   rescue DataProvider::Error => e
-    Result.new(count: 0, error: e)
+    Result.new(count: 0, error: e, criteria: criteria)
   end
 
   private
