@@ -14,9 +14,17 @@ export default class extends Controller {
     this.showSpinner("buttonText", "buttonSpinner")
   }
 
-  // Case number form submit
+  // Case number form submit — use readOnly instead of disabled so value is submitted
   submitCaseNumber() {
-    this.disableAll()
+    if (this.hasCaseInputTarget) this.caseInputTarget.readOnly = true
+    if (this.hasSubmitButtonTarget) {
+      this.submitButtonTarget.disabled = true
+      this.submitButtonTarget.classList.add("opacity-50", "cursor-not-allowed")
+    }
+    if (this.hasAddButtonTarget) {
+      this.addButtonTarget.disabled = true
+      this.addButtonTarget.classList.add("opacity-50", "cursor-not-allowed")
+    }
     this.showSpinner("addButtonText", "addButtonSpinner")
   }
 
@@ -27,7 +35,10 @@ export default class extends Controller {
     }
     this.hideSpinner("buttonText", "buttonSpinner")
     this.hideSpinner("addButtonText", "addButtonSpinner")
-    if (this.hasCaseInputTarget) this.caseInputTarget.disabled = false
+    if (this.hasCaseInputTarget) {
+      this.caseInputTarget.disabled = false
+      this.caseInputTarget.readOnly = false
+    }
     if (this.hasAddButtonTarget) {
       this.addButtonTarget.disabled = false
       this.addButtonTarget.classList.remove("opacity-50", "cursor-not-allowed")
