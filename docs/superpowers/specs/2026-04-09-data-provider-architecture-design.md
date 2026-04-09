@@ -454,6 +454,8 @@ module DataProvider
   # Scraping-specific
   class ConsentRequiredError < Error; end     # User hasn't opted in
   class SiteStructureChangedError < Error; end # Scraping target changed
+  class CaptchaError < Error; end             # Anti-bot CAPTCHA detected
+  class IpBlockedError < Error; end           # IP blocked by target site
 end
 ```
 
@@ -709,6 +711,7 @@ This spec defines the shared infrastructure. Each data source gets its own spec 
 - **Category**: `:auction`
 - **Key concerns**: Playwright-based scraping strategy, site structure change detection, consent UX, rate limiting/politeness, `fetch_data` return schema
 - **Adapter**: `GovernmentCourtAuctionAdapter`
+- **Must address**: CAPTCHA detection and graceful failure (present known CAPTCHA element selectors → raise `DataProvider::CaptchaError`), IP blocking detection and mitigation (exponential backoff, user notification), anti-bot countermeasures, session/cookie management for multi-page navigation
 
 ### Spec 2: DataGoKr Building Ledger API
 - **Provider**: `data_go_kr`
@@ -729,6 +732,7 @@ This spec defines the shared infrastructure. Each data source gets its own spec 
 - **Key concerns**: Free tier (1,000 calls/day), summary-only data (no 을구/갑구 details), use as preview before paid full retrieval
 - **Adapter**: `IrosRegistryPreviewAdapter`
 - **Note**: Cannot replace full 등기부등본. Useful for showing basic ownership info and flagging whether a paid lookup is needed.
+- **Must address**: Preview-to-paid upgrade UX flow — when iros preview shows concerning data (e.g., multiple rights entries), the UI should display a CTA: "전문 등기부등본 조회" with cost confirmation dialog ("이 조회는 건당 과금이 발생합니다. 진행하시겠습니까?"). This requires a `registry_preview` → `registry` category handoff pattern in the property detail view.
 
 ### Spec 5: Hyphen Rights Analysis API
 - **Provider**: `hyphen`
@@ -893,6 +897,25 @@ Individual scraper spec must also define:
 - Maximum pages per session: 50
 - Browser context reuse within a session
 
+### Response Validation
+
+All adapters must validate API responses before returning data. This catches subtle schema drift that wouldn't raise a `ParseError`:
+
+```ruby
+# Each adapter defines required fields for its response
+REQUIRED_FIELDS = %i[case_number court_name address appraisal_price].freeze
+
+def validate_response!(data)
+  missing = REQUIRED_FIELDS.select { |f| data[f].blank? }
+  if missing.any?
+    raise DataProvider::ParseError,
+      "Missing required fields: #{missing.join(', ')} for #{self.class.name}"
+  end
+end
+```
+
+Individual source specs must define their `REQUIRED_FIELDS` list. The common rule: **if a downstream service (rights analysis, budget calculation) depends on a field, it is required.**
+
 ### Korean Government API Quirks
 
 Individual source specs should handle these common patterns:
@@ -1051,6 +1074,17 @@ end
 ```
 
 This ensures the Settings UI reflects actual credential health, not just last manual verification.
+
+### Mid-Session Key Expiry
+
+When an API key fails at runtime (not during verification), the user needs immediate feedback:
+
+1. Adapter raises `InvalidCredentialError` → controller `rescue_from` shows flash alert
+2. Credential status is updated to `:invalid` in the DB (via `update_credential_status` above)
+3. If the user is on a property detail page (Turbo Frame), the error renders inline within the failing section — other sections remain intact (partial data pattern)
+4. Settings page reflects the new status on next visit
+
+**Distinguishing expiry vs. invalid**: Most Korean APIs don't differentiate — both return 401. The system treats both as `InvalidCredentialError` with the same user action: "API 키를 확인해주세요." If a provider's documentation specifies distinct error codes for expiry, the individual adapter can raise `ExpiredCredentialError` instead.
 
 ---
 
