@@ -1,6 +1,6 @@
 class CourtAuctionAdapter
-  def self.for
-    if ENV["USE_MOCK"] == "false"
+  def self.for(config = {})
+    if config[:adapter] == :real
       GovernmentCourtAuctionAdapter.new
     else
       MockCourtAuctionAdapter.new

@@ -1,7 +1,7 @@
 class RegistryTranscriptAdapter
-  def self.for
-    if ENV["USE_MOCK"] == "false"
-      raise NotImplementedError, "Real registry transcript adapter not yet implemented"
+  def self.for(config = {})
+    if config[:adapter] == :real
+      MockRegistryTranscriptAdapter.new  # Real adapters defined in individual source specs
     else
       MockRegistryTranscriptAdapter.new
     end

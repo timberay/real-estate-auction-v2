@@ -1,6 +1,6 @@
 class LoanPolicyAdapter
-  def self.for
-    if ENV["USE_MOCK"] == "false"
+  def self.for(config = {})
+    if config[:adapter] == :real
       GovernmentLoanPolicyAdapter.new
     else
       MockLoanPolicyAdapter.new

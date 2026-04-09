@@ -1,7 +1,7 @@
 class BuildingLedgerAdapter
-  def self.for
-    if ENV["USE_MOCK"] == "false"
-      GovernmentBuildingLedgerAdapter.new
+  def self.for(config = {})
+    if config[:adapter] == :real
+      GovernmentBuildingLedgerAdapter.new(api_key: config[:api_key])
     else
       MockBuildingLedgerAdapter.new
     end

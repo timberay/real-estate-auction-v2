@@ -6,12 +6,9 @@ class CourtAuctionAdapterTest < ActiveSupport::TestCase
     assert_instance_of MockCourtAuctionAdapter, adapter
   end
 
-  test ".for returns GovernmentCourtAuctionAdapter when USE_MOCK is false" do
-    ENV["USE_MOCK"] = "false"
-    adapter = CourtAuctionAdapter.for
+  test ".for returns GovernmentCourtAuctionAdapter when adapter is :real" do
+    adapter = CourtAuctionAdapter.for(adapter: :real)
     assert_instance_of GovernmentCourtAuctionAdapter, adapter
-  ensure
-    ENV.delete("USE_MOCK")
   end
 
   test "mock adapter returns data for known case_number" do
