@@ -7,6 +7,27 @@ class BudgetSetting < ApplicationRecord
   validates :available_cash, numericality: { greater_than: 0 }, allow_nil: true
   validates :loan_ratio, numericality: { greater_than: 0, less_than_or_equal_to: 1 }, allow_nil: true
   RESERVE_FIELDS = %i[repair_cost acquisition_tax scrivener_fee moving_cost maintenance_fee].freeze
+  REGIONS = [
+    "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시",
+    "대전광역시", "울산광역시", "세종특별자치시", "경기도", "강원도",
+    "충청북도", "충청남도", "전라북도", "전라남도", "경상북도",
+    "경상남도", "제주특별자치도", "강원특별자치도", "전북특별자치도"
+  ].freeze
+
+  DEFAULT_REGION = "제주특별자치도"
+
+  PRICE_OPTIONS = [
+    10_000_000, 50_000_000, 100_000_000, 150_000_000,
+    200_000_000, 250_000_000, 300_000_000, 350_000_000,
+    400_000_000, 450_000_000, 500_000_000, 550_000_000,
+    600_000_000, 650_000_000, 700_000_000, 750_000_000,
+    800_000_000, 850_000_000, 900_000_000, 950_000_000,
+    1_000_000_000
+  ].freeze
+
+  DEFAULT_MAX_PRICE = 500_000_000
+
+  validates :region, inclusion: { in: REGIONS }, allow_nil: true
   AREA_CATEGORIES = [
     { key: "small",     label: "소형 (10~15평 / ~40㎡)",     min_sqm: 0,   max_sqm: 40 },
     { key: "mid_small", label: "중소형 (20~25평 / 40~60㎡)", min_sqm: 40,  max_sqm: 60 },
@@ -45,5 +66,15 @@ class BudgetSetting < ApplicationRecord
 
   def total_reserves
     RESERVE_FIELDS.sum { |field| public_send(field).to_i }
+  end
+
+  def max_price_option
+    return DEFAULT_MAX_PRICE unless max_bid_amount
+    target = max_bid_amount * 10_000
+    PRICE_OPTIONS.find { |v| v >= target } || PRICE_OPTIONS.last
+  end
+
+  def effective_region
+    region.presence || DEFAULT_REGION
   end
 end

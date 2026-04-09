@@ -7,6 +7,7 @@ class User < ApplicationRecord
   has_many :inspection_results, dependent: :destroy
   has_many :rights_analysis_reports, dependent: :destroy
   has_many :api_credentials, dependent: :destroy
+  has_many :search_results, dependent: :destroy
   validates :email, presence: true, uniqueness: true
 
   # -- Search preference convenience methods --

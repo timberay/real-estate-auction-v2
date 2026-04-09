@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_09_100001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_09_114224) do
   create_table "api_credentials", force: :cascade do |t|
     t.string "api_key"
     t.string "api_secret"
@@ -64,6 +64,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_100001) do
     t.integer "max_bid_amount"
     t.integer "moving_cost"
     t.integer "property_type_id"
+    t.string "region", default: "제주특별자치도"
     t.integer "repair_cost"
     t.integer "scrivener_fee"
     t.datetime "updated_at", null: false
@@ -265,6 +266,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_100001) do
     t.index ["user_id"], name: "index_rights_analysis_reports_on_user_id"
   end
 
+  create_table "search_results", force: :cascade do |t|
+    t.string "address"
+    t.integer "appraisal_price"
+    t.string "auction_date"
+    t.string "case_number", null: false
+    t.string "court_name"
+    t.datetime "created_at", null: false
+    t.integer "failed_bid_count"
+    t.integer "min_bid_price"
+    t.string "property_type"
+    t.string "remarks"
+    t.string "status"
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id", "case_number"], name: "index_search_results_on_user_id_and_case_number", unique: true
+    t.index ["user_id"], name: "index_search_results_on_user_id"
+  end
+
   create_table "user_properties", force: :cascade do |t|
     t.datetime "analyzed_at"
     t.datetime "created_at", null: false
@@ -302,6 +321,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_100001) do
   add_foreign_key "reserve_fund_defaults", "property_types"
   add_foreign_key "rights_analysis_reports", "properties"
   add_foreign_key "rights_analysis_reports", "users"
+  add_foreign_key "search_results", "users"
   add_foreign_key "user_properties", "properties"
   add_foreign_key "user_properties", "users"
 end
