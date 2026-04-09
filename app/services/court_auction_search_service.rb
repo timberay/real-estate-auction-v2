@@ -38,10 +38,9 @@ class CourtAuctionSearchService
   def persist_results(items)
     @user.search_results.destroy_all
 
-    single_items = exclude_multi_property_cases(items)
-    Rails.logger.info "[CourtAuctionSearch] Before filter: #{items.size}, after filter: #{single_items.size}"
+    deduplicated = deduplicate_by_case_number(items)
 
-    single_items.each do |item|
+    deduplicated.each do |item, property_count|
       @user.search_results.create!(
         case_number: item["srnSaNo"],
         court_name: item["jiwonNm"],
@@ -52,19 +51,16 @@ class CourtAuctionSearchService
         status: item["mulJinYn"] == "Y" ? "진행중" : "종결",
         failed_bid_count: item["yuchalCnt"].to_i,
         auction_date: item["maeGiil"],
-        remarks: item["mulBigo"]
+        remarks: item["mulBigo"],
+        property_count: property_count
       )
     end
 
-    single_items.size
+    deduplicated.size
   end
 
-  def exclude_multi_property_cases(items)
+  def deduplicate_by_case_number(items)
     grouped = items.group_by { |i| i["srnSaNo"] }
-    multi = grouped.select { |_, v| v.size > 1 }
-    if multi.any?
-      Rails.logger.info "[CourtAuctionSearch] Excluded multi-property cases: #{multi.keys.join(', ')} (#{multi.values.sum(&:size)} items)"
-    end
-    grouped.select { |_, v| v.size == 1 }.values.flatten
+    grouped.map { |_, group| [ group.first, group.size ] }
   end
 end

@@ -111,7 +111,7 @@ class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end
 
-  test "excludes case numbers with multiple properties" do
+  test "deduplicates multi-property cases and records property_count" do
     mock_response = {
       items: [
         { "srnSaNo" => "2024타경1000", "printSt" => "주소A", "mulJinYn" => "Y" },
@@ -129,8 +129,11 @@ class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
 
     CourtAuctionSearchService.call(user: @user)
 
-    assert_equal 1, @user.search_results.count
-    assert_equal "2024타경2000", @user.search_results.first.case_number
+    assert_equal 2, @user.search_results.count
+    multi = @user.search_results.find_by(case_number: "2024타경1000")
+    single = @user.search_results.find_by(case_number: "2024타경2000")
+    assert_equal 2, multi.property_count
+    assert_equal 1, single.property_count
   ensure
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end

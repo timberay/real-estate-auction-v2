@@ -7,6 +7,9 @@
       <span class="text-sm font-semibold text-green-500">
         <%= search_result.case_number %>
         <span class="font-normal text-xs">✓ 추가됨</span>
+        <% if search_result.property_count > 1 %>
+          <span class="inline-flex items-center rounded bg-amber-900/30 px-1.5 py-0.5 text-xs font-medium text-amber-400">다물건 <%= search_result.property_count %>건</span>
+        <% end %>
       </span>
       <span class="text-xs text-slate-400">감정가 <strong class="text-slate-200 dark:text-slate-200"><%= format_price_won(search_result.appraisal_price) %></strong></span>
     </div>
@@ -18,7 +21,12 @@
     <%= form_with url: inline_import_search_result_path(search_result), method: :post, data: { turbo_stream: true } do %>
       <button type="submit" class="w-full text-left">
         <div class="flex items-center justify-between">
-          <span class="text-sm font-semibold text-violet-400"><%= search_result.case_number %></span>
+          <span class="text-sm font-semibold text-violet-400">
+            <%= search_result.case_number %>
+            <% if search_result.property_count > 1 %>
+              <span class="inline-flex items-center rounded bg-amber-900/30 px-1.5 py-0.5 text-xs font-medium text-amber-400">다물건 <%= search_result.property_count %>건</span>
+            <% end %>
+          </span>
           <span class="text-xs text-slate-400">감정가 <strong class="text-slate-200 dark:text-slate-200"><%= format_price_won(search_result.appraisal_price) %></strong></span>
         </div>
         <div class="mt-1.5">

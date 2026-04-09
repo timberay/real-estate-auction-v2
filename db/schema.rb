@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_09_114224) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_09_131950) do
   create_table "api_credentials", force: :cascade do |t|
     t.string "api_key"
     t.string "api_secret"
@@ -275,6 +275,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_09_114224) do
     t.datetime "created_at", null: false
     t.integer "failed_bid_count"
     t.integer "min_bid_price"
+    t.integer "property_count", default: 1, null: false
     t.string "property_type"
     t.string "remarks"
     t.string "status"
