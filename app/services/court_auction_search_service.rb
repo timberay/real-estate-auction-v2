@@ -24,9 +24,11 @@ class CourtAuctionSearchService
       max_price: max_price
     )
 
-    persist_results(response[:items])
+    saved_count = persist_results(response[:items])
 
-    Result.new(count: response[:total], error: nil)
+    Rails.logger.info "[CourtAuctionSearch] API total=#{response[:total]}, items=#{response[:items].size}, saved=#{saved_count}"
+
+    Result.new(count: saved_count, error: nil)
   rescue DataProvider::Error => e
     Result.new(count: 0, error: e)
   end
@@ -37,6 +39,7 @@ class CourtAuctionSearchService
     @user.search_results.destroy_all
 
     single_items = exclude_multi_property_cases(items)
+    Rails.logger.info "[CourtAuctionSearch] Before filter: #{items.size}, after filter: #{single_items.size}"
 
     single_items.each do |item|
       @user.search_results.create!(
@@ -52,10 +55,16 @@ class CourtAuctionSearchService
         remarks: item["mulBigo"]
       )
     end
+
+    single_items.size
   end
 
   def exclude_multi_property_cases(items)
-    counts = items.group_by { |i| i["srnSaNo"] }
-    counts.select { |_, v| v.size == 1 }.values.flatten
+    grouped = items.group_by { |i| i["srnSaNo"] }
+    multi = grouped.select { |_, v| v.size > 1 }
+    if multi.any?
+      Rails.logger.info "[CourtAuctionSearch] Excluded multi-property cases: #{multi.keys.join(', ')} (#{multi.values.sum(&:size)} items)"
+    end
+    grouped.select { |_, v| v.size == 1 }.values.flatten
   end
 end
