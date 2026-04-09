@@ -1,0 +1,41 @@
+{
+  "status": 200,
+  "message": "검색 결과가 조회되었습니다.",
+  "data": {
+    "dma_pageInfo": {
+      "totalCnt": "1",
+      "groupTotalCount": 1
+    },
+    "dlt_srchResult": [
+      {
+        "srnSaNo": "2026타경10001",
+        "jiwonNm": "서울중앙지방법원",
+        "dspslUsgNm": "아파트",
+        "printSt": "서울특별시 강남구 역삼동 100-1 테스트아파트 101동 1001호",
+        "gamevalAmt": "800000000",
+        "minmaePrice": "560000000",
+        "mulBigo": "일괄매각",
+        "yuchalCnt": "2",
+        "mokGbncd": "00",
+        "spJogCd": "",
+        "inqCnt": "45",
+        "boCd": "B001001",
+        "saNo": "20260130100011",
+        "maemulSer": "1",
+        "mokmulSer": "1",
+        "jpDeptCd": "1011",
+        "jpDeptNm": "경매11계",
+        "jinstatCd": "0002100001",
+        "mulStatcd": "01",
+        "mulJinYn": "Y",
+        "maeGiil": "20260501",
+        "maePlace": "경매법정4별관211호",
+        "hjguSido": "서울특별시",
+        "hjguSigu": "강남구",
+        "hjguDong": "역삼동",
+        "wgs84Xcordi": "127.0365",
+        "wgs84Ycordi": "37.5012"
+      }
+    ]
+  }
+}
