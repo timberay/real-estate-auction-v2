@@ -135,7 +135,7 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     assert_match "추가됨", response.body
   end
 
-  test "POST inline_import shows error when sync fails" do
+  test "POST inline_import falls back to search result data when detail fetch fails" do
     sr = @user.search_results.create!(
       case_number: "2026타경88888",
       address: "서울특별시",
@@ -145,18 +145,21 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
 
     error_adapter = Object.new
     error_adapter.define_singleton_method(:fetch_data_with_detail) do |case_number:|
-      raise DataProvider::TimeoutError, "timed out"
+      raise DataProvider::DataNotFoundError, "not found"
     end
 
     original_new = GovernmentCourtAuctionAdapter.method(:new)
     GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| error_adapter }
 
-    assert_no_difference "UserProperty.count" do
+    assert_difference [ "Property.count", "UserProperty.count" ], 1 do
       post inline_import_search_result_url(sr), as: :turbo_stream
     end
     assert_response :success
-    assert_includes response.content_type, "text/vnd.turbo-stream.html"
-    assert_match "시간이 초과", response.body
+    assert_match "추가됨", response.body
+
+    property = Property.find_by(case_number: "2026타경88888")
+    assert_equal "서울특별시", property.address
+    assert_equal 200_000_000, property.appraisal_price
   ensure
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end

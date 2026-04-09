@@ -33,7 +33,7 @@ class SearchResultsController < ApplicationController
 
   def import
     search_result = current_user.search_results.find(params[:id])
-    import_result = perform_import(search_result.case_number)
+    import_result = perform_import(search_result)
 
     if import_result[:success]
       redirect_to properties_path, notice: "물건이 내 목록에 추가되었습니다."
@@ -44,7 +44,7 @@ class SearchResultsController < ApplicationController
 
   def inline_import
     search_result = current_user.search_results.find(params[:id])
-    import_result = perform_import(search_result.case_number)
+    import_result = perform_import(search_result)
 
     if import_result[:success]
       render turbo_stream: turbo_stream.replace(
@@ -61,7 +61,9 @@ class SearchResultsController < ApplicationController
 
   private
 
-  def perform_import(case_number)
+  def perform_import(search_result)
+    case_number = search_result.case_number
+
     property = Property.find_by(case_number: case_number)
     if property
       current_user.user_properties.find_or_create_by!(property: property)
@@ -73,10 +75,23 @@ class SearchResultsController < ApplicationController
       current_user.user_properties.create!(property: result.property)
       { success: true }
     else
-      error = result.errors[:court]
-      Rails.logger.error "[InlineImport] Failed for #{case_number}: #{error.class} - #{error&.message}"
-      { success: false, error: error }
+      Rails.logger.warn "[InlineImport] Detail fetch failed for #{case_number}, creating from search data"
+      property = create_property_from_search_result(search_result)
+      current_user.user_properties.create!(property: property)
+      { success: true }
     end
+  end
+
+  def create_property_from_search_result(search_result)
+    Property.create!(
+      case_number: search_result.case_number,
+      address: search_result.address,
+      appraisal_price: search_result.appraisal_price,
+      min_bid_price: search_result.min_bid_price,
+      property_type: search_result.property_type,
+      status: search_result.status,
+      failed_bid_count: search_result.failed_bid_count
+    )
   end
 
   def error_message_for(error)
