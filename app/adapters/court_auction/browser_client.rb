@@ -1,204 +1,202 @@
 module CourtAuction
   class BrowserClient
-    SEARCH_URL = "https://www.courtauction.go.kr/pgj/index.on"
-    DETAIL_SEARCH_URL = "https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml"
-    API_ENDPOINT = "/pgj/pgjsearch/searchControllerMain.on"
-    DETAIL_API_ENDPOINT = "/pgj/pgj15B/selectAuctnCsSrchRslt.on"
-    DEFAULT_TIMEOUT = ENV.fetch("BROWSER_TIMEOUT", 30).to_i
+    SEARCH_URL = "https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml"
+    API_ENDPOINT = "pgjsearch/searchControllerMain.on"
+    DETAIL_API_ENDPOINT = "pgj15B/selectAuctnCsSrchRslt.on"
+    DEFAULT_TIMEOUT = ENV.fetch("BROWSER_TIMEOUT", 60).to_i
+    PAGE_LOAD_WAIT = 3
+
+    # WebSquare element IDs
+    YEAR_SELECT = "mf_wfm_mainFrame_sbx_rletCsYear"
+    CASE_NUMBER_INPUT = "mf_wfm_mainFrame_ibx_rletCsNo"
+    REGION_RADIO = "mf_wfm_mainFrame_rad_rletSrchBtn_input_2"
+    REGION_SELECT = "mf_wfm_mainFrame_sbx_rletAdongSdR"
+    USAGE_LARGE_SELECT = "mf_wfm_mainFrame_sbx_rletLclLst"
+    USAGE_MID_SELECT = "mf_wfm_mainFrame_sbx_rletMclLst"
+    MIN_PRICE_SELECT = "mf_wfm_mainFrame_sbx_rletLwsDspslMin"
+    MAX_PRICE_SELECT = "mf_wfm_mainFrame_sbx_rletLwsDspslMax"
+    SEARCH_BUTTON = "mf_wfm_mainFrame_btn_gdsDtlSrch"
 
     def initialize(timeout: DEFAULT_TIMEOUT)
       @timeout = timeout
     end
 
-    def fetch(year:, type:, number:)
+    def fetch_with_detail(year:, type:, number:)
       with_browser do |page|
-        setup_response_listener(page, API_ENDPOINT)
+        navigate_to_search(page)
+        fill_case_number(page, year: year, number: number)
+        search_data = click_search_and_capture(page)
 
-        page.go_to(SEARCH_URL)
-        submit_search(page, year: year, type: type, number: number)
-        wait_for_api_response(page)
+        items = search_data.dig("data", "dlt_srchResult") || []
+        match = find_matching_item(items, year: year, type: type, number: number)
+        raise DataProvider::DataNotFoundError, "Case #{year}#{type}#{number} not found" unless match
 
-        body = extract_api_response_body(page, API_ENDPOINT)
-        JSON.parse(body)
+        detail_data = click_result_and_capture_detail(page, match)
+
+        { "search" => search_data, "detail" => detail_data }
       end
     end
 
-    def fetch_with_detail(year:, type:, number:)
+    def search_by_criteria(region:, year:, min_price:, max_price:)
       with_browser do |page|
-        # Step 1: Navigate to detail search page and search by case number
-        page.go_to(DETAIL_SEARCH_URL)
-        sleep 1
+        navigate_to_search(page)
+        fill_criteria(page, region: region, year: year, min_price: min_price, max_price: max_price)
+        search_data = click_search_and_capture(page)
 
-        submit_detail_search(page, year: year, number: number)
-        setup_response_listener(page, API_ENDPOINT)
-        click_search_button(page)
-        wait_for_api_response(page)
+        items = search_data.dig("data", "dlt_srchResult") || []
+        total = search_data.dig("data", "dma_pageInfo", "totalCnt").to_i
 
-        search_body = extract_api_response_body(page, API_ENDPOINT)
-        search_data = JSON.parse(search_body)
-
-        # Step 2: Click the first result to load detail page
-        @api_response_received = false
-        setup_response_listener(page, DETAIL_API_ENDPOINT)
-        click_first_result(page)
-        wait_for_api_response(page)
-
-        detail_body = extract_api_response_body(page, DETAIL_API_ENDPOINT)
-        detail_data = JSON.parse(detail_body)
-
-        { "search" => search_data, "detail" => detail_data }
+        { items: items, total: total }
       end
     end
 
     private
 
     def with_browser
+      playwright = nil
       browser = nil
       begin
-        browser = create_browser
-        page = browser.create_page
+        playwright = Playwright.create(playwright_cli_executable_path: find_playwright_cli)
+        browser = playwright.chromium.launch(headless: true)
+        page = browser.new_page
         yield(page)
-      rescue Ferrum::TimeoutError, Ferrum::ProcessTimeoutError => e
+      rescue Playwright::TimeoutError => e
         raise DataProvider::TimeoutError, "Court auction browser timeout: #{e.message}"
-      rescue Ferrum::StatusError => e
-        raise DataProvider::ServiceUnavailableError, "Court auction site unreachable: #{e.message}"
       rescue JSON::ParserError => e
         raise DataProvider::ParseError, "Invalid JSON from court auction API: #{e.message}"
       ensure
-        browser&.quit
+        browser&.close
+        playwright&.stop
       end
     end
 
-    def create_browser
-      Ferrum::Browser.new(
-        headless: true,
-        timeout: @timeout,
-        browser_path: ENV["BROWSER_PATH"],
-        process_timeout: 10,
-        window_size: [ 1280, 720 ]
-      )
-    rescue Ferrum::BinaryNotFoundError => e
-      raise DataProvider::ConfigurationError,
-        "Chromium not installed: #{e.message}"
+    def find_playwright_cli
+      ENV["PLAYWRIGHT_CLI_PATH"] || "npx playwright"
     end
 
-    def setup_response_listener(page, endpoint)
-      @api_response_received = false
+    def navigate_to_search(page)
+      page.goto(SEARCH_URL, wait_until: "networkidle", timeout: @timeout * 1000)
+      page.wait_for_timeout(PAGE_LOAD_WAIT * 1000)
+    rescue Playwright::Error => e
+      raise DataProvider::ServiceUnavailableError, "Court auction site unreachable: #{e.message}"
+    end
 
-      page.on("Network.responseReceived") do |params|
-        url = params.dig("response", "url") || ""
-        if url.include?(endpoint)
-          @api_response_received = true
+    def fill_case_number(page, year:, number:)
+      set_select_via_js(page, YEAR_SELECT, year.to_s)
+      raw_number = number.to_s.gsub(/\A0+/, "")
+      page.fill("##{CASE_NUMBER_INPUT}", raw_number)
+      page.wait_for_timeout(500)
+    end
+
+    def fill_criteria(page, region:, year:, min_price:, max_price:)
+      # 1. Click "소재지(새주소)" radio
+      page.click("##{REGION_RADIO}")
+      page.wait_for_timeout(500)
+
+      # 2. Set region via DOM dispatchEvent (for cascade)
+      set_select_via_dom(page, REGION_SELECT, region)
+      page.wait_for_timeout(500)
+
+      # 3. Set year
+      set_select_via_js(page, YEAR_SELECT, year.to_s)
+
+      # 4. Set usage: 건물 → 주거용건물 (cascade)
+      set_select_via_dom(page, USAGE_LARGE_SELECT, "건물")
+      page.wait_for_timeout(1500) # wait for mid-category options to load
+      set_select_via_dom(page, USAGE_MID_SELECT, "주거용건물")
+      page.wait_for_timeout(300)
+
+      # 5. Set price range
+      set_select_via_dom(page, MIN_PRICE_SELECT, price_label(50_000_000))
+      set_select_via_dom(page, MAX_PRICE_SELECT, price_label(max_price))
+      page.wait_for_timeout(300)
+    end
+
+    def click_search_and_capture(page)
+      response = page.expect_response(
+        ->(resp) { resp.url.include?(API_ENDPOINT) && resp.status == 200 },
+        timeout: @timeout * 1000
+      ) do
+        page.evaluate("WebSquare.util.getComponentById('#{SEARCH_BUTTON}').trigger('onclick');")
+      end
+
+      JSON.parse(response.body)
+    end
+
+    def click_result_and_capture_detail(page, match)
+      address = match["printSt"].to_s
+      keyword = address.split(/\s+/).find { |w| w.length > 2 } || address[0..10]
+
+      page.wait_for_timeout(1000) # let DOM render
+
+      response = page.expect_response(
+        ->(resp) { resp.url.include?(DETAIL_API_ENDPOINT) && resp.status == 200 },
+        timeout: @timeout * 1000
+      ) do
+        page.evaluate(<<~JS)
+          (function() {
+            var keyword = '#{escape_js(keyword)}';
+            var links = document.querySelectorAll('a');
+            for (var i = 0; i < links.length; i++) {
+              var text = (links[i].textContent || '').trim();
+              if (text.indexOf(keyword) >= 0 && text.length > 10) {
+                links[i].click();
+                return;
+              }
+            }
+          })();
+        JS
+      end
+
+      JSON.parse(response.body)
+    end
+
+    def find_matching_item(items, year:, type:, number:)
+      num_str = number.to_s
+      candidates = [
+        "#{year}#{type}#{num_str}",
+        "#{year}#{type}#{num_str.rjust(5, '0')}",
+        "#{year}#{type}#{num_str.gsub(/\A0+/, '')}"
+      ].uniq
+      items.find { |i| candidates.include?(i["srnSaNo"]) }
+    end
+
+    def set_select_via_js(page, element_id, value)
+      page.evaluate("WebSquare.util.getComponentById('#{element_id}').setValue('#{escape_js(value)}');")
+    end
+
+    def set_select_via_dom(page, element_id, value)
+      page.evaluate(<<~JS)
+        (function() {
+          var el = document.getElementById('#{element_id}');
+          if (el) {
+            el.value = '#{escape_js(value)}';
+            el.dispatchEvent(new Event('change', {bubbles: true}));
+          }
+        })();
+      JS
+    end
+
+    def price_label(won)
+      case won
+      when 10_000_000 then "1천만원"
+      when 50_000_000 then "5천만원"
+      when 1_000_000_000 then "10억원"
+      else
+        eok = won / 100_000_000
+        remainder = (won % 100_000_000) / 10_000_000
+        if eok > 0 && remainder > 0
+          "#{eok}억#{remainder}천만원"
+        elsif eok > 0
+          "#{eok}억원"
+        else
+          "#{won / 10_000_000}천만원"
         end
       end
-    end
-
-    def submit_search(page, year:, type:, number:)
-      page.evaluate(<<~JS)
-        (function() {
-          var yearInput = document.querySelector('[name="csYr"], [name="srchCsYr"]');
-          var typeInput = document.querySelector('[name="csCdNm"], [name="srchCsCdNm"]');
-          var numberInput = document.querySelector('[name="csNo"], [name="srchCsNo"]');
-
-          if (yearInput) yearInput.value = '#{escape_js(year.to_s)}';
-          if (typeInput) typeInput.value = '#{escape_js(type.to_s)}';
-          if (numberInput) numberInput.value = '#{escape_js(number.to_s)}';
-
-          var searchBtn = document.querySelector('.btn_search, [onclick*="search"], button[type="submit"]');
-          if (searchBtn) searchBtn.click();
-        })();
-      JS
-    end
-
-    def submit_detail_search(page, year:, number:)
-      page.evaluate(<<~JS)
-        (function() {
-          var yearSelect = document.getElementById('mf_wfm_mainFrame_sbx_rletCsYear');
-          if (yearSelect) {
-            yearSelect.value = '#{escape_js(year.to_s)}';
-            yearSelect.dispatchEvent(new Event('change', {bubbles: true}));
-          }
-          var numInput = document.querySelector('input[id*="rletCsNo"]');
-          if (numInput) {
-            numInput.value = '#{escape_js(number.to_s)}';
-            numInput.dispatchEvent(new Event('input', {bubbles: true}));
-          }
-        })();
-      JS
-      sleep 0.3
-    end
-
-    def click_search_button(page)
-      page.evaluate(<<~JS)
-        (function() {
-          var btns = document.querySelectorAll('input[type="button"]');
-          for (var i = 0; i < btns.length; i++) {
-            if (btns[i].value === '검색' && btns[i].title && btns[i].title.indexOf('물건상세') >= 0) {
-              btns[i].click();
-              return;
-            }
-          }
-        })();
-      JS
-    end
-
-    def click_first_result(page)
-      sleep 1
-      page.evaluate(<<~JS)
-        (function() {
-          var links = document.querySelectorAll('a');
-          for (var i = 0; i < links.length; i++) {
-            var text = links[i].textContent || '';
-            var parent = links[i].closest('td, div');
-            if (parent && parent.className && parent.className.indexOf('printSt') >= 0) {
-              links[i].click();
-              return;
-            }
-          }
-          // Fallback: click first link that looks like an address
-          for (var i = 0; i < links.length; i++) {
-            var text = links[i].textContent || '';
-            if (text.indexOf('시') >= 0 && text.indexOf('구') >= 0 && text.length > 10) {
-              links[i].click();
-              return;
-            }
-          }
-        })();
-      JS
-    end
-
-    def wait_for_api_response(page)
-      start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-
-      loop do
-        return if @api_response_received
-
-        elapsed = Process.clock_gettime(Process::CLOCK_MONOTONIC) - start
-        if elapsed > @timeout
-          raise Ferrum::TimeoutError
-        end
-
-        sleep 0.1
-      end
-    end
-
-    def extract_api_response_body(page, endpoint)
-      page.network.wait_for_idle(duration: 0.5, timeout: 10)
-
-      exchange = page.network.traffic.reverse.find do |e|
-        e.request&.url&.include?(endpoint) && e.response
-      end
-
-      raise DataProvider::DataNotFoundError, "API response not found in network traffic" unless exchange
-
-      body = exchange.response.body
-      raise DataProvider::DataNotFoundError, "Empty API response body" if body.nil? || body.empty?
-
-      body
     end
 
     def escape_js(str)
-      str.gsub("\\") { "\\\\" }.gsub("'") { "\\'" }
+      str.to_s.gsub("\\") { "\\\\" }.gsub("'") { "\\'" }
     end
   end
 end
