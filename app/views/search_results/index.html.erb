@@ -1,0 +1,42 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">경매 물건 검색</h1>
+    <%= form_with url: search_results_path, method: :post do %>
+      <%= render ButtonComponent.new(type: "submit", icon: "magnifying-glass", size: :sm) { "검색 실행" } %>
+    <% end %>
+  </div>
+
+  <% if @search_results.any? %>
+    <p class="text-sm text-slate-500 dark:text-slate-400"><%= @search_results.count %>건</p>
+    <div class="space-y-3">
+      <% @search_results.each do |sr| %>
+        <div class="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex-1 min-w-0">
+              <p class="text-sm font-medium text-slate-900 dark:text-slate-100 truncate"><%= sr.address %></p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <%= sr.case_number %> · <%= sr.court_name %> · <%= sr.property_type %>
+              </p>
+              <div class="flex gap-4 mt-2 text-sm">
+                <span class="text-slate-600 dark:text-slate-300">감정가 <strong class="tabular-nums"><%= number_to_currency(sr.appraisal_price, unit: "", precision: 0) %></strong></span>
+                <span class="text-blue-600 dark:text-blue-400">최저가 <strong class="tabular-nums"><%= number_to_currency(sr.min_bid_price, unit: "", precision: 0) %></strong></span>
+                <% if sr.failed_bid_count.to_i > 0 %>
+                  <span class="text-orange-600 dark:text-orange-400">유찰 <%= sr.failed_bid_count %>회</span>
+                <% end %>
+              </div>
+            </div>
+            <%= form_with url: import_search_result_path(sr), method: :post, class: "shrink-0" do %>
+              <%= render ButtonComponent.new(type: "submit", icon: "plus", size: :sm, variant: :secondary) { "추가" } %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render EmptyStateComponent.new(
+      icon: "magnifying-glass",
+      title: "검색 결과가 없습니다",
+      description: "검색 실행 버튼을 눌러 경매 물건을 검색하세요."
+    ) %>
+  <% end %>
+</div>
