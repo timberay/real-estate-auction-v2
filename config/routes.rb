@@ -12,7 +12,11 @@ Rails.application.routes.draw do
   end
 
   namespace :settings do
-    resource :budget, only: [ :show, :update ]
+    resource :budget, only: [ :show, :update ] do
+      member do
+        patch :update_region
+      end
+    end
     resources :budget_snapshots, only: [ :index, :show ] do
       member do
         post :recalculate
@@ -43,6 +47,10 @@ Rails.application.routes.draw do
   end
 
   resources :search_results, only: [ :index, :create ] do
+    collection do
+      get :inline_page
+      delete :clear
+    end
     member do
       post :import
       post :inline_import

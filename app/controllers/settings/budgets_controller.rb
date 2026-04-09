@@ -43,6 +43,15 @@ module Settings
       render :show, status: :unprocessable_entity
     end
 
+    def update_region
+      @setting = current_user.budget_setting
+      if @setting.update(region: params.dig(:budget_setting, :region))
+        head :ok
+      else
+        head :unprocessable_entity
+      end
+    end
+
     private
 
     def load_show_data
@@ -57,7 +66,8 @@ module Settings
       params.expect(budget_setting: [
         :available_cash, :property_type_id, :area_category,
         :repair_cost, :acquisition_tax, :scrivener_fee,
-        :moving_cost, :maintenance_fee, :loan_policy_id, :loan_ratio
+        :moving_cost, :maintenance_fee, :loan_policy_id, :loan_ratio,
+        :region
       ])
     end
   end

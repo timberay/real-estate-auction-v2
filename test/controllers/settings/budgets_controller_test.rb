@@ -32,6 +32,22 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[data-reserve-fund-target='autoCalc'][checked]"
   end
 
+  test "PATCH update_region saves region and returns ok" do
+    patch update_region_settings_budget_url, params: {
+      budget_setting: { region: "서울특별시" }
+    }
+    assert_response :ok
+    assert_equal "서울특별시", @setting.reload.region
+  end
+
+  test "PATCH update_region rejects invalid region" do
+    patch update_region_settings_budget_url, params: {
+      budget_setting: { region: "존재하지않는지역" }
+    }
+    assert_response :unprocessable_entity
+    assert_equal BudgetSetting::DEFAULT_REGION, @setting.reload.region
+  end
+
   test "PATCH update saves new settings and creates snapshot" do
     patch settings_budget_url, params: {
       budget_setting: {
