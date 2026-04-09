@@ -1,26 +1,19 @@
 <%# app/views/search_results/_inline_results.html.erb %>
 <% over_limit = local_assigns.fetch(:over_limit, false) %>
 <div id="criteria-search-results" class="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 mt-3">
-  <div class="flex items-center justify-between mb-3">
+  <div class="flex items-center gap-2 mb-3">
     <span class="text-sm font-semibold text-slate-900 dark:text-slate-100">
-      조건검색 결과 <span class="text-violet-500"><%= search_results.size %>건</span>
-      <% if over_limit %>
-        <span class="text-xs font-normal text-amber-500 ml-1">최대 20건까지 조회됩니다</span>
-      <% end %>
+      조건검색 결과 <span id="criteria-search-count" class="text-violet-500"><%= search_results.size %>건</span>
     </span>
-    <%= button_to clear_search_results_path, method: :delete,
-        class: "inline-flex items-center gap-1 border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 rounded-md px-2.5 py-1 text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors",
-        data: { turbo_stream: true } do %>
-      ✕ 닫기
+    <% if over_limit %>
+      <span class="text-xs text-amber-500">최대 20건까지 조회됩니다</span>
     <% end %>
   </div>
 
   <% if search_results.any? %>
-    <div class="space-y-2">
+    <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       <% search_results.each do |sr| %>
-        <%= render "search_results/inline_result_item",
-                   search_result: sr,
-                   already_added: false %>
+        <%= render "search_results/inline_result_item", search_result: sr %>
       <% end %>
     </div>
   <% else %>

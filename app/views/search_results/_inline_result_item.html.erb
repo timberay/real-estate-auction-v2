@@ -1,39 +1,21 @@
 <%# app/views/search_results/_inline_result_item.html.erb %>
-<% added = local_assigns.fetch(:already_added, false) %>
 <div id="<%= dom_id(search_result, :inline) %>"
-     class="<%= added ? 'bg-slate-900 dark:bg-slate-900 border border-green-800 rounded-xl p-3 opacity-55' : 'bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 cursor-pointer hover:border-violet-500 dark:hover:border-violet-500 transition-colors' %>">
-  <% if added %>
-    <div class="flex items-center justify-between">
-      <span class="text-sm font-semibold text-green-500">
-        <%= search_result.case_number %>
-        <span class="font-normal text-xs">✓ 추가됨</span>
-        <% if search_result.property_count > 1 %>
-          <span class="inline-flex items-center rounded bg-amber-900/30 px-1.5 py-0.5 text-xs font-medium text-amber-400">다물건 <%= search_result.property_count %>건</span>
-        <% end %>
-      </span>
-      <span class="text-xs text-slate-400">감정가 <strong class="text-slate-200 dark:text-slate-200"><%= format_price_won(search_result.appraisal_price) %></strong></span>
-    </div>
-    <div class="mt-1.5">
-      <span class="text-xs text-slate-500">최저매각가 <span class="text-slate-400"><%= format_price_won(search_result.min_bid_price) %></span></span>
-    </div>
-    <div class="text-xs text-slate-500 mt-1 truncate">📍 <%= search_result.address %></div>
-  <% else %>
-    <%= form_with url: inline_import_search_result_path(search_result), method: :post, data: { turbo_stream: true } do %>
-      <button type="submit" class="w-full text-left">
-        <div class="flex items-center justify-between">
-          <span class="text-sm font-semibold text-violet-400">
-            <%= search_result.case_number %>
-            <% if search_result.property_count > 1 %>
-              <span class="inline-flex items-center rounded bg-amber-900/30 px-1.5 py-0.5 text-xs font-medium text-amber-400">다물건 <%= search_result.property_count %>건</span>
-            <% end %>
-          </span>
-          <span class="text-xs text-slate-400">감정가 <strong class="text-slate-200 dark:text-slate-200"><%= format_price_won(search_result.appraisal_price) %></strong></span>
-        </div>
-        <div class="mt-1.5">
-          <span class="text-xs text-slate-500">최저매각가 <span class="text-slate-400"><%= format_price_won(search_result.min_bid_price) %></span></span>
-        </div>
-        <div class="text-xs text-slate-500 mt-1 truncate">📍 <%= search_result.address %></div>
-      </button>
-    <% end %>
+     class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 cursor-pointer hover:border-violet-500 dark:hover:border-violet-500 transition-colors">
+  <%= form_with url: inline_import_search_result_path(search_result), method: :post, data: { turbo_stream: true, turbo_frame: "_top" } do %>
+    <button type="submit" class="w-full text-left">
+      <div class="flex items-center justify-between">
+        <span class="text-sm font-semibold text-violet-400">
+          <%= search_result.case_number %>
+          <% if search_result.property_count > 1 %>
+            <span class="inline-flex items-center rounded bg-amber-900/30 px-1.5 py-0.5 text-xs font-medium text-amber-400">다물건 <%= search_result.property_count %>건</span>
+          <% end %>
+        </span>
+        <span class="text-xs text-slate-400">감정가 <strong class="text-slate-200 dark:text-slate-200"><%= format_price_won(search_result.appraisal_price) %></strong></span>
+      </div>
+      <div class="mt-1.5">
+        <span class="text-xs text-slate-500">최저매각가 <span class="text-slate-400"><%= format_price_won(search_result.min_bid_price) %></span></span>
+      </div>
+      <div class="text-xs text-slate-500 mt-1 truncate">📍 <%= search_result.address %></div>
+    </button>
   <% end %>
 </div>

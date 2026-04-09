@@ -234,6 +234,7 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "2026타경55555", response.body
     assert_match "criteria-search-results", response.body
+    assert_no_match "닫기", response.body
   end
 
   test "properties index does not render results box when no search results" do
