@@ -1,35 +1,49 @@
 class InspectionRunner
   DETECTION_RULES = {
     # 매각물건명세서 tab
-    "rights-002" => ->(raw) { raw.dig("court_auction", "non_extinguished_rights")&.any? },
-    "rights-011" => ->(raw) { raw.dig("court_auction", "remarks")&.match?(/유치권|법정지상권/) },
-    "rights-005" => ->(raw) { raw.dig("court_auction", "use_approval") == false },
-    "rights-003" => ->(raw) { raw.dig("court_auction", "tenants")&.any? },
-    "rights-006" => ->(raw) {
-      tenants = raw.dig("court_auction", "tenants") || []
-      tenants.any? { |t| t["dividend_requested"] == false }
+    "rights-002" => ->(p) {
+      text = p.sale_detail&.non_extinguished_rights
+      return nil if text.nil? && p.sale_detail.nil?
+      text.present?
     },
-    "rights-014" => ->(raw) {
-      tenants = raw.dig("court_auction", "tenants") || []
-      tenants.any? { |t| t["deposit"].nil? || t["dividend_requested"] == false }
+    "rights-011" => ->(p) {
+      combined = [p.remarks, p.sale_detail&.specification_remarks, p.sale_detail&.goods_remarks].compact.join("\n")
+      combined.match?(/유치권|법정지상권/)
     },
-    "property-002" => ->(raw) { raw.dig("court_auction", "wall_partition_issue") == true },
-    "rights-019" => ->(raw) { raw.dig("court_auction", "separate_land_registry") == true },
-    "rights-020" => ->(raw) { raw.dig("court_auction", "lien_reported") == true },
-    "resale-003" => ->(raw) { raw.dig("building_ledger", "floor_info")&.include?("반지하") },
-
-    # 등기부등본 tab
-    "rights-001" => ->(raw) { raw.dig("registry_transcript", "provisional_disposition_senior") == true },
-    "rights-007" => ->(raw) { raw.dig("registry_transcript", "notice_registration") == true },
-    "rights-008" => ->(raw) { raw.dig("registry_transcript", "senior_tax_seizure") == true },
-
-    # 건축물대장 tab
-    "property-004" => ->(raw) { raw.dig("building_ledger", "violation_flag") == true },
-    "property-005" => ->(raw) { raw.dig("building_ledger", "usage_type") == "사무소" },
-    "resale-002" => ->(raw) { (raw.dig("building_ledger", "parking_per_unit") || 99) < 0.5 },
-
+    "rights-005" => ->(p) { nil }, # use_approval not available
+    "rights-003" => ->(p) { nil }, # tenants not available
+    "rights-006" => ->(p) { nil }, # tenants not available
+    "rights-014" => ->(p) { nil }, # tenants not available
+    "property-002" => ->(p) {
+      combined = [p.remarks, p.sale_detail&.specification_remarks, p.sale_detail&.goods_remarks].compact.join("\n")
+      return nil if combined.blank? && p.sale_detail.nil?
+      combined.match?(/벽체|구조변경|불법.*증축|불법.*개축/) ? true : false
+    },
+    "rights-019" => ->(p) {
+      cat = p.land_category
+      return nil if cat.nil?
+      cat != "전유"
+    },
+    "rights-020" => ->(p) {
+      combined = [p.remarks, p.sale_detail&.specification_remarks, p.sale_detail&.goods_remarks].compact.join("\n")
+      return nil if combined.blank? && p.sale_detail.nil?
+      combined.match?(/유치권/) ? true : false
+    },
+    "resale-003" => ->(p) {
+      floor = p.building_detail
+      return nil if floor.blank?
+      floor.match?(/지하|반지하/) && !floor.match?(/지상/)
+    },
+    # 등기부등본 tab — still reads raw_data
+    "rights-001" => ->(p) { p.raw_data&.dig("registry_transcript", "provisional_disposition_senior") == true },
+    "rights-007" => ->(p) { p.raw_data&.dig("registry_transcript", "notice_registration") == true },
+    "rights-008" => ->(p) { p.raw_data&.dig("registry_transcript", "senior_tax_seizure") == true },
+    # 건축물대장 tab — still reads raw_data
+    "property-004" => ->(p) { p.raw_data&.dig("building_ledger", "violation_flag") == true },
+    "property-005" => ->(p) { p.raw_data&.dig("building_ledger", "usage_type") == "사무소" },
+    "resale-002" => ->(p) { (p.raw_data&.dig("building_ledger", "parking_per_unit") || 99) < 0.5 },
     # 온라인조회 tab
-    "property-001" => ->(raw) { raw.dig("court_auction", "is_partial_share") == true }
+    "property-001" => ->(p) { p.sale_detail&.share_description.present? }
   }.freeze
 
   def self.call(property:, user:)
@@ -42,7 +56,8 @@ class InspectionRunner
   end
 
   def call
-    raw = @property.raw_data || {}
+    # Eager load sale_detail to avoid N+1
+    @property.sale_detail
 
     InspectionItem.ordered.map do |item|
       result = @property.inspection_results.find_or_initialize_by(inspection_item: item, user: @user)
@@ -55,7 +70,7 @@ class InspectionRunner
         end
       else
         detected = begin
-          rule.call(raw)
+          rule.call(@property)
         rescue
           nil
         end

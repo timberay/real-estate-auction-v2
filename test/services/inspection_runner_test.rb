@@ -2,8 +2,8 @@ require "test_helper"
 
 class InspectionRunnerTest < ActiveSupport::TestCase
   setup do
-    @safe_property = PropertyDataSyncService.call(case_number: "2026타경10001").property
-    @risky_property = PropertyDataSyncService.call(case_number: "2026타경10002").property
+    @safe_property = properties(:safe_apartment)
+    @risky_property = properties(:risky_villa)
     @user = users(:guest)
   end
 
@@ -12,14 +12,54 @@ class InspectionRunnerTest < ActiveSupport::TestCase
     assert_equal InspectionItem.count, results.size
   end
 
-  test "auto-detects risks from raw_data when detection rule exists" do
+  test "detects non_extinguished_rights risk on risky_villa" do
+    InspectionRunner.call(property: @risky_property, user: @user)
+    item = InspectionItem.find_by(code: "rights-002")
+    return unless item
+    result = InspectionResult.find_by(property: @risky_property, inspection_item: item, user: @user)
+    assert_not_nil result
+    assert result.auto?
+    assert result.has_risk, "risky_villa sale_detail has non_extinguished_rights, should detect risk"
+  end
+
+  test "detects lien from risky_villa remarks" do
+    InspectionRunner.call(property: @risky_property, user: @user)
+    item = InspectionItem.find_by(code: "rights-020")
+    return unless item
+    result = InspectionResult.find_by(property: @risky_property, inspection_item: item, user: @user)
+    assert_not_nil result
+    assert result.auto?
+    assert result.has_risk, "risky_villa remarks contain 유치권, should detect lien risk"
+  end
+
+  test "detects lien/superficies pattern from risky_villa" do
     InspectionRunner.call(property: @risky_property, user: @user)
     item = InspectionItem.find_by(code: "rights-011")
     return unless item
     result = InspectionResult.find_by(property: @risky_property, inspection_item: item, user: @user)
     assert_not_nil result
     assert result.auto?
-    assert result.has_risk
+    assert result.has_risk, "risky_villa has 유치권 in remarks/sale_detail"
+  end
+
+  test "safe apartment has no risks for structured rules" do
+    InspectionRunner.call(property: @safe_property, user: @user)
+    # rights-002: safe_apartment has empty non_extinguished_rights
+    item = InspectionItem.find_by(code: "rights-002")
+    if item
+      result = InspectionResult.find_by(property: @safe_property, inspection_item: item, user: @user)
+      assert_not_nil result
+      assert_equal false, result.has_risk,
+        "safe_apartment sale_detail has empty non_extinguished_rights, should not detect risk"
+    end
+
+    # rights-011: safe_apartment has no 유치권/법정지상권
+    item = InspectionItem.find_by(code: "rights-011")
+    if item
+      result = InspectionResult.find_by(property: @safe_property, inspection_item: item, user: @user)
+      assert_not_nil result
+      assert_equal false, result.has_risk
+    end
   end
 
   test "leaves items without detection rules as unanswered" do
