@@ -1,69 +1,35 @@
 class PropertyDataSyncService
-  Result = Data.define(:court_data, :building_data, :registry_data, :errors, :property)
+  Result = Data.define(:court_data, :errors, :property)
 
-  def self.call(case_number:, user: nil, with_detail: false)
-    new(case_number:, user:, with_detail:).call
+  def self.call(case_number:, user: nil)
+    new(case_number:).call
   end
 
-  def initialize(case_number:, user: nil, with_detail: false)
+  def initialize(case_number:)
     @case_number = case_number
-    @user = user
-    @with_detail = with_detail
   end
 
   def call
     errors = {}
+    court_data = nil
 
-    court_data = fetch_source(:court_auction, errors, :court) do |config|
+    begin
       adapter = GovernmentCourtAuctionAdapter.new
-      if @with_detail
-        adapter.fetch_data_with_detail(case_number: @case_number)
-      else
-        adapter.fetch_data(case_number: @case_number)
-      end
+      court_data = adapter.fetch_data_with_detail(case_number: @case_number)
+    rescue DataProvider::Error => e
+      errors[:court] = e
     end
 
-    building_data = fetch_source(:data_go_kr, errors, :building) do |config|
-      BuildingLedgerAdapter.for(config).fetch_data(case_number: @case_number)
-    end
+    property = persist_property(court_data) if court_data
 
-    registry_data = fetch_source_by_category(:registry, errors, :registry) do |config|
-      RegistryTranscriptAdapter.for(config).fetch_data(case_number: @case_number)
-    end
-
-    property = persist_property(court_data, building_data, registry_data) if court_data
-
-    Result.new(
-      court_data: court_data,
-      building_data: building_data,
-      registry_data: registry_data,
-      errors: errors,
-      property: property
-    )
+    Result.new(court_data: court_data, errors: errors, property: property)
   end
 
   private
 
-  def fetch_source(provider_name, errors, error_key)
-    config = CredentialResolver.new(user: @user, provider_name: provider_name).resolve
-    yield(config)
-  rescue DataProvider::Error => e
-    errors[error_key] = e
-    nil
-  end
-
-  def fetch_source_by_category(category, errors, error_key)
-    config = CredentialResolver.new(user: @user, category: category).resolve
-    yield(config)
-  rescue DataProvider::Error => e
-    errors[error_key] = e
-    nil
-  end
-
-  def persist_property(court_data, building_data, registry_data)
+  def persist_property(court_data)
     property = Property.find_or_initialize_by(case_number: @case_number)
 
-    # Set all property columns from court_data
     property.assign_attributes(
       property_type: court_data[:property_type],
       property_usage_code: court_data[:property_usage_code],
@@ -87,24 +53,13 @@ class PropertyDataSyncService
       remarks: court_data[:remarks],
       case_type: court_data[:case_type],
       claim_amount: court_data[:claim_amount],
-      land_category: court_data[:land_category],
-      raw_data: {
-        building_ledger: building_data&.deep_stringify_keys,
-        registry_transcript: registry_data&.deep_stringify_keys
-      }.compact
+      land_category: court_data[:land_category]
     )
     property.save!
 
-    # Create/update sale_detail (1:1) if detail fields present
     sync_sale_detail(property, court_data)
-
-    # Replace auction_schedules (destroy_all + create)
     sync_auction_schedules(property, court_data[:auction_schedules])
-
-    # Replace land_details (destroy_all + create)
     sync_land_details(property, court_data[:land_details])
-
-    # Replace appraisal_points (destroy_all + create)
     sync_appraisal_points(property, court_data[:appraisal_points])
 
     property
@@ -128,26 +83,20 @@ class PropertyDataSyncService
     return if schedules.blank?
 
     property.auction_schedules.destroy_all
-    schedules.each do |attrs|
-      property.auction_schedules.create!(attrs)
-    end
+    schedules.each { |attrs| property.auction_schedules.create!(attrs) }
   end
 
   def sync_land_details(property, lands)
     return if lands.blank?
 
     property.land_details.destroy_all
-    lands.each do |attrs|
-      property.land_details.create!(attrs)
-    end
+    lands.each { |attrs| property.land_details.create!(attrs) }
   end
 
   def sync_appraisal_points(property, points)
     return if points.blank?
 
     property.appraisal_points.destroy_all
-    points.each do |attrs|
-      property.appraisal_points.create!(attrs)
-    end
+    points.each { |attrs| property.appraisal_points.create!(attrs) }
   end
 end

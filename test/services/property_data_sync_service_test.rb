@@ -1,86 +1,163 @@
 require "test_helper"
 
 class PropertyDataSyncServiceTest < ActiveSupport::TestCase
-  test "creates new property from adapters" do
-    Property.find_by(case_number: "2026타경10001")&.destroy
-    assert_difference "Property.count", 1 do
+  setup do
+    @search_fixture = JSON.parse(
+      File.read(Rails.root.join("test/fixtures/files/court_auction_search_intercepted.json"))
+    )
+    @detail_fixture = JSON.parse(
+      File.read(Rails.root.join("test/fixtures/files/court_auction_detail_intercepted.json"))
+    )
+  end
+
+  test "creates new property with court data" do
+    with_stubbed_adapter(@search_fixture, @detail_fixture) do
+      Property.where(case_number: "2026타경10001").destroy_all
+      assert_difference "Property.count", 1 do
+        result = PropertyDataSyncService.call(case_number: "2026타경10001")
+        property = result.property
+
+        assert_equal "2026타경10001", property.case_number
+        assert_equal "아파트", property.property_type
+        assert_equal "서울특별시 강남구 역삼동 100-1 테스트아파트 101동 1001호", property.address
+        assert_equal 800_000_000, property.appraisal_price
+        assert_equal 560_000_000, property.min_bid_price
+      end
+    end
+  end
+
+  test "creates sale_detail from detail data" do
+    with_stubbed_adapter(@search_fixture, @detail_fixture) do
+      Property.where(case_number: "2026타경10001").destroy_all
+
       result = PropertyDataSyncService.call(case_number: "2026타경10001")
-      property = result.property
-      assert_equal "2026타경10001", property.case_number
-      assert_equal "아파트", property.property_type
-      assert_equal "서울특별시 강남구 역삼동 100-1", property.address
-      assert_equal 80000, property.appraisal_price
-      assert_equal 56000, property.min_bid_price
+      detail = result.property.sale_detail
+
+      assert_not_nil detail
+      assert_equal "부동산임의경매", result.property.case_type
+      assert_equal "2024.01.15 근저당 설정", detail.senior_mortgage_basis
+      assert_equal 800_000_000, detail.price_round_1
+      assert_equal 560_000_000, detail.price_round_2
+    end
+  end
+
+  test "creates auction_schedules from detail data" do
+    with_stubbed_adapter(@search_fixture, @detail_fixture) do
+      Property.where(case_number: "2026타경10001").destroy_all
+
+      result = PropertyDataSyncService.call(case_number: "2026타경10001")
+      schedules = result.property.auction_schedules
+
+      assert_equal 2, schedules.count
+      assert_equal Date.new(2026, 5, 1), schedules.order(:schedule_date).last.schedule_date
+    end
+  end
+
+  test "creates land_details from detail data" do
+    with_stubbed_adapter(@search_fixture, @detail_fixture) do
+      Property.where(case_number: "2026타경10001").destroy_all
+
+      result = PropertyDataSyncService.call(case_number: "2026타경10001")
+      lands = result.property.land_details
+
+      assert_equal 1, lands.count
+      assert_equal "대", lands.first.land_type
+    end
+  end
+
+  test "creates appraisal_points from detail data" do
+    with_stubbed_adapter(@search_fixture, @detail_fixture) do
+      Property.where(case_number: "2026타경10001").destroy_all
+
+      result = PropertyDataSyncService.call(case_number: "2026타경10001")
+      points = result.property.appraisal_points
+
+      assert_equal 2, points.count
+      assert_equal "01", points.first.item_code
     end
   end
 
   test "upserts existing property without duplicating" do
-    PropertyDataSyncService.call(case_number: "2026타경10001")
-    assert_no_difference "Property.count" do
-      result = PropertyDataSyncService.call(case_number: "2026타경10001")
-      assert_equal "2026타경10001", result.property.case_number
+    with_stubbed_adapter(@search_fixture, @detail_fixture) do
+      Property.where(case_number: "2026타경10001").destroy_all
+
+      PropertyDataSyncService.call(case_number: "2026타경10001")
+      assert_no_difference "Property.count" do
+        result = PropertyDataSyncService.call(case_number: "2026타경10001")
+        assert_equal "2026타경10001", result.property.case_number
+      end
     end
   end
 
-  test "raw_data only contains building_ledger and registry_transcript" do
-    result = PropertyDataSyncService.call(case_number: "2026타경10001")
-    property = result.property
+  test "returns Result with court_data, errors, property" do
+    with_stubbed_adapter(@search_fixture, @detail_fixture) do
+      Property.where(case_number: "2026타경10001").destroy_all
 
-    assert property.raw_data.key?("building_ledger")
-    assert property.raw_data.key?("registry_transcript")
-    assert_not property.raw_data.key?("court_auction"),
-      "raw_data should not contain court_auction — court data goes into structured columns"
+      result = PropertyDataSyncService.call(case_number: "2026타경10001")
+      assert_respond_to result, :court_data
+      assert_respond_to result, :errors
+      assert_respond_to result, :property
+    end
   end
 
-  test "stores building_ledger in raw_data" do
-    result = PropertyDataSyncService.call(case_number: "2026타경10002")
-    property = result.property
-    building_data = property.raw_data["building_ledger"]
-
-    assert_equal true, building_data["violation_flag"]
+  test "returns nil property when case not found" do
+    empty_search = JSON.parse(
+      File.read(Rails.root.join("test/fixtures/files/court_auction_empty_search.json"))
+    )
+    with_stubbed_adapter(empty_search, nil) do
+      result = PropertyDataSyncService.call(case_number: "2026타경99999")
+      assert_nil result.property
+      assert_nil result.court_data
+    end
   end
 
-  test "stores registry_transcript in raw_data" do
-    result = PropertyDataSyncService.call(case_number: "2026타경10001")
-    property = result.property
-    transcript = property.raw_data["registry_transcript"]
+  test "captures DataProvider errors in result.errors" do
+    error_adapter = Object.new
+    error_adapter.define_singleton_method(:fetch_data_with_detail) do |case_number:|
+      raise DataProvider::TimeoutError, "timed out"
+    end
 
-    assert transcript.key?("rights")
-    assert transcript.key?("tenants")
-    assert transcript.key?("hug_waiver")
-    assert transcript.key?("seizures")
-  end
-
-  test "maps mock adapter remarks to property.remarks column" do
-    result = PropertyDataSyncService.call(case_number: "2026타경10002")
-    property = result.property
-
-    assert property.remarks.include?("유치권")
-  end
-
-  test "handles missing building ledger data gracefully" do
-    result = PropertyDataSyncService.call(case_number: "2026타경10001")
-    assert result.property.raw_data.key?("building_ledger")
+    original_new = GovernmentCourtAuctionAdapter.method(:new)
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |**_kwargs| error_adapter }
+    begin
+      result = PropertyDataSyncService.call(case_number: "2026타경10001")
+      assert_nil result.property
+      assert result.errors.key?(:court)
+      assert_instance_of DataProvider::TimeoutError, result.errors[:court]
+    ensure
+      GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new.unbind)
+    end
   end
 
   test "accepts user parameter" do
-    user = users(:guest)
-    result = PropertyDataSyncService.call(case_number: "2026타경10001", user: user)
-    assert result.court_data.present?
-    assert result.property.present?
+    with_stubbed_adapter(@search_fixture, @detail_fixture) do
+      Property.where(case_number: "2026타경10001").destroy_all
+
+      user = users(:guest)
+      result = PropertyDataSyncService.call(case_number: "2026타경10001", user: user)
+      assert result.court_data.present?
+      assert result.property.present?
+    end
   end
 
-  test "returns Result with court_data, building_data, registry_data, errors" do
-    result = PropertyDataSyncService.call(case_number: "2026타경10001")
-    assert_respond_to result, :court_data
-    assert_respond_to result, :building_data
-    assert_respond_to result, :registry_data
-    assert_respond_to result, :errors
-    assert_respond_to result, :property
-  end
+  private
 
-  test "errors hash is empty on full success" do
-    result = PropertyDataSyncService.call(case_number: "2026타경10001")
-    assert_empty result.errors
+  def with_stubbed_adapter(search_response, detail_response)
+    mock_client = Object.new
+    mock_client.define_singleton_method(:fetch_with_detail) do |**_args|
+      { "search" => search_response, "detail" => detail_response }
+    end
+
+    adapter = GovernmentCourtAuctionAdapter.allocate
+    adapter.instance_variable_set(:@browser_client, mock_client)
+    adapter.instance_variable_set(:@parser, CourtAuction::ResponseParser.new)
+    adapter.instance_variable_set(:@rate_limiter,
+      CourtAuction::RateLimiter.new(min_interval: 0, max_per_minute: 1000))
+
+    original_new = GovernmentCourtAuctionAdapter.method(:new)
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |**_kwargs| adapter }
+    yield
+  ensure
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new.unbind)
   end
 end
