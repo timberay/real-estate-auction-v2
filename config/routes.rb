@@ -43,6 +43,9 @@ Rails.application.routes.draw do
   end
 
   resources :search_results, only: [ :index, :create ] do
+    collection do
+      get :preview
+    end
     member do
       post :import
       post :inline_import

@@ -4,6 +4,20 @@ class SearchResultsController < ApplicationController
     @search_results = current_user.search_results.order(created_at: :desc)
   end
 
+  def preview
+    bs = current_user.budget_setting
+    criteria = {
+      region: bs&.effective_region || BudgetSetting::DEFAULT_REGION,
+      year: Time.current.year.to_s,
+      min_price: 50_000_000,
+      max_price: bs&.max_price_option || BudgetSetting::DEFAULT_MAX_PRICE
+    }
+
+    render turbo_stream: turbo_stream.update("criteria-debug-popup",
+      partial: "search_results/criteria_preview_popup",
+      locals: { criteria: criteria })
+  end
+
   def create
     result = CourtAuctionSearchService.call(user: current_user)
 
