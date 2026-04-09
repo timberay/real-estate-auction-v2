@@ -21,11 +21,16 @@ class SearchResultsController < ApplicationController
             partial: "search_results/inline_error",
             locals: { message: error_message_for(result.error) })
         else
-          search_results = current_user.search_results.order(created_at: :desc)
-          @user_property_case_numbers = current_user.properties.pluck(:case_number)
+          existing_case_numbers = current_user.properties.pluck(:case_number)
+          search_results = current_user.search_results
+            .where.not(case_number: existing_case_numbers)
+            .order(created_at: :desc)
+          total_count = search_results.count
+          over_limit = total_count > 20
+          search_results = search_results.limit(20)
           render turbo_stream: turbo_stream.update("criteria-search-results",
             partial: "search_results/inline_results",
-            locals: { search_results: search_results, user_property_case_numbers: @user_property_case_numbers })
+            locals: { search_results: search_results, over_limit: over_limit })
         end
       end
     end

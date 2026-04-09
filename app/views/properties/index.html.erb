@@ -72,8 +72,7 @@
     <div id="criteria-search-results">
       <% if @search_results&.any? %>
         <%= render "search_results/inline_results",
-                   search_results: @search_results,
-                   user_property_case_numbers: @user_property_case_numbers %>
+                   search_results: @search_results %>
       <% end %>
     </div>
   </div>

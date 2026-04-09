@@ -66,7 +66,8 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end
 
-  test "POST create with turbo_stream marks already-added properties" do
+  test "POST create with turbo_stream excludes already-added properties" do
+    @user.user_properties.destroy_all
     property = Property.find_by(case_number: "2026타경10001") || properties(:safe_apartment)
     @user.user_properties.find_or_create_by!(property: property)
 
@@ -82,9 +83,21 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
         "yuchalCnt" => "1",
         "maeGiil" => "2026-05-01",
         "mulBigo" => ""
+      },
+      {
+        "srnSaNo" => "2026타경10002",
+        "jiwonNm" => "제주지방법원",
+        "printSt" => "서울특별시 서초구",
+        "gamevalAmt" => "400000000",
+        "minmaePrice" => "280000000",
+        "dspslUsgNm" => "아파트",
+        "mulJinYn" => "Y",
+        "yuchalCnt" => "0",
+        "maeGiil" => "2026-06-01",
+        "mulBigo" => ""
       }
     ]
-    mock_response = { items: mock_items, total: 1 }
+    mock_response = { items: mock_items, total: 2 }
     adapter = Object.new
     adapter.define_singleton_method(:search_by_criteria) { |**_| mock_response }
 
@@ -93,7 +106,39 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
 
     post search_results_url, as: :turbo_stream
     assert_response :success
-    assert_match "추가됨", response.body
+    assert_no_match "2026타경10001", response.body
+    assert_match "2026타경10002", response.body
+    assert_match "1건", response.body
+  ensure
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
+  end
+
+  test "POST create with turbo_stream limits to 20 results and shows over-limit message" do
+    mock_items = 25.times.map do |i|
+      {
+        "srnSaNo" => "2026타경#{60000 + i}",
+        "jiwonNm" => "서울중앙지방법원",
+        "printSt" => "서울특별시 #{i}구",
+        "gamevalAmt" => "#{200_000_000 + i}",
+        "minmaePrice" => "#{140_000_000 + i}",
+        "dspslUsgNm" => "아파트",
+        "mulJinYn" => "Y",
+        "yuchalCnt" => "0",
+        "maeGiil" => "2026-05-01",
+        "mulBigo" => ""
+      }
+    end
+    mock_response = { items: mock_items, total: 25 }
+    adapter = Object.new
+    adapter.define_singleton_method(:search_by_criteria) { |**_| mock_response }
+
+    original_new = GovernmentCourtAuctionAdapter.method(:new)
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
+
+    post search_results_url, as: :turbo_stream
+    assert_response :success
+    assert_match "20건", response.body
+    assert_match "최대 20건까지 조회됩니다", response.body
   ensure
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end
