@@ -134,4 +134,30 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "추가됨", response.body
   end
+
+  test "POST inline_import shows error when sync fails" do
+    sr = @user.search_results.create!(
+      case_number: "2026타경88888",
+      address: "서울특별시",
+      appraisal_price: 200_000_000,
+      min_bid_price: 140_000_000
+    )
+
+    error_adapter = Object.new
+    error_adapter.define_singleton_method(:fetch_data_with_detail) do |case_number:|
+      raise DataProvider::TimeoutError, "timed out"
+    end
+
+    original_new = GovernmentCourtAuctionAdapter.method(:new)
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| error_adapter }
+
+    assert_no_difference "UserProperty.count" do
+      post inline_import_search_result_url(sr), as: :turbo_stream
+    end
+    assert_response :success
+    assert_includes response.content_type, "text/vnd.turbo-stream.html"
+    assert_match "시간이 초과", response.body
+  ensure
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
+  end
 end
