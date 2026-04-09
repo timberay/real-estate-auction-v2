@@ -15,21 +15,23 @@ class GovernmentCourtAuctionAdapterIntegrationTest < ActiveSupport::TestCase
     result = adapter.fetch_data(case_number: "2026타경10001")
 
     assert_equal "2026타경10001", result[:case_number]
-    assert_equal "서울중앙지방법원", result[:court_name]
     assert_equal "아파트", result[:property_type]
     assert_equal "서울특별시 강남구 역삼동 100-1 테스트아파트 101동 1001호", result[:address]
+    assert_equal "서울특별시", result[:sido]
+    assert_equal "강남구", result[:sigungu]
     assert_equal 800_000_000, result[:appraisal_price]
     assert_equal 560_000_000, result[:min_bid_price]
   end
 
-  test "fetch_data returns raw_data fields for inspection" do
+  test "fetch_data returns structured fields for inspection" do
     adapter = build_adapter(@fixture)
     result = adapter.fetch_data(case_number: "2026타경10001")
 
     assert_equal "일괄매각", result[:remarks]
     assert_equal 2, result[:failed_bid_count]
-    assert_equal false, result[:is_partial_share]
     assert_equal 45, result[:view_count]
+    assert_equal "서울특별시", result[:sido]
+    assert_equal "강남구", result[:sigungu]
   end
 
   test "fetch_data returns nil when case not found" do

@@ -7,19 +7,19 @@
   <%= render CardComponent.new(title: @property.case_number) do |card| %>
     <div class="space-y-3">
       <div class="flex items-center gap-2">
-        <% if @property.court_name.present? %>
-          <span class="text-sm text-slate-500 dark:text-slate-400"><%= @property.court_name %></span>
+        <% if @property.building_name.present? %>
+          <span class="text-sm text-slate-500 dark:text-slate-400"><%= @property.building_name %></span>
         <% end %>
       </div>
       <p class="text-sm text-slate-700 dark:text-slate-300"><%= @property.address %></p>
       <div class="grid grid-cols-2 gap-4 text-sm">
         <div>
           <span class="text-slate-500 dark:text-slate-400">감정가</span>
-          <p class="font-semibold text-slate-900 dark:text-slate-100"><%= format_price_in_eok(@property.appraisal_price) %></p>
+          <p class="font-semibold text-slate-900 dark:text-slate-100"><%= format_price_won(@property.appraisal_price) %></p>
         </div>
         <div>
           <span class="text-slate-500 dark:text-slate-400">최저매각가</span>
-          <p class="font-semibold text-slate-900 dark:text-slate-100"><%= format_price_in_eok(@property.min_bid_price) %></p>
+          <p class="font-semibold text-slate-900 dark:text-slate-100"><%= format_price_won(@property.min_bid_price) %></p>
         </div>
       </div>
       <div class="mt-4 text-center">

@@ -1,6 +1,7 @@
 module ApplicationHelper
   # Formats a price in 만원 units to a human-readable Korean format.
-  # DB stores values in 만원. Display converts to 억 when >= 10,000.
+  # Budget settings store values in 만원. Property prices are in 원 (won) —
+  # use format_price_won for those.
   #
   # Examples:
   #   format_price_in_eok(5000)   => "5,000만원"
@@ -21,5 +22,19 @@ module ApplicationHelper
     else
       "#{number_with_delimiter(amount)}만원"
     end
+  end
+
+  # Formats a price in 원 (won) to a human-readable Korean format.
+  # Property prices from the court auction API are stored in won.
+  #
+  # Examples:
+  #   format_price_won(800000000)  => "8억"
+  #   format_price_won(560000000)  => "5억 6,000만원"
+  #   format_price_won(50000000)   => "5,000만원"
+  #   format_price_won(nil)        => "—"
+  def format_price_won(amount)
+    return "—" unless amount.present? && amount > 0
+
+    format_price_in_eok(amount / 10000)
   end
 end

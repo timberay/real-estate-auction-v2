@@ -36,4 +36,22 @@ class ApplicationHelperTest < ActionView::TestCase
   test "formats small amount without eok" do
     assert_equal "500만원", format_price_in_eok(500)
   end
+
+  # --- format_price_won ---
+
+  test "format_price_won converts won to eok" do
+    assert_equal "8억", format_price_won(800000000)
+  end
+
+  test "format_price_won converts won with remainder" do
+    assert_equal "5억 6,000만원", format_price_won(560000000)
+  end
+
+  test "format_price_won converts won below 1 eok" do
+    assert_equal "5,000만원", format_price_won(50000000)
+  end
+
+  test "format_price_won returns dash for nil" do
+    assert_equal "—", format_price_won(nil)
+  end
 end

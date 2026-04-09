@@ -7,8 +7,8 @@ class MockCourtAuctionAdapterTest < ActiveSupport::TestCase
 
   test "returns predefined data for known case numbers" do
     data = @adapter.fetch_data(case_number: "2026타경10001")
-    assert_equal "서울중앙지방법원", data[:court_name]
     assert_equal "아파트", data[:property_type]
+    assert_equal "서울특별시 강남구 역삼동 100-1", data[:address]
   end
 
   test "generates data for unknown case numbers" do

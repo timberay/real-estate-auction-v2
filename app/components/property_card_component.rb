@@ -10,10 +10,13 @@ class PropertyCardComponent < ViewComponent::Base
   private
 
   def formatted_price(amount)
-    helpers.format_price_in_eok(amount)
+    helpers.format_price_won(amount)
   end
 
   def budget_exceeded?
-    @max_bid_amount.present? && @property.appraisal_price.present? && @property.appraisal_price > @max_bid_amount
+    return false unless @max_bid_amount.present? && @property.appraisal_price.present?
+
+    # max_bid_amount is in 만원 (from budget settings), property prices are in 원 (won)
+    @property.appraisal_price > @max_bid_amount * 10000
   end
 end

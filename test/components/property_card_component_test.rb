@@ -36,14 +36,14 @@ class PropertyCardComponentTest < ViewComponent::TestCase
   end
 
   test "renders budget exceeded badge when appraisal_price exceeds max_bid_amount" do
-    property = properties(:safe_apartment) # appraisal_price: 80000
-    render_inline(PropertyCardComponent.new(property: property, max_bid_amount: 50000))
+    property = properties(:safe_apartment) # appraisal_price: 800000000 (8억원)
+    render_inline(PropertyCardComponent.new(property: property, max_bid_amount: 50000)) # 5억만원
     assert_selector ".inline-flex", text: "예산 초과"
   end
 
   test "does not render budget exceeded badge when within budget" do
-    property = properties(:safe_apartment) # appraisal_price: 80000
-    render_inline(PropertyCardComponent.new(property: property, max_bid_amount: 100000))
+    property = properties(:safe_apartment) # appraisal_price: 800000000 (8억원)
+    render_inline(PropertyCardComponent.new(property: property, max_bid_amount: 100000)) # 10억만원
     assert_no_text "예산 초과"
   end
 
