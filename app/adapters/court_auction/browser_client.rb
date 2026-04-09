@@ -53,11 +53,11 @@ module CourtAuction
     private
 
     def with_browser
-      playwright = nil
+      execution = nil
       browser = nil
       begin
-        playwright = Playwright.create(playwright_cli_executable_path: find_playwright_cli)
-        browser = playwright.chromium.launch(headless: true)
+        execution = Playwright.create(playwright_cli_executable_path: find_playwright_cli)
+        browser = execution.playwright.chromium.launch(headless: true)
         page = browser.new_page
         yield(page)
       rescue Playwright::TimeoutError => e
@@ -66,7 +66,7 @@ module CourtAuction
         raise DataProvider::ParseError, "Invalid JSON from court auction API: #{e.message}"
       ensure
         browser&.close
-        playwright&.stop
+        execution&.stop
       end
     end
 
