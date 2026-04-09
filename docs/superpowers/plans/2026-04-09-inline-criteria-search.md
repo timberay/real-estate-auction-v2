@@ -267,7 +267,7 @@ With:
     <% end %>
     <div class="flex items-center justify-between mt-1.5">
       <p class="text-sm text-slate-500 dark:text-slate-400">법원 경매 사건번호를 입력하세요</p>
-      <%= form_with url: search_results_path, method: :post, data: { turbo_stream: true, action: "submit->criteria-search#submit" } do %>
+      <%= form_with url: search_results_path, method: :post, data: { turbo_stream: true, action: "submit->criteria-search#submit turbo:submit-end->criteria-search#enable" } do %>
         <button type="submit"
                 data-criteria-search-target="submitButton"
                 class="inline-flex items-center justify-center gap-1.5 min-w-[100px] px-5 h-8 rounded-md bg-violet-600 hover:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-500 text-white text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900">
@@ -667,14 +667,25 @@ git commit -m "test: add inline import turbo stream tests"
 
 ---
 
-### Task 7: Re-enable Button After Turbo Stream Response
+### Task 7: Re-enable Button After Form Submission Completes
 
 **Files:**
 - Modify: `app/javascript/controllers/criteria_search_controller.js`
+- Modify: `app/views/properties/index.html.erb`
 
-- [ ] **Step 1: Add turbo:before-stream-render listener to re-enable the button**
+- [ ] **Step 1: Use `turbo:submit-end` event to re-enable the button**
 
-Update the full controller:
+`turbo:submit-end` fires when any Turbo form submission completes, regardless of success or failure (network error, 500, timeout, etc.). This is safer than `turbo:before-stream-render` which only fires on successful Turbo Stream responses. We listen on the controller element (not `document`) so it only reacts to forms within this controller's scope.
+
+Update the form in `app/views/properties/index.html.erb` to add `turbo:submit-end` action:
+
+```erb
+      <%= form_with url: search_results_path, method: :post, data: { turbo_stream: true, action: "submit->criteria-search#submit turbo:submit-end->criteria-search#enable" } do %>
+```
+
+- [ ] **Step 2: Remove `connect`/`disconnect` lifecycle hooks from Stimulus controller**
+
+The final `criteria_search_controller.js` should be:
 
 ```js
 // app/javascript/controllers/criteria_search_controller.js
@@ -682,15 +693,6 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["submitButton", "buttonText", "buttonSpinner", "caseInput", "addButton", "resultsContainer"]
-
-  connect() {
-    this.boundEnable = this.enable.bind(this)
-    document.addEventListener("turbo:before-stream-render", this.boundEnable)
-  }
-
-  disconnect() {
-    document.removeEventListener("turbo:before-stream-render", this.boundEnable)
-  }
 
   submit() {
     this.disable()
@@ -726,11 +728,11 @@ export default class extends Controller {
 }
 ```
 
-- [ ] **Step 2: Commit**
+- [ ] **Step 3: Commit**
 
 ```bash
-git add app/javascript/controllers/criteria_search_controller.js
-git commit -m "feat: re-enable criteria search button after turbo stream response"
+git add app/javascript/controllers/criteria_search_controller.js app/views/properties/index.html.erb
+git commit -m "feat: use turbo:submit-end to re-enable criteria search button"
 ```
 
 ---
