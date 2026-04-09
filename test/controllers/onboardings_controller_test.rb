@@ -87,6 +87,18 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "div[class*='grid-cols-2']"
   end
 
+  test "POST step1 saves region along with available_cash" do
+    get start_onboarding_url
+
+    post step1_onboarding_url, params: {
+      budget_setting: { available_cash: 30000, region: "서울특별시" }
+    }
+    assert_response :success
+
+    user = User.find_by(email: "guest@auction.local")
+    assert_equal "서울특별시", user.budget_setting.region
+  end
+
   test "GET step1 redirects to budget settings for returning user" do
     get start_onboarding_url
     guest = User.find_by(email: "guest@auction.local")

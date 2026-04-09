@@ -15,6 +15,7 @@ class OnboardingsController < ApplicationController
   # POST /onboarding/step1 — saves cash, renders step2
   def create_step1
     @setting.available_cash = step1_params[:available_cash]
+    @setting.region = step1_params[:region]
 
     if @setting.save
       load_step2_data
@@ -90,7 +91,7 @@ class OnboardingsController < ApplicationController
   end
 
   def step1_params
-    params.expect(budget_setting: [ :available_cash ])
+    params.expect(budget_setting: [ :available_cash, :region ])
   end
 
   def step2_params
