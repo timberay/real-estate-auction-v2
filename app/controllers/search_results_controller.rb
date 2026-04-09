@@ -73,7 +73,9 @@ class SearchResultsController < ApplicationController
       current_user.user_properties.create!(property: result.property)
       { success: true }
     else
-      { success: false, error: result.errors[:court] }
+      error = result.errors[:court]
+      Rails.logger.error "[InlineImport] Failed for #{case_number}: #{error.class} - #{error&.message}"
+      { success: false, error: error }
     end
   end
 
