@@ -2,71 +2,45 @@ module CourtAuction
   class ResponseParser
     REQUIRED_FIELDS = %i[case_number court_name address appraisal_price min_bid_price].freeze
 
-    def parse(search_result:, detail_result:)
-      result = build_result(search_result, detail_result)
+    def parse(api_response:)
+      items = extract_items(api_response)
+      return nil if items.nil? || items.empty?
+
+      item = items.first
+      result = build_result(item)
       validate!(result)
       result
     end
 
     private
 
-    def build_result(search, detail)
+    def extract_items(response)
+      items = response.dig("data", "dlt_srchResult")
+      raise DataProvider::ParseError, "Unexpected response structure" if items.nil?
+      items
+    rescue NoMethodError
+      raise DataProvider::ParseError, "Unexpected response structure"
+    end
+
+    def build_result(item)
       {
-        case_number: "#{detail['csYr']}#{detail['csCdNm']}#{detail['csNo']}",
-        court_name: search[:court_name],
-        property_type: search[:property_type],
-        address: search[:address],
-        appraisal_price: search[:appraisal_price],
-        min_bid_price: search[:min_bid_price],
-        remarks: detail["bkgsRmk"] || "",
-        non_extinguished_rights: parse_rights(detail["dlt_neRghts"]),
-        tenants: parse_tenants(detail["dlt_tenants"]),
-        separate_land_registry: yn_to_bool(detail["sprtLandRgstYn"]),
-        lien_reported: yn_to_bool(detail["lienRptYn"]),
-        use_approval: yn_to_bool(detail["useAprYn"]),
-        wall_partition_issue: yn_to_bool(detail["wlpttIsuYn"]),
-        is_partial_share: search[:is_partial_share],
-        failed_bid_count: search[:failed_bid_count],
-        status: search[:status],
-        sale_schedule: parse_schedule(detail["dlt_dxdyDts"])
+        case_number: item["srnSaNo"],
+        court_name: item["jiwonNm"],
+        property_type: item["dspslUsgNm"],
+        address: item["printSt"],
+        appraisal_price: parse_price(item["gamevalAmt"]),
+        min_bid_price: parse_price(item["minmaePrice"]),
+        remarks: item["mulBigo"] || "",
+        failed_bid_count: item["yuchalCnt"].to_i,
+        is_partial_share: item["mokGbncd"] != "00",
+        special_conditions: item["spJogCd"] || "",
+        view_count: item["inqCnt"].to_i
       }
     end
 
-    def parse_rights(rights)
-      return [] unless rights.is_a?(Array)
-      rights.map { |r| r["rghtsNm"] }.compact
-    end
-
-    def parse_tenants(tenants)
-      return [] unless tenants.is_a?(Array)
-      tenants.map do |t|
-        {
-          name: t["tnntNm"],
-          deposit: t["dpstAmt"]&.to_i,
-          move_in_date: parse_date(t["mvnDt"]),
-          dividend_requested: yn_to_bool(t["dvdReqYn"])
-        }
-      end
-    end
-
-    def parse_schedule(dates)
-      return [] unless dates.is_a?(Array)
-      dates.map do |d|
-        {
-          date: parse_date(d["dxdyDt"]),
-          min_price: d["lwstSaleAmt"]&.to_i,
-          result: d["dxdyRslt"]
-        }
-      end
-    end
-
-    def yn_to_bool(value)
-      value == "Y"
-    end
-
-    def parse_date(yyyymmdd)
-      return nil unless yyyymmdd.is_a?(String) && yyyymmdd.length == 8
-      "#{yyyymmdd[0..3]}-#{yyyymmdd[4..5]}-#{yyyymmdd[6..7]}"
+    def parse_price(value)
+      return nil if value.blank?
+      value.to_i
     end
 
     def validate!(result)

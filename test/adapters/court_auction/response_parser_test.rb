@@ -3,106 +3,91 @@ require "test_helper"
 class CourtAuction::ResponseParserTest < ActiveSupport::TestCase
   setup do
     @parser = CourtAuction::ResponseParser.new
-    @search_result = {
-      court_code: "B001001",
-      court_name: "서울중앙지방법원",
-      item_number: "001",
-      property_type: "아파트",
-      address: "서울특별시 강남구 역삼동 100-1",
-      appraisal_price: 800_000_000,
-      min_bid_price: 560_000_000,
-      is_partial_share: false,
-      failed_bid_count: 0,
-      status: "진행"
-    }
-    @detail_result = JSON.parse(
-      File.read(Rails.root.join("test/fixtures/files/court_auction_detail_response.json"))
+    @fixture = JSON.parse(
+      File.read(Rails.root.join("test/fixtures/files/court_auction_search_intercepted.json"))
     )
   end
 
-  test "parses complete result matching mock adapter schema" do
-    result = @parser.parse(search_result: @search_result, detail_result: @detail_result)
+  test "parses intercepted API response into normalized hash" do
+    result = @parser.parse(api_response: @fixture)
 
     assert_equal "2026타경10001", result[:case_number]
     assert_equal "서울중앙지방법원", result[:court_name]
     assert_equal "아파트", result[:property_type]
-    assert_equal "서울특별시 강남구 역삼동 100-1", result[:address]
+    assert_equal "서울특별시 강남구 역삼동 100-1 테스트아파트 101동 1001호", result[:address]
     assert_equal 800_000_000, result[:appraisal_price]
     assert_equal 560_000_000, result[:min_bid_price]
-    assert_equal "해당사항 없음", result[:remarks]
-    assert_equal [], result[:non_extinguished_rights]
-    assert_equal [], result[:tenants]
-    assert_equal false, result[:separate_land_registry]
-    assert_equal false, result[:lien_reported]
-    assert_equal true, result[:use_approval]
-    assert_equal false, result[:wall_partition_issue]
+  end
+
+  test "parses raw_data fields for inspection runner" do
+    result = @parser.parse(api_response: @fixture)
+
+    assert_equal "일괄매각", result[:remarks]
+    assert_equal 2, result[:failed_bid_count]
     assert_equal false, result[:is_partial_share]
+    assert_equal "", result[:special_conditions]
+    assert_equal 45, result[:view_count]
   end
 
-  test "includes new fields not in mock" do
-    result = @parser.parse(search_result: @search_result, detail_result: @detail_result)
+  test "returns nil when dlt_srchResult is empty" do
+    empty = JSON.parse(
+      File.read(Rails.root.join("test/fixtures/files/court_auction_empty_search.json"))
+    )
+    result = @parser.parse(api_response: empty)
 
-    assert_equal 0, result[:failed_bid_count]
-    assert_equal "진행", result[:status]
-    assert_kind_of Array, result[:sale_schedule]
+    assert_nil result
   end
 
-  test "maps boolean Y/N correctly" do
-    @detail_result["lienRptYn"] = "Y"
-    @detail_result["useAprYn"] = "N"
-    @detail_result["sprtLandRgstYn"] = "Y"
-    @detail_result["wlpttIsuYn"] = "Y"
+  test "raises ParseError when required fields are blank" do
+    @fixture["data"]["dlt_srchResult"][0]["jiwonNm"] = ""
 
-    result = @parser.parse(search_result: @search_result, detail_result: @detail_result)
-
-    assert_equal true, result[:lien_reported]
-    assert_equal false, result[:use_approval]
-    assert_equal true, result[:separate_land_registry]
-    assert_equal true, result[:wall_partition_issue]
-  end
-
-  test "parses tenants from detail" do
-    @detail_result["dlt_tenants"] = [
-      {
-        "tnntNm" => "김임차",
-        "dpstAmt" => "50000000",
-        "mvnDt" => "20240315",
-        "dvdReqYn" => "N"
-      }
-    ]
-    result = @parser.parse(search_result: @search_result, detail_result: @detail_result)
-
-    assert_equal 1, result[:tenants].size
-    tenant = result[:tenants].first
-    assert_equal "김임차", tenant[:name]
-    assert_equal 50_000_000, tenant[:deposit]
-    assert_equal "2024-03-15", tenant[:move_in_date]
-    assert_equal false, tenant[:dividend_requested]
-  end
-
-  test "parses non-extinguished rights" do
-    @detail_result["dlt_neRghts"] = [
-      { "rghtsNm" => "전세권" },
-      { "rghtsNm" => "지상권" }
-    ]
-    result = @parser.parse(search_result: @search_result, detail_result: @detail_result)
-
-    assert_equal [ "전세권", "지상권" ], result[:non_extinguished_rights]
-  end
-
-  test "has all keys that MockCourtAuctionAdapter returns" do
-    mock_keys = MockCourtAuctionAdapter.new.fetch_data(case_number: "2026타경10001").keys
-    result = @parser.parse(search_result: @search_result, detail_result: @detail_result)
-
-    mock_keys.each do |key|
-      assert result.key?(key), "Missing key: #{key}"
+    assert_raises(DataProvider::ParseError) do
+      @parser.parse(api_response: @fixture)
     end
   end
 
-  test "raises ParseError when required fields missing" do
-    @search_result[:court_name] = nil
+  test "raises ParseError when price field is missing" do
+    @fixture["data"]["dlt_srchResult"][0]["gamevalAmt"] = ""
+
     assert_raises(DataProvider::ParseError) do
-      @parser.parse(search_result: @search_result, detail_result: @detail_result)
+      @parser.parse(api_response: @fixture)
+    end
+  end
+
+  test "raises ParseError when response structure is unexpected" do
+    bad_response = { "status" => 200, "data" => {} }
+
+    assert_raises(DataProvider::ParseError) do
+      @parser.parse(api_response: bad_response)
+    end
+  end
+
+  test "converts price strings to integers" do
+    result = @parser.parse(api_response: @fixture)
+
+    assert_kind_of Integer, result[:appraisal_price]
+    assert_kind_of Integer, result[:min_bid_price]
+  end
+
+  test "mokGbncd 00 means not partial share" do
+    @fixture["data"]["dlt_srchResult"][0]["mokGbncd"] = "00"
+    result = @parser.parse(api_response: @fixture)
+    assert_equal false, result[:is_partial_share]
+  end
+
+  test "mokGbncd 03 means partial share" do
+    @fixture["data"]["dlt_srchResult"][0]["mokGbncd"] = "03"
+    result = @parser.parse(api_response: @fixture)
+    assert_equal true, result[:is_partial_share]
+  end
+
+  test "result has all keys that mock adapter returns" do
+    result = @parser.parse(api_response: @fixture)
+
+    core_keys = %i[case_number court_name property_type address appraisal_price min_bid_price
+                   remarks is_partial_share failed_bid_count]
+    core_keys.each do |key|
+      assert result.key?(key), "Missing key: #{key}"
     end
   end
 end

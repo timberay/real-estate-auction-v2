@@ -1,4 +1,11 @@
 {
-  "totalCnt": 0,
-  "dlt_list": []
+  "status": 200,
+  "message": "검색 결과가 조회되었습니다.",
+  "data": {
+    "dma_pageInfo": {
+      "totalCnt": "0",
+      "groupTotalCount": 0
+    },
+    "dlt_srchResult": []
+  }
 }
