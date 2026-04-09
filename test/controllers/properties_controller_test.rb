@@ -21,14 +21,44 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "POST create with new case number adds property" do
+    # Stub the adapter to return fixture data
+    search_fixture = JSON.parse(
+      File.read(Rails.root.join("test/fixtures/files/court_auction_search_intercepted.json"))
+    )
+    detail_fixture = JSON.parse(
+      File.read(Rails.root.join("test/fixtures/files/court_auction_detail_intercepted.json"))
+    )
+
+    mock_client = Object.new
+    mock_client.define_singleton_method(:fetch_with_detail) do |**_args|
+      { "search" => search_fixture, "detail" => detail_fixture }
+    end
+
+    adapter = GovernmentCourtAuctionAdapter.allocate
+    adapter.instance_variable_set(:@browser_client, mock_client)
+    adapter.instance_variable_set(:@parser, CourtAuction::ResponseParser.new)
+    adapter.instance_variable_set(:@rate_limiter,
+      CourtAuction::RateLimiter.new(min_interval: 0, max_per_minute: 1000))
+
+    original_new = GovernmentCourtAuctionAdapter.method(:new)
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_args| adapter }
+
+    # Use a case number that matches the fixture
+    Property.where(case_number: "2026타경10001").destroy_all
+    UserProperty.where(user: User.find_by(email: "guest@auction.local")).where(
+      property: Property.find_by(case_number: "2026타경10001")
+    ).destroy_all
+
     assert_difference "Property.count", 1 do
       assert_difference "UserProperty.count", 1 do
-        post properties_url, params: { case_number: "2026타경99999" }
+        post properties_url, params: { case_number: "2026타경10001" }
       end
     end
     assert_redirected_to properties_path
     follow_redirect!
     assert_match "물건이 추가되었습니다", flash[:notice]
+  ensure
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end
 
   test "POST create with existing case number adds to user list" do
@@ -94,5 +124,63 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     get property_url(property)
     assert_response :success
     assert_select "button", text: "분석 시작"
+  end
+
+  test "POST create with invalid case number format shows format error" do
+    post properties_url, params: { case_number: "invalid-format" }
+    assert_redirected_to properties_path
+    follow_redirect!
+    assert_match "사건번호 형식이 올바르지 않습니다", flash[:alert]
+  end
+
+  test "POST create handles timeout error" do
+    error_adapter = Object.new
+    error_adapter.define_singleton_method(:fetch_data_with_detail) do |case_number:|
+      raise DataProvider::TimeoutError, "timed out"
+    end
+
+    original_new = GovernmentCourtAuctionAdapter.method(:new)
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_args| error_adapter }
+
+    post properties_url, params: { case_number: "2026타경88888" }
+    assert_redirected_to properties_path
+    follow_redirect!
+    assert_match "시간이 초과", flash[:alert]
+  ensure
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
+  end
+
+  test "POST create handles service unavailable error" do
+    error_adapter = Object.new
+    error_adapter.define_singleton_method(:fetch_data_with_detail) do |case_number:|
+      raise DataProvider::ServiceUnavailableError, "site down"
+    end
+
+    original_new = GovernmentCourtAuctionAdapter.method(:new)
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_args| error_adapter }
+
+    post properties_url, params: { case_number: "2026타경88888" }
+    assert_redirected_to properties_path
+    follow_redirect!
+    assert_match "접속할 수 없습니다", flash[:alert]
+  ensure
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
+  end
+
+  test "POST create handles configuration error" do
+    error_adapter = Object.new
+    error_adapter.define_singleton_method(:fetch_data_with_detail) do |case_number:|
+      raise DataProvider::ConfigurationError, "no chromium"
+    end
+
+    original_new = GovernmentCourtAuctionAdapter.method(:new)
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_args| error_adapter }
+
+    post properties_url, params: { case_number: "2026타경88888" }
+    assert_redirected_to properties_path
+    follow_redirect!
+    assert_match "시스템 설정을 확인", flash[:alert]
+  ensure
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end
 end

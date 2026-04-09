@@ -51,8 +51,38 @@ class PropertiesController < ApplicationController
         current_user.user_properties.create!(property: result.property)
         redirect_to properties_path, notice: "물건이 추가되었습니다."
       else
-        redirect_to properties_path, alert: "해당 사건번호의 물건을 찾을 수 없습니다."
+        error = result.errors[:court]
+        redirect_to properties_path, alert: error_message_for(error)
       end
+    end
+  rescue DataProvider::ParseError => e
+    if e.message.include?("Invalid case number format")
+      redirect_to properties_path, alert: "사건번호 형식이 올바르지 않습니다. (예: 2026타경1234)"
+    else
+      redirect_to properties_path, alert: "데이터 처리 중 오류가 발생했습니다."
+    end
+  end
+
+  private
+
+  def error_message_for(error)
+    case error
+    when DataProvider::TimeoutError
+      "데이터 수집 시간이 초과되었습니다. 다시 시도해주세요."
+    when DataProvider::ServiceUnavailableError, DataProvider::ConnectionError
+      "법원경매 사이트에 접속할 수 없습니다. 잠시 후 다시 시도해주세요."
+    when DataProvider::ConfigurationError
+      "브라우저 실행에 실패했습니다. 시스템 설정을 확인해주세요."
+    when DataProvider::ParseError
+      if error.message.include?("Invalid case number format")
+        "사건번호 형식이 올바르지 않습니다. (예: 2026타경1234)"
+      else
+        "데이터 처리 중 오류가 발생했습니다."
+      end
+    when DataProvider::DataNotFoundError, nil
+      "해당 사건번호의 물건을 찾을 수 없습니다."
+    else
+      "데이터 수집 중 오류가 발생했습니다. 다시 시도해주세요."
     end
   end
 end
