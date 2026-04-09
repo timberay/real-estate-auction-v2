@@ -4,11 +4,11 @@
     <span class="text-sm font-semibold text-slate-900 dark:text-slate-100">
       조건검색 결과 <span class="text-violet-500"><%= search_results.size %>건</span>
     </span>
-    <button type="button"
-            data-action="click->criteria-search#closeResults"
-            class="inline-flex items-center gap-1 border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 rounded-md px-2.5 py-1 text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+    <%= button_to clear_search_results_path, method: :delete,
+        class: "inline-flex items-center gap-1 border border-slate-300 dark:border-slate-600 text-slate-500 dark:text-slate-400 rounded-md px-2.5 py-1 text-xs hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors",
+        data: { turbo_stream: true } do %>
       ✕ 닫기
-    </button>
+    <% end %>
   </div>
 
   <% if search_results.any? %>

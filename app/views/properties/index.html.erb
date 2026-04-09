@@ -73,8 +73,7 @@
       <% if @search_results&.any? %>
         <%= render "search_results/inline_results",
                    search_results: @search_results,
-                   user_property_case_numbers: @user_property_case_numbers,
-                   pagy: @pagy_search %>
+                   user_property_case_numbers: @user_property_case_numbers %>
       <% end %>
     </div>
   </div>

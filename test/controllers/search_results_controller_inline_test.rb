@@ -159,4 +159,43 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
   ensure
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end
+
+  test "DELETE clear removes all search results and returns turbo stream" do
+    3.times do |i|
+      @user.search_results.create!(
+        case_number: "2026타경#{90000 + i}",
+        address: "서울특별시",
+        appraisal_price: 100_000_000,
+        min_bid_price: 70_000_000
+      )
+    end
+
+    assert_difference "SearchResult.count", -3 do
+      delete clear_search_results_url, as: :turbo_stream
+    end
+    assert_response :success
+    assert_includes response.content_type, "text/vnd.turbo-stream.html"
+  end
+
+  test "properties index renders persisted search results on load" do
+    @user.search_results.create!(
+      case_number: "2026타경55555",
+      address: "부산광역시",
+      appraisal_price: 150_000_000,
+      min_bid_price: 105_000_000
+    )
+
+    get properties_url
+    assert_response :success
+    assert_match "2026타경55555", response.body
+    assert_match "criteria-search-results", response.body
+  end
+
+  test "properties index does not render results box when no search results" do
+    @user.search_results.destroy_all
+
+    get properties_url
+    assert_response :success
+    assert_no_match(/조건검색 결과/, response.body)
+  end
 end

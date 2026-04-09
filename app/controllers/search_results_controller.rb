@@ -21,11 +21,11 @@ class SearchResultsController < ApplicationController
             partial: "search_results/inline_error",
             locals: { message: error_message_for(result.error) })
         else
-          @search_results = current_user.search_results.order(created_at: :desc)
+          search_results = current_user.search_results.order(created_at: :desc)
           @user_property_case_numbers = current_user.properties.pluck(:case_number)
           render turbo_stream: turbo_stream.update("criteria-search-results",
             partial: "search_results/inline_results",
-            locals: { search_results: @search_results, user_property_case_numbers: @user_property_case_numbers })
+            locals: { search_results: search_results, user_property_case_numbers: @user_property_case_numbers })
         end
       end
     end
@@ -53,6 +53,17 @@ class SearchResultsController < ApplicationController
         dom_id(search_result, :inline),
         partial: "search_results/inline_result_item_error",
         locals: { search_result: search_result, message: error_message_for(import_result[:error]) })
+    end
+  end
+
+  def clear
+    current_user.search_results.destroy_all
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.update("criteria-search-results", "")
+      end
+      format.html { redirect_to properties_path }
     end
   end
 

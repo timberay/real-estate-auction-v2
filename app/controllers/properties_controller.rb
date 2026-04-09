@@ -18,11 +18,8 @@ class PropertiesController < ApplicationController
     end
 
     # Load persisted search results for inline display
-    search_results = current_user.search_results.order(created_at: :desc)
-    if search_results.exists?
-      @pagy_search, @search_results = pagy(search_results, limit: 10, page_param: :search_page)
-      @user_property_case_numbers = current_user.properties.pluck(:case_number)
-    end
+    @search_results = current_user.search_results.order(created_at: :desc)
+    @user_property_case_numbers = current_user.properties.pluck(:case_number) if @search_results.exists?
   end
 
   def show

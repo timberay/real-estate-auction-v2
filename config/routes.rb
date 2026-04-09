@@ -48,7 +48,6 @@ Rails.application.routes.draw do
 
   resources :search_results, only: [ :index, :create ] do
     collection do
-      get :inline_page
       delete :clear
     end
     member do
