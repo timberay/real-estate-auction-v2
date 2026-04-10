@@ -24,7 +24,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     Property.where(case_number: "2026타경88888").destroy_all
 
     discovery_result = CaseSearchService::Result.new(
-      properties: [Property.new(case_number: "2026타경88888")],
+      properties: [ Property.new(case_number: "2026타경88888") ],
       error: nil
     )
 
@@ -177,7 +177,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "POST create handles timeout error during detail sync" do
-    discovery_result = CaseSearchService::Result.new(properties: [Property.new(case_number: "2026타경88888")], error: nil)
+    discovery_result = CaseSearchService::Result.new(properties: [ Property.new(case_number: "2026타경88888") ], error: nil)
     original_find = CaseSearchService.method(:find_by_case_number)
     CaseSearchService.define_singleton_method(:find_by_case_number) { |**_| discovery_result }
 
@@ -199,7 +199,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "POST create handles service unavailable during detail sync" do
-    discovery_result = CaseSearchService::Result.new(properties: [Property.new(case_number: "2026타경88888")], error: nil)
+    discovery_result = CaseSearchService::Result.new(properties: [ Property.new(case_number: "2026타경88888") ], error: nil)
     original_find = CaseSearchService.method(:find_by_case_number)
     CaseSearchService.define_singleton_method(:find_by_case_number) { |**_| discovery_result }
 
@@ -221,7 +221,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "POST create handles configuration error during detail sync" do
-    discovery_result = CaseSearchService::Result.new(properties: [Property.new(case_number: "2026타경88888")], error: nil)
+    discovery_result = CaseSearchService::Result.new(properties: [ Property.new(case_number: "2026타경88888") ], error: nil)
     original_find = CaseSearchService.method(:find_by_case_number)
     CaseSearchService.define_singleton_method(:find_by_case_number) { |**_| discovery_result }
 

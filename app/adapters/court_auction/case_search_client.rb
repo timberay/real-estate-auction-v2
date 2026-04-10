@@ -78,7 +78,7 @@ module CourtAuction
     ].freeze
 
     def self.priority_court_codes
-      priority = PRIORITY_COURTS.filter_map { |name| [name, COURT_CODES[name]] if COURT_CODES[name] }
+      priority = PRIORITY_COURTS.filter_map { |name| [ name, COURT_CODES[name] ] if COURT_CODES[name] }
       remaining = COURT_CODES.reject { |name, _| PRIORITY_COURTS.include?(name) }.to_a
       priority + remaining
     end
