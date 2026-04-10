@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :rights_analysis_reports, dependent: :destroy
   has_many :api_credentials, dependent: :destroy
   has_many :search_results, dependent: :destroy
+  has_many :llm_analysis_logs, dependent: :nullify
   validates :email, presence: true, uniqueness: true
 
   # -- Search preference convenience methods --

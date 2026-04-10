@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_10_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_10_101554) do
   create_table "api_credentials", force: :cascade do |t|
     t.string "api_key"
     t.string "api_secret"
@@ -149,6 +149,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_10_000001) do
     t.string "share_ratio"
     t.datetime "updated_at", null: false
     t.index ["property_id"], name: "index_land_details_on_property_id"
+  end
+
+  create_table "llm_analysis_logs", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "error_message"
+    t.datetime "executed_at"
+    t.string "model"
+    t.integer "property_id", null: false
+    t.string "provider"
+    t.json "response_json"
+    t.integer "status", default: 0, null: false
+    t.text "system_prompt", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.text "user_prompt", null: false
+    t.index ["property_id", "status"], name: "index_llm_analysis_logs_on_property_id_and_status"
+    t.index ["property_id"], name: "index_llm_analysis_logs_on_property_id"
+    t.index ["status"], name: "index_llm_analysis_logs_on_status"
+    t.index ["user_id"], name: "index_llm_analysis_logs_on_user_id"
   end
 
   create_table "loan_policies", force: :cascade do |t|
@@ -319,6 +338,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_10_000001) do
   add_foreign_key "inspection_results", "properties"
   add_foreign_key "inspection_results", "users"
   add_foreign_key "land_details", "properties"
+  add_foreign_key "llm_analysis_logs", "properties"
+  add_foreign_key "llm_analysis_logs", "users"
   add_foreign_key "loan_policies", "property_types"
   add_foreign_key "property_sale_details", "properties"
   add_foreign_key "reserve_fund_defaults", "property_types"
