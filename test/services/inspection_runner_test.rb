@@ -332,6 +332,57 @@ class InspectionRunnerTest < ActiveSupport::TestCase
     assert_nil result.has_risk
   end
 
+  # === Evidence storage tests ===
+
+  test "auto-detected result stores evidence with field data" do
+    InspectionRunner.call(property: @safe_property, user: @user)
+    result = find_result(@safe_property, "property-006")
+    return unless result
+    assert_equal "auto", result.source_type
+    assert_not_nil result.evidence, "auto result should have evidence"
+    assert_equal "법원경매 물건정보", result.evidence["source_label"]
+    assert_kind_of Array, result.evidence["fields"]
+    field = result.evidence["fields"].find { |f| f["label"] == "물건종류" }
+    assert_not_nil field
+    assert_equal "아파트", field["value"]
+  end
+
+  test "auto-detected result stores evidence with keyword data" do
+    InspectionRunner.call(property: @safe_property, user: @user)
+    result = find_result(@safe_property, "rights-020")
+    return unless result
+    assert_equal "auto", result.source_type
+    assert_not_nil result.evidence
+    assert_equal "비고, 물건명세서, 현황조사서", result.evidence["source_label"]
+    assert_kind_of Hash, result.evidence["keywords"]
+    assert_includes result.evidence["keywords"]["searched"], "유치권"
+    assert_equal false, result.evidence["keywords"]["found"]
+  end
+
+  test "partial grade keyword rule stores evidence when risk detected" do
+    InspectionRunner.call(property: @basement_villa, user: @user)
+    result = find_result(@basement_villa, "rights-005")
+    return unless result
+    assert_equal "auto", result.source_type
+    assert_not_nil result.evidence
+    assert_equal "물건명세서, 감정평가서", result.evidence["source_label"]
+    assert_includes result.evidence["keywords"]["searched"], "무허가"
+    assert_equal true, result.evidence["keywords"]["found"]
+  end
+
+  test "partial grade field rule stores evidence when risk detected" do
+    property = @safe_property
+    property.update!(status: "취하")
+    InspectionRunner.call(property: property, user: @user)
+    result = find_result(property, "bidding-001")
+    return unless result
+    assert_equal "auto", result.source_type
+    assert_not_nil result.evidence
+    assert_equal "법원경매 물건정보", result.evidence["source_label"]
+    field = result.evidence["fields"].find { |f| f["label"] == "진행상태" }
+    assert_equal "취하", field["value"]
+  end
+
   # === Removed rules: registry/building_ledger should not auto-detect ===
 
   test "registry transcript items are not auto-detected" do
