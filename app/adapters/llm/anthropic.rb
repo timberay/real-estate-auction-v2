@@ -15,7 +15,7 @@ module Llm
           model: model_name(DEFAULT_MODEL),
           max_tokens: 4096,
           system: system,
-          messages: [{ role: "user", content: prompt }]
+          messages: [ { role: "user", content: prompt } ]
         }
       end
       handle_response(response)

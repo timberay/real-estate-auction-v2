@@ -12,8 +12,8 @@ module Llm
       response = conn.post("/v1beta/models/#{model}:generateContent") do |req|
         req.params["key"] = key
         req.body = {
-          system_instruction: { parts: [{ text: system }] },
-          contents: [{ parts: [{ text: prompt }] }]
+          system_instruction: { parts: [ { text: system } ] },
+          contents: [ { parts: [ { text: prompt } ] } ]
         }
       end
       handle_response(response)
