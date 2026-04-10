@@ -53,6 +53,12 @@ class InspectionResultTest < ActiveSupport::TestCase
     assert result.manual?
   end
 
+  test "source_type enum includes ai" do
+    result = InspectionResult.new(source_type: :ai)
+    assert result.ai?
+    assert_equal 2, InspectionResult.source_types["ai"]
+  end
+
   test "has_risk nil means unanswered" do
     result = InspectionResult.new(
       property: properties(:safe_apartment),
