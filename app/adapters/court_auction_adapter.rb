@@ -10,4 +10,12 @@ class CourtAuctionAdapter
   def search_by_criteria(region:, year:, min_price:, max_price:)
     raise NotImplementedError, "#{self.class}#search_by_criteria must be implemented"
   end
+
+  def search_case(court_code:, case_number:)
+    raise NotImplementedError, "#{self.class}#search_case must be implemented"
+  end
+
+  def search_case_by_serial(court_code:, serial_number:)
+    raise NotImplementedError, "#{self.class}#search_case_by_serial must be implemented"
+  end
 end

@@ -1,6 +1,7 @@
 class GovernmentCourtAuctionAdapter < CourtAuctionAdapter
   def initialize
     @browser_client = CourtAuction::BrowserClient.new
+    @case_search_client = CourtAuction::CaseSearchClient.new
     @parser = CourtAuction::ResponseParser.new
     @rate_limiter = CourtAuction::RateLimiter.new
   end
@@ -35,5 +36,15 @@ class GovernmentCourtAuctionAdapter < CourtAuctionAdapter
       min_price: min_price,
       max_price: max_price
     )
+  end
+
+  def search_case(court_code:, case_number:)
+    @rate_limiter.throttle
+    @case_search_client.search(court_code: court_code, case_number: case_number)
+  end
+
+  def search_case_by_serial(court_code:, serial_number:)
+    @rate_limiter.throttle
+    @case_search_client.search_by_serial(court_code: court_code, serial_number: serial_number)
   end
 end
