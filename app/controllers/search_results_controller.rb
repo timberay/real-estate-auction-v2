@@ -5,7 +5,12 @@ class SearchResultsController < ApplicationController
   end
 
   def create
-    result = CourtAuctionSearchService.call(user: current_user)
+    bs = current_user.budget_setting
+    result = CourtAuctionSearchService.call(
+      user: current_user,
+      address: bs&.effective_region || BudgetSetting::DEFAULT_REGION,
+      max_bid_price: bs&.max_bid_amount.to_i * 10_000
+    )
 
     respond_to do |format|
       format.html do

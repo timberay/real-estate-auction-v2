@@ -3,11 +3,6 @@ require "test_helper"
 class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
   setup do
     @user = users(:guest)
-    @user.create_budget_setting!(
-      region: "제주특별자치도",
-      max_bid_amount: 30000,
-      available_cash: 10000
-    ) unless @user.budget_setting
   end
 
   test "creates search_results from adapter response" do
@@ -26,7 +21,7 @@ class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
           "mulBigo" => "일괄매각"
         }
       ],
-      total: 1
+      total_count: 1
     }
 
     adapter = Object.new
@@ -35,10 +30,14 @@ class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
     original_new = GovernmentCourtAuctionAdapter.method(:new)
     GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
 
-    result = CourtAuctionSearchService.call(user: @user)
+    result = CourtAuctionSearchService.call(
+      user: @user,
+      address: "제주특별자치도 서귀포시 성산읍",
+      max_bid_price: 200_000_000
+    )
 
     assert_equal 1, result.count
-    assert_equal 1, @user.search_results.count
+    assert_nil result.error
 
     sr = @user.search_results.first
     assert_equal "2024타경4812", sr.case_number
@@ -51,62 +50,59 @@ class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end
 
+  test "maps address to region_code and max_bid_price to next price tier" do
+    mock_response = { items: [], total_count: 0 }
+    adapter = Object.new
+    captured_args = nil
+    adapter.define_singleton_method(:search_by_criteria) do |**args|
+      captured_args = args
+      mock_response
+    end
+
+    original_new = GovernmentCourtAuctionAdapter.method(:new)
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
+
+    CourtAuctionSearchService.call(
+      user: @user,
+      address: "서울특별시 강남구 역삼동 100",
+      max_bid_price: 120_000_000
+    )
+
+    assert_equal "11", captured_args[:region_code]
+    assert_equal 150_000_000, captured_args[:max_price]
+  ensure
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
+  end
+
+  test "returns error for unrecognized address" do
+    result = CourtAuctionSearchService.call(
+      user: @user,
+      address: "알수없는주소",
+      max_bid_price: 100_000_000
+    )
+
+    assert_equal 0, result.count
+    assert_kind_of ArgumentError, result.error
+  end
+
   test "replaces existing search_results on new search" do
     @user.search_results.create!(case_number: "OLD001", address: "old")
 
-    mock_response = { items: [ { "srnSaNo" => "NEW001", "mulJinYn" => "Y" } ], total: 1 }
+    mock_response = { items: [ { "srnSaNo" => "NEW001", "mulJinYn" => "Y" } ], total_count: 1 }
     adapter = Object.new
     adapter.define_singleton_method(:search_by_criteria) { |**_args| mock_response }
 
     original_new = GovernmentCourtAuctionAdapter.method(:new)
     GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
 
-    CourtAuctionSearchService.call(user: @user)
+    CourtAuctionSearchService.call(
+      user: @user,
+      address: "제주특별자치도 제주시",
+      max_bid_price: 100_000_000
+    )
 
     assert_equal 1, @user.search_results.count
     assert_equal "NEW001", @user.search_results.first.case_number
-  ensure
-    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
-  end
-
-  test "uses default region when budget_setting has no region" do
-    @user.budget_setting.update!(region: nil)
-
-    mock_response = { items: [], total: 0 }
-    adapter = Object.new
-    captured_args = nil
-    adapter.define_singleton_method(:search_by_criteria) do |**args|
-      captured_args = args
-      mock_response
-    end
-
-    original_new = GovernmentCourtAuctionAdapter.method(:new)
-    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
-
-    CourtAuctionSearchService.call(user: @user)
-
-    assert_equal "제주특별자치도", captured_args[:region]
-  ensure
-    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
-  end
-
-  test "uses default max_price when budget_setting has no max_bid_amount" do
-    @user.budget_setting.update!(max_bid_amount: nil)
-
-    mock_response = { items: [], total: 0 }
-    adapter = Object.new
-    captured_args = nil
-    adapter.define_singleton_method(:search_by_criteria) do |**args|
-      captured_args = args
-      mock_response
-    end
-
-    original_new = GovernmentCourtAuctionAdapter.method(:new)
-    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
-
-    CourtAuctionSearchService.call(user: @user)
-
-    assert_equal 500_000_000, captured_args[:max_price]
   ensure
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end
@@ -118,7 +114,7 @@ class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
         { "srnSaNo" => "2024타경1000", "printSt" => "주소B", "mulJinYn" => "Y" },
         { "srnSaNo" => "2024타경2000", "printSt" => "주소C", "mulJinYn" => "Y" }
       ],
-      total: 3
+      total_count: 3
     }
 
     adapter = Object.new
@@ -127,7 +123,11 @@ class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
     original_new = GovernmentCourtAuctionAdapter.method(:new)
     GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
 
-    CourtAuctionSearchService.call(user: @user)
+    CourtAuctionSearchService.call(
+      user: @user,
+      address: "서울특별시 강남구",
+      max_bid_price: 300_000_000
+    )
 
     assert_equal 2, @user.search_results.count
     multi = @user.search_results.find_by(case_number: "2024타경1000")
@@ -145,7 +145,11 @@ class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
     original_new = GovernmentCourtAuctionAdapter.method(:new)
     GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
 
-    result = CourtAuctionSearchService.call(user: @user)
+    result = CourtAuctionSearchService.call(
+      user: @user,
+      address: "서울특별시 강남구",
+      max_bid_price: 100_000_000
+    )
 
     assert_equal 0, result.count
     assert_instance_of DataProvider::TimeoutError, result.error

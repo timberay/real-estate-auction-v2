@@ -1,32 +1,33 @@
 class CourtAuctionSearchService
   Result = Data.define(:count, :error)
 
-  def self.call(user:)
-    new(user:).call
+  def self.call(user:, address:, max_bid_price:)
+    new(user: user, address: address, max_bid_price: max_bid_price).call
   end
 
-  def initialize(user:)
+  def initialize(user:, address:, max_bid_price:)
     @user = user
+    @address = address
+    @max_bid_price = max_bid_price
   end
 
   def call
-    bs = @user.budget_setting
+    region_code = CourtAuction::CriteriaSearchClient.region_code_for(@address)
+    unless region_code
+      return Result.new(count: 0, error: ArgumentError.new("Unknown region in address: #{@address}"))
+    end
 
-    region = bs&.effective_region || BudgetSetting::DEFAULT_REGION
-    year = Time.current.year.to_s
-    max_price = bs&.max_price_option || BudgetSetting::DEFAULT_MAX_PRICE
+    max_price = CourtAuction::CriteriaSearchClient.next_price_tier(@max_bid_price)
 
     adapter = GovernmentCourtAuctionAdapter.new
-    response = adapter.search_by_criteria(
-      region: region,
-      year: year,
-      min_price: 50_000_000,
-      max_price: max_price
-    )
+    response = adapter.search_by_criteria(region_code: region_code, max_price: max_price)
 
     saved_count = persist_results(response[:items])
 
-    Rails.logger.info "[CourtAuctionSearch] API total=#{response[:total]}, items=#{response[:items].size}, saved=#{saved_count}"
+    Rails.logger.info(
+      "[CourtAuctionSearch] region=#{region_code} max_price=#{max_price} " \
+      "total=#{response[:total_count]} saved=#{saved_count}"
+    )
 
     Result.new(count: saved_count, error: nil)
   rescue DataProvider::Error => e
