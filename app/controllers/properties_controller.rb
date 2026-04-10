@@ -46,6 +46,9 @@ class PropertiesController < ApplicationController
       return
     end
 
+    # Validate format before any DB or API calls
+    CourtAuction::CaseNumberParser.parse(case_number)
+
     property = Property.find_by(case_number: case_number)
 
     if property&.address.present?

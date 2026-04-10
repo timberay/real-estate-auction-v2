@@ -1,5 +1,66 @@
 # E2E Test Report
 
+## Run 4: Court Auto-Discovery & Case Search UI (2026-04-10)
+
+- **Test date:** 2026-04-10T11:11Z
+- **Target URL:** http://localhost:3000/properties
+- **Context:** Verified UI after adding court auto-discovery to case number search (CaseSearchService.find_by_case_number)
+- **Total scenarios:** 6
+- **Passed:** 4 | **Failed:** 0 | **Skipped:** 1 | **Inconclusive:** 1
+
+### Results Summary
+
+| # | Scenario | Status | Screenshots | Notes |
+|---|----------|--------|-------------|-------|
+| S-001 | Properties index initial state | PASS | before/s001-properties-index.png | All UI elements present, no JS errors |
+| S-002 | Empty case number submit | PASS | after/s002-empty-case-number-error.png | Flash alert: "사건번호를 입력해주세요." |
+| S-003 | Invalid format case number | INCONCLUSIVE | after/s003-invalid-format-error.png | See Issue #1 — no fast validation before court discovery |
+| S-004 | Valid case number loading state | PASS | before/s004-case-number-input-filled.png, after/s004-case-number-loading.png | + button disabled, 조건검색 disabled, spinner shown |
+| S-005 | Criteria search execution | PASS | before/s005-before-criteria-search.png, after/s005-criteria-search-loading.png | 13 results from live API, inline grid display |
+| S-006 | Inline import (click-to-add) | SKIP | before/s006-criteria-results.png, after/s006-after-inline-import.png | Card disabled during import; full verify needs BrowserClient |
+
+### UI Verification Checklist
+
+**Case Number Search Form:**
+- [x] Text input with placeholder "예: 2026타경1234"
+- [x] + button triggers form submit
+- [x] Empty submit shows validation error
+- [x] Loading state: input readonly, + button disabled with spinner, 조건검색 disabled
+- [x] Stimulus controller (`criteria-search`) active and managing state
+
+**Criteria Search:**
+- [x] "조건검색" button visible and clickable
+- [x] Uses BudgetSetting region and max_bid_amount
+- [x] Results render inline in 4-column grid
+- [x] Card shows: case_number (violet), appraisal_price, min_bid_price, address
+- [x] 다물건 badge when property_count > 1
+- [x] Count display: "조건검색 결과 13건"
+- [x] Cards are clickable, disabled during import
+
+**No UI changes needed:** The court auto-discovery change is backend-only. The existing case number input + "+" button UI works correctly with the new discovery flow.
+
+### Issues Found
+
+**Issue #1 (Important): Invalid format bypasses fast validation**
+
+When user submits "invalid-format", the controller calls `CaseSearchService.find_by_case_number` which iterates 60 courts via HTTP. This takes 30+ seconds vs instant failure.
+
+**Fix:** Add `CaseNumberParser.parse(case_number)` validation before discovery:
+```ruby
+begin
+  CourtAuction::CaseNumberParser.parse(case_number)
+rescue DataProvider::ParseError
+  redirect_to properties_path, alert: "사건번호 형식이 올바르지 않습니다. (예: 2026타경1234)"
+  return
+end
+```
+
+### Console Errors
+
+None detected (0 JS errors across all scenarios).
+
+---
+
 ## Run 3: Post Playwright Redesign Verification (2026-04-09)
 
 - **Test date:** 2026-04-09T04:41:00Z
