@@ -36,7 +36,7 @@ PropertyInspectionService.call(property:, user:)
   ├── [primary] AiInspectionRunner.call(property:, user:)
   │       ├── PropertyDataAssembler.call(property)  → structured text
   │       ├── InspectionPromptBuilder.call(text, items)  → system + user prompt
-  │       ├── LlmAdapter.for(:anthropic).analyze(prompt)  → JSON response
+  │       ├── LlmAdapter.for.analyze(prompt)  → JSON response
   │       └── InspectionResultMapper.call(response, property, user)  → DB records
   │
   ├── [fallback] InspectionRunner.call(property:, user:)
@@ -61,7 +61,7 @@ class AiInspectionRunner
     text = Inspection::PropertyDataAssembler.call(@property)
     items = InspectionItem.ordered
     prompt = Inspection::InspectionPromptBuilder.call(property_text: text, items: items)
-    response = LlmAdapter.for(:anthropic).analyze(system: prompt[:system], prompt: prompt[:user])
+    response = LlmAdapter.for.analyze(system: prompt[:system], prompt: prompt[:user])
     Inspection::InspectionResultMapper.call(
       response: response, property: @property, user: @user, items: items
     )
@@ -157,7 +157,7 @@ Base class with mock/real switching.
 
 ```ruby
 class LlmAdapter
-  def self.for(provider = :anthropic)
+  def self.for
     if ENV["USE_MOCK"] == "true"
       MockLlmAdapter.new
     else

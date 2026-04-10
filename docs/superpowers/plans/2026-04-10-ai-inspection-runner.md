@@ -89,14 +89,14 @@ class LlmAdapterTest < ActiveSupport::TestCase
 
   test ".for returns MockLlmAdapter when USE_MOCK is true" do
     ClimateControl.modify(USE_MOCK: "true") do
-      adapter = LlmAdapter.for(:anthropic)
+      adapter = LlmAdapter.for
       assert_instance_of MockLlmAdapter, adapter
     end
   end
 
   test ".for returns AnthropicLlmAdapter when USE_MOCK is not true" do
     ClimateControl.modify(USE_MOCK: "false") do
-      adapter = LlmAdapter.for(:anthropic)
+      adapter = LlmAdapter.for
       assert_instance_of AnthropicLlmAdapter, adapter
     end
   end
@@ -132,7 +132,7 @@ If missing, use ENV stubbing instead. Replace ClimateControl in tests with:
 test ".for returns MockLlmAdapter when USE_MOCK is true" do
   original = ENV["USE_MOCK"]
   ENV["USE_MOCK"] = "true"
-  adapter = LlmAdapter.for(:anthropic)
+  adapter = LlmAdapter.for
   assert_instance_of MockLlmAdapter, adapter
 ensure
   ENV["USE_MOCK"] = original
@@ -145,7 +145,7 @@ Create `app/adapters/llm_adapter.rb`:
 
 ```ruby
 class LlmAdapter
-  def self.for(provider = :anthropic)
+  def self.for
     if ENV["USE_MOCK"] == "true"
       MockLlmAdapter.new
     else
@@ -1069,7 +1069,7 @@ class AiInspectionRunner
     text = Inspection::PropertyDataAssembler.call(@property)
     items = InspectionItem.ordered
     prompt = Inspection::InspectionPromptBuilder.call(property_text: text, items: items)
-    response = LlmAdapter.for(:anthropic).analyze(system: prompt[:system], prompt: prompt[:user])
+    response = LlmAdapter.for.analyze(system: prompt[:system], prompt: prompt[:user])
     Inspection::InspectionResultMapper.call(
       response: response, property: @property, user: @user, items: items
     )
