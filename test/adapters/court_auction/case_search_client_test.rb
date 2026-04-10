@@ -114,6 +114,28 @@ class CourtAuction::CaseSearchClientTest < ActiveSupport::TestCase
     end
   end
 
+  # -- priority court ordering -----------------------------------------------
+
+  test "priority_court_codes returns all courts with priority ones first" do
+    codes = CourtAuction::CaseSearchClient.priority_court_codes
+
+    # Contains all 60 courts
+    assert_equal CourtAuction::CaseSearchClient::COURT_CODES.size, codes.size
+
+    # Seoul courts come first
+    first_5 = codes.first(5).map(&:first)
+    assert_includes first_5, "서울중앙지방법원"
+    assert_includes first_5, "서울동부지방법원"
+    assert_includes first_5, "서울서부지방법원"
+    assert_includes first_5, "서울남부지방법원"
+    assert_includes first_5, "서울북부지방법원"
+
+    # Gyeonggi courts come next
+    next_batch = codes.slice(5, 7).map(&:first)
+    assert_includes next_batch, "수원지방법원"
+    assert_includes next_batch, "의정부지방법원"
+  end
+
   # -- court code lookup -----------------------------------------------------
 
   test "court_code_for returns correct code for known court name" do

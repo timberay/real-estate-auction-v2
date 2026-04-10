@@ -71,6 +71,18 @@ module CourtAuction
       "제주지방법원" => "B000530"
     }.freeze
 
+    PRIORITY_COURTS = %w[
+      서울중앙지방법원 서울동부지방법원 서울서부지방법원 서울남부지방법원 서울북부지방법원
+      수원지방법원 성남지원 안산지원 안양지원 의정부지방법원 고양지원 남양주지원
+      인천지방법원 부천지원
+    ].freeze
+
+    def self.priority_court_codes
+      priority = PRIORITY_COURTS.filter_map { |name| [name, COURT_CODES[name]] if COURT_CODES[name] }
+      remaining = COURT_CODES.reject { |name, _| PRIORITY_COURTS.include?(name) }.to_a
+      priority + remaining
+    end
+
     def self.court_code_for(court_name)
       COURT_CODES[court_name]
     end
