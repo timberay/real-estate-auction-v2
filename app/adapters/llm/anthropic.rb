@@ -3,6 +3,14 @@ module Llm
     BASE_URL = "https://api.anthropic.com"
     DEFAULT_MODEL = "claude-sonnet-4-20250514"
 
+    def provider_name
+      "anthropic"
+    end
+
+    def model_id
+      model_name(DEFAULT_MODEL)
+    end
+
     def analyze(system:, prompt:)
       key = api_key("anthropic", "ANTHROPIC_API_KEY")
       raise "ANTHROPIC_API_KEY not configured. Set USE_MOCK=true for development." unless key

@@ -3,6 +3,14 @@ module Llm
     BASE_URL = "https://api.openai.com"
     DEFAULT_MODEL = "gpt-4o-mini"
 
+    def provider_name
+      "openai"
+    end
+
+    def model_id
+      model_name(DEFAULT_MODEL)
+    end
+
     def analyze(system:, prompt:)
       key = api_key("openai", "OPENAI_API_KEY")
       raise "OPENAI_API_KEY not configured. Set USE_MOCK=true for development." unless key

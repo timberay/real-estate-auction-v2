@@ -20,6 +20,14 @@ module Llm
       raise NotImplementedError, "#{self.class}#analyze must be implemented"
     end
 
+    def provider_name
+      raise NotImplementedError, "#{self.class}#provider_name must be implemented"
+    end
+
+    def model_id
+      raise NotImplementedError, "#{self.class}#model_id must be implemented"
+    end
+
     private
 
     def api_key(provider_name, env_key)

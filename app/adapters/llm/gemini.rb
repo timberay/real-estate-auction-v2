@@ -3,6 +3,14 @@ module Llm
     BASE_URL = "https://generativelanguage.googleapis.com"
     DEFAULT_MODEL = "gemini-2.0-flash"
 
+    def provider_name
+      "gemini"
+    end
+
+    def model_id
+      model_name(DEFAULT_MODEL)
+    end
+
     def analyze(system:, prompt:)
       key = api_key("gemini", "GEMINI_API_KEY")
       raise "GEMINI_API_KEY not configured. Set USE_MOCK=true for development." unless key

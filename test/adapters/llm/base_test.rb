@@ -98,4 +98,63 @@ class Llm::BaseTest < ActiveSupport::TestCase
   ensure
     ENV["LLM_MODEL"] = original
   end
+
+  test "base class raises NotImplementedError on provider_name" do
+    adapter = Llm::Base.new
+    assert_raises(NotImplementedError) do
+      adapter.provider_name
+    end
+  end
+
+  test "base class raises NotImplementedError on model_id" do
+    adapter = Llm::Base.new
+    assert_raises(NotImplementedError) do
+      adapter.model_id
+    end
+  end
+
+  test "Mock adapter returns provider_name and model_id" do
+    adapter = Llm::Mock.new
+    assert_equal "mock", adapter.provider_name
+    assert_equal "mock", adapter.model_id
+  end
+
+  test "Anthropic adapter returns provider_name and model_id" do
+    adapter = Llm::Anthropic.new
+    assert_equal "anthropic", adapter.provider_name
+    assert_includes adapter.model_id, "claude"
+  end
+
+  test "OpenAi adapter returns provider_name and model_id" do
+    adapter = Llm::OpenAi.new
+    assert_equal "openai", adapter.provider_name
+    assert_includes adapter.model_id, "gpt"
+  end
+
+  test "Gemini adapter returns provider_name and model_id" do
+    adapter = Llm::Gemini.new
+    assert_equal "gemini", adapter.provider_name
+    assert_includes adapter.model_id, "gemini"
+  end
+
+  test "Ollama adapter returns provider_name and model_id" do
+    adapter = Llm::Ollama.new
+    assert_equal "ollama", adapter.provider_name
+    assert_includes adapter.model_id, "llama"
+  end
+
+  test "OpenRouter adapter returns provider_name and model_id" do
+    adapter = Llm::OpenRouter.new
+    assert_equal "openrouter", adapter.provider_name
+    assert_includes adapter.model_id, "claude"
+  end
+
+  test "Base.for returns adapter with metadata methods" do
+    ENV["USE_MOCK"] = "true"
+    adapter = Llm::Base.for
+    assert_respond_to adapter, :provider_name
+    assert_respond_to adapter, :model_id
+  ensure
+    ENV.delete("USE_MOCK")
+  end
 end

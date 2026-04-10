@@ -5,5 +5,13 @@ module Llm
     def analyze(system:, prompt:)
       JSON.parse(File.read(FIXTURE_PATH))
     end
+
+    def provider_name
+      "mock"
+    end
+
+    def model_id
+      "mock"
+    end
   end
 end

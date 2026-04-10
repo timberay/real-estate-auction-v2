@@ -2,6 +2,14 @@ module Llm
   class Ollama < Base
     DEFAULT_MODEL = "llama3.1"
 
+    def provider_name
+      "ollama"
+    end
+
+    def model_id
+      model_name(DEFAULT_MODEL)
+    end
+
     def analyze(system:, prompt:)
       conn = connection(base_url)
       response = conn.post("/api/chat") do |req|

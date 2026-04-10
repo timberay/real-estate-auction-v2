@@ -3,6 +3,14 @@ module Llm
     BASE_URL = "https://openrouter.ai"
     DEFAULT_MODEL = "anthropic/claude-sonnet-4-20250514"
 
+    def provider_name
+      "openrouter"
+    end
+
+    def model_id
+      model_name(DEFAULT_MODEL)
+    end
+
     def analyze(system:, prompt:)
       key = api_key("openrouter", "OPENROUTER_API_KEY")
       raise "OPENROUTER_API_KEY not configured. Set USE_MOCK=true for development." unless key
