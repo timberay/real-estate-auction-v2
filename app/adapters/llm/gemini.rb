@@ -4,7 +4,21 @@ module Llm
     DEFAULT_MODEL = "gemini-2.0-flash"
 
     def analyze(system:, prompt:)
-      raise NotImplementedError, "#{self.class}#analyze not yet implemented"
+      key = api_key("gemini", "GEMINI_API_KEY")
+      raise "GEMINI_API_KEY not configured. Set USE_MOCK=true for development." unless key
+
+      model = model_name(DEFAULT_MODEL)
+      conn = connection(BASE_URL)
+      response = conn.post("/v1beta/models/#{model}:generateContent") do |req|
+        req.params["key"] = key
+        req.body = {
+          system_instruction: { parts: [{ text: system }] },
+          contents: [{ parts: [{ text: prompt }] }]
+        }
+      end
+      handle_response(response)
+      text = response.body["candidates"][0]["content"]["parts"][0]["text"]
+      sanitize_and_parse_json(text)
     end
   end
 end

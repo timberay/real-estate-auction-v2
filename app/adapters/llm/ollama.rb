@@ -3,7 +3,19 @@ module Llm
     DEFAULT_MODEL = "llama3.1"
 
     def analyze(system:, prompt:)
-      raise NotImplementedError, "#{self.class}#analyze not yet implemented"
+      conn = connection(base_url)
+      response = conn.post("/api/chat") do |req|
+        req.body = {
+          model: model_name(DEFAULT_MODEL),
+          stream: false,
+          messages: [
+            { role: "system", content: system },
+            { role: "user", content: prompt }
+          ]
+        }
+      end
+      handle_response(response)
+      sanitize_and_parse_json(response.body["message"]["content"])
     end
 
     private
