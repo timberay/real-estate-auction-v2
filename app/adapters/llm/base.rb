@@ -1,6 +1,6 @@
 module Llm
   class Base
-    TIMEOUT_SECONDS = 30
+    TIMEOUT_SECONDS = 120
 
     def self.for
       return Llm::Mock.new if ENV["USE_MOCK"] == "true"

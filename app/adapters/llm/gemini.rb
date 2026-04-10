@@ -1,7 +1,7 @@
 module Llm
   class Gemini < Base
     BASE_URL = "https://generativelanguage.googleapis.com"
-    DEFAULT_MODEL = "gemini-2.0-flash"
+    DEFAULT_MODEL = "gemini-2.5-flash"
 
     def provider_name
       "gemini"
