@@ -57,6 +57,25 @@ class PropertyInspectionFlowTest < ActionDispatch::IntegrationTest
     assert_select "span", text: "수정됨"
   end
 
+  test "inspection flow stores evidence for auto-detected results" do
+    post property_inspections_start_url(@property)
+
+    auto_results = @property.inspection_results
+      .where(user: @user, source_type: "auto")
+      .where.not(evidence: nil)
+
+    assert auto_results.any?, "At least one auto result should have evidence"
+
+    auto_results.each do |result|
+      assert_not_nil result.evidence["source_label"],
+        "evidence for #{result.inspection_item.code} should have source_label"
+      has_fields = result.evidence["fields"].present?
+      has_keywords = result.evidence["keywords"].present?
+      assert has_fields || has_keywords,
+        "evidence for #{result.inspection_item.code} should have fields or keywords"
+    end
+  end
+
   test "manual input updates result" do
     PropertyInspectionService.call(property: @property, user: @user)
 
