@@ -54,7 +54,7 @@ class CaseSearchService
   end
 
   def discover_court(case_number:)
-    delay = BASE_DELAY
+    delay = 0
     consecutive_errors = 0
 
     CourtAuction::CaseSearchClient.priority_court_codes.each do |_name, code|

@@ -48,7 +48,7 @@ class PropertiesController < ApplicationController
 
     property = Property.find_by(case_number: case_number)
 
-    if property
+    if property&.address.present?
       if current_user.user_properties.exists?(property: property)
         redirect_to properties_path, notice: "이미 내 목록에 있는 물건입니다."
       else
