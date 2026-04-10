@@ -114,7 +114,8 @@ class SearchResultsController < ApplicationController
       return { success: true, property: property, user_property: user_property }
     end
 
-    result = PropertyDataSyncService.call(case_number: case_number, user: current_user)
+    court_code = CourtAuction::CaseSearchClient.court_code_for(search_result.court_name)
+    result = PropertyDataSyncService.call(case_number: case_number, court_code: court_code, user: current_user)
     if result.property
       result.property.update!(property_count: search_result.property_count) if search_result.property_count > 1
       user_property = current_user.user_properties.create!(property: result.property)

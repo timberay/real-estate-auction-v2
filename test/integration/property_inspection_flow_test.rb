@@ -27,6 +27,11 @@ class PropertyInspectionFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "override auto result preserves auto_value and shows as manual" do
+    # Force rule-based fallback by disabling both mock and real LLM
+    ENV.delete("USE_MOCK")
+    saved_provider = ENV.delete("LLM_PROVIDER")
+    saved_key = ENV.delete("GEMINI_API_KEY")
+
     PropertyInspectionService.call(property: @property, user: @user)
 
     auto_result = @property.inspection_results
@@ -55,9 +60,17 @@ class PropertyInspectionFlowTest < ActionDispatch::IntegrationTest
     get edit_property_inspections_tab_url(@property, tab_key: tab_key)
     assert_response :success
     assert_select "span", text: "수정됨"
+  ensure
+    ENV["LLM_PROVIDER"] = saved_provider if saved_provider
+    ENV["GEMINI_API_KEY"] = saved_key if saved_key
   end
 
   test "inspection flow stores evidence for auto-detected results" do
+    # Force rule-based fallback
+    ENV.delete("USE_MOCK")
+    saved_provider = ENV.delete("LLM_PROVIDER")
+    saved_key = ENV.delete("GEMINI_API_KEY")
+
     post property_inspections_start_url(@property)
 
     auto_results = @property.inspection_results
@@ -74,6 +87,9 @@ class PropertyInspectionFlowTest < ActionDispatch::IntegrationTest
       assert has_fields || has_keywords,
         "evidence for #{result.inspection_item.code} should have fields or keywords"
     end
+  ensure
+    ENV["LLM_PROVIDER"] = saved_provider if saved_provider
+    ENV["GEMINI_API_KEY"] = saved_key if saved_key
   end
 
   test "manual input updates result" do

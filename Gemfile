@@ -81,3 +81,5 @@ group :test do
   # HTTP request stubbing for adapter tests
   gem "webmock"
 end
+
+gem "dotenv", "~> 3.2", groups: [:development, :test]

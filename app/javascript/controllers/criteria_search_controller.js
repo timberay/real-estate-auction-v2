@@ -10,21 +10,37 @@ export default class extends Controller {
   connect() {
     this.handleSubmitStart = this.handleSubmitStart.bind(this)
     this.handleSubmitEnd = this.handleSubmitEnd.bind(this)
-    this.element.addEventListener("turbo:submit-start", this.handleSubmitStart)
-    this.element.addEventListener("turbo:submit-end", this.handleSubmitEnd)
+    document.addEventListener("turbo:submit-start", this.handleSubmitStart)
+    document.addEventListener("turbo:submit-end", this.handleSubmitEnd)
   }
 
   disconnect() {
-    this.element.removeEventListener("turbo:submit-start", this.handleSubmitStart)
-    this.element.removeEventListener("turbo:submit-end", this.handleSubmitEnd)
+    document.removeEventListener("turbo:submit-start", this.handleSubmitStart)
+    document.removeEventListener("turbo:submit-end", this.handleSubmitEnd)
   }
 
-  handleSubmitStart() {
+  get resultsContainer() {
+    return document.getElementById("criteria-search-results")
+  }
+
+  handleSubmitStart(event) {
+    const form = event.target
+    if (!this.element.contains(form) && !this.resultsContainer?.contains(form)) return
+
     this.element.classList.add("pointer-events-none", "cursor-wait")
+    if (this.resultsContainer) {
+      this.resultsContainer.classList.add("pointer-events-none", "opacity-60")
+    }
   }
 
-  handleSubmitEnd() {
+  handleSubmitEnd(event) {
+    const form = event.target
+    if (!this.element.contains(form) && !this.resultsContainer?.contains(form)) return
+
     this.element.classList.remove("pointer-events-none", "cursor-wait")
+    if (this.resultsContainer) {
+      this.resultsContainer.classList.remove("pointer-events-none", "opacity-60")
+    }
     this.enable()
   }
 

@@ -1,10 +1,13 @@
 {
   "status": 200,
-  "message": "성공",
+  "message": "최고 공고 목록이 조회되었습니다.",
+  "timestamp": 1775829520484,
+  "errors": null,
   "data": {
-    "dma_result": {
-      "csBaseInfo": {},
+    "ipcheck": true,
+    "dma_csBasInf": {
       "errMsg": "해당 사건번호는 잘못된 번호입니다. 다시 한번 확인해 보시기 바랍니다."
     }
-  }
+  },
+  "token": null
 }

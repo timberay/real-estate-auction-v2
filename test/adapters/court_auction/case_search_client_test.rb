@@ -23,9 +23,9 @@ class CourtAuction::CaseSearchClientTest < ActiveSupport::TestCase
     result = @client.search(court_code: "B000530", case_number: "2022타경564")
 
     assert_not_nil result
-    assert_equal "2022타경564전자", result.dig("csBaseInfo", "csNo")
-    assert_equal "부동산임의경매", result.dig("csBaseInfo", "csNm")
-    assert_equal "260000000", result.dig("csBaseInfo", "clmAmt")
+    assert_equal "20220130000564", result.dig("dma_csBasInf", "csNo")
+    assert_equal "부동산임의경매", result.dig("dma_csBasInf", "csNm")
+    assert_equal 260000000, result.dig("dma_csBasInf", "clmAmt")
   end
 
   test "search returns nil for invalid case number" do

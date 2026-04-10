@@ -4,7 +4,17 @@ class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @property = properties(:safe_apartment)
     UserProperty.find_or_create_by!(user: users(:guest), property: @property)
+    # Force rule-based fallback so auto results are created
+    @saved_mock = ENV.delete("USE_MOCK")
+    @saved_provider = ENV.delete("LLM_PROVIDER")
+    @saved_key = ENV.delete("GEMINI_API_KEY")
     PropertyInspectionService.call(property: @property, user: users(:guest))
+  end
+
+  teardown do
+    ENV["USE_MOCK"] = @saved_mock if @saved_mock
+    ENV["LLM_PROVIDER"] = @saved_provider if @saved_provider
+    ENV["GEMINI_API_KEY"] = @saved_key if @saved_key
   end
 
   test "edit renders tab items" do

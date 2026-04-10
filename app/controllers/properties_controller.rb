@@ -40,6 +40,7 @@ class PropertiesController < ApplicationController
 
   def create
     case_number = params[:case_number]&.strip
+    court_name = params[:court_name].presence
 
     if case_number.blank?
       redirect_to properties_path, alert: "사건번호를 입력해주세요."
@@ -59,22 +60,35 @@ class PropertiesController < ApplicationController
         redirect_to properties_path, notice: "이미 등록된 물건입니다. 내 목록에 추가했습니다."
       end
     else
-      # Step 1: Discover which court holds this case
-      discovery = CaseSearchService.find_by_case_number(case_number: case_number)
+      court_code = CourtAuction::CaseSearchClient.court_code_for(court_name) if court_name
 
-      unless discovery.success?
-        redirect_to properties_path, alert: discovery_error_message(discovery.error)
-        return
-      end
-
-      # Step 2: Fetch full details via existing sync service
-      result = PropertyDataSyncService.call(case_number: case_number, user: current_user)
-      if result.property
-        current_user.user_properties.create!(property: result.property)
-        redirect_to properties_path, notice: "물건이 추가되었습니다."
+      if court_code
+        # Direct search at the specified court
+        result = PropertyDataSyncService.call(case_number: case_number, court_code: court_code, user: current_user)
+        if result.property
+          current_user.user_properties.create!(property: result.property)
+          redirect_to properties_path, notice: "물건이 추가되었습니다."
+        else
+          error = result.errors[:court]
+          redirect_to properties_path, alert: error_message_for(error)
+        end
       else
-        error = result.errors[:court]
-        redirect_to properties_path, alert: error_message_for(error)
+        # No court specified — discover by searching all courts
+        discovery = CaseSearchService.find_by_case_number(case_number: case_number)
+
+        unless discovery.success?
+          redirect_to properties_path, alert: discovery_error_message(discovery.error)
+          return
+        end
+
+        result = PropertyDataSyncService.call(case_number: case_number, user: current_user)
+        if result.property
+          current_user.user_properties.create!(property: result.property)
+          redirect_to properties_path, notice: "물건이 추가되었습니다."
+        else
+          error = result.errors[:court]
+          redirect_to properties_path, alert: error_message_for(error)
+        end
       end
     end
   rescue DataProvider::ParseError => e

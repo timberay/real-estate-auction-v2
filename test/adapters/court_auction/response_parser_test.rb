@@ -205,6 +205,68 @@ class CourtAuction::ResponseParserTest < ActiveSupport::TestCase
     assert_equal "대지", result[:land_details].first[:land_type]
   end
 
+  # -- parse_case_search (new API format) ------------------------------------
+
+  test "parse_case_search parses case base info" do
+    data = JSON.parse(file_fixture("court_auction_case_search_valid.json").read)["data"]
+    result = @parser.parse_case_search(api_data: data)
+
+    assert_equal "2022타경564", result[:case_number]
+    assert_equal "부동산임의경매", result[:case_type]
+    assert_equal 260_000_000, result[:claim_amount]
+    assert_equal "진행중", result[:status]
+  end
+
+  test "parse_case_search parses property details" do
+    data = JSON.parse(file_fixture("court_auction_case_search_valid.json").read)["data"]
+    result = @parser.parse_case_search(api_data: data)
+
+    assert_equal "단독주택", result[:property_type]
+    assert_equal "제주특별자치도 제주시 애월읍 유수암리 821", result[:address]
+    assert_equal "제주특별자치도", result[:sido]
+    assert_equal "제주시", result[:sigungu]
+    assert_equal 445_123_280, result[:appraisal_price]
+    assert_equal 445_123_280, result[:min_bid_price]
+  end
+
+  test "parse_case_search parses auction schedules" do
+    data = JSON.parse(file_fixture("court_auction_case_search_valid.json").read)["data"]
+    result = @parser.parse_case_search(api_data: data)
+
+    assert_equal 2, result[:auction_schedules].size
+    first = result[:auction_schedules].first
+    assert_equal Date.new(2026, 4, 21), first[:schedule_date]
+    assert_equal "1000", first[:schedule_time]
+  end
+
+  test "parse_case_search counts failed bids" do
+    data = JSON.parse(file_fixture("court_auction_case_search_valid.json").read)["data"]
+    result = @parser.parse_case_search(api_data: data)
+
+    assert_equal 1, result[:failed_bid_count]
+  end
+
+  test "parse_case_search parses parties" do
+    data = JSON.parse(file_fixture("court_auction_case_search_valid.json").read)["data"]
+    result = @parser.parse_case_search(api_data: data)
+
+    assert_equal 2, result[:parties].size
+    assert_equal "채권자", result[:parties].first[:role]
+  end
+
+  test "parse_case_search returns nil for empty data" do
+    result = @parser.parse_case_search(api_data: { "dma_csBasInf" => nil })
+    assert_nil result
+  end
+
+  test "parse_case_search includes raw_data" do
+    data = JSON.parse(file_fixture("court_auction_case_search_valid.json").read)["data"]
+    result = @parser.parse_case_search(api_data: data)
+
+    assert_not_nil result[:raw_data]
+    assert_equal data, result[:raw_data]
+  end
+
   private
 
   def build_detail_response(rights_text: "전세권")

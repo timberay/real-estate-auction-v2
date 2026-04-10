@@ -447,6 +447,7 @@ DEPENDENCIES
   bundler-audit
   capybara
   debug
+  dotenv (~> 3.2)
   faraday
   heroicon
   image_processing (~> 1.2)

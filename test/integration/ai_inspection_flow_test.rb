@@ -36,6 +36,8 @@ class AiInspectionFlowTest < ActiveSupport::TestCase
 
   test "fallback to InspectionRunner when USE_MOCK is false and no API key" do
     ENV.delete("USE_MOCK")
+    saved_provider = ENV.delete("LLM_PROVIDER")
+    saved_key = ENV.delete("GEMINI_API_KEY")
     @property.inspection_results.where(user: @user).where.not(source_type: :manual).destroy_all
 
     PropertyInspectionService.call(property: @property, user: @user)
@@ -43,6 +45,9 @@ class AiInspectionFlowTest < ActiveSupport::TestCase
     # Should have auto results from InspectionRunner fallback
     rights_011 = find_result("rights-011")
     assert rights_011.auto?
+  ensure
+    ENV["LLM_PROVIDER"] = saved_provider if saved_provider
+    ENV["GEMINI_API_KEY"] = saved_key if saved_key
   end
 
   private

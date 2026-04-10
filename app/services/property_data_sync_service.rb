@@ -1,12 +1,13 @@
 class PropertyDataSyncService
   Result = Data.define(:court_data, :errors, :property)
 
-  def self.call(case_number:, user: nil)
-    new(case_number:).call
+  def self.call(case_number:, court_code: nil, user: nil)
+    new(case_number:, court_code:).call
   end
 
-  def initialize(case_number:)
+  def initialize(case_number:, court_code: nil)
     @case_number = case_number
+    @court_code = court_code
   end
 
   def call
@@ -15,7 +16,12 @@ class PropertyDataSyncService
 
     begin
       adapter = GovernmentCourtAuctionAdapter.new
-      court_data = adapter.fetch_data_with_detail(case_number: @case_number)
+      if @court_code
+        raw = adapter.search_case(court_code: @court_code, case_number: @case_number)
+        court_data = CourtAuction::ResponseParser.new.parse_case_search(api_data: raw) if raw
+      else
+        court_data = adapter.fetch_data_with_detail(case_number: @case_number)
+      end
     rescue DataProvider::Error => e
       Rails.logger.error("[PropertyDataSync] #{e.class}: #{e.message} (case=#{@case_number})")
       errors[:court] = e
@@ -54,7 +60,8 @@ class PropertyDataSyncService
       remarks: court_data[:remarks],
       case_type: court_data[:case_type],
       claim_amount: court_data[:claim_amount],
-      land_category: court_data[:land_category]
+      land_category: court_data[:land_category],
+      raw_data: court_data[:raw_data]
     )
     property.save!
 

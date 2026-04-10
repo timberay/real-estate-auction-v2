@@ -1,77 +1,167 @@
 {
   "status": 200,
-  "message": "성공",
+  "message": "최고 공고 목록이 조회되었습니다.",
+  "timestamp": 1775829520484,
+  "errors": null,
   "data": {
-    "dma_result": {
-      "csBaseInfo": {
-        "csNo": "2022타경564전자",
-        "csNm": "부동산임의경매",
-        "rcptYmd": "20220204",
-        "strtDcsnYmd": "20220215",
-        "chrgGye": "경매2계",
-        "chrgGyeTlno": "064-729-2152",
-        "clmAmt": "260000000",
-        "tmntRsltNm": "미종국",
-        "tmntYmd": ""
+    "ipcheck": true,
+    "dma_csBasInf": {
+      "cortOfcCd": "B000530",
+      "cortOfcNm": "제주지방법원",
+      "cortSptNm": "제주지방법원",
+      "csNo": "20220130000564",
+      "csNm": "부동산임의경매",
+      "csRcptYmd": "20220204",
+      "csCmdcYmd": "20220215",
+      "clmAmt": 260000000,
+      "rletApalYn": "N",
+      "auctnSuspStatCd": "03",
+      "ultmtDvsCd": "000",
+      "csUltmtYmd": null,
+      "csProgStatCd": "0002100001",
+      "jdgeAojAsstnNm": null,
+      "auctnDpcnMrgDvsCd": "0",
+      "csProgSuspRsn": null,
+      "mvprpCsNo": null,
+      "mvprpRletDvsCd": "00031R",
+      "jdbnCd": "1002",
+      "cortAuctnJdbnNm": "경매2계",
+      "jdbnTelno": "064-729-2152",
+      "execrCsTelno": "064-729-2152",
+      "cortTypCd": "40",
+      "expCsNo": null,
+      "lwstDvsCd": "2",
+      "userCsNo": "2022타경564"
+    },
+    "dlt_dstrtDemnLstprdDts": [
+      {
+        "cortOfcCd": "B000530",
+        "csNo": "20220130000564",
+        "dspslObjctSeq": 1,
+        "auctnLstDvsCd": "01",
+        "rprsAdongSdCd": "50",
+        "rprsAdongSggCd": "110",
+        "rprsAdongEmdCd": "350",
+        "rprsAdongRiCd": "00",
+        "rprsLtnoAddr": "821",
+        "bldNm": null,
+        "adongSdNm": "제주특별자치도",
+        "adongSggNm": "제주시",
+        "adongEmdNm": "애월읍",
+        "adongRiNm": "유수암리",
+        "dstrtDemnLstprdYmd": "20220516",
+        "addrTypCd": "J",
+        "bldDtlDts": null
+      }
+    ],
+    "dlt_dspslGdsDspslObjctLst": [
+      {
+        "cortOfcCd": "B000530",
+        "csNo": "20220130000564",
+        "csProgStatCd": "0002100001",
+        "dspslGdsSeq": 1,
+        "auctnGdsUsgCd": "01",
+        "aeeEvlAmt": 445123280,
+        "auctnGdsStatCd": "01",
+        "dspslGdsRmk": "-일괄매각. 제시외 건물 포함\n-목록1 지분매각. 현황 일부 도로",
+        "gdsDspslProgYn": "Y",
+        "bidDvsCd": "000331",
+        "dspslDxdyYmd": "20260421",
+        "fstDspslHm": "1000",
+        "dspslAmt": 0,
+        "fstPbancLwsDspslPrc": 445123280,
+        "prchDposRate": 10,
+        "dspslObjctSeq": 1,
+        "bldNm": null,
+        "auctnLstDvsCd": "01",
+        "ultmtDvsCd": "000",
+        "adongSdNm": "제주특별자치도",
+        "adongSggNm": "제주시",
+        "adongEmdNm": "애월읍",
+        "adongRiNm": "유수암리",
+        "addrTypCd": "J",
+        "bldDtlDts": null,
+        "userSt": "제주특별자치도 제주시 애월읍 유수암리 821",
+        "printCsNo": "2022타경564",
+        "auctnLstNm": "단독주택",
+        "ultmtNm": "미종국"
+      }
+    ],
+    "dlt_rletCsGdsDtsDxdyInf": [
+      {
+        "cortOfcCd": "B000530",
+        "csNo": "20220130000564",
+        "dspslGdsSeq": 1,
+        "auctnDxdyKndCd": "01",
+        "dxdyYmd": "20260421",
+        "dxdyHm": "1000",
+        "dxdyPlcNm": "경매법정",
+        "auctnDxdyRsltCd": null
       },
-      "dspslGdsInfo": [
-        {
-          "dspslGdsSeq": "1",
-          "dspslGdsUsgNm": "단독주택",
-          "gamevalAmt": "445123280",
-          "lwsDspslPrc": "445123280",
-          "msSrchDpstAmt": "44512400",
-          "dspslGdsSttNm": "매각준비 -> 매각공고",
-          "nxtDxdyYmd": "20260421",
-          "lstIpchalRslt": "2022.11.22 유찰",
-          "dspslGdsRmk": "-일괄매각. 제시외 건물 포함\n-목록1 지분매각. 현황 일부 도로"
-        }
-      ],
-      "dspslGdsMlstInfo": [
-        {
-          "mlstSeq": "1",
-          "mlstAddr": "제주특별자치도 제주시 애월읍 유수암리 821",
-          "dstrtDemnLstprdYmd": "20220516",
-          "mlstDvs": "토지"
-        },
-        {
-          "mlstSeq": "2",
-          "mlstAddr": "제주특별자치도 제주시 애월읍 유수암평화길 82 (108호)",
-          "dstrtDemnLstprdYmd": "20220516",
-          "mlstDvs": "건물"
-        }
-      ],
-      "csPartiesInfo": [
-        { "partiesDvs": "채권자", "partiesNm": "문OO" },
-        { "partiesDvs": "채무자겸소유자", "partiesNm": "고OO" }
-      ],
-      "relCsInfo": [
-        {
-          "relCortNm": "제주지방법원",
-          "relCsNo": "2024타경30057",
-          "relCsDvs": "중복"
-        }
-      ],
-      "dspslGdsDxdyLst": [
-        {
-          "dxdyYmd": "20260421",
-          "dxdyHm": "10:00",
-          "dxdyPlcNm": "경매법정",
-          "auctnDxdyKndCd": "매각",
-          "auctnDxdyRsltCd": null,
-          "tsLwsDspslPrc": "445123280",
-          "dspslAmt": null
-        },
-        {
-          "dxdyYmd": "20221122",
-          "dxdyHm": "10:00",
-          "dxdyPlcNm": "경매법정",
-          "auctnDxdyKndCd": "매각",
-          "auctnDxdyRsltCd": "유찰",
-          "tsLwsDspslPrc": "445123280",
-          "dspslAmt": null
-        }
-      ]
-    }
-  }
+      {
+        "cortOfcCd": "B000530",
+        "csNo": "20220130000564",
+        "dspslGdsSeq": 1,
+        "auctnDxdyKndCd": "01",
+        "dxdyYmd": "20221122",
+        "dxdyHm": "1000",
+        "dxdyPlcNm": "경매법정",
+        "auctnDxdyRsltCd": "002"
+      }
+    ],
+    "dlt_rletCsIntrpsLst": [
+      {
+        "cortOfcCd": "B000530",
+        "csNo": "20220130000564",
+        "auctnIntrpsDvsCd": "0001527",
+        "intrpsSeq": 1271,
+        "intrpsNm": "문OO",
+        "slctnrTypCd": null,
+        "auctnIntrpsDvsNm": "채권자"
+      },
+      {
+        "cortOfcCd": "B000530",
+        "csNo": "20220130000564",
+        "auctnIntrpsDvsCd": "0001558",
+        "intrpsSeq": 1581,
+        "intrpsNm": "고OO",
+        "slctnrTypCd": null,
+        "auctnIntrpsDvsNm": "채무자겸소유자"
+      }
+    ],
+    "dlt_rletCsDspslObjctLst": [
+      {
+        "cortOfcCd": "B000530",
+        "csNo": "20220130000564",
+        "dspslObjctSeq": 1,
+        "bldNm": null,
+        "auctnLstDvsCd": "01",
+        "ultmtDvsCd": "000",
+        "adongSdNm": "제주특별자치도",
+        "adongSggNm": "제주시",
+        "adongEmdNm": "애월읍",
+        "adongRiNm": "유수암리",
+        "addrTypCd": "J",
+        "bldDtlDts": null,
+        "userSt": "제주특별자치도 제주시 애월읍 유수암리 821",
+        "auctnLstNm": "단독주택",
+        "ultmtNm": "미종국"
+      }
+    ],
+    "dlt_rletReltCsLst": [
+      {
+        "reltCsCortOfcCd": "B000530",
+        "reltCsNo": "20240130030057",
+        "reltCsDvsCd": "10",
+        "cortOfcNm": "제주지방법원",
+        "cortSptNm": "제주지방법원",
+        "userReltCsNo": "2024타경30057",
+        "reltCsDvsNm": "중복"
+      }
+    ],
+    "dlt_csApalRaplDts": [],
+    "dlt_rletCsSugtExclBldLst": [],
+    "dma_dlvrfDtsParam": null
+  },
+  "token": null
 }

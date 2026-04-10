@@ -22,7 +22,7 @@ class CaseSearchServiceTest < ActiveSupport::TestCase
     property = result.properties.first
     assert_equal "2022타경564", property.case_number
     assert_not_nil property.raw_data
-    assert_equal "2022타경564전자", property.raw_data.dig("csBaseInfo", "csNo")
+    assert_equal "20220130000564", property.raw_data.dig("dma_csBasInf", "csNo")
   end
 
   test "returns error for invalid case number" do
@@ -80,7 +80,7 @@ class CaseSearchServiceTest < ActiveSupport::TestCase
     assert result.success?
     property.reload
     assert_not_nil property.raw_data
-    assert_equal "2022타경564전자", property.raw_data.dig("csBaseInfo", "csNo")
+    assert_equal "20220130000564", property.raw_data.dig("dma_csBasInf", "csNo")
   end
 
   # -- error handling -------------------------------------------------------

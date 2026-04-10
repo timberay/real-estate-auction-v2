@@ -6,6 +6,12 @@ require "rails/all"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# Load .env variables in development only (test uses .env.test if present)
+if defined?(Dotenv)
+  Dotenv.load(".env.test", ".env") if Rails.env.test?
+  Dotenv.load if Rails.env.development?
+end
+
 module RealEstateAuctionV2
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.

@@ -21,7 +21,7 @@ class GovernmentCourtAuctionAdapterCaseSearchTest < ActiveSupport::TestCase
     result = @adapter.search_case(court_code: "B000530", case_number: "2022타경564")
 
     assert_not_nil result
-    assert_equal "2022타경564전자", result.dig("csBaseInfo", "csNo")
+    assert_equal "20220130000564", result.dig("dma_csBasInf", "csNo")
   end
 
   test "search_case returns nil for invalid case" do

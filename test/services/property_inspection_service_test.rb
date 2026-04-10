@@ -37,11 +37,16 @@ class PropertyInspectionServiceTest < ActiveSupport::TestCase
     property = properties(:risky_villa)
     property.inspection_results.where(user: @user).where.not(source_type: :manual).destroy_all
     ENV.delete("USE_MOCK")
+    saved_provider = ENV.delete("LLM_PROVIDER")
+    saved_key = ENV.delete("GEMINI_API_KEY")
 
     PropertyInspectionService.call(property: property, user: @user)
 
     item = InspectionItem.find_by(code: "rights-011")
     result = InspectionResult.find_by(property: property, inspection_item: item, user: @user)
     assert result.auto?, "Expected auto source_type from fallback but got #{result.source_type}"
+  ensure
+    ENV["LLM_PROVIDER"] = saved_provider if saved_provider
+    ENV["GEMINI_API_KEY"] = saved_key if saved_key
   end
 end

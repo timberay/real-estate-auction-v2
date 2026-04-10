@@ -150,17 +150,19 @@ module CourtAuction
       end
 
       body = response.body
-      result = body.dig("data", "dma_result")
-      return nil if result.nil?
-      return nil if invalid_case?(result)
+      data = body["data"]
+      return nil if data.nil?
 
-      result
+      cs_bas_inf = data["dma_csBasInf"]
+      return nil if cs_bas_inf.nil?
+      return nil if invalid_case?(cs_bas_inf)
+
+      data
     end
 
-    def invalid_case?(result)
-      result["errMsg"].present? ||
-        result.dig("csBaseInfo").blank? ||
-        result.dig("csBaseInfo", "csNo").blank?
+    def invalid_case?(cs_bas_inf)
+      cs_bas_inf["errMsg"].present? ||
+        cs_bas_inf["csNo"].blank?
     end
   end
 end
