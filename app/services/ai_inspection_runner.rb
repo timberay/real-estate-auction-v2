@@ -19,13 +19,14 @@ class AiInspectionRunner
     begin
       response = adapter.analyze(system: prompt[:system], prompt: prompt[:user])
       complete_log(log, response)
-      Inspection::InspectionResultMapper.call(
-        response: response, property: @property, user: @user, items: items
-      )
     rescue => e
       fail_log(log, e)
       raise
     end
+
+    Inspection::InspectionResultMapper.call(
+      response: response, property: @property, user: @user, items: items
+    )
   end
 
   private
