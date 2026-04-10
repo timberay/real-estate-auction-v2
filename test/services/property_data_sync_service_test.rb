@@ -140,6 +140,18 @@ class PropertyDataSyncServiceTest < ActiveSupport::TestCase
     end
   end
 
+  include ActiveJob::TestHelper
+
+  test "enqueues AiInspectionJob after successful sync" do
+    with_stubbed_adapter(@search_fixture, @detail_fixture) do
+      Property.where(case_number: "2026타경10001").destroy_all
+
+      assert_enqueued_with(job: AiInspectionJob) do
+        PropertyDataSyncService.call(case_number: "2026타경10001")
+      end
+    end
+  end
+
   private
 
   def with_stubbed_adapter(search_response, detail_response)

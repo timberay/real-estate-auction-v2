@@ -63,6 +63,8 @@ class PropertyDataSyncService
     sync_land_details(property, court_data[:land_details])
     sync_appraisal_points(property, court_data[:appraisal_points])
 
+    AiInspectionJob.perform_later(property)
+
     property
   end
 
