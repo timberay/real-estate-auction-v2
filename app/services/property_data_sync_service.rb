@@ -17,6 +17,7 @@ class PropertyDataSyncService
       adapter = GovernmentCourtAuctionAdapter.new
       court_data = adapter.fetch_data_with_detail(case_number: @case_number)
     rescue DataProvider::Error => e
+      Rails.logger.error("[PropertyDataSync] #{e.class}: #{e.message} (case=#{@case_number})")
       errors[:court] = e
     end
 

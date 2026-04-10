@@ -11,11 +11,33 @@ module CourtAuction
     CASE_NUMBER_INPUT = "mf_wfm_mainFrame_ibx_rletCsNo"
     REGION_RADIO = "mf_wfm_mainFrame_rad_rletSrchBtn_input_2"
     REGION_SELECT = "mf_wfm_mainFrame_sbx_rletAdongSdR"
+    BID_CATEGORY_ALL_RADIO = "mf_wfm_mainFrame_rad_mvprpBidLst_input_0"
     USAGE_LARGE_SELECT = "mf_wfm_mainFrame_sbx_rletLclLst"
     USAGE_MID_SELECT = "mf_wfm_mainFrame_sbx_rletMclLst"
     MIN_PRICE_SELECT = "mf_wfm_mainFrame_sbx_rletLwsDspslMin"
     MAX_PRICE_SELECT = "mf_wfm_mainFrame_sbx_rletLwsDspslMax"
     SEARCH_BUTTON = "mf_wfm_mainFrame_btn_gdsDtlSrch"
+
+    # Search form defaults
+    MIN_BID_PRICE = 50_000_000
+    DEFAULT_MAX_PRICE = 500_000_000
+
+    PRICE_TIERS = [
+      10_000_000, 50_000_000,
+      100_000_000, 150_000_000, 200_000_000, 250_000_000, 300_000_000,
+      350_000_000, 400_000_000, 450_000_000, 500_000_000, 550_000_000,
+      600_000_000, 650_000_000, 700_000_000, 750_000_000, 800_000_000,
+      850_000_000, 900_000_000, 950_000_000, 1_000_000_000
+    ].freeze
+
+    VALID_REGIONS = %w[
+      서울특별시 부산광역시 대구광역시 인천광역시 광주광역시
+      대전광역시 울산광역시 세종특별자치시 경기도 강원도
+      충청북도 충청남도 전라북도 전라남도 경상북도 경상남도
+      제주특별자치도 강원특별자치도 전북특별자치도
+    ].freeze
+
+    DEFAULT_REGION = "제주특별자치도"
 
     def initialize(timeout: DEFAULT_TIMEOUT)
       @timeout = timeout
@@ -23,15 +45,32 @@ module CourtAuction
 
     def fetch_with_detail(year:, type:, number:)
       with_browser do |page|
+        log "Starting fetch_with_detail for #{year}#{type}#{number}"
+
+        log "Step 1/4: Navigating to search page..."
         navigate_to_search(page)
+        log "Step 1/4: Navigation complete"
+
+        log "Step 2/4: Filling case number (year=#{year}, number=#{number})..."
         fill_case_number(page, year: year, number: number)
+        log "Step 2/4: Case number filled"
+
+        log "Step 3/4: Clicking search and capturing response..."
         search_data = click_search_and_capture(page)
-
         items = search_data.dig("data", "dlt_srchResult") || []
-        match = find_matching_item(items, year: year, type: type, number: number)
-        raise DataProvider::DataNotFoundError, "Case #{year}#{type}#{number} not found" unless match
+        log "Step 3/4: Search complete — #{items.size} items returned"
 
+        match = find_matching_item(items, year: year, type: type, number: number)
+        unless match
+          candidates = items.map { |i| i["srnSaNo"] }
+          log "No match found. Looking for #{year}#{type}#{number}, available: #{candidates.inspect}"
+          raise DataProvider::DataNotFoundError, "Case #{year}#{type}#{number} not found"
+        end
+        log "Step 3/4: Match found — #{match['srnSaNo']}"
+
+        log "Step 4/4: Clicking result and capturing detail..."
         detail_data = click_result_and_capture_detail(page, match)
+        log "Step 4/4: Detail capture complete"
 
         { "search" => search_data, "detail" => detail_data }
       end
@@ -39,12 +78,14 @@ module CourtAuction
 
     def search_by_criteria(region:, year:, min_price:, max_price:)
       with_browser do |page|
+        log "Starting search_by_criteria (region=#{region}, year=#{year}, price=#{min_price}~#{max_price})"
         navigate_to_search(page)
         fill_criteria(page, region: region, year: year, min_price: min_price, max_price: max_price)
         search_data = click_search_and_capture(page)
 
         items = search_data.dig("data", "dlt_srchResult") || []
         total = search_data.dig("data", "dma_pageInfo", "totalCnt").to_i
+        log "Search complete — total=#{total}, items=#{items.size}"
 
         { items: items, total: total }
       end
@@ -56,13 +97,16 @@ module CourtAuction
       execution = nil
       browser = nil
       begin
+        log "Launching browser (timeout=#{@timeout}s)..."
         execution = Playwright.create(playwright_cli_executable_path: find_playwright_cli)
         browser = execution.playwright.chromium.launch(headless: true)
         page = browser.new_page
         yield(page)
       rescue Playwright::TimeoutError => e
+        log "TIMEOUT: #{e.message}"
         raise DataProvider::TimeoutError, "Court auction browser timeout: #{e.message}"
       rescue JSON::ParserError => e
+        log "PARSE ERROR: #{e.message}"
         raise DataProvider::ParseError, "Invalid JSON from court auction API: #{e.message}"
       ensure
         browser&.close
@@ -82,6 +126,10 @@ module CourtAuction
     end
 
     def fill_case_number(page, year:, number:)
+      # Switch to 소재지(새주소) mode to avoid default court (서울중앙) restriction
+      page.click("##{REGION_RADIO}", force: true)
+      page.wait_for_timeout(500)
+
       set_select_via_js(page, YEAR_SELECT, year.to_s)
       raw_number = number.to_s.gsub(/\A0+/, "")
       page.fill("##{CASE_NUMBER_INPUT}", raw_number)
@@ -94,21 +142,25 @@ module CourtAuction
       page.wait_for_timeout(500)
 
       # 2. Set region via DOM dispatchEvent (for cascade)
-      set_select_via_dom(page, REGION_SELECT, region)
+      set_select_via_dom(page, REGION_SELECT, normalize_region(region))
       page.wait_for_timeout(500)
 
       # 3. Set year
       set_select_via_js(page, YEAR_SELECT, year.to_s)
 
-      # 4. Set usage: 건물 → 주거용건물 (cascade)
+      # 4. Set bid category to 전체
+      page.click("##{BID_CATEGORY_ALL_RADIO}", force: true)
+      page.wait_for_timeout(300)
+
+      # 5. Set usage: 건물 → 주거용건물 (cascade)
       set_select_via_dom(page, USAGE_LARGE_SELECT, "건물")
       page.wait_for_timeout(1500) # wait for mid-category options to load
       set_select_via_dom(page, USAGE_MID_SELECT, "주거용건물")
       page.wait_for_timeout(300)
 
-      # 5. Set price range
-      set_select_via_dom(page, MIN_PRICE_SELECT, price_label(50_000_000))
-      set_select_via_dom(page, MAX_PRICE_SELECT, price_label(max_price))
+      # 6. Set price range: min=5천만원, max=next tier above user's max bid
+      set_select_via_dom(page, MIN_PRICE_SELECT, price_label(MIN_BID_PRICE))
+      set_select_via_dom(page, MAX_PRICE_SELECT, price_label(next_price_tier(max_price)))
       page.wait_for_timeout(300)
     end
 
@@ -195,8 +247,21 @@ module CourtAuction
       end
     end
 
+    def normalize_region(region)
+      VALID_REGIONS.include?(region) ? region : DEFAULT_REGION
+    end
+
+    def next_price_tier(amount)
+      return DEFAULT_MAX_PRICE unless amount
+      PRICE_TIERS.find { |tier| tier > amount } || PRICE_TIERS.last
+    end
+
     def escape_js(str)
       str.to_s.gsub("\\") { "\\\\" }.gsub("'") { "\\'" }
+    end
+
+    def log(message)
+      Rails.logger.info("[CourtAuction::BrowserClient] #{message}")
     end
   end
 end
