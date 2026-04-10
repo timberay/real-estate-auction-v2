@@ -100,6 +100,20 @@ class LlmAdapterTest < ActiveSupport::TestCase
       assert_instance_of AnthropicLlmAdapter, adapter
     end
   end
+
+  test "sanitize_and_parse_json strips markdown code block wrapper" do
+    adapter = LlmAdapter.new
+    raw = "```json\n{\"results\": {}}\n```"
+    parsed = adapter.send(:sanitize_and_parse_json, raw)
+    assert_equal({}, parsed["results"])
+  end
+
+  test "sanitize_and_parse_json handles plain JSON" do
+    adapter = LlmAdapter.new
+    raw = '{"results": {}}'
+    parsed = adapter.send(:sanitize_and_parse_json, raw)
+    assert_equal({}, parsed["results"])
+  end
 end
 ```
 
@@ -141,6 +155,17 @@ class LlmAdapter
 
   def analyze(system:, prompt:)
     raise NotImplementedError, "#{self.class}#analyze must be implemented"
+  end
+
+  private
+
+  # LLMs often wrap JSON in markdown code blocks (```json ... ```).
+  # This strips that wrapper before parsing.
+  def sanitize_and_parse_json(raw)
+    cleaned = raw.strip
+      .gsub(/\A```(?:json)?\s*\n?/, "")
+      .gsub(/\n?```\s*\z/, "")
+    JSON.parse(cleaned)
   end
 end
 ```
@@ -426,6 +451,9 @@ Create `app/adapters/anthropic_llm_adapter.rb`:
 
 ```ruby
 class AnthropicLlmAdapter < LlmAdapter
+  # Future implementation will:
+  # 1. Use response_format: { type: "json" } to force pure JSON from API
+  # 2. Use sanitize_and_parse_json as fallback for markdown-wrapped responses
   def analyze(system:, prompt:)
     raise NotImplementedError,
       "AnthropicLlmAdapter requires ANTHROPIC_API_KEY. " \
