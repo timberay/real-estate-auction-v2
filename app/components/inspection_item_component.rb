@@ -106,7 +106,8 @@ class InspectionItemComponent < ViewComponent::Base
   end
 
   def evidence
-    @result.evidence
+    ev = @result.evidence
+    ev.is_a?(String) ? JSON.parse(ev) : ev
   end
 
   def evidence_border_classes
