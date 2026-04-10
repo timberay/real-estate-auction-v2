@@ -1,0 +1,55 @@
+{
+  "status": 200,
+  "message": "검색 결과가 조회되었습니다.",
+  "data": {
+    "dma_pageInfo": {
+      "pageNo": 1,
+      "pageSize": 10,
+      "totalYn": "Y",
+      "startRowNo": 1,
+      "totalCnt": "12",
+      "groupTotalCount": 12
+    },
+    "ipcheck": true,
+    "dlt_srchResult": [
+      {
+        "docid": "B00021120240130100011",
+        "srnSaNo": "2024타경10001",
+        "boCd": "B000211",
+        "saNo": "20240130100011",
+        "maemulSer": "1",
+        "mokmulSer": "1",
+        "printSt": "서울특별시 강남구 역삼동 100-1",
+        "gamevalAmt": "120000000",
+        "minmaePrice": "96000000",
+        "yuchalCnt": "1",
+        "ipchalGbncd": "000331",
+        "maeGiil": "20260420",
+        "maegyuljGiil": "20260427",
+        "jiwonNm": "서울동부지방법원",
+        "dspslUsgNm": "아파트",
+        "mulJinYn": "Y",
+        "mulBigo": ""
+      },
+      {
+        "docid": "B00021120240130100022",
+        "srnSaNo": "2024타경10002",
+        "boCd": "B000211",
+        "saNo": "20240130100022",
+        "maemulSer": "2",
+        "mokmulSer": "1",
+        "printSt": "서울특별시 서초구 서초동 200-2",
+        "gamevalAmt": "140000000",
+        "minmaePrice": "112000000",
+        "yuchalCnt": "0",
+        "ipchalGbncd": "000332",
+        "maeGiil": "20260422",
+        "maegyuljGiil": "20260429",
+        "jiwonNm": "서울동부지방법원",
+        "dspslUsgNm": "빌라",
+        "mulJinYn": "Y",
+        "mulBigo": "일괄매각"
+      }
+    ]
+  }
+}

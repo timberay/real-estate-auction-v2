@@ -1,0 +1,36 @@
+{
+  "status": 200,
+  "message": "검색 결과가 조회되었습니다.",
+  "data": {
+    "dma_pageInfo": {
+      "pageNo": 2,
+      "pageSize": 10,
+      "totalYn": "Y",
+      "startRowNo": 11,
+      "totalCnt": "12",
+      "groupTotalCount": 12
+    },
+    "ipcheck": true,
+    "dlt_srchResult": [
+      {
+        "docid": "B00021120230130200031",
+        "srnSaNo": "2023타경20003",
+        "boCd": "B000211",
+        "saNo": "20230130200031",
+        "maemulSer": "1",
+        "mokmulSer": "1",
+        "printSt": "서울특별시 마포구 상암동 300-3",
+        "gamevalAmt": "90000000",
+        "minmaePrice": "72000000",
+        "yuchalCnt": "3",
+        "ipchalGbncd": "000331",
+        "maeGiil": "20260425",
+        "maegyuljGiil": "20260502",
+        "jiwonNm": "서울서부지방법원",
+        "dspslUsgNm": "다세대주택",
+        "mulJinYn": "Y",
+        "mulBigo": ""
+      }
+    ]
+  }
+}
