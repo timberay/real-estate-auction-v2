@@ -1,4 +1,8 @@
 class CaseSearchService
+  BASE_DELAY = 0.5
+  MAX_DELAY = 5.0
+  MAX_CONSECUTIVE_ERRORS = 5
+
   Result = Data.define(:properties, :error) do
     def success?
       error.nil?
@@ -11,6 +15,10 @@ class CaseSearchService
 
   def self.call_by_serial(court_code:, serial_number:)
     new.search_by_serial(court_code: court_code, serial_number: serial_number)
+  end
+
+  def self.find_by_case_number(case_number:)
+    new.discover_court(case_number: case_number)
   end
 
   def initialize
@@ -43,6 +51,38 @@ class CaseSearchService
   rescue DataProvider::Error => e
     log_error(e, serial_number)
     Result.new(properties: [], error: "API connection failed: #{e.message}")
+  end
+
+  def discover_court(case_number:)
+    delay = BASE_DELAY
+    consecutive_errors = 0
+
+    CourtAuction::CaseSearchClient.priority_court_codes.each do |_name, code|
+      sleep(delay) unless delay.zero?
+
+      begin
+        data = @adapter.search_case(court_code: code, case_number: case_number)
+
+        if data
+          property = persist(case_number, data)
+          return Result.new(properties: [ property ], error: nil)
+        end
+
+        # Valid response but case not at this court — reset backoff
+        delay = BASE_DELAY
+        consecutive_errors = 0
+      rescue DataProvider::Error => e
+        consecutive_errors += 1
+        delay = [ delay * 2, MAX_DELAY ].min
+
+        if consecutive_errors >= MAX_CONSECUTIVE_ERRORS
+          log_error(e, case_number)
+          return Result.new(properties: [], error: "Court auction site unavailable after #{consecutive_errors} consecutive errors")
+        end
+      end
+    end
+
+    Result.new(properties: [], error: "Case #{case_number} not found at any court")
   end
 
   private

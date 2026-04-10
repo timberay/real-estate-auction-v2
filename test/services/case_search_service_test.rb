@@ -94,11 +94,122 @@ class CaseSearchServiceTest < ActiveSupport::TestCase
     assert_includes result.error, "connection"
   end
 
+  # -- find_by_case_number (court auto-discovery) ---------------------------
+
+  test "find_by_case_number discovers court and returns property" do
+    stub_case_search_service_sleep!
+
+    stub_request(:post, ENDPOINT_URL)
+      .to_return(status: 200, body: @invalid_response, headers: json_headers)
+
+    stub_request(:post, ENDPOINT_URL)
+      .with(body: hash_including("dma_srchCsDtlInf" => hash_including("cortOfcCd" => "B000530")))
+      .to_return(status: 200, body: @valid_response, headers: json_headers)
+
+    stub_priority_court_codes([
+      [ "서울중앙지방법원", "B000210" ],
+      [ "제주지방법원", "B000530" ]
+    ]) do
+      result = CaseSearchService.find_by_case_number(case_number: "2022타경564")
+
+      assert result.success?
+      assert_equal 1, result.properties.size
+      assert_equal "2022타경564", result.properties.first.case_number
+    end
+  end
+
+  test "find_by_case_number returns error when case not found at any court" do
+    stub_case_search_service_sleep!
+
+    stub_request(:post, ENDPOINT_URL)
+      .to_return(status: 200, body: @invalid_response, headers: json_headers)
+
+    stub_priority_court_codes([
+      [ "서울중앙지방법원", "B000210" ],
+      [ "제주지방법원", "B000530" ]
+    ]) do
+      result = CaseSearchService.find_by_case_number(case_number: "2099타경99999")
+
+      assert_not result.success?
+      assert_empty result.properties
+      assert_includes result.error, "not found"
+    end
+  end
+
+  test "find_by_case_number aborts after 5 consecutive HTTP errors" do
+    stub_case_search_service_sleep!
+
+    stub_request(:post, ENDPOINT_URL).to_timeout
+
+    courts = 10.times.map { |i| [ "Court#{i}", "B00000#{i}" ] }
+
+    stub_priority_court_codes(courts) do
+      result = CaseSearchService.find_by_case_number(case_number: "2026타경1234")
+
+      assert_not result.success?
+      assert_includes result.error, "unavailable"
+    end
+
+    assert_requested(:post, ENDPOINT_URL, times: 5)
+  end
+
+  test "find_by_case_number resets backoff after successful response" do
+    stub_case_search_service_sleep!
+
+    courts = [
+      [ "CourtA", "A001" ], [ "CourtB", "B001" ], [ "CourtC", "C001" ],
+      [ "CourtD", "D001" ], [ "CourtE", "E001" ]
+    ]
+
+    stub_request(:post, ENDPOINT_URL)
+      .with(body: hash_including("dma_srchCsDtlInf" => hash_including("cortOfcCd" => "A001")))
+      .to_timeout
+    stub_request(:post, ENDPOINT_URL)
+      .with(body: hash_including("dma_srchCsDtlInf" => hash_including("cortOfcCd" => "B001")))
+      .to_return(status: 200, body: @invalid_response, headers: json_headers)
+    stub_request(:post, ENDPOINT_URL)
+      .with(body: hash_including("dma_srchCsDtlInf" => hash_including("cortOfcCd" => "C001")))
+      .to_timeout
+    stub_request(:post, ENDPOINT_URL)
+      .with(body: hash_including("dma_srchCsDtlInf" => hash_including("cortOfcCd" => "D001")))
+      .to_timeout
+    stub_request(:post, ENDPOINT_URL)
+      .with(body: hash_including("dma_srchCsDtlInf" => hash_including("cortOfcCd" => "E001")))
+      .to_return(status: 200, body: @valid_response, headers: json_headers)
+
+    stub_priority_court_codes(courts) do
+      result = CaseSearchService.find_by_case_number(case_number: "2022타경564")
+
+      assert result.success?
+      assert_equal 1, result.properties.size
+    end
+
+    assert_requested(:post, ENDPOINT_URL, times: 5)
+  end
+
   private
 
   def stub_case_search_client_sleep!
     CourtAuction::CaseSearchClient.prepend(Module.new {
       def sleep(_); end
     })
+  end
+
+  def stub_case_search_service_sleep!
+    CaseSearchService.prepend(Module.new {
+      def sleep(_); end
+    })
+  end
+
+  def json_headers
+    { "Content-Type" => "application/json" }
+  end
+
+  def stub_priority_court_codes(courts)
+    original = CourtAuction::CaseSearchClient.method(:priority_court_codes)
+    CourtAuction::CaseSearchClient.define_singleton_method(:priority_court_codes) { courts }
+    yield
+  ensure
+    CourtAuction::CaseSearchClient.define_singleton_method(:priority_court_codes, original)
   end
 end
