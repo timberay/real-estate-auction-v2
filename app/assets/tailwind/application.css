@@ -12,6 +12,16 @@
 @source "../../helpers/**/*.rb";
 @source "../../javascript/**/*.js";
 
+/* Inline result card: show not-allowed cursor while Turbo form is submitting */
+[id^="inline_"] form[aria-busy="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+[id^="inline_"] form[aria-busy="true"] button {
+  pointer-events: none;
+}
+
 /* Pretendard as default font family */
 @theme {
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;

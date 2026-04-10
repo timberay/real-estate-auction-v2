@@ -2,7 +2,7 @@
 <div id="<%= dom_id(search_result, :inline) %>"
      class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 cursor-pointer hover:border-violet-500 dark:hover:border-violet-500 transition-colors">
   <%= form_with url: inline_import_search_result_path(search_result), method: :post, data: { turbo_stream: true, turbo_frame: "_top" } do %>
-    <button type="submit" class="w-full text-left">
+    <button type="submit" class="w-full text-left cursor-pointer">
       <div class="flex items-center justify-between">
         <span class="text-sm font-semibold text-violet-400">
           <%= search_result.case_number %>

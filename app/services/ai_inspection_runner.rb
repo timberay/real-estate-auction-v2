@@ -12,7 +12,7 @@ class AiInspectionRunner
     text = Inspection::PropertyDataAssembler.call(@property)
     items = InspectionItem.ordered
     prompt = Inspection::InspectionPromptBuilder.call(property_text: text, items: items)
-    response = LlmAdapter.for.analyze(system: prompt[:system], prompt: prompt[:user])
+    response = Llm::Base.for.analyze(system: prompt[:system], prompt: prompt[:user])
     Inspection::InspectionResultMapper.call(
       response: response, property: @property, user: @user, items: items
     )
