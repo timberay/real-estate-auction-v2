@@ -115,4 +115,55 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     assert_includes yes_row[:class], "bg-green-100"
     assert_includes yes_row[:class], "text-green-800"
   end
+
+  # --- Evidence block tests ---
+
+  test "renders evidence block with field data for auto result" do
+    result = inspection_results(:safe_apartment_rights_002)
+    result.update!(evidence: {
+      "source_label" => "법원경매 물건정보",
+      "fields" => [{ "label" => "물건종류", "value" => "아파트" }]
+    })
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-evidence]"
+    assert_text "판정 근거"
+    assert_text "법원경매 물건정보"
+    assert_text "물건종류"
+    assert_text "아파트"
+  end
+
+  test "renders evidence block with keyword data for auto result" do
+    result = inspection_results(:safe_apartment_rights_011)
+    result.update!(evidence: {
+      "source_label" => "비고, 물건명세서, 현황조사서",
+      "keywords" => { "searched" => ["유치권", "법정지상권"], "found" => false }
+    })
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-evidence]"
+    assert_text "판정 근거"
+    assert_text "비고, 물건명세서, 현황조사서"
+    assert_text "유치권"
+    assert_text "해당 없음"
+  end
+
+  test "does not render evidence block for manual result" do
+    result = inspection_results(:manual_risk)
+    render_inline(InspectionItemComponent.new(result: result))
+
+    refute_selector "[data-evidence]"
+  end
+
+  test "renders keyword found state with 발견 text" do
+    result = inspection_results(:risky_villa_rights_011)
+    result.update!(evidence: {
+      "source_label" => "비고, 물건명세서, 현황조사서",
+      "keywords" => { "searched" => ["유치권", "법정지상권"], "found" => true }
+    })
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-evidence]"
+    assert_text "발견"
+  end
 end

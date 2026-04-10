@@ -100,4 +100,48 @@ class InspectionItemComponent < ViewComponent::Base
       "text-slate-400 dark:text-slate-500"
     end
   end
+
+  def evidence_present?
+    auto_source? && @result.evidence.present?
+  end
+
+  def evidence
+    @result.evidence
+  end
+
+  def evidence_border_classes
+    if @result.has_risk
+      "border-l-red-500 bg-red-500/5 dark:bg-red-500/10"
+    else
+      "border-l-indigo-500 bg-indigo-500/5 dark:bg-indigo-500/10"
+    end
+  end
+
+  def evidence_header_classes
+    if @result.has_risk
+      "text-red-400"
+    else
+      "text-indigo-400"
+    end
+  end
+
+  def evidence_label_classes
+    if @result.has_risk
+      "text-red-300 dark:text-red-400"
+    else
+      "text-indigo-300 dark:text-indigo-400"
+    end
+  end
+
+  def evidence_value_classes
+    "text-slate-200 dark:text-slate-200 font-medium"
+  end
+
+  def keyword_result_classes
+    if @result.has_risk
+      "text-red-400 font-semibold"
+    else
+      "text-green-400"
+    end
+  end
 end

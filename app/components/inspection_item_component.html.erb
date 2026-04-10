@@ -47,6 +47,22 @@
     </div>
   <% end %>
 
+  <% if evidence_present? %>
+    <div class="mt-2.5 rounded-r-md border-l-3 p-2 px-3 text-xs <%= evidence_border_classes %>"
+         data-evidence>
+      <div class="font-semibold mb-1 <%= evidence_header_classes %>">📋 판정 근거 · <%= evidence["source_label"] %></div>
+      <% if evidence["fields"].present? %>
+        <% evidence["fields"].each do |field| %>
+          <div class="<%= evidence_label_classes %>"><%= field["label"] %>: <span class="<%= evidence_value_classes %>"><%= field["value"] %></span></div>
+        <% end %>
+      <% end %>
+      <% if evidence["keywords"].present? %>
+        <div class="<%= evidence_label_classes %>">매칭 키워드: <span class="text-slate-300 dark:text-slate-300"><%= evidence["keywords"]["searched"].map { |k| "\"#{k}\"" }.join(", ") %></span></div>
+        <div class="mt-0.5 <%= evidence_label_classes %>">결과: <span class="<%= keyword_result_classes %>"><%= evidence["keywords"]["found"] ? "발견" : "해당 없음" %></span></div>
+      <% end %>
+    </div>
+  <% end %>
+
   <%# Edit mode: radio buttons for overriding AUTO answer (hidden by default) %>
   <% if show_edit_mode? %>
     <div class="mt-3 hidden border-t border-slate-200 dark:border-slate-600 pt-3"
