@@ -18,7 +18,8 @@ module Inspection
         sale_detail_section,
         appraisal_section,
         land_section,
-        auction_section
+        auction_section,
+        raw_data_section
       ]
       sections.join("\n\n")
     end
@@ -90,6 +91,13 @@ module Inspection
         "- #{s.schedule_date} #{s.schedule_type} 최저가=#{format_price(s.min_price)} 결과=#{val(s.result_code)}"
       end
       "[경매 일정]\n#{lines.join("\n")}"
+    end
+
+    def raw_data_section
+      data = @property.raw_data
+      return "[원시 데이터 (raw_data)]\n(정보 없음)" if data.blank?
+
+      "[원시 데이터 (raw_data)]\n#{JSON.pretty_generate(data)}"
     end
 
     def val(v)

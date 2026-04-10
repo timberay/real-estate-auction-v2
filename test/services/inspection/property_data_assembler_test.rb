@@ -40,4 +40,25 @@ class Inspection::PropertyDataAssemblerTest < ActiveSupport::TestCase
     assert_includes text, "2026-05-01"
     assert_includes text, "매각기일"
   end
+
+  test "includes raw_data section when raw_data is present" do
+    property = properties(:risky_villa)
+    property.update!(raw_data: { "registry_transcript" => "등기부등본 내용", "sale_memo" => "비고" })
+
+    text = Inspection::PropertyDataAssembler.call(property)
+
+    assert_includes text, "[원시 데이터 (raw_data)]"
+    assert_includes text, "registry_transcript"
+    assert_includes text, "등기부등본 내용"
+  end
+
+  test "shows no raw_data message when raw_data is nil" do
+    property = properties(:unanalyzed_officetel)
+    property.update!(raw_data: nil)
+
+    text = Inspection::PropertyDataAssembler.call(property)
+
+    assert_includes text, "[원시 데이터 (raw_data)]"
+    assert_includes text, "(정보 없음)"
+  end
 end
