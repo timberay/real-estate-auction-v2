@@ -7,22 +7,26 @@ class InspectionItemComponent < ViewComponent::Base
 
   private
 
+  def auto_or_ai_source? = @result.source_type.in?(%w[auto ai])
+  def ai_source? = @result.source_type == "ai"
   def auto_source? = @result.source_type == "auto"
-  def manual_source? = !auto_source?
+  def manual_source? = @result.source_type == "manual"
   def overridden? = manual_source? && @result.auto_value.present?
 
   def risk_classes
-    if manual_source? && @result.has_risk.nil?
+    if !auto_or_ai_source? && @result.has_risk.nil?
       "border-slate-400 bg-slate-100 dark:border-slate-600 dark:bg-slate-800/50"
     elsif @result.has_risk
-      auto_source? ? "border-red-400 bg-red-100 dark:border-red-600 dark:bg-red-900/20" : "border-yellow-400 bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900/20"
+      auto_or_ai_source? ? "border-red-400 bg-red-100 dark:border-red-600 dark:bg-red-900/20" : "border-yellow-400 bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900/20"
     else
       "border-green-400 bg-green-100 dark:border-green-600 dark:bg-green-900/20"
     end
   end
 
   def source_badge_text
-    if auto_source?
+    if ai_source?
+      "AI 분석"
+    elsif auto_source?
       "자동"
     elsif overridden?
       "수정됨"
@@ -32,7 +36,9 @@ class InspectionItemComponent < ViewComponent::Base
   end
 
   def source_badge_classes
-    if auto_source?
+    if ai_source?
+      "bg-blue-100 text-blue-700 ring-1 ring-inset ring-blue-600/20 dark:bg-blue-900/30 dark:text-blue-300 dark:ring-blue-400/20"
+    elsif auto_source?
       "bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400"
     elsif overridden?
       "bg-amber-100 text-amber-700 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-300 dark:ring-amber-400/20"
@@ -42,14 +48,14 @@ class InspectionItemComponent < ViewComponent::Base
   end
 
   def status_text
-    if manual_source? && @result.has_risk.nil? then "미입력"
-    elsif @result.has_risk then auto_source? ? "위험" : "위험 확인"
+    if !auto_or_ai_source? && @result.has_risk.nil? then "미입력"
+    elsif @result.has_risk then auto_or_ai_source? ? "위험" : "위험 확인"
     else "안전"
     end
   end
 
   def status_classes
-    if manual_source? && @result.has_risk.nil?
+    if !auto_or_ai_source? && @result.has_risk.nil?
       "text-slate-400 dark:text-slate-500"
     elsif @result.has_risk
       "text-red-600 dark:text-red-400"
@@ -58,9 +64,9 @@ class InspectionItemComponent < ViewComponent::Base
     end
   end
 
-  def show_auto_resolution? = @show_resolution && auto_source? && @result.has_risk
-  def show_manual_input? = @show_resolution && manual_source? && !overridden?
-  def show_edit_mode? = @show_resolution && (auto_source? || overridden?)
+  def show_auto_resolution? = @show_resolution && auto_or_ai_source? && @result.has_risk
+  def show_manual_input? = @show_resolution && !auto_or_ai_source? && !overridden?
+  def show_edit_mode? = @show_resolution && (auto_or_ai_source? || overridden?)
 
   def yes_radio_value
     @item.yes_means_safe? ? "false" : "true"
@@ -102,7 +108,7 @@ class InspectionItemComponent < ViewComponent::Base
   end
 
   def evidence_present?
-    auto_source? && @result.evidence.present?
+    auto_or_ai_source? && @result.evidence.present?
   end
 
   def evidence

@@ -155,6 +155,29 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     refute_selector "[data-evidence]"
   end
 
+  test "renders AI 분석 badge for ai source" do
+    result = inspection_results(:risky_villa_rights_011)
+    result.update!(
+      source_type: :ai, has_risk: true,
+      evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "테스트 근거" }
+    )
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "span", text: "AI 분석"
+  end
+
+  test "renders evidence block for ai result with reasoning" do
+    result = inspection_results(:risky_villa_rights_011)
+    result.update!(
+      source_type: :ai, has_risk: true,
+      evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "유치권 신고가 있습니다." }
+    )
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-evidence]"
+    assert_text "유치권 신고가 있습니다."
+  end
+
   test "renders keyword found state with 발견 text" do
     result = inspection_results(:risky_villa_rights_011)
     result.update!(evidence: {
