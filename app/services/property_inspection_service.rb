@@ -9,7 +9,13 @@ class PropertyInspectionService
   end
 
   def call
-    InspectionRunner.call(property: @property, user: @user)
+    begin
+      AiInspectionRunner.call(property: @property, user: @user)
+    rescue NotImplementedError, StandardError => e
+      Rails.logger.warn("AI inspection failed: #{e.message}, falling back to rule-based")
+      InspectionRunner.call(property: @property, user: @user)
+    end
+
     RightsAnalysisService.call(property: @property, user: @user)
   end
 end

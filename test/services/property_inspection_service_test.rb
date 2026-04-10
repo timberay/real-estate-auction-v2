@@ -18,4 +18,30 @@ class PropertyInspectionServiceTest < ActiveSupport::TestCase
     assert_not_nil report
     assert_not_nil report.analyzed_at
   end
+
+  test "uses AiInspectionRunner when USE_MOCK is true" do
+    property = properties(:risky_villa)
+    property.inspection_results.where(user: @user).where.not(source_type: :manual).destroy_all
+    ENV["USE_MOCK"] = "true"
+
+    PropertyInspectionService.call(property: property, user: @user)
+
+    item = InspectionItem.find_by(code: "rights-002")
+    result = InspectionResult.find_by(property: property, inspection_item: item, user: @user)
+    assert result.ai?, "Expected AI source_type but got #{result.source_type}"
+  ensure
+    ENV.delete("USE_MOCK")
+  end
+
+  test "falls back to InspectionRunner when AI fails" do
+    property = properties(:risky_villa)
+    property.inspection_results.where(user: @user).where.not(source_type: :manual).destroy_all
+    ENV.delete("USE_MOCK")
+
+    PropertyInspectionService.call(property: property, user: @user)
+
+    item = InspectionItem.find_by(code: "rights-011")
+    result = InspectionResult.find_by(property: property, inspection_item: item, user: @user)
+    assert result.auto?, "Expected auto source_type from fallback but got #{result.source_type}"
+  end
 end
