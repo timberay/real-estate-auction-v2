@@ -1,0 +1,26 @@
+<div class="max-w-lg mx-auto space-y-4">
+  <h1 class="text-lg font-semibold text-slate-900 dark:text-slate-100">새 분석</h1>
+
+  <%= render CardComponent.new(title: "PDF 문서 업로드") do %>
+    <div class="space-y-3">
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        법원경매 사이트에서 확보한 문서(매각물건명세서, 현황조사서, 감정평가서, 등기부등본 등)를 PDF로 업로드해주세요.
+      </p>
+      <div class="text-xs text-amber-600 dark:text-amber-400">
+        업로드된 문서는 AI 분석을 위해 외부 API(선택한 LLM 제공자)로 전송됩니다.
+      </div>
+
+      <%= form_with url: analyses_path, method: :post, class: "space-y-3" do |f| %>
+        <div>
+          <%= f.file_field :documents, multiple: true, accept: "application/pdf",
+              class: "block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300" %>
+        </div>
+        <%= f.submit "분석 시작", class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div id="analysis_progress">
+    <%= turbo_stream_from "analysis_progress_#{current_user.id}" %>
+  </div>
+</div>

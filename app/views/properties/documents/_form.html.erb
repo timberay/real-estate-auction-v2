@@ -1,0 +1,11 @@
+<%= form_with url: property_documents_path(property), method: :post, class: "space-y-3" do |f| %>
+  <div class="text-xs text-amber-600 dark:text-amber-400">
+    업로드된 문서는 AI 분석을 위해 외부 API(선택한 LLM 제공자)로 전송됩니다.
+  </div>
+  <div>
+    <%= f.file_field :documents, multiple: true, accept: "application/pdf",
+        class: "block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300",
+        direct_upload: false %>
+  </div>
+  <%= f.submit "업로드", class: "inline-flex items-center rounded-md bg-slate-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700" %>
+<% end %>

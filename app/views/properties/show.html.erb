@@ -22,10 +22,26 @@
           <p class="font-semibold text-slate-900 dark:text-slate-100"><%= format_price_won(@property.min_bid_price) %></p>
         </div>
       </div>
-      <div class="mt-4 text-center">
-        <%= button_to "분석 시작", property_inspections_start_path(@property), method: :post,
-            class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" %>
-      </div>
     </div>
   <% end %>
+
+  <%= render CardComponent.new(title: "문서") do %>
+    <div class="space-y-4">
+      <%= render "properties/documents/list", property: @property %>
+      <%= render "properties/documents/form", property: @property %>
+    </div>
+  <% end %>
+
+  <div class="text-center">
+    <% if @property.documents.attached? %>
+      <%= button_to "분석 시작", property_inspections_start_path(@property), method: :post,
+          class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" %>
+    <% else %>
+      <p class="text-sm text-slate-400">문서를 업로드하면 분석을 시작할 수 있습니다.</p>
+    <% end %>
+  </div>
+
+  <div id="analysis_progress">
+    <%= turbo_stream_from "analysis_progress_#{current_user.id}" %>
+  </div>
 </div>

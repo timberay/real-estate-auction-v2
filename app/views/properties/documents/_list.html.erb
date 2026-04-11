@@ -1,0 +1,15 @@
+<% if property.documents.attached? %>
+  <ul class="space-y-1">
+    <% property.documents.each do |doc| %>
+      <li class="flex items-center justify-between text-sm">
+        <span class="text-slate-700 dark:text-slate-300"><%= doc.filename %></span>
+        <%= button_to "삭제", property_document_path(property, doc),
+            method: :delete,
+            class: "text-red-500 hover:text-red-700 text-xs",
+            form: { data: { turbo_confirm: "이 문서를 삭제하시겠습니까?" } } %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p class="text-sm text-slate-400">업로드된 문서가 없습니다.</p>
+<% end %>
