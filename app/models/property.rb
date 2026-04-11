@@ -1,8 +1,5 @@
 class Property < ApplicationRecord
-  has_one :sale_detail, class_name: "PropertySaleDetail", dependent: :destroy
   has_many :auction_schedules, dependent: :destroy
-  has_many :land_details, dependent: :destroy
-  has_many :appraisal_points, dependent: :destroy
 
   has_many :user_properties, dependent: :destroy
   has_many :users, through: :user_properties
