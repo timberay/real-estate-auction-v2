@@ -59,7 +59,7 @@
     <%= render ReportSummaryComponent.new(report: @report, property: @property) %>
     <%= render RegistryTimelineComponent.new(report: @report) %>
     <%= render DividendSimulatorComponent.new(report: @report, property: @property) %>
-    <%= render SourceDocViewerComponent.new(report: @report) %>
+    <%= render SourceDocViewerComponent.new(report: @report, property: @property) %>
     <%= render LegalDisclaimerComponent.new %>
   </div>
 <% end %>

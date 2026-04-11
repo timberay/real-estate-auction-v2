@@ -1,6 +1,9 @@
 class SourceDocViewerComponent < ViewComponent::Base
-  def initialize(report:)
+  def initialize(report:, property: nil)
     @report = report
+    @property = property
+    @source_doc_reviewed = report&.source_doc_reviewed || false
+    @review_url = property ? Rails.application.routes.url_helpers.property_inspections_source_doc_review_path(property) : ""
   end
 
   private
