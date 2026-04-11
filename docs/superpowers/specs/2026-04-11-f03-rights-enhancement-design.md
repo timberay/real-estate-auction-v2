@@ -57,18 +57,25 @@ A pure-calculation service that takes LLM-extracted facts and produces validated
 
 2. **Priority repayment rights (per tenant):**
    ```
-   has_priority_repayment = opposing_power && confirmed_date != nil
+   has_priority_repayment = move_in_date != nil && confirmed_date != nil
    ```
+   Per the Housing Lease Protection Act (주택임대차보호법), priority repayment rights arise from having BOTH move-in registration (전입신고+점유) AND confirmed date (확정일자), **independent of opposing power status**. A tenant without opposing power (후순위) can still hold priority repayment rights and receive distribution ahead of other junior creditors in the dividend process.
 
-3. **Priority rank recalculation:**
-   Sort tenants with opposing power by `confirmed_date` ascending, assign sequential `priority_rank`.
+3. **Priority repayment effective date (효력발생일) calculation:**
+   ```
+   effective_date = max(move_in_date + 1.day, confirmed_date)
+   ```
+   The priority repayment right takes effect on the LATER of: (a) the day after move-in registration (전입신고 익일 00:00), or (b) the confirmed date itself. Example: if confirmed_date is Jan 1 but move_in_date is Jan 5, the effective date is Jan 6 (move_in_date + 1 day), not Jan 1.
 
-4. **Amount recalculation:**
+4. **Priority rank recalculation:**
+   Sort tenants with `has_priority_repayment == true` by `effective_date` ascending, assign sequential `priority_rank`. Tenants without priority repayment rights get `priority_rank: nil`.
+
+5. **Amount recalculation:**
    - `assumed_amount` = sum of rights where `extinguished_on_sale == false`
    - `opposing_deposits` = sum of deposits from tenants where `opposing_power == true`
    - `total_risk_amount` = `assumed_amount` + `opposing_deposits`
 
-5. **Discrepancy detection:**
+6. **Discrepancy detection:**
    Compare LLM `opposing_power` vs Ruby `opposing_power` per tenant.
    Record differences in `discrepancies` array:
    ```json
@@ -82,7 +89,7 @@ A pure-calculation service that takes LLM-extracted facts and produces validated
    ```
 
 **Output:**
-- `validated_tenants` — tenants with Ruby-recalculated opposing_power, priority_rank
+- `validated_tenants` — tenants with Ruby-recalculated opposing_power, has_priority_repayment, effective_date, priority_rank
 - `validated_amounts` — { assumed_amount, opposing_deposits, total_risk_amount }
 - `discrepancies` — array of mismatches (empty if all agree)
 
@@ -101,9 +108,20 @@ A pure-calculation service that takes LLM-extracted facts and produces validated
     "checklist_references": []
   },
   "calculated": {
-    "tenants": [],
+    "tenants": [
+      {
+        "name": "김○○",
+        "deposit": 50000000,
+        "move_in_date": "2023-06-01",
+        "confirmed_date": "2023-06-15",
+        "opposing_power": true,
+        "has_priority_repayment": true,
+        "effective_date": "2023-06-15",
+        "priority_rank": 1
+      }
+    ],
     "assumed_amount": 0,
-    "opposing_deposits": 0,
+    "opposing_deposits": 50000000,
     "total_risk_amount": 50000000
   },
   "discrepancies": [],
@@ -205,10 +223,12 @@ end
 1. **RightsValidator** (core logic):
    - `move_in_date < base_right_date` → `opposing_power: true`
    - `move_in_date >= base_right_date` → `opposing_power: false`
-   - `confirmed_date`-based `priority_rank` sorting
+   - `has_priority_repayment`: true when both `move_in_date` and `confirmed_date` present (independent of opposing_power)
+   - `effective_date`: `max(move_in_date + 1.day, confirmed_date)` — covers case where confirmed_date precedes move_in_date
+   - `priority_rank` sorted by `effective_date` ascending (not `confirmed_date`)
    - `assumed_amount` / `total_risk_amount` calculation accuracy
    - Discrepancy detection: LLM says false, Ruby says true → recorded
-   - Edge cases: no tenants, no rights, `confirmed_date: null`
+   - Edge cases: no tenants, no rights, `confirmed_date: null`, `move_in_date` after `confirmed_date`
 
 2. **PdfAnalysisService** (integration):
    - `report_data` contains `llm_raw` / `calculated` / `discrepancies` structure
@@ -252,3 +272,4 @@ end
 - Rights relationship diagram (complex graph visualization — future iteration)
 - Tenant eviction difficulty scoring (belongs to F10)
 - PDF export of rights report (future enhancement)
+- **Dividend request deadline (배당요구종기일) tracking** — Whether a tenant with opposing power requested dividend distribution before the deadline fundamentally changes the assumed risk (e.g., opposing-power tenant who did NOT request dividend → buyer assumes full deposit). This requires LLM extraction of `dividend_requested` (boolean) and `dividend_request_date` per tenant. Planned for next iteration when the prompt and report_data schema are extended. Until then, the current calculation conservatively assumes all opposing-power tenants' deposits are at risk.
