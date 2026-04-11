@@ -33,6 +33,7 @@ class PdfAnalysisService
     )
 
     log_analysis(property, llm, prompts, response)
+    create_or_update_report(property, response)
 
     UserProperty.find_or_create_by!(user: @user, property: property)
     InspectionRatingService.call(property: property, user: @user)
@@ -87,6 +88,52 @@ class PdfAnalysisService
       response_json: response,
       status: :completed,
       executed_at: Time.current
+    )
+  end
+
+  def create_or_update_report(property, response)
+    report = RightsAnalysisReport.find_or_initialize_by(user: @user, property: property)
+    rights_data = response["rights_analysis"]
+
+    if rights_data.blank?
+      report.update!(
+        analyzed_at: Time.current,
+        verdict_summary: nil,
+        report_data: { "analysis_status" => "extraction_failed", "failed_at" => Time.current.iso8601 }
+      )
+      return
+    end
+
+    rights_timeline = rights_data["rights_timeline"] || []
+    tenants = rights_data["tenants"] || []
+
+    assumed_amount = rights_timeline
+      .reject { |r| r["extinguished_on_sale"] }
+      .sum { |r| r["amount"].to_i }
+
+    opposing_tenant_deposits = tenants
+      .select { |t| t["opposing_power"] }
+      .sum { |t| t["deposit"].to_i }
+
+    total_risk_amount = assumed_amount + opposing_tenant_deposits
+
+    report.update!(
+      analyzed_at: Time.current,
+      verdict: rights_data["verdict"],
+      verdict_summary: rights_data["verdict_summary"],
+      base_right_type: rights_data["base_right_type"],
+      base_right_holder: rights_data["base_right_holder"],
+      base_right_date: rights_data["base_right_date"],
+      assumed_amount: assumed_amount,
+      total_risk_amount: total_risk_amount,
+      opportunity_type: rights_data["opportunity_type"],
+      opportunity_reason: rights_data["opportunity_reason"],
+      report_data: {
+        "tenants" => tenants,
+        "rights_timeline" => rights_timeline,
+        "reasoning" => rights_data["reasoning"],
+        "checklist_references" => rights_data["checklist_references"]
+      }
     )
   end
 

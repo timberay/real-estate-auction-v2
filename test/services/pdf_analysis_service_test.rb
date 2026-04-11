@@ -71,4 +71,64 @@ class PdfAnalysisServiceTest < ActiveSupport::TestCase
     ENV["LLM_PROVIDER"] = nil
     ENV["USE_MOCK"] = "true"
   end
+
+  test "creates RightsAnalysisReport from LLM rights_analysis response" do
+    result = PdfAnalysisService.call(property: @property, user: @user)
+
+    assert result.success?
+
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+    assert_not_nil report
+    assert_equal "caution", report.verdict
+    assert_equal "근저당권", report.base_right_type
+    assert_equal "○○은행", report.base_right_holder
+    assert_equal Date.parse("2024-01-15"), report.base_right_date
+  end
+
+  test "calculates assumed_amount from rights_timeline in Ruby" do
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    # All 3 rights have extinguished_on_sale: true → assumed_amount = 0
+    assert_equal 0, report.assumed_amount
+  end
+
+  test "calculates total_risk_amount from assumed_amount plus opposing tenants" do
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    # assumed_amount(0) + opposing tenant 김○○ deposit(50_000_000) = 50_000_000
+    assert_equal 50_000_000, report.total_risk_amount
+  end
+
+  test "stores tenants and rights_timeline in report_data" do
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    assert_equal 2, report.report_data["tenants"].size
+    assert_equal 3, report.report_data["rights_timeline"].size
+    assert report.report_data["reasoning"].present?
+  end
+
+  test "creates extraction_failed report when rights_analysis key is missing" do
+    fixture_path = Rails.root.join("test/fixtures/files/ai_inspection_response.json")
+    original = File.read(fixture_path)
+    no_rights = JSON.parse(original).except("rights_analysis")
+    File.write(fixture_path, JSON.generate(no_rights))
+
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    assert_not_nil report
+    assert_equal "extraction_failed", report.report_data["analysis_status"]
+  ensure
+    File.write(fixture_path, original)
+  end
+
+  test "report creation is idempotent on re-analysis" do
+    PdfAnalysisService.call(property: @property, user: @user)
+    PdfAnalysisService.call(property: @property, user: @user)
+
+    assert_equal 1, RightsAnalysisReport.where(property: @property, user: @user).count
+  end
 end
