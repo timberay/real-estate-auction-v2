@@ -11,7 +11,7 @@
   </div>
 
   <% if search_results.any? %>
-    <div class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <% search_results.each do |sr| %>
         <%= render "search_results/inline_result_item", search_result: sr %>
       <% end %>

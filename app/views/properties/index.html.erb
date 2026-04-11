@@ -117,7 +117,7 @@
     </div>
 
     <%# Property cards grid %>
-    <div id="property-cards-grid" class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div id="property-cards-grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <% @user_properties.each do |user_property| %>
         <%= render PropertyCardComponent.new(
           property: user_property.property,
