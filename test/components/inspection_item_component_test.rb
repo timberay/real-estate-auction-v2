@@ -189,4 +189,15 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     assert_selector "[data-evidence]"
     assert_text "발견"
   end
+
+  test "renders reasoning with line breaks preserved" do
+    result = inspection_results(:risky_villa_rights_011)
+    result.update!(
+      source_type: :ai, has_risk: true,
+      evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "첫째 줄입니다.\n둘째 줄입니다." }
+    )
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-evidence] span.whitespace-pre-line", text: /첫째 줄입니다/
+  end
 end

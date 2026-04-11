@@ -52,7 +52,7 @@
          data-evidence>
       <div class="font-semibold mb-1 <%= evidence_header_classes %>">📋 판정 근거 · <%= evidence["source_label"] %></div>
       <% if evidence["reasoning"].present? %>
-        <div class="<%= evidence_label_classes %>"><span class="<%= evidence_value_classes %>"><%= evidence["reasoning"] %></span></div>
+        <div class="<%= evidence_label_classes %>"><span class="whitespace-pre-line <%= evidence_value_classes %>"><%= evidence["reasoning"] %></span></div>
       <% end %>
       <% if evidence["fields"].present? %>
         <% evidence["fields"].each do |field| %>
