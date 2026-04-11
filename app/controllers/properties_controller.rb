@@ -40,93 +40,24 @@ class PropertiesController < ApplicationController
 
   def create
     case_number = params[:case_number]&.strip
-    court_name = params[:court_name].presence
 
     if case_number.blank?
       redirect_to properties_path, alert: "사건번호를 입력해주세요."
       return
     end
 
-    # Validate format before any DB or API calls
-    CourtAuction::CaseNumberParser.parse(case_number)
-
     property = Property.find_by(case_number: case_number)
 
-    if property&.address.present?
-      if current_user.user_properties.exists?(property: property)
-        redirect_to properties_path, notice: "이미 내 목록에 있는 물건입니다."
-      else
-        current_user.user_properties.create!(property: property)
-        redirect_to properties_path, notice: "이미 등록된 물건입니다. 내 목록에 추가했습니다."
-      end
-    else
-      court_code = CourtAuction::CaseSearchClient.court_code_for(court_name) if court_name
-
-      if court_code
-        # Direct search at the specified court
-        result = PropertyDataSyncService.call(case_number: case_number, court_code: court_code, user: current_user)
-        if result.property
-          current_user.user_properties.create!(property: result.property)
-          redirect_to properties_path, notice: "물건이 추가되었습니다."
-        else
-          error = result.errors[:court]
-          redirect_to properties_path, alert: error_message_for(error)
-        end
-      else
-        # No court specified — discover by searching all courts
-        discovery = CaseSearchService.find_by_case_number(case_number: case_number)
-
-        unless discovery.success?
-          redirect_to properties_path, alert: discovery_error_message(discovery.error)
-          return
-        end
-
-        result = PropertyDataSyncService.call(case_number: case_number, user: current_user)
-        if result.property
-          current_user.user_properties.create!(property: result.property)
-          redirect_to properties_path, notice: "물건이 추가되었습니다."
-        else
-          error = result.errors[:court]
-          redirect_to properties_path, alert: error_message_for(error)
-        end
-      end
+    if property.nil?
+      redirect_to properties_path, alert: "해당 사건번호의 물건을 찾을 수 없습니다."
+      return
     end
-  rescue DataProvider::ParseError => e
-    if e.message.include?("Invalid case number format")
-      redirect_to properties_path, alert: "사건번호 형식이 올바르지 않습니다. (예: 2026타경1234)"
-    else
-      redirect_to properties_path, alert: "데이터 처리 중 오류가 발생했습니다."
-    end
-  end
 
-  private
-
-  def discovery_error_message(error_string)
-    if error_string.include?("unavailable")
-      "법원경매 사이트에 접속할 수 없습니다. 잠시 후 다시 시도해주세요."
+    if current_user.user_properties.exists?(property: property)
+      redirect_to properties_path, notice: "이미 내 목록에 있는 물건입니다."
     else
-      "해당 사건번호의 물건을 찾을 수 없습니다."
-    end
-  end
-
-  def error_message_for(error)
-    case error
-    when DataProvider::TimeoutError
-      "데이터 수집 시간이 초과되었습니다. 다시 시도해주세요."
-    when DataProvider::ServiceUnavailableError, DataProvider::ConnectionError
-      "법원경매 사이트에 접속할 수 없습니다. 잠시 후 다시 시도해주세요."
-    when DataProvider::ConfigurationError
-      "브라우저 실행에 실패했습니다. 시스템 설정을 확인해주세요."
-    when DataProvider::ParseError
-      if error.message.include?("Invalid case number format")
-        "사건번호 형식이 올바르지 않습니다. (예: 2026타경1234)"
-      else
-        "데이터 처리 중 오류가 발생했습니다."
-      end
-    when DataProvider::DataNotFoundError, nil
-      "해당 사건번호의 물건을 찾을 수 없습니다."
-    else
-      "데이터 수집 중 오류가 발생했습니다. 다시 시도해주세요."
+      current_user.user_properties.create!(property: property)
+      redirect_to property_path(property), notice: "내 목록에 추가했습니다."
     end
   end
 end
