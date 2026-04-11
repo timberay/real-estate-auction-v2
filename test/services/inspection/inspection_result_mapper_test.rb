@@ -67,6 +67,36 @@ class Inspection::InspectionResultMapperTest < ActiveSupport::TestCase
     assert result.evidence["reasoning"].present?
   end
 
+  test "overrides has_risk to nil for items not applicable to property type" do
+    finance_item = InspectionItem.create!(
+      code: "finance-003", tab: :profit_analysis, tab_position: 2,
+      category: "자금&대출 분석",
+      question: "등기부등본에 근저당 설정 이력이 있습니까?",
+      applicable_types: ["아파트"],
+      yes_means_safe: true
+    )
+
+    response_with_detached = @response.deep_dup
+    response_with_detached["metadata"]["property_type"] = "단독주택"
+    response_with_detached["results"]["finance-003"] = {
+      "has_risk" => false, "confidence" => "high",
+      "reasoning" => "근저당 설정 이력이 확인됩니다."
+    }
+
+    items_with_finance = @items.to_a + [finance_item]
+
+    Inspection::InspectionResultMapper.call(
+      response: response_with_detached, property: @property, user: @user, items: items_with_finance
+    )
+
+    result = InspectionResult.find_by(property: @property, inspection_item: finance_item, user: @user)
+    assert_nil result.has_risk, "should override to nil for non-applicable property type"
+    assert_equal "none", result.evidence["confidence"]
+    assert_includes result.evidence["reasoning"], "단독주택"
+  ensure
+    finance_item&.destroy
+  end
+
   private
 
   def find_result(code)

@@ -9,6 +9,7 @@ module Inspection
       @property = property
       @user = user
       @items = items
+      @property_type = response.dig("metadata", "property_type")
     end
 
     def call
@@ -42,6 +43,23 @@ module Inspection
               source_label: source_label,
               confidence: ai_result["confidence"],
               reasoning: ai_result["reasoning"]
+            }
+          )
+        end
+
+        # Server-side: override AI result for non-applicable property types
+        if @property_type.present? && item.applicable_types.present? && !item.applicable_for?(@property_type)
+          original_reasoning = ai_result&.dig("reasoning")
+          override_reasoning = "해당 물건은 #{@property_type}이므로 이 항목(#{item.applicable_types.join('·')} 전용)은 직접 확인이 필요합니다."
+          override_reasoning += " AI 의견: #{original_reasoning}" if original_reasoning.present?
+
+          result.assign_attributes(
+            source_type: "ai",
+            has_risk: nil,
+            evidence: {
+              source_label: "AI 분석 (참고)",
+              confidence: "none",
+              reasoning: override_reasoning
             }
           )
         end
