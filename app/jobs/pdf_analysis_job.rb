@@ -24,6 +24,7 @@ class PdfAnalysisJob < ApplicationJob
   rescue => e
     Rails.logger.error "[PdfAnalysisJob] Failed: #{e.message}"
     broadcast_progress("failed", "분석 중 오류가 발생했습니다: #{e.message}")
+    raise
   end
 
   private
@@ -37,5 +38,7 @@ class PdfAnalysisJob < ApplicationJob
     )
   rescue ActionView::MissingTemplate => e
     Rails.logger.debug "[PdfAnalysisJob] Broadcast skipped (template missing): #{e.message}"
+  rescue => e
+    Rails.logger.error "[PdfAnalysisJob] Broadcast failed: #{e.message}"
   end
 end
