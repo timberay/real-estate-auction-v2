@@ -1,9 +1,10 @@
 class RegistryTimelineComponent < ViewComponent::Base
   def initialize(report:)
     @report = report
-    @timeline = report.report_data&.dig("registry_timeline") || []
-    @tenants = report.report_data&.dig("tenants") || []
-    @checklist_refs = report.report_data&.dig("checklist_references") || []
+    @timeline = report.effective_rights_timeline
+    @tenants = report.effective_tenants
+    @checklist_refs = report.report_data&.dig("llm_raw", "checklist_references") ||
+                      report.report_data&.dig("checklist_references") || []
   end
 
   private

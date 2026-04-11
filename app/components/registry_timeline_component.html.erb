@@ -21,7 +21,7 @@
       <% end %>
 
       <% @tenants.each do |tenant| %>
-        <% has_power = tenant["has_opposing_power"] %>
+        <% has_power = tenant["opposing_power"] %>
         <div class="relative">
           <div class="absolute -left-[25px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 <%= has_power ? 'bg-red-500' : 'bg-green-500' %>"></div>
           <div class="rounded-lg border p-3 <%= has_power ? 'border-red-300 bg-red-50 dark:border-red-600 dark:bg-red-900/20' : 'border-green-300 bg-green-50 dark:border-green-600 dark:bg-green-900/20' %>">
