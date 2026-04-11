@@ -10,7 +10,9 @@ module Llm
       model_name(DEFAULT_MODEL)
     end
 
-    def analyze(system:, prompt:)
+    def analyze(system:, prompt:, documents: [])
+      raise Llm::Base::PDF_UNSUPPORTED_ERROR if documents.any?
+
       conn = connection(base_url)
       response = conn.post("/api/chat") do |req|
         req.body = {

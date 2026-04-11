@@ -10,7 +10,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_10_101554) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_11_013504) do
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
   create_table "api_credentials", force: :cascade do |t|
     t.string "api_key"
     t.string "api_secret"
@@ -22,16 +50,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_10_101554) do
     t.integer "user_id", null: false
     t.index ["user_id", "provider_name"], name: "index_api_credentials_on_user_id_and_provider_name", unique: true
     t.index ["user_id"], name: "index_api_credentials_on_user_id"
-  end
-
-  create_table "appraisal_points", force: :cascade do |t|
-    t.text "content"
-    t.datetime "created_at", null: false
-    t.string "item_code"
-    t.integer "property_id", null: false
-    t.datetime "updated_at", null: false
-    t.index ["property_id", "item_code"], name: "index_appraisal_points_on_property_id_and_item_code"
-    t.index ["property_id"], name: "index_appraisal_points_on_property_id"
   end
 
   create_table "auction_schedules", force: :cascade do |t|
@@ -138,19 +156,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_10_101554) do
     t.index ["user_id"], name: "index_inspection_results_on_user_id"
   end
 
-  create_table "land_details", force: :cascade do |t|
-    t.string "address"
-    t.datetime "created_at", null: false
-    t.string "land_area"
-    t.string "land_category"
-    t.string "land_type"
-    t.string "lot_number"
-    t.integer "property_id", null: false
-    t.string "share_ratio"
-    t.datetime "updated_at", null: false
-    t.index ["property_id"], name: "index_land_details_on_property_id"
-  end
-
   create_table "llm_analysis_logs", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "error_message"
@@ -206,7 +211,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_10_101554) do
     t.integer "property_count", default: 1, null: false
     t.string "property_type"
     t.string "property_usage_code"
-    t.json "raw_data"
     t.text "remarks"
     t.string "sido"
     t.string "sigungu"
@@ -217,24 +221,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_10_101554) do
     t.index ["case_number"], name: "index_properties_on_case_number", unique: true
     t.index ["property_type"], name: "index_properties_on_property_type"
     t.index ["sido", "sigungu", "dong"], name: "idx_properties_location"
-  end
-
-  create_table "property_sale_details", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.date "dividend_demand_deadline"
-    t.text "goods_remarks"
-    t.text "non_extinguished_rights"
-    t.bigint "price_round_1"
-    t.bigint "price_round_2"
-    t.bigint "price_round_3"
-    t.bigint "price_round_4"
-    t.integer "property_id", null: false
-    t.string "senior_mortgage_basis"
-    t.text "share_description"
-    t.text "specification_remarks"
-    t.text "superficies_details"
-    t.datetime "updated_at", null: false
-    t.index ["property_id"], name: "index_property_sale_details_on_property_id", unique: true
   end
 
   create_table "property_types", force: :cascade do |t|
@@ -326,8 +312,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_10_101554) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "api_credentials", "users"
-  add_foreign_key "appraisal_points", "properties"
   add_foreign_key "auction_schedules", "properties"
   add_foreign_key "budget_settings", "loan_policies"
   add_foreign_key "budget_settings", "property_types"
@@ -337,11 +324,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_10_101554) do
   add_foreign_key "inspection_results", "inspection_items"
   add_foreign_key "inspection_results", "properties"
   add_foreign_key "inspection_results", "users"
-  add_foreign_key "land_details", "properties"
   add_foreign_key "llm_analysis_logs", "properties"
   add_foreign_key "llm_analysis_logs", "users"
   add_foreign_key "loan_policies", "property_types"
-  add_foreign_key "property_sale_details", "properties"
   add_foreign_key "reserve_fund_defaults", "property_types"
   add_foreign_key "rights_analysis_reports", "properties"
   add_foreign_key "rights_analysis_reports", "users"

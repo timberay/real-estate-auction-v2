@@ -39,12 +39,6 @@
     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">사건번호로 물건 추가</label>
     <div class="flex items-center gap-2">
       <%= form_with url: properties_path, method: :post, class: "contents", data: { action: "submit->criteria-search#submitCaseNumber" } do |f| %>
-        <%= f.select :court_name,
-            options_for_select(
-              [["법원 선택 (자동검색)", ""]] + CourtAuction::CaseSearchClient::COURT_CODES.keys.map { |name| [name, name] }
-            ),
-            {},
-            class: "h-8 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" %>
         <%= f.text_field :case_number,
             placeholder: "예: 2026타경1234",
             data: { criteria_search_target: "caseInput" },

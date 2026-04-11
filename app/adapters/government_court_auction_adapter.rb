@@ -1,46 +1,13 @@
 class GovernmentCourtAuctionAdapter < CourtAuctionAdapter
   def initialize
     @browser_client = CourtAuction::BrowserClient.new
-    @case_search_client = CourtAuction::CaseSearchClient.new
     @criteria_search_client = CourtAuction::CriteriaSearchClient.new
     @parser = CourtAuction::ResponseParser.new
     @rate_limiter = CourtAuction::RateLimiter.new
   end
 
-  def fetch_data(case_number:)
-    parsed = CourtAuction::CaseNumberParser.parse(case_number)
-
-    @rate_limiter.throttle
-    api_response = @browser_client.fetch_with_detail(**parsed)
-
-    # Return search-only parse for backward compat
-    @parser.parse(api_response: api_response["search"])
-  end
-
-  def fetch_data_with_detail(case_number:)
-    parsed = CourtAuction::CaseNumberParser.parse(case_number)
-
-    @rate_limiter.throttle
-    combined = @browser_client.fetch_with_detail(**parsed)
-
-    @parser.parse_with_detail(
-      search_response: combined["search"],
-      detail_response: combined["detail"]
-    )
-  end
-
   def search_by_criteria(region_code:, max_price:)
     @rate_limiter.throttle
     @criteria_search_client.search_all(region_code: region_code, max_price: max_price)
-  end
-
-  def search_case(court_code:, case_number:)
-    @rate_limiter.throttle
-    @case_search_client.search(court_code: court_code, case_number: case_number)
-  end
-
-  def search_case_by_serial(court_code:, serial_number:)
-    @rate_limiter.throttle
-    @case_search_client.search_by_serial(court_code: court_code, serial_number: serial_number)
   end
 end

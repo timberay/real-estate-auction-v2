@@ -38,6 +38,7 @@ Rails.application.routes.draw do
   end
 
   resources :properties, only: [ :index, :show, :create ] do
+    resources :documents, only: [ :create, :destroy ], controller: "properties/documents"
     namespace :inspections do
       resource :start, only: [ :create ], controller: "start"
       resources :tabs, only: [ :edit, :update ], param: :tab_key
@@ -45,6 +46,8 @@ Rails.application.routes.draw do
       resource :dividend, only: [ :update ], controller: "dividends"
     end
   end
+
+  resources :analyses, only: [ :new, :create ]
 
   resources :search_results, only: [ :index, :create ] do
     collection do

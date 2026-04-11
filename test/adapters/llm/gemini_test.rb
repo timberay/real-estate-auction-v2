@@ -4,7 +4,7 @@ class Llm::GeminiTest < ActiveSupport::TestCase
   setup do
     @adapter = Llm::Gemini.new
     @api_response = {
-      "candidates" => [{ "content" => { "parts" => [{ "text" => '{"results": {"rights-002": {"has_risk": true, "confidence": "high", "reasoning": "test"}}}' }] } }]
+      "candidates" => [ { "content" => { "parts" => [ { "text" => '{"results": {"rights-002": {"has_risk": true, "confidence": "high", "reasoning": "test"}}}' } ] } } ]
     }
   end
 
@@ -21,7 +21,7 @@ class Llm::GeminiTest < ActiveSupport::TestCase
     original = ENV["GEMINI_API_KEY"]
     ENV["GEMINI_API_KEY"] = "test-key"
 
-    stub = stub_request(:post, "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent")
+    stub = stub_request(:post, "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")
       .with(query: { "key" => "test-key" })
       .to_return(status: 200, body: @api_response.to_json, headers: { "Content-Type" => "application/json" })
 
@@ -36,7 +36,7 @@ class Llm::GeminiTest < ActiveSupport::TestCase
     original = ENV["GEMINI_API_KEY"]
     ENV["GEMINI_API_KEY"] = "test-key"
 
-    stub_request(:post, "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent")
+    stub_request(:post, "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")
       .with(query: { "key" => "test-key" })
       .to_return(status: 400, body: '{"error": "bad request"}', headers: { "Content-Type" => "application/json" })
 

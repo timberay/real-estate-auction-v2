@@ -2,13 +2,11 @@ module CourtAuction
   class BrowserClient
     SEARCH_URL = "https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml"
     API_ENDPOINT = "pgjsearch/searchControllerMain.on"
-    DETAIL_API_ENDPOINT = "pgj15B/selectAuctnCsSrchRslt.on"
     DEFAULT_TIMEOUT = ENV.fetch("BROWSER_TIMEOUT", 90).to_i
     PAGE_LOAD_WAIT = 3
 
     # WebSquare element IDs
     YEAR_SELECT = "mf_wfm_mainFrame_sbx_rletCsYear"
-    CASE_NUMBER_INPUT = "mf_wfm_mainFrame_ibx_rletCsNo"
     REGION_RADIO = "mf_wfm_mainFrame_rad_rletSrchBtn_input_2"
     REGION_SELECT = "mf_wfm_mainFrame_sbx_rletAdongSdR"
     BID_CATEGORY_ALL_RADIO = "mf_wfm_mainFrame_rad_mvprpBidLst_input_0"
@@ -41,39 +39,6 @@ module CourtAuction
 
     def initialize(timeout: DEFAULT_TIMEOUT)
       @timeout = timeout
-    end
-
-    def fetch_with_detail(year:, type:, number:)
-      with_browser do |page|
-        log "Starting fetch_with_detail for #{year}#{type}#{number}"
-
-        log "Step 1/4: Navigating to search page..."
-        navigate_to_search(page)
-        log "Step 1/4: Navigation complete"
-
-        log "Step 2/4: Filling case number (year=#{year}, number=#{number})..."
-        fill_case_number(page, year: year, number: number)
-        log "Step 2/4: Case number filled"
-
-        log "Step 3/4: Clicking search and capturing response..."
-        search_data = click_search_and_capture(page)
-        items = search_data.dig("data", "dlt_srchResult") || []
-        log "Step 3/4: Search complete — #{items.size} items returned"
-
-        match = find_matching_item(items, year: year, type: type, number: number)
-        unless match
-          candidates = items.map { |i| i["srnSaNo"] }
-          log "No match found. Looking for #{year}#{type}#{number}, available: #{candidates.inspect}"
-          raise DataProvider::DataNotFoundError, "Case #{year}#{type}#{number} not found"
-        end
-        log "Step 3/4: Match found — #{match['srnSaNo']}"
-
-        log "Step 4/4: Clicking result and capturing detail..."
-        detail_data = click_result_and_capture_detail(page, match)
-        log "Step 4/4: Detail capture complete"
-
-        { "search" => search_data, "detail" => detail_data }
-      end
     end
 
     def search_by_criteria(region:, year:, min_price:, max_price:)
@@ -125,17 +90,6 @@ module CourtAuction
       raise DataProvider::ServiceUnavailableError, "Court auction site unreachable: #{e.message}"
     end
 
-    def fill_case_number(page, year:, number:)
-      # Switch to 소재지(새주소) mode to avoid default court (서울중앙) restriction
-      page.click("##{REGION_RADIO}", force: true)
-      page.wait_for_timeout(500)
-
-      set_select_via_js(page, YEAR_SELECT, year.to_s)
-      raw_number = number.to_s.gsub(/\A0+/, "")
-      page.fill("##{CASE_NUMBER_INPUT}", raw_number)
-      page.wait_for_timeout(500)
-    end
-
     def fill_criteria(page, region:, year:, min_price:, max_price:)
       # 1. Click "소재지(새주소)" radio (label intercepts pointer events, so use force)
       page.click("##{REGION_RADIO}", force: true)
@@ -173,44 +127,6 @@ module CourtAuction
       end
 
       JSON.parse(response.body)
-    end
-
-    def click_result_and_capture_detail(page, match)
-      address = match["printSt"].to_s
-      keyword = address.split(/\s+/).find { |w| w.length > 2 } || address[0..10]
-
-      page.wait_for_timeout(1000) # let DOM render
-
-      response = page.expect_response(
-        ->(resp) { resp.url.include?(DETAIL_API_ENDPOINT) && resp.status == 200 },
-        timeout: @timeout * 1000
-      ) do
-        page.evaluate(<<~JS)
-          (function() {
-            var keyword = '#{escape_js(keyword)}';
-            var links = document.querySelectorAll('a');
-            for (var i = 0; i < links.length; i++) {
-              var text = (links[i].textContent || '').trim();
-              if (text.indexOf(keyword) >= 0 && text.length > 10) {
-                links[i].click();
-                return;
-              }
-            }
-          })();
-        JS
-      end
-
-      JSON.parse(response.body)
-    end
-
-    def find_matching_item(items, year:, type:, number:)
-      num_str = number.to_s
-      candidates = [
-        "#{year}#{type}#{num_str}",
-        "#{year}#{type}#{num_str.rjust(5, '0')}",
-        "#{year}#{type}#{num_str.gsub(/\A0+/, '')}"
-      ].uniq
-      items.find { |i| candidates.include?(i["srnSaNo"]) }
     end
 
     def set_select_via_js(page, element_id, value)

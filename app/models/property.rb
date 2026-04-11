@@ -1,8 +1,5 @@
 class Property < ApplicationRecord
-  has_one :sale_detail, class_name: "PropertySaleDetail", dependent: :destroy
   has_many :auction_schedules, dependent: :destroy
-  has_many :land_details, dependent: :destroy
-  has_many :appraisal_points, dependent: :destroy
 
   has_many :user_properties, dependent: :destroy
   has_many :users, through: :user_properties
@@ -11,5 +8,18 @@ class Property < ApplicationRecord
   has_many :rights_analysis_reports, dependent: :destroy
   has_many :llm_analysis_logs, dependent: :destroy
 
+  has_many_attached :documents
+
   validates :case_number, presence: true, uniqueness: true
+  validate :documents_must_be_pdf
+
+  private
+
+  def documents_must_be_pdf
+    documents.each do |doc|
+      unless doc.content_type == "application/pdf"
+        errors.add(:documents, "PDF 파일만 업로드할 수 있습니다.")
+      end
+    end
+  end
 end

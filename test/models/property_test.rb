@@ -24,27 +24,10 @@ class PropertyTest < ActiveSupport::TestCase
     assert_includes duplicate.errors[:case_number], "has already been taken"
   end
 
-  test "has_one sale_detail" do
-    property = properties(:safe_apartment)
-    assert_respond_to property, :sale_detail
-    assert_instance_of PropertySaleDetail, property.sale_detail
-  end
-
   test "has_many auction_schedules" do
     property = properties(:safe_apartment)
     assert_respond_to property, :auction_schedules
     assert property.auction_schedules.count > 0
-  end
-
-  test "has_many land_details" do
-    property = properties(:safe_apartment)
-    assert_respond_to property, :land_details
-  end
-
-  test "has_many appraisal_points" do
-    property = properties(:safe_apartment)
-    assert_respond_to property, :appraisal_points
-    assert property.appraisal_points.count > 0
   end
 
   test "has_many inspection_results" do
@@ -57,10 +40,4 @@ class PropertyTest < ActiveSupport::TestCase
     assert_respond_to property, :user_properties
   end
 
-  test "destroying property cascades to sale_detail" do
-    property = properties(:safe_apartment)
-    detail_id = property.sale_detail.id
-    property.destroy
-    assert_nil PropertySaleDetail.find_by(id: detail_id)
-  end
 end

@@ -114,18 +114,9 @@ class SearchResultsController < ApplicationController
       return { success: true, property: property, user_property: user_property }
     end
 
-    court_code = CourtAuction::CaseSearchClient.court_code_for(search_result.court_name)
-    result = PropertyDataSyncService.call(case_number: case_number, court_code: court_code, user: current_user)
-    if result.property
-      result.property.update!(property_count: search_result.property_count) if search_result.property_count > 1
-      user_property = current_user.user_properties.create!(property: result.property)
-      { success: true, property: result.property, user_property: user_property }
-    else
-      Rails.logger.warn "[InlineImport] Detail fetch failed for #{case_number}, creating from search data"
-      property = create_property_from_search_result(search_result)
-      user_property = current_user.user_properties.create!(property: property)
-      { success: true, property: property, user_property: user_property }
-    end
+    property = create_property_from_search_result(search_result)
+    user_property = current_user.user_properties.create!(property: property)
+    { success: true, property: property, user_property: user_property }
   end
 
   def create_property_from_search_result(search_result)

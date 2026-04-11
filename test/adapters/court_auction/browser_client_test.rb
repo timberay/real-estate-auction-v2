@@ -31,26 +31,6 @@ class CourtAuction::BrowserClientTest < ActiveSupport::TestCase
     assert_equal "1천만원", @client.send(:price_label, 10_000_000)
   end
 
-  # -- find_matching_item --------------------------------------------------
-
-  test "find_matching_item matches exact case number" do
-    items = [ { "srnSaNo" => "2024타경6008" } ]
-    match = @client.send(:find_matching_item, items, year: "2024", type: "타경", number: "06008")
-    assert_equal "2024타경6008", match["srnSaNo"]
-  end
-
-  test "find_matching_item matches zero-padded case number" do
-    items = [ { "srnSaNo" => "2024타경06008" } ]
-    match = @client.send(:find_matching_item, items, year: "2024", type: "타경", number: "6008")
-    assert_equal "2024타경06008", match["srnSaNo"]
-  end
-
-  test "find_matching_item returns nil when no match" do
-    items = [ { "srnSaNo" => "2024타경99999" } ]
-    match = @client.send(:find_matching_item, items, year: "2024", type: "타경", number: "6008")
-    assert_nil match
-  end
-
   # -- escape_js -----------------------------------------------------------
 
   test "escape_js escapes single quotes" do

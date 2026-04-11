@@ -1,4 +1,12 @@
 {
+  "metadata": {
+    "court_name": "수원지방법원",
+    "case_number": "2024타경12345",
+    "address": "경기도 수원시 팔달구 인계동 123-4",
+    "property_type": "아파트",
+    "appraisal_price": 350000000,
+    "min_bid_price": 280000000
+  },
   "results": {
     "rights-002": {
       "has_risk": true,

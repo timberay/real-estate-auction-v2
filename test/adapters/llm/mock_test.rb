@@ -8,6 +8,18 @@ class Llm::MockTest < ActiveSupport::TestCase
     assert response.key?("results"), "Response must have 'results' key"
   end
 
+  test "analyze accepts documents parameter and returns metadata" do
+    mock = Llm::Mock.new
+    result = mock.analyze(system: "test", prompt: "test", documents: [])
+
+    assert result.key?("metadata")
+    assert result.key?("results")
+  end
+
+  test "supports_documents? returns true" do
+    assert Llm::Mock.new.supports_documents?
+  end
+
   test "response contains rights-002 item with required fields" do
     adapter = Llm::Mock.new
     response = adapter.analyze(system: "ignored", prompt: "ignored")
