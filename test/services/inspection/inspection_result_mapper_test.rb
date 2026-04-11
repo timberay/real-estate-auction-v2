@@ -72,7 +72,7 @@ class Inspection::InspectionResultMapperTest < ActiveSupport::TestCase
       code: "finance-003", tab: :profit_analysis, tab_position: 2,
       category: "자금&대출 분석",
       question: "등기부등본에 근저당 설정 이력이 있습니까?",
-      applicable_types: ["아파트"],
+      applicable_types: [ "아파트" ],
       yes_means_safe: true
     )
 
@@ -83,7 +83,7 @@ class Inspection::InspectionResultMapperTest < ActiveSupport::TestCase
       "reasoning" => "근저당 설정 이력이 확인됩니다."
     }
 
-    items_with_finance = @items.to_a + [finance_item]
+    items_with_finance = @items.to_a + [ finance_item ]
 
     Inspection::InspectionResultMapper.call(
       response: response_with_detached, property: @property, user: @user, items: items_with_finance

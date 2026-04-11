@@ -106,7 +106,7 @@ class InspectionItemTest < ActiveSupport::TestCase
       category: "물건분석",
       question: "특정 타입에만 적용?",
       priority: "중",
-      applicable_types: ["아파트", "오피스텔"]
+      applicable_types: [ "아파트", "오피스텔" ]
     )
     assert item.applicable_for?("아파트")
     assert item.applicable_for?("오피스텔")
@@ -120,7 +120,7 @@ class InspectionItemTest < ActiveSupport::TestCase
       category: "현장확인",
       question: "특정 타입 제외?",
       priority: "하",
-      applicable_types: ["아파트"]
+      applicable_types: [ "아파트" ]
     )
     refute item.applicable_for?("단독주택")
   end

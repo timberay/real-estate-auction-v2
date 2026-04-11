@@ -122,7 +122,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     result = inspection_results(:safe_apartment_rights_002)
     result.update!(evidence: {
       "source_label" => "법원경매 물건정보",
-      "fields" => [{ "label" => "물건종류", "value" => "아파트" }]
+      "fields" => [ { "label" => "물건종류", "value" => "아파트" } ]
     })
     render_inline(InspectionItemComponent.new(result: result))
 
@@ -137,7 +137,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     result = inspection_results(:safe_apartment_rights_011)
     result.update!(evidence: {
       "source_label" => "비고, 물건명세서, 현황조사서",
-      "keywords" => { "searched" => ["유치권", "법정지상권"], "found" => false }
+      "keywords" => { "searched" => [ "유치권", "법정지상권" ], "found" => false }
     })
     render_inline(InspectionItemComponent.new(result: result))
 
@@ -182,7 +182,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     result = inspection_results(:risky_villa_rights_011)
     result.update!(evidence: {
       "source_label" => "비고, 물건명세서, 현황조사서",
-      "keywords" => { "searched" => ["유치권", "법정지상권"], "found" => true }
+      "keywords" => { "searched" => [ "유치권", "법정지상권" ], "found" => true }
     })
     render_inline(InspectionItemComponent.new(result: result))
 
