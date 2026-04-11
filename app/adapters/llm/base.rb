@@ -2,6 +2,8 @@ module Llm
   class Base
     TIMEOUT_SECONDS = 120
 
+    PDF_UNSUPPORTED_ERROR = "이 모델은 PDF 분석을 지원하지 않습니다. Anthropic Claude 또는 Gemini를 사용해주세요."
+
     def self.for
       return Llm::Mock.new if ENV["USE_MOCK"] == "true"
 
@@ -16,8 +18,15 @@ module Llm
       end
     end
 
-    def analyze(system:, prompt:)
+    def analyze(system:, prompt:, documents: [])
+      if documents.any? && !supports_documents?
+        raise PDF_UNSUPPORTED_ERROR
+      end
       raise NotImplementedError, "#{self.class}#analyze must be implemented"
+    end
+
+    def supports_documents?
+      false
     end
 
     def provider_name
@@ -57,6 +66,14 @@ module Llm
     def handle_response(response)
       unless response.success?
         raise "LLM API error (#{response.status}): #{response.body}"
+      end
+    end
+
+    def encode_pdf_base64(blob_or_path)
+      if blob_or_path.respond_to?(:download)
+        Base64.strict_encode64(blob_or_path.download)
+      else
+        Base64.strict_encode64(File.read(blob_or_path))
       end
     end
   end
