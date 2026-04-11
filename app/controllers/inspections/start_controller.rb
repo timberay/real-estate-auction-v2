@@ -3,6 +3,10 @@ module Inspections
     def create
       @property = Property.find(params[:property_id])
 
+      if params[:documents].present?
+        @property.documents.attach(params[:documents])
+      end
+
       unless @property.documents.attached?
         redirect_to property_path(@property), alert: "분석할 문서를 먼저 업로드해주세요."
         return
