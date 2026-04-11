@@ -84,8 +84,22 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_property_inspections_tab_path(property, tab_key: "rights_analysis")
   end
 
-  test "GET show renders pre-analysis state when no analysis" do
+  test "GET show renders upload prompt when no documents attached" do
     property = properties(:unanalyzed_officetel)
+
+    get property_url(property)
+    assert_response :success
+    assert_select "p", text: "문서를 업로드하면 분석을 시작할 수 있습니다."
+  end
+
+  test "GET show renders analysis button when documents attached" do
+    property = properties(:unanalyzed_officetel)
+    pdf_blob = ActiveStorage::Blob.create_and_upload!(
+      io: StringIO.new("%PDF-1.4 test"),
+      filename: "test.pdf",
+      content_type: "application/pdf"
+    )
+    property.documents.attach(pdf_blob)
 
     get property_url(property)
     assert_response :success
