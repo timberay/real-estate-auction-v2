@@ -8,14 +8,22 @@ class RightsAnalysisReport < ApplicationRecord
   validates :analyzed_at, presence: true
 
   def effective_tenants
-    report_data&.dig("calculated", "tenants") || report_data&.dig("tenants") || []
+    parsed_data&.dig("calculated", "tenants") || parsed_data&.dig("tenants") || []
   end
 
   def effective_rights_timeline
-    report_data&.dig("llm_raw", "rights_timeline") || report_data&.dig("rights_timeline") || []
+    parsed_data&.dig("llm_raw", "rights_timeline") || parsed_data&.dig("rights_timeline") || []
   end
 
   def discrepancies
-    report_data&.dig("discrepancies") || []
+    parsed_data&.dig("discrepancies") || []
+  end
+
+  def parsed_data
+    return nil if report_data.nil?
+    return report_data if report_data.is_a?(Hash)
+    JSON.parse(report_data)
+  rescue JSON::ParserError
+    {}
   end
 end

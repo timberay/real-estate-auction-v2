@@ -18,4 +18,19 @@ class SourceDocViewerComponentTest < ViewComponent::TestCase
     render_inline(SourceDocViewerComponent.new(report: report))
     assert_text "분석 데이터를 구조화하는 데 실패했습니다"
   end
+
+  test "reads tenants from calculated namespace" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => { "tenants" => [], "rights_timeline" => [] },
+      "calculated" => {
+        "tenants" => [
+          { "name" => "김○○", "deposit" => 50_000_000, "opposing_power" => true }
+        ]
+      },
+      "discrepancies" => []
+    }
+    render_inline(SourceDocViewerComponent.new(report: report))
+    assert_text "대항력 있음: 1명"
+  end
 end
