@@ -200,4 +200,17 @@ class InspectionItemComponentTest < ViewComponent::TestCase
 
     assert_selector "[data-evidence] span.whitespace-pre-line", text: /첫째 줄입니다/
   end
+
+  test "renders evidence block for ai result with none confidence (참고)" do
+    result = inspection_results(:risky_villa_rights_011)
+    result.update!(
+      source_type: :ai, has_risk: nil,
+      evidence: { "source_label" => "AI 분석 (참고)", "confidence" => "none", "reasoning" => "해당 물건은 단독주택이므로 직접 확인이 필요합니다." }
+    )
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-evidence]"
+    assert_text "AI 분석 (참고)"
+    assert_text "해당 물건은 단독주택이므로 직접 확인이 필요합니다."
+  end
 end

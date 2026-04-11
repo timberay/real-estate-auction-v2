@@ -119,24 +119,30 @@ class InspectionItemComponent < ViewComponent::Base
   def evidence_border_classes
     if @result.has_risk
       "border-l-red-500 bg-red-500/5 dark:bg-red-500/10"
-    else
+    elsif @result.has_risk == false
       "border-l-indigo-500 bg-indigo-500/5 dark:bg-indigo-500/10"
+    else
+      "border-l-slate-400 bg-slate-500/5 dark:bg-slate-500/10"
     end
   end
 
   def evidence_header_classes
     if @result.has_risk
       "text-red-400"
-    else
+    elsif @result.has_risk == false
       "text-indigo-400"
+    else
+      "text-slate-400"
     end
   end
 
   def evidence_label_classes
     if @result.has_risk
       "text-red-300 dark:text-red-400"
-    else
+    elsif @result.has_risk == false
       "text-indigo-300 dark:text-indigo-400"
+    else
+      "text-slate-300 dark:text-slate-400"
     end
   end
 
