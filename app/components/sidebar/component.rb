@@ -8,21 +8,15 @@ module Sidebar
       "물건검색" => [
         MenuItem.new(label: "예산 설정", icon: "calculator", path: "/onboarding", enabled: true),
         MenuItem.new(label: "물건 목록", icon: "magnifying-glass", path: "/properties", enabled: true),
-        MenuItem.new(label: "시세 조회", icon: "chart-bar", path: nil, enabled: false)
+        MenuItem.new(label: "AI분석", icon: "document-plus", path: "/analyses/new", enabled: true)
       ],
-      "권리분석" => [
-        MenuItem.new(label: "권리분석 리포트", icon: "document-magnifying-glass", path: nil, enabled: false),
-        MenuItem.new(label: "수익 계산기", icon: "banknotes", path: nil, enabled: false),
-        MenuItem.new(label: "대출 매칭", icon: "building-library", path: nil, enabled: false)
+      "리포트" => [
+        MenuItem.new(label: "순수익 계산기", icon: "banknotes", path: nil, enabled: false),
+        MenuItem.new(label: "통합 시세 조회", icon: "chart-bar", path: nil, enabled: false),
+        MenuItem.new(label: "리포트 내보내기", icon: "arrow-down-tray", path: nil, enabled: false)
       ],
-      "입찰" => [
-        MenuItem.new(label: "진행 체크리스트", icon: "clipboard-document-check", path: nil, enabled: false),
-        MenuItem.new(label: "가상 입찰", icon: "play", path: nil, enabled: false),
-        MenuItem.new(label: "사전 임장", icon: "map-pin", path: nil, enabled: false)
-      ],
-      "낙찰" => [
-        MenuItem.new(label: "명도 가이드", icon: "key", path: nil, enabled: false),
-        MenuItem.new(label: "전문가 연결", icon: "user-group", path: nil, enabled: false)
+      "가이드" => [
+        MenuItem.new(label: "명도 가이드", icon: "key", path: nil, enabled: false)
       ]
     }.freeze
 

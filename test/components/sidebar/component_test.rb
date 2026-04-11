@@ -20,37 +20,36 @@ module Sidebar
 
     # --- Menu groups ---
 
-    test "renders 4 group titles" do
+    test "renders 3 group titles" do
       render_inline(Sidebar::Component.new)
 
       assert_text "물건검색"
-      assert_text "권리분석"
-      assert_text "입찰"
-      assert_text "낙찰"
+      assert_text "리포트"
+      assert_text "가이드"
     end
 
     test "renders group titles with dropdown controller" do
       render_inline(Sidebar::Component.new)
 
-      assert_selector "[data-controller='dropdown']", count: 4
+      assert_selector "[data-controller='dropdown']", count: 3
     end
 
     test "renders group toggle buttons" do
       render_inline(Sidebar::Component.new)
 
-      assert_selector "[data-action='dropdown#toggle']", count: 4
+      assert_selector "[data-action='dropdown#toggle']", count: 3
     end
 
     test "renders dropdown menu targets" do
       render_inline(Sidebar::Component.new)
 
-      assert_selector "[data-dropdown-target='menu']", count: 4
+      assert_selector "[data-dropdown-target='menu']", count: 3
     end
 
     test "renders chevron targets" do
       render_inline(Sidebar::Component.new)
 
-      assert_selector "[data-dropdown-target='chevron']", count: 4
+      assert_selector "[data-dropdown-target='chevron']", count: 3
     end
 
     # --- Menu items ---
@@ -60,20 +59,16 @@ module Sidebar
 
       assert_text "예산 설정"
       assert_text "물건 목록"
+      assert_text "AI분석"
     end
 
     test "renders disabled menu item labels" do
       render_inline(Sidebar::Component.new)
 
-      assert_text "시세 조회"
-      assert_text "권리분석 리포트"
-      assert_text "수익 계산기"
-      assert_text "대출 매칭"
-      assert_text "진행 체크리스트"
-      assert_text "가상 입찰"
-      assert_text "사전 임장"
+      assert_text "순수익 계산기"
+      assert_text "통합 시세 조회"
+      assert_text "리포트 내보내기"
       assert_text "명도 가이드"
-      assert_text "전문가 연결"
     end
 
     test "renders enabled items as links" do
@@ -81,12 +76,13 @@ module Sidebar
 
       assert_selector "a[href='/onboarding']", text: "예산 설정"
       assert_selector "a[href='/properties']", text: "물건 목록"
+      assert_selector "a[href='/analyses/new']", text: "AI분석"
     end
 
     test "renders disabled items as disabled buttons" do
       render_inline(Sidebar::Component.new)
 
-      assert_selector "button[disabled]", minimum: 9
+      assert_selector "button[disabled]", minimum: 4
     end
 
     test "renders disabled items with opacity" do
