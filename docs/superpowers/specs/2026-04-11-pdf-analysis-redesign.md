@@ -185,12 +185,29 @@ Llm::Base#analyze(system:, prompt:)
 Llm::Base#analyze(system:, prompt:, documents: [])
 ```
 
-Each adapter converts PDFs to its API format:
-- **Anthropic Claude**: base64-encoded PDF as `document` content block
-- **Gemini**: `inlineData` with PDF mime type
-- **OpenAI**: file upload or base64 image (PDF pages as images if needed)
-- **Ollama**: May not support PDF — graceful error
-- **Mock**: Returns predefined response (for testing)
+#### PDF Support by Provider
+
+PDF analysis requires native multimodal document support. Not all LLM providers support this equally.
+
+| Provider | PDF Support | Structured Output | MVP Status |
+|---|---|---|---|
+| **Anthropic Claude** | Native (`document` content block, base64) | Tool Use with JSON schema | **Supported** |
+| **Gemini** | Native (`inlineData` with PDF mime type) | `response_mime_type: "application/json"` + `response_schema` | **Supported** |
+| **OpenAI** | Limited (may require PDF-to-image conversion) | JSON Mode / Structured Outputs | **Not supported in MVP** — returns clear error |
+| **OpenRouter** | Depends on underlying model | Varies | **Not supported in MVP** — returns clear error |
+| **Ollama** | Not supported | Varies | **Not supported in MVP** — returns clear error |
+| **Mock** | Returns predefined response | N/A | **Supported** (for testing) |
+
+Unsupported providers raise a descriptive error: "이 모델은 PDF 분석을 지원하지 않습니다. Anthropic Claude 또는 Gemini를 사용해주세요."
+
+PDF-to-text fallback for unsupported providers is deferred to post-MVP.
+
+#### Structured Output Enforcement
+
+LLM responses must be valid JSON. Each adapter enforces this at API parameter level:
+- **Anthropic**: Use Tool Use to define response JSON schema, forcing structured output
+- **Gemini**: Set `response_mime_type: "application/json"` and provide `response_schema`
+- **Defensive parsing**: All adapters strip markdown code fences (```json ... ```) and extract JSON via regex before parsing, as a safety net
 
 ### 4. Controller & Route Changes
 
@@ -281,4 +298,39 @@ has_many_attached :documents  # Active Storage
 - PDF-only validation (client + server)
 - Uploaded file list displayed with delete option
 - "분석 시작" button activates after at least one PDF uploaded
-- Analysis runs as background job; result page refreshes via Turbo Stream on completion
+- Analysis runs as background job with step-by-step progress feedback (see section 7)
+
+### 7. Analysis Progress Feedback
+
+PDF analysis can take significant time (tens of seconds to minutes) depending on document size and count. Users must see real-time progress.
+
+**Implementation:** Turbo Stream broadcasts via Solid Cable (Action Cable already configured).
+
+**Progress steps displayed to user:**
+1. "문서 업로드 완료" — PDFs received
+2. "AI 분석 중..." — LLM API call in progress
+3. "결과 저장 중..." — Parsing response and saving InspectionResults
+4. "분석 완료" — Redirect to results page
+
+**Technical flow:**
+- `PdfAnalysisJob` (background job) broadcasts status updates to a user-specific Turbo Stream channel
+- UI shows a progress indicator with current step
+- On completion, Turbo Stream replaces the progress area with a link to results (or auto-redirects)
+- On failure, error message is displayed inline
+
+No estimated time is shown (too variable). Step-based progress is sufficient.
+
+### 8. Privacy & Data Retention
+
+Uploaded PDFs may contain personal information (owner names, partial resident registration numbers, addresses from 등기부등본).
+
+**MVP policy:**
+- **Storage**: PDFs stored on local disk via Active Storage. Retained for re-analysis.
+- **User control**: Users can delete individual documents at any time via `DocumentsController#destroy`
+- **Upload notice**: Upload UI displays a notice: "업로드된 문서는 AI 분석을 위해 외부 API(선택한 LLM 제공자)로 전송됩니다."
+- **No automatic purge** in MVP — manual deletion only
+
+**Post-MVP considerations:**
+- Automatic purge policy (e.g., delete PDFs N days after analysis)
+- Server-side encryption at rest
+- Audit log for document access
