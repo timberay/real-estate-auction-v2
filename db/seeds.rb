@@ -90,7 +90,8 @@ inspection_data.each do |attrs|
     priority: attrs["priority"],
     merged_from: attrs["merged_from"],
     answer_type: attrs["answer_type"],
-    yes_means_safe: attrs.fetch("yes_means_safe", true)
+    yes_means_safe: attrs.fetch("yes_means_safe", true),
+    applicable_types: attrs["applicable_types"]
   )
   item.save!
   seeded_codes << code
