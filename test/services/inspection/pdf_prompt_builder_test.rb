@@ -29,4 +29,17 @@ class Inspection::PdfPromptBuilderTest < ActiveSupport::TestCase
     assert result[:user].include?("yes_means_safe=false")
     assert result[:user].include?("priority=상")
   end
+
+  test "includes confirmed_date field in tenant schema" do
+    items = InspectionItem.ordered.limit(1)
+    result = Inspection::PdfPromptBuilder.call(items: items)
+    assert result[:system].include?("confirmed_date")
+  end
+
+  test "includes HUG opportunity detection instructions" do
+    items = InspectionItem.ordered.limit(1)
+    result = Inspection::PdfPromptBuilder.call(items: items)
+    assert result[:system].include?("주택도시보증공사")
+    assert result[:system].include?("hug_waiver")
+  end
 end
