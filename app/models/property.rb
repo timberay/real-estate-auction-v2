@@ -13,6 +13,10 @@ class Property < ApplicationRecord
   validates :case_number, presence: true, uniqueness: true
   validate :documents_must_be_pdf
 
+  def analyzed?
+    inspection_results.exists?
+  end
+
   private
 
   def documents_must_be_pdf

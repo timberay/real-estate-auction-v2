@@ -40,4 +40,14 @@ class PropertyTest < ActiveSupport::TestCase
     assert_respond_to property, :user_properties
   end
 
+  test "analyzed? returns true when inspection_results exist" do
+    property = properties(:safe_apartment)
+    assert property.analyzed?
+  end
+
+  test "analyzed? returns false when no inspection_results exist" do
+    property = properties(:unanalyzed_officetel)
+    assert_not property.analyzed?
+  end
+
 end
