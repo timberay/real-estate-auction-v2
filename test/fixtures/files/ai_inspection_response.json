@@ -13,13 +13,14 @@
     "base_right_type": "근저당권",
     "base_right_holder": "○○은행",
     "base_right_date": "2024-01-15",
-    "opportunity_type": null,
-    "opportunity_reason": null,
+    "opportunity_type": "hug_waiver",
+    "opportunity_reason": "HUG(주택도시보증공사) 전세보증금반환채권이 설정되어 있으나, 배당요구종기일까지 권리신고를 하지 않아 낙찰자에게 인수되지 않습니다.",
     "tenants": [
       {
         "name": "김○○",
         "deposit": 50000000,
         "move_in_date": "2023-06-01",
+        "confirmed_date": "2023-06-15",
         "opposing_power": true,
         "priority_rank": 1
       },
@@ -27,6 +28,7 @@
         "name": "박○○",
         "deposit": 30000000,
         "move_in_date": "2024-05-01",
+        "confirmed_date": "2024-05-10",
         "opposing_power": false,
         "priority_rank": 3
       }
