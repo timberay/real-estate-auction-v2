@@ -89,7 +89,7 @@ end
 1. User navigates to "새 분석" menu
 2. User uploads PDFs
 3. User clicks "분석 시작" → `PdfAnalysisService.call(documents:, user:)`
-4. LLM extracts metadata → Property record created/matched by `case_number`
+4. LLM extracts metadata → Property matched by `case_number` (if exists, documents are attached to it and analysis results are updated) or created as new record
 5. Redirects to property show page with results
 
 ### 3. LLM Analysis Pipeline
