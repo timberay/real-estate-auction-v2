@@ -47,23 +47,19 @@
   <% end %>
 
   <div class="rounded-lg border p-4 <%= burden_config[:bg] %>">
-    <div class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-2">💰 낙찰자 부담 분석</div>
-    <div class="grid grid-cols-3 gap-4 text-sm mb-3">
+    <div class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-2">낙찰자 부담 분석</div>
+    <div class="grid grid-cols-2 gap-4 text-sm mb-3">
       <div>
-        <span class="text-slate-500 dark:text-slate-400">인수 금액</span>
-        <p class="font-semibold text-slate-900 dark:text-slate-100"><%= format_manwon(@burden["assumed_amount"]) %></p>
+        <span class="text-slate-500 dark:text-slate-400">인수 금액 (대항력 임차인)</span>
+        <p class="font-semibold text-slate-900 dark:text-slate-100"><%= format_manwon(bidder_burden) %></p>
       </div>
       <div>
-        <span class="text-slate-500 dark:text-slate-400">미확인 위험</span>
-        <p class="font-semibold text-slate-900 dark:text-slate-100"><%= format_manwon(@burden["unconfirmed_risk"]) %></p>
-      </div>
-      <div>
-        <span class="text-slate-500 dark:text-slate-400">실질 부담 총액</span>
-        <p class="font-bold text-slate-900 dark:text-slate-100"><%= format_manwon(@burden["total_burden"]) %></p>
+        <span class="text-slate-500 dark:text-slate-400">총 위험 금액</span>
+        <p class="font-bold text-slate-900 dark:text-slate-100"><%= format_manwon(@report.total_risk_amount) %></p>
       </div>
     </div>
     <div class="text-sm font-medium <%= burden_config[:color] %>">
-      <% if @burden["verdict"] == "safe" %>✅<% elsif @burden["verdict"] == "caution" %>⚠️<% else %>🔴<% end %>
+      <% if burden_verdict == "safe" %>✅<% elsif burden_verdict == "caution" %>⚠️<% else %>🔴<% end %>
       <%= burden_config[:message] %>
     </div>
   </div>

@@ -8,8 +8,7 @@ class DividendSimulatorComponent < ViewComponent::Base
   def initialize(report:, property:)
     @report = report
     @property = property
-    @simulation = report.report_data&.dig("dividend_simulation") || {}
-    @burden = report.report_data&.dig("bidder_burden") || {}
+    @simulation = report.report_data&.dig("user_simulation") || {}
   end
 
   private
@@ -22,8 +21,22 @@ class DividendSimulatorComponent < ViewComponent::Base
     @simulation["distribution"] || []
   end
 
+  def bidder_burden
+    @simulation["bidder_burden"] || 0
+  end
+
+  def burden_verdict
+    if bidder_burden > 0
+      "danger"
+    elsif @report.total_risk_amount > 0
+      "caution"
+    else
+      "safe"
+    end
+  end
+
   def burden_config
-    BURDEN_CONFIG[@burden["verdict"]] || BURDEN_CONFIG["safe"]
+    BURDEN_CONFIG[burden_verdict]
   end
 
   def format_manwon(amount)
