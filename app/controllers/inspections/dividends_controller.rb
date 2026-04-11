@@ -33,8 +33,8 @@ module Inspections
       distribution << build_row(1, "집행비용", "집행비용", execution_cost, execution_cost)
 
       data = parsed_report_data
-      rights = data["rights_timeline"] || []
-      tenants = data["tenants"] || []
+      rights = data.dig("llm_raw", "rights_timeline") || data["rights_timeline"] || []
+      tenants = data.dig("calculated", "tenants") || data["tenants"] || []
 
       claimants = build_claimants(rights, tenants)
       claimants.sort_by! { |c| c[:priority_rank] }
