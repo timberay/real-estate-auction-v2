@@ -101,13 +101,62 @@ class PdfAnalysisServiceTest < ActiveSupport::TestCase
     assert_equal 50_000_000, report.total_risk_amount
   end
 
-  test "stores tenants and rights_timeline in report_data" do
+  test "stores report_data with llm_raw, calculated, and discrepancies" do
     result = PdfAnalysisService.call(property: @property, user: @user)
     report = RightsAnalysisReport.find_by(property: result.property, user: @user)
 
-    assert_equal 2, report.report_data["tenants"].size
-    assert_equal 3, report.report_data["rights_timeline"].size
-    assert report.report_data["reasoning"].present?
+    assert_equal 2, report.report_data["llm_raw"]["tenants"].size
+    assert_equal 3, report.report_data["llm_raw"]["rights_timeline"].size
+    assert report.report_data["llm_raw"]["reasoning"].present?
+    assert_equal 2, report.report_data["calculated"]["tenants"].size
+    assert report.report_data["discrepancies"].is_a?(Array)
+  end
+
+  test "calculated tenants have opposing_power recalculated by Ruby" do
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    tenants = report.report_data["calculated"]["tenants"]
+    kim = tenants.find { |t| t["name"] == "김○○" }
+    park = tenants.find { |t| t["name"] == "박○○" }
+
+    assert_equal true, kim["opposing_power"]
+    assert_equal true, kim["has_priority_repayment"]
+    assert_equal false, park["opposing_power"]
+    assert_equal true, park["has_priority_repayment"]
+  end
+
+  test "calculated amounts use Ruby values" do
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    amounts = report.report_data["calculated"]
+    assert_equal 0, amounts["assumed_amount"]
+    assert_equal 50_000_000, amounts["opposing_deposits"]
+    assert_equal 50_000_000, amounts["total_risk_amount"]
+  end
+
+  test "DB columns match Ruby-calculated values" do
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    assert_equal report.report_data.dig("calculated", "assumed_amount"), report.assumed_amount
+    assert_equal report.report_data.dig("calculated", "total_risk_amount"), report.total_risk_amount
+  end
+
+  test "stores opportunity_type from LLM response" do
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    assert_equal "hug_waiver", report.opportunity_type
+    assert report.opportunity_reason.present?
+  end
+
+  test "effective_tenants helper returns calculated tenants" do
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    assert_equal report.report_data["calculated"]["tenants"], report.effective_tenants
   end
 
   test "creates extraction_failed report when rights_analysis key is missing" do
