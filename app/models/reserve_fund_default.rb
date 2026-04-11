@@ -8,11 +8,11 @@ class ReserveFundDefault < ApplicationRecord
             numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 0.12 }
   validate :area_range_max_greater_than_min
 
-  scope :for_property_type_and_area, ->(property_type_id, area_sqm) {
+  def self.for_property_type_and_area(property_type_id, area_sqm)
     where(property_type_id: property_type_id)
       .where("area_range_min <= ? AND area_range_max >= ?", area_sqm, area_sqm)
       .first
-  }
+  end
 
   private
 

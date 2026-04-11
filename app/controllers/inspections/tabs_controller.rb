@@ -22,8 +22,14 @@ module Inspections
       return head(:not_found) unless VALID_TABS.include?(@tab_key)
 
       if params[:resolutions].present?
+        resolution_ids = params[:resolutions].keys
+        results_by_id = @property.inspection_results
+          .where(user: current_user, id: resolution_ids)
+          .index_by(&:id)
+
         params[:resolutions].each do |id, values|
-          result = @property.inspection_results.where(user: current_user).find(id)
+          result = results_by_id[id.to_i]
+          next unless result
 
           if values[:override] == "true" && result.auto?
             apply_override(result, values)
