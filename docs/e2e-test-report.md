@@ -1,5 +1,73 @@
 # E2E Test Report
 
+## Run 5: Full Menu Crawl & Feature Verification (2026-04-11)
+
+- **Test date:** 2026-04-11T02:53Z
+- **Target URL:** http://localhost:3000
+- **Context:** Full E2E menu crawl — every navigation element, search/filter interactions, property flows
+- **Total scenarios:** 13
+- **Passed:** 13 | **Failed:** 0 | **Skipped:** 0
+
+### Results Summary
+
+| # | Scenario | Status | Screenshots | Notes |
+|---|----------|--------|-------------|-------|
+| S-000 | Home page load | PASS | before/s000-home-full.png | Redirects to /properties, 12 search results |
+| S-001 | Nav > 예산 설정 | PASS | after/s001-onboarding.png | /settings/budget loads, full budget form |
+| S-002 | Nav > 물건 목록 | PASS | after/s002-properties.png | /properties loads correctly |
+| S-003 | Property detail (saved item) | PASS | after/s003-property-detail.png | /properties/74, case info + doc upload section |
+| S-004 | Search result > add to list | PASS | after/s004-search-result-click.png | Click adds property, count 12→11 |
+| S-004b | Property detail (added item) | PASS | after/s004b-property-detail-added.png | /properties/75 loads correctly |
+| S-005 | 최대입찰가 link | PASS | — | Navigates to /settings/budget |
+| S-006a | Header button 1 (dark mode) | PASS | after/s006-header-btn1.png | Toggles dark mode on/off |
+| S-006b/c | Header buttons 2-3 | PASS | after/s006-header-btn2/3.png | No navigation, no errors |
+| S-007 | Sidebar collapse/expand | PASS | after/s007-sidebar-collapsed.png | Sidebar toggles correctly |
+| S-008 | Region selector | PASS | after/s008-region-seoul.png | Changed to 서울특별시 |
+| S-009 | 조건검색 button | PASS | after/s009-condition-search.png | Fetches Seoul results (20건) |
+| S-010 | Budget filter toggle | PASS | after/s010-budget-filter.png | Checkbox toggles, URL params updated |
+| S-011 | Safety rating filter | PASS | after/s011-safety-filter.png | Filter applied, empty state shown |
+| S-012 | Console errors check | PASS | — | 0 JS errors across all pages |
+| S-013 | Disabled nav buttons (x10) | PASS | — | All 10 disabled buttons confirmed |
+
+### Disabled Navigation Items (MVP)
+
+| Category | Item | Status |
+|----------|------|--------|
+| 물건검색 | 시세 조회 | disabled |
+| 권리분석 | 권리분석 리포트 | disabled |
+| 권리분석 | 수익 계산기 | disabled |
+| 권리분석 | 대출 매칭 | disabled |
+| 입찰 | 진행 체크리스트 | disabled |
+| 입찰 | 가상 입찰 | disabled |
+| 입찰 | 사전 임장 | disabled |
+| 낙찰 | 명도 가이드 | disabled |
+| 낙찰 | 전문가 연결 | disabled |
+
+### Pages Tested
+
+| Page | URL | HTTP Status |
+|------|-----|-------------|
+| Home | / | 302 → /properties |
+| Properties list | /properties | 200 |
+| Budget settings | /settings/budget | 200 |
+| Property detail | /properties/74 | 200 |
+| Property detail | /properties/75 | 200 |
+
+### Console Summary
+
+- JS errors: 0
+- Warnings: ~14 (non-critical, across all navigations)
+
+### Observations
+
+1. **Region change + search**: Changing to 서울특별시 and clicking 조건검색 fetches 20 Seoul properties
+2. **Search result → property addition**: Click removes from results, adds to user's list with detail page
+3. **Dark mode**: First header button toggles correctly
+4. **Header buttons 2-3**: Click without error, no visible effect (future features)
+5. **Empty state**: Safety filter with no matches shows "검색 결과가 없습니다" with guidance
+
+---
+
 ## Run 4: Court Auto-Discovery & Case Search UI (2026-04-10)
 
 - **Test date:** 2026-04-10T11:11Z
