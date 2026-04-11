@@ -67,7 +67,7 @@
 **Changes:**
 - Move the criteria search form/button to the region select row (inline with the dropdown)
 - Change "+" icon-only button to show "+ 추가" (icon + text)
-- Remove `max-w-2xl` from the criteria-search container so its width matches the filter bar below
+- Remove `max-w-2xl` from the criteria-search container so the region/case-number input area spans the same width as the filter/search bar below (both full-width within the content area)
 
 ## 6. Search Result Card — Price Order
 
@@ -112,6 +112,18 @@
 | `app/components/property_card_component.html.erb` | #4: render AI badge |
 | `app/models/property.rb` | #3: add `analyzed?` method |
 | `app/javascript/controllers/file_upload_controller.js` | #1, #2: new Stimulus controller |
+| `app/components/sidebar/component.rb` | #9: menu label changes |
+
+## 9. Sidebar Menu Label Changes
+
+**File:** `app/components/sidebar/component.rb`
+
+**Problem:** Menu group and item labels don't clearly convey their purpose.
+
+**Changes to `MENU_GROUPS`:**
+- Item: "새 분석" → "AI분석"
+- Group: "분석 (P1)" → "리포트"
+- Group: "낙찰 후 (P2)" → "가이드"
 
 ## Out of Scope
 
