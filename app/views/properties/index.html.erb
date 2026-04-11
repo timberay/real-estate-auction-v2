@@ -121,7 +121,8 @@
         <%= render PropertyCardComponent.new(
           property: user_property.property,
           safety_rating: user_property.safety_rating,
-          max_bid_amount: @max_bid_amount
+          max_bid_amount: @max_bid_amount,
+          analyzed: user_property.property.analyzed?
         ) %>
       <% end %>
     </div>

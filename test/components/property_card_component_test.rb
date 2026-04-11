@@ -58,4 +58,22 @@ class PropertyCardComponentTest < ViewComponent::TestCase
     render_inline(PropertyCardComponent.new(property: property))
     assert_no_text "예산 초과"
   end
+
+  test "renders AI analysis badge when analyzed is true" do
+    property = properties(:safe_apartment)
+    render_inline(PropertyCardComponent.new(property: property, analyzed: true))
+    assert_selector ".inline-flex", text: "AI 분석완료"
+  end
+
+  test "does not render AI analysis badge when analyzed is false" do
+    property = properties(:safe_apartment)
+    render_inline(PropertyCardComponent.new(property: property, analyzed: false))
+    assert_no_text "AI 분석완료"
+  end
+
+  test "does not render AI analysis badge when analyzed is not provided" do
+    property = properties(:safe_apartment)
+    render_inline(PropertyCardComponent.new(property: property))
+    assert_no_text "AI 분석완료"
+  end
 end

@@ -17,6 +17,9 @@
       </div>
       <div class="mt-1 flex items-center gap-1.5 flex-wrap">
         <%= render SafetyBadgeComponent.new(rating: @safety_rating) %>
+        <% if @analyzed %>
+          <%= render(BadgeComponent.new(variant: :accent)) { "AI 분석완료" } %>
+        <% end %>
         <% if budget_exceeded? %>
           <%= render(BadgeComponent.new(variant: :warning)) { "예산 초과" } %>
         <% end %>
