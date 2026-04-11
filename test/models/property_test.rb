@@ -49,5 +49,4 @@ class PropertyTest < ActiveSupport::TestCase
     property = properties(:unanalyzed_officetel)
     assert_not property.analyzed?
   end
-
 end
