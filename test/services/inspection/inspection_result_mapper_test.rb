@@ -53,6 +53,20 @@ class Inspection::InspectionResultMapperTest < ActiveSupport::TestCase
     assert result.ai?
   end
 
+  test "preserves AI reasoning even when confidence is none" do
+    @property.inspection_results.where(user: @user).where.not(source_type: :manual).destroy_all
+
+    Inspection::InspectionResultMapper.call(
+      response: @response, property: @property, user: @user, items: @items
+    )
+    result = find_result("rights-009")
+    assert_nil result.has_risk
+    assert result.evidence.present?, "evidence should be preserved for none confidence"
+    assert_equal "none", result.evidence["confidence"]
+    assert_equal "AI 분석 (참고)", result.evidence["source_label"]
+    assert result.evidence["reasoning"].present?
+  end
+
   private
 
   def find_result(code)

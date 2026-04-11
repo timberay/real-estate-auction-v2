@@ -22,8 +22,17 @@ module Inspection
         next result if result.persisted? && result.manual?
 
         ai_result = results[item.code]
-        if ai_result.nil? || ai_result["confidence"] == "none"
+        if ai_result.nil?
           result.assign_attributes(source_type: nil, has_risk: nil, evidence: nil)
+        elsif ai_result["confidence"] == "none"
+          evidence_attrs = if ai_result["reasoning"].present?
+            {
+              source_label: "AI 분석 (참고)",
+              confidence: "none",
+              reasoning: ai_result["reasoning"]
+            }
+          end
+          result.assign_attributes(source_type: "ai", has_risk: nil, evidence: evidence_attrs)
         else
           source_label = ai_result["confidence"] == "high" ? "AI 분석" : "AI 분석 (추론)"
           result.assign_attributes(

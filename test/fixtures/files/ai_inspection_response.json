@@ -109,6 +109,11 @@
       "has_risk": false,
       "confidence": "high",
       "reasoning": "경기도 수원시 빌라 3층 물건으로 분묘기지권 성립 가능성이 없습니다."
+    },
+    "rights-009": {
+      "has_risk": null,
+      "confidence": "none",
+      "reasoning": "해당 물건은 단독주택이므로 이 항목(아파트 전용)은 직접 확인이 필요합니다. AI 의견: 등기부등본에서 HUG 관련 기재를 확인할 수 없었습니다."
     }
   }
 }
