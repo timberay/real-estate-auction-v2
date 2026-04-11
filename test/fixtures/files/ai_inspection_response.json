@@ -7,6 +7,56 @@
     "appraisal_price": 350000000,
     "min_bid_price": 280000000
   },
+  "rights_analysis": {
+    "verdict": "caution",
+    "verdict_summary": "선순위 근저당 2억원이 말소기준권리이며, 대항력 있는 임차인 1명(보증금 5천만원)이 존재합니다.",
+    "base_right_type": "근저당권",
+    "base_right_holder": "○○은행",
+    "base_right_date": "2024-01-15",
+    "opportunity_type": null,
+    "opportunity_reason": null,
+    "tenants": [
+      {
+        "name": "김○○",
+        "deposit": 50000000,
+        "move_in_date": "2023-06-01",
+        "opposing_power": true,
+        "priority_rank": 1
+      },
+      {
+        "name": "박○○",
+        "deposit": 30000000,
+        "move_in_date": "2024-05-01",
+        "opposing_power": false,
+        "priority_rank": 3
+      }
+    ],
+    "rights_timeline": [
+      {
+        "date": "2024-01-15",
+        "type": "근저당권",
+        "holder": "○○은행",
+        "amount": 200000000,
+        "extinguished_on_sale": true
+      },
+      {
+        "date": "2024-03-20",
+        "type": "전세권",
+        "holder": "김○○",
+        "amount": 50000000,
+        "extinguished_on_sale": true
+      },
+      {
+        "date": "2024-08-10",
+        "type": "가압류",
+        "holder": "이○○",
+        "amount": 10000000,
+        "extinguished_on_sale": true
+      }
+    ],
+    "reasoning": "말소기준권리는 2024-01-15 설정된 ○○은행 근저당권(채권최고액 2억원)입니다. 이보다 선순위인 임차인 김○○(전입 2023-06-01, 보증금 5천만원)은 대항력이 있어 낙찰자가 인수해야 합니다. 후순위 전세권과 가압류는 매각으로 소멸합니다.",
+    "checklist_references": ["rights-002"]
+  },
   "results": {
     "rights-002": {
       "has_risk": true,
