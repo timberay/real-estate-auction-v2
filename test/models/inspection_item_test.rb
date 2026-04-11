@@ -83,4 +83,45 @@ class InspectionItemTest < ActiveSupport::TestCase
     )
     assert_equal false, item.yes_means_safe
   end
+
+  test "applicable_for? returns true when applicable_types is nil (applies to all)" do
+    item = InspectionItem.create!(
+      code: "applicable-all",
+      tab: "rights_analysis",
+      tab_position: 1,
+      category: "권리분석",
+      question: "모든 타입에 적용?",
+      priority: "상",
+      applicable_types: nil
+    )
+    assert item.applicable_for?("단독주택")
+    assert item.applicable_for?("아파트")
+  end
+
+  test "applicable_for? returns true when property_type is in applicable_types" do
+    item = InspectionItem.create!(
+      code: "applicable-specific",
+      tab: "property_analysis",
+      tab_position: 1,
+      category: "물건분석",
+      question: "특정 타입에만 적용?",
+      priority: "중",
+      applicable_types: ["아파트", "오피스텔"]
+    )
+    assert item.applicable_for?("아파트")
+    assert item.applicable_for?("오피스텔")
+  end
+
+  test "applicable_for? returns false when property_type is not in applicable_types" do
+    item = InspectionItem.create!(
+      code: "applicable-exclude",
+      tab: "field_check",
+      tab_position: 1,
+      category: "현장확인",
+      question: "특정 타입 제외?",
+      priority: "하",
+      applicable_types: ["아파트"]
+    )
+    refute item.applicable_for?("단독주택")
+  end
 end

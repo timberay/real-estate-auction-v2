@@ -19,4 +19,8 @@ class InspectionItem < ApplicationRecord
 
   scope :ordered, -> { order(:tab, :tab_position) }
   scope :for_tab, ->(tab) { where(tab: tab).order(:tab_position) }
+
+  def applicable_for?(property_type)
+    applicable_types.blank? || applicable_types.include?(property_type)
+  end
 end
