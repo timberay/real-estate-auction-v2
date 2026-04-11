@@ -1,0 +1,76 @@
+<div class="space-y-3">
+  <h4 class="text-sm font-semibold text-slate-900 dark:text-slate-100">권리 타임라인</h4>
+
+  <% if has_data? %>
+    <div class="overflow-x-auto">
+      <div class="relative min-w-[400px]">
+        <%# Horizontal timeline bar %>
+        <div class="absolute top-5 left-0 right-0 h-0.5 bg-slate-300 dark:bg-slate-600"></div>
+
+        <div class="flex gap-4 pb-2">
+          <% all_entries.each do |entry| %>
+            <div class="relative flex-shrink-0 w-40 pt-8"
+                 data-status="<%= entry[:extinguished] ? 'extinguished' : 'assumed' %>">
+              <%# Timeline dot %>
+              <div class="absolute top-3 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full border-2 border-white dark:border-slate-900
+                          <%= if entry[:is_base]
+                                'bg-red-500 ring-2 ring-red-300'
+                              elsif entry[:kind] == :tenant
+                                'bg-blue-500'
+                              elsif entry[:extinguished]
+                                'bg-slate-400'
+                              else
+                                'bg-red-500'
+                              end %>"></div>
+
+              <%# Base right label %>
+              <% if entry[:is_base] %>
+                <div class="absolute -top-1 left-1/2 -translate-x-1/2 whitespace-nowrap">
+                  <span class="text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-1.5 py-0.5 rounded">말소기준권리</span>
+                </div>
+              <% end %>
+
+              <%# Card %>
+              <div class="rounded-lg border p-2.5 text-xs
+                          <%= if entry[:kind] == :tenant
+                                'border-blue-200 bg-blue-50 dark:border-blue-700 dark:bg-blue-900/20'
+                              elsif entry[:extinguished]
+                                'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50'
+                              else
+                                'border-red-200 bg-red-50 dark:border-red-700 dark:bg-red-900/20'
+                              end %>">
+                <div class="text-slate-500 dark:text-slate-400"><%= entry[:date] %></div>
+                <div class="font-semibold mt-0.5
+                            <%= entry[:extinguished] ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-900 dark:text-slate-100' %>">
+                  <%= entry[:type] %>
+                </div>
+                <div class="text-slate-600 dark:text-slate-300 mt-0.5"><%= entry[:holder] %></div>
+                <div class="mt-1 font-medium
+                            <%= if entry[:kind] == :tenant
+                                  'text-blue-700 dark:text-blue-400'
+                                elsif entry[:extinguished]
+                                  'text-slate-400 dark:text-slate-500'
+                                else
+                                  'text-red-700 dark:text-red-400'
+                                end %>">
+                  <%= format_amount(entry[:amount]) %>
+                </div>
+                <div class="mt-1">
+                  <% if entry[:kind] == :tenant %>
+                    <span class="text-blue-600 dark:text-blue-400 font-medium">대항력 있음</span>
+                  <% elsif entry[:extinguished] %>
+                    <span class="text-slate-400 dark:text-slate-500">소멸</span>
+                  <% else %>
+                    <span class="text-red-600 dark:text-red-400 font-semibold">인수</span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <p class="text-sm text-slate-500 dark:text-slate-400">권리 설정 내역이 없습니다.</p>
+  <% end %>
+</div>
