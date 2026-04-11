@@ -5,16 +5,13 @@ class DataProviderErrorTest < ActiveSupport::TestCase
     error_classes = [
       DataProvider::MissingCredentialError,
       DataProvider::InvalidCredentialError,
-      DataProvider::ExpiredCredentialError,
       DataProvider::ConnectionError,
       DataProvider::RateLimitError,
       DataProvider::ServiceUnavailableError,
       DataProvider::DataNotFoundError,
       DataProvider::ParseError,
       DataProvider::ConsentRequiredError,
-      DataProvider::SiteStructureChangedError,
-      DataProvider::CaptchaError,
-      DataProvider::IpBlockedError
+      DataProvider::SiteStructureChangedError
     ]
 
     error_classes.each do |klass|
