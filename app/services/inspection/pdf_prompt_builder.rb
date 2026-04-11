@@ -21,6 +21,16 @@ module Inspection
       - yes_means_safe=false인 항목은 "예"가 위험을 의미합니다. has_risk는 항상 "이 항목이 위험한가?"를 기준으로 판정하세요.
       - reasoning은 반드시 문서에서 확인한 구체적 근거를 인용하세요.
 
+      [물건 종류별 판정 규칙]
+      - 작업 1에서 추출한 property_type을 작업 2의 모든 판정에 반드시 참조하세요.
+      - 각 항목에 applicable_types가 명시된 경우, property_type이 해당 목록에 포함되지 않으면:
+        has_risk: null, confidence: "none",
+        reasoning: "해당 물건은 [property_type]이므로 이 항목([applicable_types 전용])은 직접 확인이 필요합니다. [AI 의견: 문서에서 확인된 관련 정보가 있다면 기술]"
+      - property-006 항목(물건 종류가 아파트인지)은 property_type으로 직접 판정하세요:
+        아파트이면 has_risk: false, 아파트가 아니면 has_risk: true.
+      - property-007 항목(엘리베이터)은 건물 층수가 4층 미만이면 has_risk: false로 판정하세요.
+      - market-006 항목(나홀로 건물)은 property_type이 단독주택이면 has_risk: true로 판정하세요.
+
       [작업 3: 권리분석]
       등기부등본과 매각물건명세서를 종합하여 권리분석 데이터를 추출하세요.
       금액은 반드시 원(₩) 단위 숫자로 반환하세요.
@@ -93,7 +103,8 @@ module Inspection
 
     def build_user_prompt
       item_lines = @items.map do |item|
-        "#{item.code}: #{item.question} (yes_means_safe=#{item.yes_means_safe?}, priority=#{item.priority})"
+        applicable = item.applicable_types.present? ? "applicable_types=#{item.applicable_types.join(',')}" : "applicable_types=all"
+        "#{item.code}: #{item.question} (yes_means_safe=#{item.yes_means_safe?}, priority=#{item.priority}, #{applicable})"
       end
 
       <<~PROMPT
