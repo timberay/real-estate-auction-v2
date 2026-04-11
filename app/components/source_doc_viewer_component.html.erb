@@ -1,47 +1,51 @@
 <div class="space-y-4" data-controller="source-doc-tracker">
   <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">원문 뷰어</h3>
 
-  <div class="flex border-b border-slate-200 dark:border-slate-700">
-    <button class="px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
-            data-source-doc-tracker-target="tab" data-action="click->source-doc-tracker#switchTab"
-            data-doc-type="court_auction">매각물건명세서</button>
-    <button class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 dark:text-slate-400"
-            data-source-doc-tracker-target="tab" data-action="click->source-doc-tracker#switchTab"
-            data-doc-type="registry">등기부등본</button>
-  </div>
+  <% if extraction_failed? %>
+    <div class="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-4 text-sm text-amber-800 dark:text-amber-200">
+      분석 데이터를 구조화하는 데 실패했습니다. 원본 문서를 참고하세요.
+    </div>
+  <% elsif !has_data? %>
+    <div class="rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 text-sm text-slate-500 dark:text-slate-400">
+      분석을 먼저 실행해주세요.
+    </div>
+  <% else %>
+    <div class="flex border-b border-slate-200 dark:border-slate-700">
+      <button class="px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600 dark:border-blue-400 dark:text-blue-400"
+              data-source-doc-tracker-target="tab" data-action="click->source-doc-tracker#switchTab"
+              data-doc-type="court_auction">매각물건명세서</button>
+      <button class="px-4 py-2 text-sm font-medium border-b-2 border-transparent text-slate-500 dark:text-slate-400"
+              data-source-doc-tracker-target="tab" data-action="click->source-doc-tracker#switchTab"
+              data-doc-type="registry">등기부등본</button>
+    </div>
 
-  <div data-source-doc-tracker-target="panel" data-doc-type="court_auction"
-       class="rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 text-sm font-mono leading-relaxed text-slate-700 dark:text-slate-300">
-    <div class="font-semibold text-slate-900 dark:text-slate-100 mb-2">매각물건명세서 주요 내용</div>
-    <% if @sale_detail %>
-      <p>• 비고란: <%= @property.remarks.presence || "해당사항 없음" %></p>
-      <p>• 소멸되지 아니하는 것: <%= @sale_detail.non_extinguished_rights.presence || "해당 없음" %></p>
-      <p>• 말소기준권리: <%= @sale_detail.senior_mortgage_basis.presence || "미확인" %></p>
-      <p>• 배당요구종기: <%= @sale_detail.dividend_demand_deadline&.strftime("%Y.%m.%d") || "미확인" %></p>
-      <% if @sale_detail.specification_remarks.present? %>
-        <p>• 명세서 비고: <%= @sale_detail.specification_remarks %></p>
-      <% end %>
-      <% if @sale_detail.share_description.present? %>
-        <p>• 지분매각: <%= @sale_detail.share_description %></p>
-      <% end %>
-    <% else %>
-      <p class="text-slate-500 dark:text-slate-400">매각물건명세서 데이터가 없습니다.</p>
-    <% end %>
-  </div>
+    <div data-source-doc-tracker-target="panel" data-doc-type="court_auction"
+         class="rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 text-sm font-mono leading-relaxed text-slate-700 dark:text-slate-300">
+      <div class="font-semibold text-slate-900 dark:text-slate-100 mb-2">매각물건명세서 주요 내용</div>
+      <p>• 말소기준권리: <%= @report.base_right_type.presence || "미확인" %> (<%= @report.base_right_holder.presence || "미확인" %>, <%= @report.base_right_date&.strftime("%Y.%m.%d") || "미확인" %>)</p>
+      <p>• 종합 판단: <%= @report.verdict_summary.presence || "—" %></p>
+      <p>• 인수 금액: <%= number_to_currency(@report.assumed_amount, unit: "₩", precision: 0) %></p>
+      <p>• 위험 금액: <%= number_to_currency(@report.total_risk_amount, unit: "₩", precision: 0) %></p>
+    </div>
 
-  <div data-source-doc-tracker-target="panel" data-doc-type="registry" class="hidden rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 text-sm font-mono leading-relaxed text-slate-700 dark:text-slate-300">
-    <div class="font-semibold text-slate-900 dark:text-slate-100 mb-2">등기부등본 주요 내용</div>
-    <% if @registry_transcript.any? %>
-      <p>• 권리 설정: <%= (@registry_transcript["rights"] || []).size %>건</p>
-      <p>• 임차인: <%= (@registry_transcript["tenants"] || []).size %>명</p>
-      <p>• HUG 확약서: <%= @registry_transcript["hug_waiver"] ? "제출됨 (대항력 포기)" : "없음" %></p>
-      <p>• 압류: <%= (@registry_transcript["seizures"] || []).size %>건</p>
-    <% else %>
-      <p class="text-slate-500 dark:text-slate-400">등기부등본 데이터가 없습니다.</p>
-    <% end %>
-  </div>
+    <div data-source-doc-tracker-target="panel" data-doc-type="registry" class="hidden rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 text-sm font-mono leading-relaxed text-slate-700 dark:text-slate-300">
+      <div class="font-semibold text-slate-900 dark:text-slate-100 mb-2">등기부등본 주요 내용</div>
+      <p>• 권리 설정: <%= rights_timeline.size %>건</p>
+      <p>• 임차인: <%= tenants.size %>명 (대항력 있음: <%= tenants_with_opposing_power %>명)</p>
+      <% if rights_timeline.any? %>
+        <div class="mt-2 space-y-1">
+          <% rights_timeline.each do |right| %>
+            <p class="<%= right["extinguished_on_sale"] ? "text-slate-500 dark:text-slate-400" : "text-red-600 dark:text-red-400 font-semibold" %>">
+              • <%= right["date"] %> <%= right["type"] %> — <%= right["holder"] %> (<%= number_to_currency(right["amount"], unit: "₩", precision: 0) %>)
+              <%= right["extinguished_on_sale"] ? "[소멸]" : "[인수]" %>
+            </p>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
 
   <div class="rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 px-3 py-2 text-sm text-red-800 dark:text-red-200">
-    ⚠️ 반드시 매각물건명세서 비고란을 직접 확인하세요. 본 서비스는 분석 결과의 정확성을 보증하지 않습니다.
+    반드시 매각물건명세서 비고란을 직접 확인하세요. 본 서비스는 분석 결과의 정확성을 보증하지 않습니다.
   </div>
 </div>
