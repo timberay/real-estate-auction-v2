@@ -1,11 +1,10 @@
 class TabSummaryTableComponent < ViewComponent::Base
   TAB_LABELS = {
-    "sale_document" => "매각물건명세서",
-    "registry" => "등기부등본",
-    "building_ledger" => "건축물대장",
-    "online" => "온라인조회",
-    "field_visit" => "현장임장",
-    "etc" => "기타"
+    "rights_analysis" => "권리분석",
+    "property_analysis" => "물건분석",
+    "profit_analysis" => "수익분석",
+    "field_check" => "현장확인",
+    "bidding" => "입찰&낙찰"
   }.freeze
 
   def initialize(results_by_tab:, property:)
