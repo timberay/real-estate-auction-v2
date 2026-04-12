@@ -8,8 +8,6 @@ class PdfAnalysisJob < ApplicationJob
     @user = User.find(user_id)
     @property = Property.find(property_id) if property_id
 
-    broadcast_progress("analyzing", "AI 분석 중... (문서가 많으면 수 분 소요)")
-
     result = if document_blob_ids
       documents = ActiveStorage::Blob.where(id: document_blob_ids).to_a
       PdfAnalysisService.call(documents: documents, user: @user)
@@ -19,32 +17,56 @@ class PdfAnalysisJob < ApplicationJob
 
     if result.success?
       @property = result.property
-      broadcast_progress("saving", "결과 저장 중...")
-      broadcast_progress("completed", "분석 완료", property_id: result.property.id)
+      broadcast_toast("분석 완료", :success,
+        action_url: inspect_tab_url(result.property.id),
+        action_label: "결과 보기")
+      broadcast_indicator(active: false)
     else
-      broadcast_progress("failed", result.error)
+      broadcast_toast(result.error, :danger)
+      broadcast_indicator(active: false)
     end
   rescue Faraday::TimeoutError => e
     Rails.logger.error "[PdfAnalysisJob] Timeout: #{e.message}"
-    broadcast_progress("failed", "AI 서버 응답 시간이 초과되었습니다. 자동 재시도됩니다.")
+    broadcast_toast("AI 서버 응답 시간이 초과되었습니다. 자동 재시도됩니다.", :danger)
+    broadcast_indicator(active: false)
     raise
   rescue => e
     Rails.logger.error "[PdfAnalysisJob] Failed: #{e.message}"
-    broadcast_progress("failed", "분석 중 오류가 발생했습니다: #{e.message}")
+    broadcast_toast("분석 중 오류가 발생했습니다: #{e.message}", :danger)
+    broadcast_indicator(active: false)
   end
 
   private
 
-  def broadcast_progress(status, message, **extra)
-    Turbo::StreamsChannel.broadcast_replace_to(
-      "analysis_progress_#{@user.id}",
-      target: "analysis_progress",
-      partial: "analyses/progress",
-      locals: { status: status, message: message, **extra }
+  def channel_name
+    "user_notifications_#{@user.id}"
+  end
+
+  def broadcast_toast(message, type, action_url: nil, action_label: nil)
+    Turbo::StreamsChannel.broadcast_append_to(
+      channel_name,
+      target: "global_toasts",
+      partial: "notifications/toast",
+      locals: { message: message, type: type, action_url: action_url, action_label: action_label }
     )
-  rescue ActionView::MissingTemplate => e
-    Rails.logger.debug "[PdfAnalysisJob] Broadcast skipped (template missing): #{e.message}"
   rescue => e
-    Rails.logger.error "[PdfAnalysisJob] Broadcast failed: #{e.message}"
+    Rails.logger.error "[PdfAnalysisJob] Toast broadcast failed: #{e.message}"
+  end
+
+  def broadcast_indicator(active:)
+    Turbo::StreamsChannel.broadcast_replace_to(
+      channel_name,
+      target: "analysis_indicator",
+      partial: "notifications/analysis_indicator",
+      locals: { active: active }
+    )
+  rescue => e
+    Rails.logger.error "[PdfAnalysisJob] Indicator broadcast failed: #{e.message}"
+  end
+
+  def inspect_tab_url(property_id)
+    Rails.application.routes.url_helpers.edit_property_inspections_tab_path(
+      property_id, tab_key: "rights_analysis"
+    )
   end
 end

@@ -23,10 +23,15 @@ class PdfAnalysisJobTest < ActiveSupport::TestCase
     assert InspectionResult.count > initial_count, "Expected InspectionResult count to increase"
   end
 
-  test "broadcasts failure message on exception" do
-    # Property.find(-1) raises RecordNotFound, caught by rescue => e
-    assert_nothing_raised do
-      PdfAnalysisJob.perform_now(property_id: -1, user_id: @user.id)
+  test "broadcasts completion toast to user notifications channel" do
+    assert_broadcasts("user_notifications_#{@user.id}", 2) do
+      PdfAnalysisJob.perform_now(property_id: @property.id, user_id: @user.id)
+    end
+  end
+
+  test "broadcasts failure toast on exception" do
+    assert_broadcasts("user_notifications_#{users(:guest).id}", 2) do
+      PdfAnalysisJob.perform_now(property_id: -1, user_id: users(:guest).id)
     end
   end
 end
