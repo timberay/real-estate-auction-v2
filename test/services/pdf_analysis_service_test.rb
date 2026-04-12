@@ -184,4 +184,29 @@ class PdfAnalysisServiceTest < ActiveSupport::TestCase
 
     assert_equal 1, RightsAnalysisReport.where(property: @property, user: @user).count
   end
+
+  test "Path 3: processes user-provided JSON without LLM call" do
+    response_json = JSON.parse(File.read(Rails.root.join("test/fixtures/files/ai_inspection_response.json")))
+
+    result = PdfAnalysisService.call(response_json: response_json, user: @user)
+
+    assert result.success?
+    assert result.property.persisted?
+    assert_equal "2024타경12345", result.property.case_number
+    assert result.property.inspection_results.where(user: @user).any?
+  end
+
+  test "Path 3: logs analysis with provider manual and model user_input" do
+    response_json = JSON.parse(File.read(Rails.root.join("test/fixtures/files/ai_inspection_response.json")))
+
+    assert_difference "LlmAnalysisLog.count", 1 do
+      PdfAnalysisService.call(response_json: response_json, user: @user)
+    end
+
+    log = LlmAnalysisLog.last
+    assert_equal "manual", log.provider
+    assert_equal "user_input", log.model
+    assert_equal "manual_upload", log.system_prompt
+    assert_equal "completed", log.status
+  end
 end

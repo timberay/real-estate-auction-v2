@@ -1,17 +1,31 @@
 class PdfAnalysisService
   Result = Struct.new(:success?, :property, :error, keyword_init: true)
 
-  def self.call(property: nil, documents: nil, user:)
-    new(property:, documents:, user:).call
+  def self.call(property: nil, documents: nil, user:, response_json: nil)
+    new(property:, documents:, user:, response_json:).call
   end
 
-  def initialize(property:, documents:, user:)
+  def initialize(property:, documents:, user:, response_json: nil)
     @property = property
     @documents = documents
     @user = user
+    @response_json = response_json
   end
 
   def call
+    if @response_json
+      call_with_manual_json
+    else
+      call_with_llm
+    end
+  rescue => e
+    log_failure(e)
+    raise
+  end
+
+  private
+
+  def call_with_llm
     pdf_blobs = collect_documents
     return Result.new(success?: false, error: "문서를 먼저 업로드해주세요.") if pdf_blobs.empty?
 
@@ -32,19 +46,32 @@ class PdfAnalysisService
       response: response, property: property, user: @user, items: items
     )
 
-    log_analysis(property, llm, prompts, response)
+    log_analysis(property, response, llm: llm, prompts: prompts)
     create_or_update_report(property, response)
 
     UserProperty.find_or_create_by!(user: @user, property: property)
     InspectionRatingService.call(property: property, user: @user)
 
     Result.new(success?: true, property: property)
-  rescue => e
-    log_failure(e)
-    raise
   end
 
-  private
+  def call_with_manual_json
+    response = @response_json
+    items = InspectionItem.ordered
+    property = resolve_property(response["metadata"])
+
+    Inspection::InspectionResultMapper.call(
+      response: response, property: property, user: @user, items: items
+    )
+
+    log_analysis(property, response)
+    create_or_update_report(property, response)
+
+    UserProperty.find_or_create_by!(user: @user, property: property)
+    InspectionRatingService.call(property: property, user: @user)
+
+    Result.new(success?: true, property: property)
+  end
 
   def collect_documents
     if @property
@@ -77,18 +104,32 @@ class PdfAnalysisService
     end
   end
 
-  def log_analysis(property, llm, prompts, response)
-    LlmAnalysisLog.create!(
-      property: property,
-      user: @user,
-      provider: llm.provider_name,
-      model: llm.model_id,
-      system_prompt: prompts[:system],
-      user_prompt: prompts[:user],
-      response_json: response,
-      status: :completed,
-      executed_at: Time.current
-    )
+  def log_analysis(property, response, llm: nil, prompts: nil)
+    if @response_json
+      LlmAnalysisLog.create!(
+        property: property,
+        user: @user,
+        provider: "manual",
+        model: "user_input",
+        system_prompt: "manual_upload",
+        user_prompt: "manual_upload",
+        response_json: response,
+        status: :completed,
+        executed_at: Time.current
+      )
+    else
+      LlmAnalysisLog.create!(
+        property: property,
+        user: @user,
+        provider: llm.provider_name,
+        model: llm.model_id,
+        system_prompt: prompts[:system],
+        user_prompt: prompts[:user],
+        response_json: response,
+        status: :completed,
+        executed_at: Time.current
+      )
+    end
   end
 
   def create_or_update_report(property, response)
