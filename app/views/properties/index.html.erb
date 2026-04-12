@@ -20,12 +20,12 @@
   </div>
 
   <%# Case number input + criteria search %>
-  <div data-controller="criteria-search" class="max-w-2xl">
+  <div data-controller="criteria-search" class="max-w-xl min-w-80">
     <div class="mb-4">
       <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">관심 지역</label>
       <div class="flex items-center gap-2">
         <select name="budget_setting[region]"
-                class="flex-1 h-8 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                class="flex-1 h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
                 data-controller="region-select"
                 data-region-select-url-value="<%= update_region_settings_budget_path %>"
                 data-action="change->region-select#save">
@@ -34,6 +34,17 @@
           <% end %>
         </select>
         <span class="text-sm text-slate-500 dark:text-slate-400 transition-opacity duration-300 opacity-0" data-region-select-target="feedback"></span>
+        <%= form_with url: search_results_path, method: :post, class: "contents", data: { turbo_stream: true, action: "submit->criteria-search#submit turbo:submit-end->criteria-search#enable" } do %>
+          <button type="submit"
+                  data-criteria-search-target="submitButton"
+                  class="inline-flex items-center justify-center gap-1.5 w-24 h-10 rounded-md bg-violet-600 hover:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-500 text-white text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900">
+            <span data-criteria-search-target="buttonText">조건검색</span>
+            <svg data-criteria-search-target="buttonSpinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </button>
+        <% end %>
       </div>
     </div>
     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">사건번호로 물건 추가</label>
@@ -42,24 +53,14 @@
         <%= f.text_field :case_number,
             placeholder: "예: 2026타경1234",
             data: { criteria_search_target: "caseInput" },
-            class: "flex-1 min-w-0 h-8 rounded-md border px-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" %>
+            class: "flex-1 min-w-0 h-10 rounded-md border px-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" %>
         <button type="submit" data-criteria-search-target="addButton"
-                class="inline-flex items-center justify-center h-8 px-3 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 text-white transition-colors">
-          <span data-criteria-search-target="addButtonText">
+                class="inline-flex items-center justify-center gap-1.5 w-24 h-10 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 text-white transition-colors">
+          <span data-criteria-search-target="addButtonText" class="flex items-center gap-1">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15"/></svg>
+            추가
           </span>
           <svg data-criteria-search-target="addButtonSpinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </button>
-      <% end %>
-      <%= form_with url: search_results_path, method: :post, class: "contents", data: { turbo_stream: true, action: "submit->criteria-search#submit turbo:submit-end->criteria-search#enable" } do %>
-        <button type="submit"
-                data-criteria-search-target="submitButton"
-                class="inline-flex items-center justify-center gap-1.5 px-5 h-8 rounded-md bg-violet-600 hover:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-500 text-white text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900">
-          <span data-criteria-search-target="buttonText">조건검색</span>
-          <svg data-criteria-search-target="buttonSpinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
@@ -80,31 +81,37 @@
 
   <% if @user_properties.any? || params[:safety_rating].present? || params[:search].present? || params[:within_budget].present? %>
     <%# Filter + Search bar %>
-    <div data-controller="property-filter">
-      <%= form_with url: properties_path, method: :get, data: { property_filter_target: "form" }, class: "flex flex-col sm:flex-row items-stretch sm:items-center gap-2" do %>
-        <%= select_tag :safety_rating,
-            options_for_select([["전체", ""], ["안전", "safe"], ["주의", "caution"], ["경고", "danger"]], params[:safety_rating]),
-            class: "h-8 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 text-sm px-3 focus:ring-2 focus:ring-blue-500/20 focus:outline-none",
-            data: { property_filter_target: "ratingSelect", action: "change->property-filter#filter" } %>
-        <div class="relative flex-1 sm:max-w-xs">
-          <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
+    <div data-controller="property-filter" class="max-w-xl min-w-80">
+      <%= form_with url: properties_path, method: :get, data: { property_filter_target: "form" }, class: "space-y-2" do %>
+        <div class="flex items-center gap-2">
+          <%= select_tag :safety_rating,
+              options_for_select([["전체", ""], ["안전", "safe"], ["주의", "caution"], ["경고", "danger"]], params[:safety_rating]),
+              class: "h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 text-sm px-3 focus:ring-2 focus:ring-blue-500/20 focus:outline-none",
+              data: { property_filter_target: "ratingSelect", action: "change->property-filter#filter" } %>
+          <div class="relative flex-1 min-w-0">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+            <%= text_field_tag :search, params[:search],
+                placeholder: "주소, 사건번호, 법원명 검색",
+                class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 text-sm pl-9 pr-3 focus:ring-2 focus:ring-blue-500/20 focus:outline-none" %>
           </div>
-          <%= text_field_tag :search, params[:search],
-              placeholder: "주소, 사건번호, 법원명 검색",
-              class: "w-full h-8 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 text-sm pl-9 pr-3 focus:ring-2 focus:ring-blue-500/20 focus:outline-none" %>
+          <button type="submit" data-property-filter-target="searchButton"
+                  class="inline-flex items-center justify-center gap-1.5 w-24 h-10 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 text-white transition-colors focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            검색
+          </button>
+          <div class="hidden items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400" data-property-filter-target="loading">
+            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>검색 중...</span>
+          </div>
         </div>
-        <%= render ButtonComponent.new(type: "submit", icon: "magnifying-glass", size: :sm, data: { property_filter_target: "searchButton" }) { "검색" } %>
-        <div class="hidden items-center gap-1.5 text-sm text-slate-500 dark:text-slate-400" data-property-filter-target="loading">
-          <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span>검색 중...</span>
-        </div>
-        <label class="sm:ml-auto inline-flex items-center gap-1.5 cursor-pointer select-none shrink-0">
+        <label class="inline-flex items-center gap-1.5 cursor-pointer select-none">
           <span class="text-sm text-slate-500 dark:text-slate-400">예산 범위 적용</span>
           <input type="hidden" name="within_budget" value="0">
           <%= check_box_tag :within_budget, "1", params[:within_budget] == "1",
@@ -116,12 +123,13 @@
     </div>
 
     <%# Property cards grid %>
-    <div id="property-cards-grid" class="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div id="property-cards-grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <% @user_properties.each do |user_property| %>
         <%= render PropertyCardComponent.new(
           property: user_property.property,
           safety_rating: user_property.safety_rating,
-          max_bid_amount: @max_bid_amount
+          max_bid_amount: @max_bid_amount,
+          analyzed: user_property.property.analyzed?
         ) %>
       <% end %>
     </div>

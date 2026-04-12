@@ -28,18 +28,43 @@
   <%= render CardComponent.new(title: "문서") do %>
     <div class="space-y-4">
       <%= render "properties/documents/list", property: @property %>
-      <%= render "properties/documents/form", property: @property %>
+
+      <div data-controller="file-upload" data-file-upload-has-existing-value="<%= @property.documents.attached? %>">
+        <%= form_with url: property_inspections_start_path(@property), method: :post, class: "space-y-3" do |f| %>
+          <div class="text-xs text-amber-600 dark:text-amber-400">
+            업로드된 문서는 AI 분석을 위해 외부 API(선택한 LLM 제공자)로 전송됩니다.
+          </div>
+          <div>
+            <%= f.file_field :documents, multiple: true, accept: "application/pdf",
+                data: { file_upload_target: "input", action: "change->file-upload#select" },
+                class: "block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300 dark:text-slate-400" %>
+          </div>
+          <div data-file-upload-target="fileList" class="hidden text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 rounded-md p-3 border border-slate-200 dark:border-slate-700"></div>
+
+          <% if @property.analyzed? %>
+            <div class="flex items-center gap-2">
+              <%= link_to edit_property_inspections_tab_path(@property, tab_key: "rights_analysis"),
+                  class: "inline-flex items-center rounded-md bg-slate-100 dark:bg-slate-700 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600" do %>
+                분석 결과 보기
+              <% end %>
+              <%= f.submit "다시 분석",
+                  data: { file_upload_target: "submit" },
+                  class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" %>
+            </div>
+          <% elsif @property.documents.attached? %>
+            <%= f.submit "분석 시작",
+                data: { file_upload_target: "submit" },
+                class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" %>
+          <% else %>
+            <%= f.submit "분석 시작",
+                data: { file_upload_target: "submit" },
+                disabled: true,
+                class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" %>
+          <% end %>
+        <% end %>
+      </div>
     </div>
   <% end %>
-
-  <div class="text-center">
-    <% if @property.documents.attached? %>
-      <%= button_to "분석 시작", property_inspections_start_path(@property), method: :post,
-          class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" %>
-    <% else %>
-      <p class="text-sm text-slate-400">문서를 업로드하면 분석을 시작할 수 있습니다.</p>
-    <% end %>
-  </div>
 
   <div id="analysis_progress">
     <%= turbo_stream_from "analysis_progress_#{current_user.id}" %>

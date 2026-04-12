@@ -160,10 +160,14 @@ class PdfAnalysisServiceTest < ActiveSupport::TestCase
   end
 
   test "creates extraction_failed report when rights_analysis key is missing" do
-    fixture_path = Rails.root.join("test/fixtures/files/ai_inspection_response.json")
-    original = File.read(fixture_path)
-    no_rights = JSON.parse(original).except("rights_analysis")
-    File.write(fixture_path, JSON.generate(no_rights))
+    original = JSON.parse(File.read(Llm::Mock::FIXTURE_PATH))
+    no_rights = original.except("rights_analysis")
+
+    mock_llm = Llm::Mock.new
+    mock_llm.override_response = no_rights
+
+    original_for = Llm::Base.method(:for)
+    Llm::Base.define_singleton_method(:for) { mock_llm }
 
     result = PdfAnalysisService.call(property: @property, user: @user)
     report = RightsAnalysisReport.find_by(property: result.property, user: @user)
@@ -171,7 +175,7 @@ class PdfAnalysisServiceTest < ActiveSupport::TestCase
     assert_not_nil report
     assert_equal "extraction_failed", report.report_data["analysis_status"]
   ensure
-    File.write(fixture_path, original)
+    Llm::Base.define_singleton_method(:for, original_for)
   end
 
   test "report creation is idempotent on re-analysis" do
