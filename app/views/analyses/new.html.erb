@@ -11,7 +11,7 @@
       </div>
 
       <div id="analysis_form" data-controller="file-upload">
-        <%= form_with url: analyses_path, method: :post, class: "space-y-3" do |f| %>
+        <%= form_with url: analyses_path, method: :post, class: "space-y-3", data: { action: "submit->file-upload#submit" } do |f| %>
           <div>
             <%= f.file_field :documents, multiple: true, accept: "application/pdf",
                 data: { file_upload_target: "input", action: "change->file-upload#select" },

@@ -14,6 +14,12 @@ export default class extends Controller {
     this.updateState()
   }
 
+  submit() {
+    this.submitTarget.disabled = true
+    this.submitTarget.classList.add("opacity-50", "cursor-not-allowed")
+    this.submitTarget.value = "분석 중..."
+  }
+
   updateState() {
     const hasFiles = this.inputTarget.files.length > 0 || this.hasExistingValue
     this.submitTarget.disabled = !hasFiles

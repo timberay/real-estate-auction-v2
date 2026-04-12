@@ -1,7 +1,7 @@
 <div class="rounded-lg border p-4 <%= risk_classes %>"
      data-controller="inspection-item"
      data-inspection-item-result-id-value="<%= @result.id %>"
-     data-inspection-item-auto-value="<%= auto_source? %>"
+     data-inspection-item-auto-value="<%= auto_or_ai_source? && !ai_reference? %>"
      data-inspection-item-original-has-risk-value="<%= @result.has_risk.nil? ? '' : @result.has_risk %>"
      data-inspection-item-original-badge-text-value="<%= source_badge_text %>"
      data-inspection-item-original-badge-classes-value="<%= source_badge_classes %>"
