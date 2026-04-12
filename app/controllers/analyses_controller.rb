@@ -73,7 +73,7 @@ class AnalysesController < ApplicationController
 
   def manual
     unless params[:json_file].present?
-      redirect_to new_analysis_path, alert: "JSON 파일을 업로드해주세요."
+      redirect_to new_analysis_path(tab: "manual"), alert: "JSON 파일을 업로드해주세요."
       return
     end
 
@@ -81,22 +81,22 @@ class AnalysesController < ApplicationController
     parsed = begin
       JSON.parse(json_string)
     rescue JSON::ParserError
-      redirect_to new_analysis_path, alert: "유효한 JSON 파일이 아닙니다."
+      redirect_to new_analysis_path(tab: "manual"), alert: "유효한 JSON 파일이 아닙니다."
       return
     end
 
     unless parsed.key?("metadata")
-      redirect_to new_analysis_path, alert: "JSON에 metadata 키가 필요합니다."
+      redirect_to new_analysis_path(tab: "manual"), alert: "JSON에 metadata 키가 필요합니다."
       return
     end
 
     unless parsed.key?("results")
-      redirect_to new_analysis_path, alert: "JSON에 results 키가 필요합니다."
+      redirect_to new_analysis_path(tab: "manual"), alert: "JSON에 results 키가 필요합니다."
       return
     end
 
     unless parsed.dig("metadata", "case_number").present?
-      redirect_to new_analysis_path, alert: "metadata.case_number가 필요합니다."
+      redirect_to new_analysis_path(tab: "manual"), alert: "metadata.case_number가 필요합니다."
       return
     end
 
@@ -106,10 +106,10 @@ class AnalysesController < ApplicationController
       redirect_to edit_property_inspections_tab_path(result.property, tab_key: "rights_analysis"),
         notice: "분석 결과가 저장되었습니다."
     else
-      redirect_to new_analysis_path, alert: "분석 결과 저장 중 오류가 발생했습니다: #{result.error}"
+      redirect_to new_analysis_path(tab: "manual"), alert: "분석 결과 저장 중 오류가 발생했습니다: #{result.error}"
     end
   rescue => e
-    redirect_to new_analysis_path, alert: "분석 결과 저장 중 오류가 발생했습니다: #{e.message}"
+    redirect_to new_analysis_path(tab: "manual"), alert: "분석 결과 저장 중 오류가 발생했습니다: #{e.message}"
   end
 
   def create

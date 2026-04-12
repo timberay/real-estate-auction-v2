@@ -70,14 +70,14 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "분석 결과가 저장되었습니다.", flash[:notice]
   end
 
-  test "POST manual without JSON file shows alert" do
+  test "POST manual without JSON file shows alert and stays on manual tab" do
     post manual_analyses_path, params: {}
 
-    assert_redirected_to new_analysis_path
+    assert_redirected_to new_analysis_path(tab: "manual")
     assert_equal "JSON 파일을 업로드해주세요.", flash[:alert]
   end
 
-  test "POST manual with invalid JSON shows alert" do
+  test "POST manual with invalid JSON shows alert and stays on manual tab" do
     invalid_file = Rack::Test::UploadedFile.new(
       StringIO.new("this is not json"),
       "application/json",
@@ -86,11 +86,11 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
 
     post manual_analyses_path, params: { json_file: invalid_file }
 
-    assert_redirected_to new_analysis_path
+    assert_redirected_to new_analysis_path(tab: "manual")
     assert_equal "유효한 JSON 파일이 아닙니다.", flash[:alert]
   end
 
-  test "POST manual with JSON missing metadata key shows alert" do
+  test "POST manual with JSON missing metadata key shows alert and stays on manual tab" do
     json_content = { "results" => {} }.to_json
     file = Rack::Test::UploadedFile.new(
       StringIO.new(json_content),
@@ -100,11 +100,11 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
 
     post manual_analyses_path, params: { json_file: file }
 
-    assert_redirected_to new_analysis_path
+    assert_redirected_to new_analysis_path(tab: "manual")
     assert_equal "JSON에 metadata 키가 필요합니다.", flash[:alert]
   end
 
-  test "POST manual with JSON missing case_number shows alert" do
+  test "POST manual with JSON missing case_number shows alert and stays on manual tab" do
     json_content = { "metadata" => { "address" => "test" }, "results" => {} }.to_json
     file = Rack::Test::UploadedFile.new(
       StringIO.new(json_content),
@@ -114,7 +114,7 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
 
     post manual_analyses_path, params: { json_file: file }
 
-    assert_redirected_to new_analysis_path
+    assert_redirected_to new_analysis_path(tab: "manual")
     assert_equal "metadata.case_number가 필요합니다.", flash[:alert]
   end
 end

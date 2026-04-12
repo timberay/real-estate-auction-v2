@@ -4,7 +4,12 @@ export default class extends Controller {
   static targets = ["autoTab", "manualTab", "autoPanel", "manualPanel", "jsonInput", "submitButton", "fileName"]
 
   connect() {
-    this.showAuto()
+    const params = new URLSearchParams(window.location.search)
+    if (params.get("tab") === "manual") {
+      this.showManual()
+    } else {
+      this.showAuto()
+    }
   }
 
   showAuto() {
