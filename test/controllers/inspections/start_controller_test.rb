@@ -26,4 +26,18 @@ class Inspections::StartControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to property_path(@property)
     assert_equal "분석이 시작되었습니다.", flash[:notice]
   end
+
+  test "broadcasts analysis indicator on start" do
+    pdf_blob = ActiveStorage::Blob.create_and_upload!(
+      io: StringIO.new("%PDF-1.4 test"),
+      filename: "test.pdf",
+      content_type: "application/pdf"
+    )
+    @property.documents.attach(pdf_blob)
+
+    user = users(:guest)
+    assert_broadcasts("user_notifications_#{user.id}", 1) do
+      post property_inspections_start_url(@property)
+    end
+  end
 end
