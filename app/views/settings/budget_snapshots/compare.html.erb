@@ -1,6 +1,7 @@
+<% content_for(:page_title, "스냅샷 비교") %>
+
 <div class="max-w-2xl mx-auto">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">스냅샷 비교</h1>
+  <div class="flex justify-end items-center mb-6">
     <%= render ButtonComponent.new(variant: :ghost, tag: :a, href: settings_budget_snapshots_path, icon: "arrow-left", size: :sm) { "목록으로" } %>
   </div>
 

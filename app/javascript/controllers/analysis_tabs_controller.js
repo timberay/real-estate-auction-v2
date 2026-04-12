@@ -1,7 +1,14 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["autoTab", "manualTab", "autoPanel", "manualPanel", "jsonInput", "submitButton", "fileName"]
+  static targets = [
+    "autoTab", "manualTab", "autoPanel", "manualPanel",
+    "jsonInput", "submitButton", "fileName", "fileNameText",
+    "copyButton", "copyIcon", "checkIcon",
+    "fileMethodTab", "pasteMethodTab", "fileInputPanel", "pasteInputPanel",
+    "jsonTextInput", "pasteSubmitButton"
+  ]
+  static values = { promptUrl: String }
 
   connect() {
     const params = new URLSearchParams(window.location.search)
@@ -30,29 +37,111 @@ export default class extends Controller {
     this.autoTabTarget.classList.add("border-transparent", "text-slate-500")
   }
 
+  // --- Input method toggle ---
+
+  showFileInput() {
+    this.fileInputPanelTarget.classList.remove("hidden")
+    this.pasteInputPanelTarget.classList.add("hidden")
+    this.#activateMethodTab(this.fileMethodTabTarget)
+    this.#deactivateMethodTab(this.pasteMethodTabTarget)
+  }
+
+  showPasteInput() {
+    this.pasteInputPanelTarget.classList.remove("hidden")
+    this.fileInputPanelTarget.classList.add("hidden")
+    this.#activateMethodTab(this.pasteMethodTabTarget)
+    this.#deactivateMethodTab(this.fileMethodTabTarget)
+  }
+
+  // --- File input ---
+
   selectJson() {
     const file = this.jsonInputTarget.files[0]
     if (file) {
-      this.fileNameTarget.textContent = `${file.name} (${this.formatSize(file.size)})`
-      this.fileNameTarget.classList.remove("hidden")
-      this.submitButtonTarget.disabled = false
-      this.submitButtonTarget.classList.remove("opacity-50", "cursor-not-allowed")
+      this.fileNameTextTarget.textContent = `${file.name} (${this.formatSize(file.size)})`
+      this.#enableButton(this.submitButtonTarget)
     } else {
-      this.fileNameTarget.classList.add("hidden")
-      this.submitButtonTarget.disabled = true
-      this.submitButtonTarget.classList.add("opacity-50", "cursor-not-allowed")
+      this.fileNameTextTarget.textContent = "선택된 파일 없음"
+      this.#disableButton(this.submitButtonTarget)
     }
   }
 
-  submitManual() {
-    this.submitButtonTarget.disabled = true
-    this.submitButtonTarget.classList.add("opacity-50", "cursor-not-allowed")
-    this.submitButtonTarget.value = "저장 중..."
+  triggerFileSelect() {
+    this.jsonInputTarget.click()
   }
+
+  // --- Paste input ---
+
+  checkPasteInput() {
+    if (this.jsonTextInputTarget.value.trim().length > 0) {
+      this.#enableButton(this.pasteSubmitButtonTarget)
+    } else {
+      this.#disableButton(this.pasteSubmitButtonTarget)
+    }
+  }
+
+  // --- Submit ---
+
+  submitManual() {
+    const button = this.fileInputPanelTarget.classList.contains("hidden")
+      ? this.pasteSubmitButtonTarget
+      : this.submitButtonTarget
+
+    this.#disableButton(button)
+    button.querySelector("span").textContent = "저장 중..."
+  }
+
+  // --- Prompt copy ---
+
+  async copyPrompt() {
+    const button = this.copyButtonTarget
+    button.disabled = true
+
+    try {
+      const response = await fetch(this.promptUrlValue)
+      const data = await response.json()
+      await navigator.clipboard.writeText(data.prompt)
+
+      this.copyIconTarget.classList.add("hidden")
+      this.checkIconTarget.classList.remove("hidden")
+      button.querySelector("span").textContent = "복사 완료"
+
+      setTimeout(() => {
+        this.copyIconTarget.classList.remove("hidden")
+        this.checkIconTarget.classList.add("hidden")
+        button.querySelector("span").textContent = "프롬프트 복사"
+        button.disabled = false
+      }, 2000)
+    } catch {
+      button.disabled = false
+    }
+  }
+
+  // --- Helpers ---
 
   formatSize(bytes) {
     if (bytes < 1024) return `${bytes}B`
     if (bytes < 1048576) return `${(bytes / 1024).toFixed(0)}KB`
     return `${(bytes / 1048576).toFixed(1)}MB`
+  }
+
+  #activateMethodTab(tab) {
+    tab.classList.add("bg-blue-100", "text-blue-700", "dark:bg-blue-900/50", "dark:text-blue-300")
+    tab.classList.remove("bg-slate-100", "text-slate-600", "hover:bg-slate-200", "dark:bg-slate-700", "dark:text-slate-400", "dark:hover:bg-slate-600")
+  }
+
+  #deactivateMethodTab(tab) {
+    tab.classList.remove("bg-blue-100", "text-blue-700", "dark:bg-blue-900/50", "dark:text-blue-300")
+    tab.classList.add("bg-slate-100", "text-slate-600", "hover:bg-slate-200", "dark:bg-slate-700", "dark:text-slate-400", "dark:hover:bg-slate-600")
+  }
+
+  #enableButton(button) {
+    button.disabled = false
+    button.classList.remove("opacity-50", "cursor-not-allowed")
+  }
+
+  #disableButton(button) {
+    button.disabled = true
+    button.classList.add("opacity-50", "cursor-not-allowed")
   }
 }

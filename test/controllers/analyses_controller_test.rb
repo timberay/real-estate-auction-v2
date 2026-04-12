@@ -45,17 +45,15 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
   end
 
   # Task 3: prompt action
-  test "GET prompt downloads markdown file" do
+  test "GET prompt returns JSON with prompt content" do
     get prompt_analyses_path
 
     assert_response :success
-    assert_equal "text/markdown", response.content_type
-    assert_match /attachment/, response.headers["Content-Disposition"]
-    assert_match /auction-analysis-prompt\.md/, response.headers["Content-Disposition"]
-    assert_includes response.body, "부동산 경매 AI 분석 프롬프트"
-    assert_includes response.body, "시스템 프롬프트"
-    assert_includes response.body, "사용자 프롬프트"
-    assert_includes response.body, "기대 응답 형식"
+    assert_equal "application/json; charset=utf-8", response.content_type
+
+    data = JSON.parse(response.body)
+    assert data.key?("prompt")
+    assert_includes data["prompt"], "부동산 경매 권리분석 전문가"
   end
 
   # Task 4: manual action
@@ -74,7 +72,16 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     post manual_analyses_path, params: {}
 
     assert_redirected_to new_analysis_path(tab: "manual")
-    assert_equal "JSON 파일을 업로드해주세요.", flash[:alert]
+    assert_equal "JSON 파일을 업로드하거나 텍스트를 붙여넣어주세요.", flash[:alert]
+  end
+
+  test "POST manual with json_text param processes pasted JSON" do
+    json_text = { "metadata" => { "case_number" => "2024타경PASTE" }, "results" => {} }.to_json
+
+    post manual_analyses_path, params: { json_text: json_text }
+
+    property = Property.find_by(case_number: "2024타경PASTE")
+    assert_not_nil property
   end
 
   test "POST manual with invalid JSON shows alert and stays on manual tab" do
@@ -87,7 +94,7 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     post manual_analyses_path, params: { json_file: invalid_file }
 
     assert_redirected_to new_analysis_path(tab: "manual")
-    assert_equal "유효한 JSON 파일이 아닙니다.", flash[:alert]
+    assert_equal "유효한 JSON 파일이 아닙니다. JSON만 포함된 파일인지 확인해주세요.", flash[:alert]
   end
 
   test "POST manual with JSON missing metadata key shows alert and stays on manual tab" do
@@ -102,6 +109,20 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to new_analysis_path(tab: "manual")
     assert_equal "JSON에 metadata 키가 필요합니다.", flash[:alert]
+  end
+
+  test "POST manual strips markdown code blocks from JSON" do
+    json_content = "```json\n" + { "metadata" => { "case_number" => "2024타경999" }, "results" => {} }.to_json + "\n```"
+    file = Rack::Test::UploadedFile.new(
+      StringIO.new(json_content),
+      "application/json",
+      original_filename: "markdown_wrapped.json"
+    )
+
+    post manual_analyses_path, params: { json_file: file }
+
+    # Should not get a parse error — it should reach the service layer
+    assert_not_equal "유효한 JSON 파일이 아닙니다. JSON만 포함된 파일인지 확인해주세요.", flash[:alert]
   end
 
   test "POST manual with JSON missing case_number shows alert and stays on manual tab" do

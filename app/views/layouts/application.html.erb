@@ -41,7 +41,7 @@
       본문으로 건너뛰기
     </a>
 
-    <%= render Header::Component.new %>
+    <%= render Header::Component.new(page_title: content_for(:page_title)) %>
     <%= render Sidebar::Component.new(current_path: request.path) %>
 
     <div class="fixed inset-0 z-20 bg-black/50 hidden md:hidden" data-sidebar-target="backdrop" data-action="click->sidebar#close"></div>

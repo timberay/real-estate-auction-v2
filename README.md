@@ -17,9 +17,17 @@
 
 ## 스크린샷
 
-| 물건 목록 | 조건검색 결과 |
-|---|---|
-| ![물건 목록](docs/screenshots/before/s001-properties-index.png) | ![조건검색](docs/screenshots/before/s006-criteria-results.png) |
+### 예산설정
+![예산설정](docs/screenshots/before/rea_001.png)
+
+### 물건목록
+![물건목록](docs/screenshots/before/rea_002.png)
+
+### AI분석
+![AI분석](docs/screenshots/before/rea_003.png)
+
+### 권리분석
+![권리분석](docs/screenshots/before/rea_004.png)
 
 ### 핵심 기능 (MVP — P0)
 

@@ -1,40 +1,96 @@
 <div class="space-y-4">
-  <%= render CardComponent.new(title: "프롬프트 다운로드") do %>
+  <%= render CardComponent.new(title: "프롬프트 복사") do %>
     <div class="space-y-3">
       <p class="text-sm text-slate-600 dark:text-slate-400">
-        아래 버튼을 눌러 AI 분석용 프롬프트를 다운로드하세요.
-        다운로드한 파일의 내용을 AI(ChatGPT, Claude, Gemini 등)에 전달하고,
+        아래 버튼을 눌러 AI 분석용 프롬프트를 클립보드에 복사하세요.
+        복사한 내용을 AI(ChatGPT, Claude, Gemini 등)에 붙여넣고,
         법원경매 PDF 문서와 함께 분석을 요청하세요.
       </p>
-      <%= link_to prompt_analyses_path, class: "inline-flex items-center gap-1.5 rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600" do %>
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+      <button type="button"
+              data-analysis-tabs-target="copyButton"
+              data-action="analysis-tabs#copyPrompt"
+              class="inline-flex items-center gap-1.5 h-10 rounded-md bg-slate-100 px-4 text-sm font-medium text-slate-700 hover:bg-slate-200 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed">
+        <svg data-analysis-tabs-target="copyIcon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
         </svg>
-        프롬프트 다운로드 (.md)
-      <% end %>
+        <svg data-analysis-tabs-target="checkIcon" class="w-4 h-4 hidden text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <span>프롬프트 복사</span>
+      </button>
     </div>
   <% end %>
 
   <%= render CardComponent.new(title: "분석 결과 업로드") do %>
     <div class="space-y-3">
       <p class="text-sm text-slate-600 dark:text-slate-400">
-        AI로부터 받은 JSON 결과 파일을 업로드하세요.
+        AI로부터 받은 JSON 결과를 파일로 업로드하거나 직접 붙여넣으세요.
       </p>
 
-      <%= form_with url: manual_analyses_path, method: :post, class: "space-y-3", data: { action: "submit->analysis-tabs#submitManual" } do |f| %>
-        <div>
+      <%# Input method toggle %>
+      <div class="flex gap-2">
+        <button type="button"
+                data-analysis-tabs-target="fileMethodTab"
+                data-action="analysis-tabs#showFileInput"
+                class="inline-flex items-center gap-1.5 h-8 rounded-md px-3 text-sm font-medium transition-colors duration-150 bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+          </svg>
+          파일 선택
+        </button>
+        <button type="button"
+                data-analysis-tabs-target="pasteMethodTab"
+                data-action="analysis-tabs#showPasteInput"
+                class="inline-flex items-center gap-1.5 h-8 rounded-md px-3 text-sm font-medium transition-colors duration-150 bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-400 dark:hover:bg-slate-600">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+          붙여넣기
+        </button>
+      </div>
+
+      <%# File input form %>
+      <div data-analysis-tabs-target="fileInputPanel">
+        <%= form_with url: manual_analyses_path, method: :post, class: "space-y-3", data: { action: "submit->analysis-tabs#submitManual" } do |f| %>
           <%= f.file_field :json_file, accept: ".json,application/json",
               data: { analysis_tabs_target: "jsonInput", action: "change->analysis-tabs#selectJson" },
-              class: "block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300 dark:text-slate-400" %>
-        </div>
-        <div data-analysis-tabs-target="fileName"
-             class="hidden text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 rounded-md p-3 border border-slate-200 dark:border-slate-700">
-        </div>
-        <%= f.submit "분석 결과 저장",
-            data: { analysis_tabs_target: "submitButton" },
-            disabled: true,
-            class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" %>
-      <% end %>
+              class: "hidden" %>
+          <div data-analysis-tabs-target="fileName"
+               data-action="click->analysis-tabs#triggerFileSelect"
+               class="text-sm text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-md p-3 border border-slate-200 dark:border-slate-700 border-dashed cursor-pointer hover:border-blue-400 hover:text-blue-600 dark:hover:border-blue-500 dark:hover:text-blue-400 transition-colors duration-150">
+            <span data-analysis-tabs-target="fileNameText">선택된 파일 없음</span>
+          </div>
+          <%= f.submit "분석 결과 저장",
+              data: { analysis_tabs_target: "submitButton" },
+              disabled: true,
+              class: "inline-flex items-center gap-1.5 h-10 rounded-md bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-400 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            분석 결과 저장
+          <% end %>
+        <% end %>
+      </div>
+
+      <%# Paste input form %>
+      <div data-analysis-tabs-target="pasteInputPanel" class="hidden">
+        <%= form_with url: manual_analyses_path, method: :post, class: "space-y-3", data: { action: "submit->analysis-tabs#submitManual" } do |f| %>
+          <%= f.text_area :json_text,
+              placeholder: "AI 분석 결과 JSON을 여기에 붙여넣으세요...",
+              rows: 10,
+              data: { analysis_tabs_target: "jsonTextInput", action: "input->analysis-tabs#checkPasteInput" },
+              class: "block w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-mono text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/50" %>
+          <%= f.submit "분석 결과 저장",
+              data: { analysis_tabs_target: "pasteSubmitButton" },
+              disabled: true,
+              class: "inline-flex items-center gap-1.5 h-10 rounded-md bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-400 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            분석 결과 저장
+          <% end %>
+        <% end %>
+      </div>
     </div>
   <% end %>
 </div>
