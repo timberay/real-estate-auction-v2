@@ -1,0 +1,6 @@
+<%= render ToastComponent.new(
+  message: message,
+  type: type.to_sym,
+  action_url: defined?(action_url) ? action_url : nil,
+  action_label: defined?(action_label) ? action_label : nil
+) %>
