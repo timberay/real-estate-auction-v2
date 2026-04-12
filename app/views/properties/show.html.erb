@@ -29,7 +29,7 @@
     <div class="space-y-4">
       <%= render "properties/documents/list", property: @property %>
 
-      <div data-controller="file-upload">
+      <div data-controller="file-upload" data-file-upload-has-existing-value="<%= @property.documents.attached? %>">
         <%= form_with url: property_inspections_start_path(@property), method: :post, class: "space-y-3" do |f| %>
           <div class="text-xs text-amber-600 dark:text-amber-400">
             업로드된 문서는 AI 분석을 위해 외부 API(선택한 LLM 제공자)로 전송됩니다.

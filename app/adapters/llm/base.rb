@@ -1,6 +1,6 @@
 module Llm
   class Base
-    TIMEOUT_SECONDS = 120
+    TIMEOUT_SECONDS = 300
 
     PDF_UNSUPPORTED_ERROR = "이 모델은 PDF 분석을 지원하지 않습니다. Anthropic Claude 또는 Gemini를 사용해주세요."
 

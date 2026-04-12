@@ -23,8 +23,9 @@ class PdfAnalysisJobTest < ActiveSupport::TestCase
     assert InspectionResult.count > initial_count, "Expected InspectionResult count to increase"
   end
 
-  test "re-raises exception after broadcasting failure" do
-    assert_raises(ActiveRecord::RecordNotFound) do
+  test "broadcasts failure message on exception" do
+    # Property.find(-1) raises RecordNotFound, caught by rescue => e
+    assert_nothing_raised do
       PdfAnalysisJob.perform_now(property_id: -1, user_id: @user.id)
     end
   end

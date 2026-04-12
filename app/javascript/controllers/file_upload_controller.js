@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["input", "submit", "fileList"]
+  static values = { hasExisting: Boolean }
 
   connect() {
     this.updateState()
@@ -14,7 +15,7 @@ export default class extends Controller {
   }
 
   updateState() {
-    const hasFiles = this.inputTarget.files.length > 0
+    const hasFiles = this.inputTarget.files.length > 0 || this.hasExistingValue
     this.submitTarget.disabled = !hasFiles
 
     if (hasFiles) {

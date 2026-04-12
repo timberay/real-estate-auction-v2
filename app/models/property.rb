@@ -17,6 +17,10 @@ class Property < ApplicationRecord
     inspection_results.exists?
   end
 
+  def needs_manual_input?
+    inspection_results.where(has_risk: nil).exists?
+  end
+
   private
 
   def documents_must_be_pdf

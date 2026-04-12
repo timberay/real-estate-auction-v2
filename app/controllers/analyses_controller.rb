@@ -3,12 +3,14 @@ class AnalysesController < ApplicationController
   end
 
   def create
-    if params[:documents].blank?
+    uploaded_files = Array(params[:documents]).reject { |f| f.is_a?(String) }
+
+    if uploaded_files.empty?
       redirect_to new_analysis_path, alert: "PDF 파일을 업로드해주세요."
       return
     end
 
-    blob_ids = params[:documents].map do |file|
+    blob_ids = uploaded_files.map do |file|
       unless file.content_type == "application/pdf"
         redirect_to new_analysis_path, alert: "PDF 파일만 업로드할 수 있습니다."
         return

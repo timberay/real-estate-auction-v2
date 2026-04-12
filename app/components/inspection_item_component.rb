@@ -12,9 +12,10 @@ class InspectionItemComponent < ViewComponent::Base
   def auto_source? = @result.source_type == "auto"
   def manual_source? = @result.source_type == "manual"
   def overridden? = manual_source? && @result.auto_value.present?
+  def ai_reference? = ai_source? && @result.has_risk.nil?
 
   def risk_classes
-    if !auto_or_ai_source? && @result.has_risk.nil?
+    if @result.has_risk.nil?
       "border-slate-400 bg-slate-100 dark:border-slate-600 dark:bg-slate-800/50"
     elsif @result.has_risk
       auto_or_ai_source? ? "border-red-400 bg-red-100 dark:border-red-600 dark:bg-red-900/20" : "border-yellow-400 bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900/20"
@@ -48,14 +49,14 @@ class InspectionItemComponent < ViewComponent::Base
   end
 
   def status_text
-    if !auto_or_ai_source? && @result.has_risk.nil? then "미입력"
+    if @result.has_risk.nil? then "미입력"
     elsif @result.has_risk then auto_or_ai_source? ? "위험" : "위험 확인"
     else "안전"
     end
   end
 
   def status_classes
-    if !auto_or_ai_source? && @result.has_risk.nil?
+    if @result.has_risk.nil?
       "text-slate-400 dark:text-slate-500"
     elsif @result.has_risk
       "text-red-600 dark:text-red-400"
@@ -65,8 +66,8 @@ class InspectionItemComponent < ViewComponent::Base
   end
 
   def show_auto_resolution? = @show_resolution && auto_or_ai_source? && @result.has_risk
-  def show_manual_input? = @show_resolution && !auto_or_ai_source? && !overridden?
-  def show_edit_mode? = @show_resolution && (auto_or_ai_source? || overridden?)
+  def show_manual_input? = @show_resolution && (!auto_or_ai_source? && !overridden? || ai_reference?)
+  def show_edit_mode? = @show_resolution && (auto_or_ai_source? && !ai_reference? || overridden?)
 
   def yes_radio_value
     @item.yes_means_safe? ? "false" : "true"
@@ -156,5 +157,9 @@ class InspectionItemComponent < ViewComponent::Base
     else
       "text-green-400"
     end
+  end
+
+  def format_reasoning(text)
+    text.gsub(/(?<=다\.)\s+(?=\S)/, "\n")
   end
 end
