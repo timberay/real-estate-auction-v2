@@ -1,7 +1,8 @@
+<% content_for(:page_title, "물건 목록") %>
+
 <%# app/views/properties/index.html.erb %>
 <div class="space-y-6">
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-    <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">물건 목록</h1>
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4">
     <% budget = current_user.budget_setting %>
     <% if budget&.max_bid_amount.present? %>
       <%= link_to settings_budget_path,
@@ -125,12 +126,14 @@
     <%# Property cards grid %>
     <div id="property-cards-grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <% @user_properties.each do |user_property| %>
-        <%= render PropertyCardComponent.new(
-          property: user_property.property,
-          safety_rating: user_property.safety_rating,
-          max_bid_amount: @max_bid_amount,
-          analyzed: user_property.property.analyzed?
-        ) %>
+        <div id="<%= dom_id(user_property.property, :card) %>">
+          <%= render PropertyCardComponent.new(
+            property: user_property.property,
+            safety_rating: user_property.safety_rating,
+            max_bid_amount: @max_bid_amount,
+            analyzed: user_property.property.analyzed?
+          ) %>
+        </div>
       <% end %>
     </div>
 
