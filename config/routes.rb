@@ -37,7 +37,7 @@ Rails.application.routes.draw do
     resources :reserve_fund_defaults, only: [ :index ]
   end
 
-  resources :properties, only: [ :index, :show, :create ] do
+  resources :properties, only: [ :index, :show, :create, :destroy ] do
     resources :documents, only: [ :create, :destroy ], controller: "properties/documents"
     namespace :inspections do
       resource :start, only: [ :create ], controller: "start"

@@ -31,6 +31,11 @@ class PropertiesController < ApplicationController
     @property = Property.find(params[:id])
     @user_property = current_user.user_properties.find_by(property: @property)
 
+    unless @property.analyzed?
+      redirect_to new_analysis_path
+      return
+    end
+
     if @user_property&.safety_rating.present?
       redirect_to property_inspections_grade_path(@property)
     elsif @user_property&.analyzed_at.present?
@@ -58,6 +63,23 @@ class PropertiesController < ApplicationController
     else
       current_user.user_properties.create!(property: property)
       redirect_to property_path(property), notice: "내 목록에 추가했습니다."
+    end
+  end
+
+  def destroy
+    property = Property.find(params[:id])
+    user_property = current_user.user_properties.find_by!(property: property)
+
+    ActiveRecord::Base.transaction do
+      InspectionResult.where(user: current_user, property: property).delete_all
+      RightsAnalysisReport.where(user: current_user, property: property).delete_all
+      LlmAnalysisLog.where(user: current_user, property: property).delete_all
+      user_property.destroy!
+    end
+
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(helpers.dom_id(property, :card)) }
+      format.html { redirect_to properties_path, notice: "물건을 내 목록에서 삭제했습니다." }
     end
   end
 end

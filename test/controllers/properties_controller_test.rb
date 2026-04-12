@@ -84,25 +84,51 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_property_inspections_tab_path(property, tab_key: "rights_analysis")
   end
 
-  test "GET show renders disabled analysis button when no documents attached" do
-    property = properties(:unanalyzed_officetel)
+  test "DELETE destroy removes user_property and user-scoped analysis data" do
+    property = properties(:safe_apartment)
+    user = User.find_by(email: "guest@auction.local")
 
-    get property_url(property)
-    assert_response :success
-    assert_select "input[type=submit][disabled][value='분석 시작']"
+    # Create user-scoped analysis data
+    item = inspection_items(:rights_002)
+    # Fixture already has inspection_result for this combo, so use a different item
+    item2 = inspection_items(:rights_001)
+    InspectionResult.create!(property: property, user: user, inspection_item: item2, source_type: :auto)
+    RightsAnalysisReport.create!(property: property, user: user, analyzed_at: Time.current, report_data: "{}")
+    LlmAnalysisLog.create!(property: property, user: user, system_prompt: "test", user_prompt: "test", status: :completed)
+
+    assert_difference "UserProperty.count", -1 do
+      delete property_url(property)
+    end
+
+    assert_not InspectionResult.exists?(property: property, user: user)
+    assert_not RightsAnalysisReport.exists?(property: property, user: user)
+    assert_not LlmAnalysisLog.exists?(property: property, user: user)
+    assert Property.exists?(property.id), "Property record itself must be preserved"
+    assert_redirected_to properties_path
   end
 
-  test "GET show renders enabled analysis button when documents attached" do
+  test "DELETE destroy responds with turbo_stream to remove card" do
+    property = properties(:safe_apartment)
+
+    delete property_url(property), as: :turbo_stream
+
+    assert_response :success
+    assert_includes response.body, "turbo-stream"
+    assert_includes response.body, "remove"
+    assert_includes response.body, "card_property_#{property.id}"
+  end
+
+  test "DELETE destroy returns 404 for property not in user list" do
+    property = properties(:basement_villa)  # not in guest's list
+
+    delete property_url(property)
+    assert_response :not_found
+  end
+
+  test "GET show redirects unanalyzed property to AI analysis page" do
     property = properties(:unanalyzed_officetel)
-    pdf_blob = ActiveStorage::Blob.create_and_upload!(
-      io: StringIO.new("%PDF-1.4 test"),
-      filename: "test.pdf",
-      content_type: "application/pdf"
-    )
-    property.documents.attach(pdf_blob)
 
     get property_url(property)
-    assert_response :success
-    assert_select "input[type=submit][value='분석 시작']"
+    assert_redirected_to new_analysis_path
   end
 end
