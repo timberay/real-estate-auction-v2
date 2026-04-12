@@ -27,19 +27,19 @@ class SnapshotCardComponentTest < ViewComponent::TestCase
   test "renders trigger badge for manual_edit" do
     render_inline(SnapshotCardComponent.new(**default_props))
 
-    assert_selector "span[class*='bg-green-50']"
+    assert_selector "span[class*='bg-green-200']"
   end
 
   test "renders trigger badge for onboarding" do
     render_inline(SnapshotCardComponent.new(**default_props.merge(trigger: "onboarding")))
 
-    assert_selector "span[class*='bg-blue-50']"
+    assert_selector "span[class*='bg-blue-200']"
   end
 
   test "renders trigger badge for recalculate" do
     render_inline(SnapshotCardComponent.new(**default_props.merge(trigger: "recalculate")))
 
-    assert_selector "span[class*='bg-yellow-50']"
+    assert_selector "span[class*='bg-yellow-200']"
   end
 
   # --- Formatted amount ---
@@ -47,7 +47,7 @@ class SnapshotCardComponentTest < ViewComponent::TestCase
   test "renders formatted max bid amount" do
     render_inline(SnapshotCardComponent.new(**default_props))
 
-    assert_text "150,000,000"
+    assert_text "1억 5,000만원"
   end
 
   # --- Action links ---

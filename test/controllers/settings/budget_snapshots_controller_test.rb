@@ -36,6 +36,18 @@ class Settings::BudgetSnapshotsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "GET compare without ids redirects with alert" do
+    get compare_settings_budget_snapshots_url
+    assert_redirected_to settings_budget_snapshots_url
+    assert_equal "비교할 스냅샷 2개를 선택해주세요.", flash[:alert]
+  end
+
+  test "GET compare with invalid ids redirects with alert" do
+    get compare_settings_budget_snapshots_url(ids: [ 999_999, 999_998 ])
+    assert_redirected_to settings_budget_snapshots_url
+    assert_equal "선택한 스냅샷을 찾을 수 없습니다.", flash[:alert]
+  end
+
   test "POST recalculate creates a new snapshot" do
     assert_difference "@user.budget_snapshots.count", 1 do
       post recalculate_settings_budget_snapshot_url(@snapshot1)

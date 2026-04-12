@@ -51,7 +51,7 @@
   <% end %>
 
   <% if evidence_present? %>
-    <div class="mt-2.5 rounded-r-md border-l-3 p-2 px-3 text-xs <%= evidence_border_classes %>"
+    <div class="mt-2.5 rounded-r-md border-l-3 p-2 px-3 text-sm <%= evidence_border_classes %>"
          data-evidence>
       <div class="font-semibold mb-1 <%= evidence_header_classes %>">📋 판정 근거 · <%= evidence["source_label"] %></div>
       <% if evidence["reasoning"].present? %>
@@ -111,7 +111,7 @@
             disabled: true,
             placeholder: "해결 방안 메모",
             data: { inspection_item_target: "overrideInput" },
-            class: "mt-2 w-full h-10 rounded-md border border-yellow-300 dark:border-yellow-600 bg-white dark:bg-slate-700 px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" %>
+            class: "mt-2 w-full h-10 rounded-md border border-yellow-400 dark:border-yellow-600 bg-white dark:bg-slate-700 px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" %>
       </div>
     </div>
   <% end %>
@@ -152,7 +152,7 @@
         </div>
         <%= text_field_tag "resolutions[#{@result.id}][resolution_note]", @result.resolution_note,
             placeholder: "해결 방안 메모",
-            class: "mt-2 w-full h-10 rounded-md border border-yellow-300 dark:border-yellow-600 bg-white dark:bg-slate-700 px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" %>
+            class: "mt-2 w-full h-10 rounded-md border border-yellow-400 dark:border-yellow-600 bg-white dark:bg-slate-700 px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" %>
       </div>
     </div>
   <% end %>

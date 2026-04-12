@@ -24,11 +24,14 @@
                 </a>
               <% else %>
                 <button type="button" disabled
-                        class="<%= item_classes(item) %> w-full"
+                        class="<%= item_classes(item) %> w-full opacity-50"
                         data-sidebar-item
-                        title="<%= item.label %>">
+                        title="준비중">
                   <%= menu_icon(item.icon) %>
-                  <span class="hidden lg:inline" data-sidebar-label><%= item.label %></span>
+                  <span class="hidden lg:inline" data-sidebar-label>
+                    <%= item.label %>
+                    <span class="ml-1 text-sm font-medium text-slate-400 dark:text-slate-500">(준비중)</span>
+                  </span>
                 </button>
               <% end %>
             <% end %>

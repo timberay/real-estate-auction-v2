@@ -81,6 +81,26 @@ class BudgetSettingTest < ActiveSupport::TestCase
     assert_equal "mid", bs.selected_area_category
   end
 
+  test "negative reserve fields are rejected" do
+    BudgetSetting::RESERVE_FIELDS.each do |field|
+      bs = BudgetSetting.new(user: users(:guest), available_cash: 30000, field => -100)
+      assert_not bs.valid?, "expected #{field} = -100 to be invalid"
+      assert_includes bs.errors[field], "must be greater than or equal to 0"
+    end
+  end
+
+  test "zero reserve fields are accepted" do
+    bs = BudgetSetting.new(
+      user: users(:guest), available_cash: 30000,
+      repair_cost: 0, acquisition_tax: 0, scrivener_fee: 0,
+      moving_cost: 0, maintenance_fee: 0
+    )
+    bs.valid?
+    BudgetSetting::RESERVE_FIELDS.each do |field|
+      assert_empty bs.errors[field], "expected #{field} = 0 to have no errors"
+    end
+  end
+
   test "mid category label does not contain 국평" do
     mid = BudgetSetting::AREA_CATEGORIES.find { |c| c[:key] == "mid" }
     assert_equal "중형 (30~34평 / 60~85㎡)", mid[:label]

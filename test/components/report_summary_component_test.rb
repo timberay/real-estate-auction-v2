@@ -48,4 +48,13 @@ class ReportSummaryComponentTest < ViewComponent::TestCase
     render_inline(ReportSummaryComponent.new(report: report, property: property))
     assert_text "인수 금액"
   end
+
+  test "formats prices correctly from won to Korean currency" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    property = properties(:safe_apartment)
+    # Fixture: appraisal_price=800000000, min_bid_price=560000000
+    render_inline(ReportSummaryComponent.new(report: report, property: property))
+    assert_text "8억"
+    assert_text "5억 6,000만원"
+  end
 end

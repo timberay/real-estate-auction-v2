@@ -19,8 +19,8 @@ class BadgeComponentTest < ViewComponent::TestCase
   test "renders success variant with correct classes" do
     render_inline(BadgeComponent.new(variant: :success)) { "Success" }
 
-    assert_selector "span[class*='bg-green-50']"
-    assert_selector "span[class*='text-green-700']"
+    assert_selector "span[class*='bg-green-200']"
+    assert_selector "span[class*='text-green-800']"
     assert_selector "span[class*='ring-1']"
     assert_selector "span[class*='ring-inset']"
     assert_selector "span[class*='ring-green-600/20']"
@@ -33,8 +33,8 @@ class BadgeComponentTest < ViewComponent::TestCase
   test "renders warning variant with correct classes" do
     render_inline(BadgeComponent.new(variant: :warning)) { "Warning" }
 
-    assert_selector "span[class*='bg-yellow-50']"
-    assert_selector "span[class*='text-yellow-700']"
+    assert_selector "span[class*='bg-yellow-200']"
+    assert_selector "span[class*='text-yellow-800']"
     assert_selector "span[class*='ring-1']"
     assert_selector "span[class*='ring-inset']"
     assert_selector "span[class*='ring-yellow-600/20']"
@@ -47,8 +47,8 @@ class BadgeComponentTest < ViewComponent::TestCase
   test "renders danger variant with correct classes" do
     render_inline(BadgeComponent.new(variant: :danger)) { "Danger" }
 
-    assert_selector "span[class*='bg-red-50']"
-    assert_selector "span[class*='text-red-700']"
+    assert_selector "span[class*='bg-red-200']"
+    assert_selector "span[class*='text-red-800']"
     assert_selector "span[class*='ring-1']"
     assert_selector "span[class*='ring-inset']"
     assert_selector "span[class*='ring-red-600/20']"
@@ -61,8 +61,8 @@ class BadgeComponentTest < ViewComponent::TestCase
   test "renders info variant with correct classes" do
     render_inline(BadgeComponent.new(variant: :info)) { "Info" }
 
-    assert_selector "span[class*='bg-blue-50']"
-    assert_selector "span[class*='text-blue-700']"
+    assert_selector "span[class*='bg-blue-200']"
+    assert_selector "span[class*='text-blue-800']"
     assert_selector "span[class*='ring-1']"
     assert_selector "span[class*='ring-inset']"
     assert_selector "span[class*='ring-blue-600/20']"
@@ -75,8 +75,8 @@ class BadgeComponentTest < ViewComponent::TestCase
   test "renders accent variant with correct classes" do
     render_inline(BadgeComponent.new(variant: :accent)) { "Accent" }
 
-    assert_selector "span[class*='bg-amber-50']"
-    assert_selector "span[class*='text-amber-700']"
+    assert_selector "span[class*='bg-amber-200']"
+    assert_selector "span[class*='text-amber-800']"
     assert_selector "span[class*='ring-1']"
     assert_selector "span[class*='ring-inset']"
     assert_selector "span[class*='ring-amber-600/20']"

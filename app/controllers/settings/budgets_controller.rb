@@ -16,6 +16,12 @@ module Settings
       @setting.area_range_min = range[:min] if range[:min]
       @setting.area_range_max = range[:max] if range[:max]
 
+      unless @setting.valid?
+        load_show_data
+        render :show, status: :unprocessable_entity
+        return
+      end
+
       result = BudgetCalculationService.call(
         available_cash: @setting.available_cash,
         reserve_funds: {

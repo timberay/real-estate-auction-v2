@@ -7,7 +7,7 @@
         <% is_base = entry["date"] == @report.base_right_date&.to_s %>
         <div class="relative">
           <div class="absolute -left-[25px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 <%= is_base ? 'bg-red-500' : 'bg-slate-400' %>"></div>
-          <div class="rounded-lg border p-3 <%= is_base ? 'border-red-300 bg-red-50 dark:border-red-600 dark:bg-red-900/20' : 'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50' %>">
+          <div class="rounded-lg border p-3 <%= is_base ? 'border-red-400 bg-red-50 dark:border-red-600 dark:bg-red-900/20' : 'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50' %>">
             <div class="flex items-center justify-between">
               <div class="text-sm">
                 <% if is_base %><span class="text-sm font-bold text-red-600 dark:text-red-400">★ 말소기준권리</span> <% end %>
@@ -24,7 +24,7 @@
         <% has_power = tenant["opposing_power"] %>
         <div class="relative">
           <div class="absolute -left-[25px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 <%= has_power ? 'bg-red-500' : 'bg-green-500' %>"></div>
-          <div class="rounded-lg border p-3 <%= has_power ? 'border-red-300 bg-red-50 dark:border-red-600 dark:bg-red-900/20' : 'border-green-300 bg-green-50 dark:border-green-600 dark:bg-green-900/20' %>">
+          <div class="rounded-lg border p-3 <%= has_power ? 'border-red-400 bg-red-50 dark:border-red-600 dark:bg-red-900/20' : 'border-green-400 bg-green-50 dark:border-green-600 dark:bg-green-900/20' %>">
             <div class="flex items-center justify-between">
               <div class="text-sm">
                 <span class="font-semibold text-slate-900 dark:text-slate-100"><%= tenant["name"] %> — 전입신고</span>

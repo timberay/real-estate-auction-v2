@@ -4,7 +4,7 @@
 
     <%# HUG Opportunity Label %>
     <% if @report.opportunity_type.present? %>
-      <div class="rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-300 dark:border-green-700 px-4 py-3">
+      <div class="rounded-lg bg-green-100 dark:bg-green-900/20 border border-green-400 dark:border-green-700 px-4 py-3">
         <div class="flex items-center gap-2">
           <span class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-800/40 px-3 py-1 text-sm font-semibold text-green-800 dark:text-green-300">
             안전 기회물건
@@ -31,7 +31,7 @@
 
     <%# Discrepancy Warning %>
     <% if @report.discrepancies.any? %>
-      <div class="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 px-4 py-3">
+      <div class="rounded-lg bg-amber-100 dark:bg-amber-900/20 border border-amber-400 dark:border-amber-700 px-4 py-3">
         <p class="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-2">AI 판단과 자동계산 결과가 다른 항목이 있습니다</p>
         <table class="w-full text-sm">
           <thead>
@@ -48,7 +48,7 @@
                 <td class="pr-4 py-0.5"><%= d["tenant_name"] %></td>
                 <td class="pr-4 py-0.5"><%= d["llm_value"] ? "대항력 있음" : "대항력 없음" %></td>
                 <td class="pr-4 py-0.5"><%= d["ruby_value"] ? "대항력 있음" : "대항력 없음" %></td>
-                <td class="py-0.5 text-xs"><%= d["reason"] %></td>
+                <td class="py-0.5 text-sm"><%= d["reason"] %></td>
               </tr>
             <% end %>
           </tbody>

@@ -1,6 +1,6 @@
 <header class="<%= HEADER_CLASSES %>">
   <div class="flex items-center gap-3">
-    <button type="button" class="<%= BUTTON_CLASSES %> md:hidden" data-action="sidebar#toggleMobile">
+    <button type="button" class="<%= BUTTON_CLASSES %> md:hidden" data-action="sidebar#toggleMobile" aria-label="메뉴 열기">
       <%= hamburger_icon %>
     </button>
     <span class="font-bold text-lg text-white"><%= @app_name %></span>
@@ -12,7 +12,7 @@
 
   <div class="flex items-center gap-1">
     <div data-controller="dark-mode">
-      <button type="button" class="<%= BUTTON_CLASSES %>" data-action="dark-mode#toggle">
+      <button type="button" class="<%= BUTTON_CLASSES %>" data-action="dark-mode#toggle" aria-label="다크 모드 전환">
         <span data-dark-mode-target="sunIcon"><%= sun_icon %></span>
         <span data-dark-mode-target="moonIcon" class="hidden"><%= moon_icon %></span>
       </button>
@@ -20,11 +20,11 @@
 
     <span id="analysis_indicator"></span>
 
-    <button type="button" class="<%= BUTTON_CLASSES %>">
+    <button type="button" class="<%= BUTTON_CLASSES %>" aria-label="알림">
       <%= bell_icon %>
     </button>
 
-    <button type="button" class="<%= BUTTON_CLASSES %>">
+    <button type="button" class="<%= BUTTON_CLASSES %>" aria-label="사용자 메뉴">
       <%= user_icon %>
     </button>
   </div>

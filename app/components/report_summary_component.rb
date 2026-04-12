@@ -1,8 +1,8 @@
 class ReportSummaryComponent < ViewComponent::Base
   VERDICT_CONFIG = {
-    "safe" => { color: "text-green-700 dark:text-green-400", bg: "bg-green-50 dark:bg-green-900/20", border: "border-green-300", emoji: "🟢", label: "안전" },
-    "caution" => { color: "text-yellow-700 dark:text-yellow-400", bg: "bg-yellow-50 dark:bg-yellow-900/20", border: "border-yellow-300", emoji: "🟡", label: "주의" },
-    "danger" => { color: "text-red-700 dark:text-red-400", bg: "bg-red-50 dark:bg-red-900/20", border: "border-red-300", emoji: "🔴", label: "위험" }
+    "safe" => { color: "text-green-700 dark:text-green-400", bg: "bg-green-100 dark:bg-green-900/20", border: "border-green-400", emoji: "🟢", label: "안전" },
+    "caution" => { color: "text-yellow-700 dark:text-yellow-400", bg: "bg-yellow-100 dark:bg-yellow-900/20", border: "border-yellow-400", emoji: "🟡", label: "주의" },
+    "danger" => { color: "text-red-700 dark:text-red-400", bg: "bg-red-100 dark:bg-red-900/20", border: "border-red-400", emoji: "🔴", label: "위험" }
   }.freeze
 
   CHECKLIST_CODE_LABELS = {
@@ -38,15 +38,7 @@ class ReportSummaryComponent < ViewComponent::Base
     amount.to_fs(:delimited) + "원"
   end
 
-  def format_price(price_in_manwon)
-    return "—" if price_in_manwon.nil? || price_in_manwon == 0
-
-    if price_in_manwon >= 10000
-      eok = price_in_manwon / 10000
-      remainder = price_in_manwon % 10000
-      remainder > 0 ? "#{eok}억 #{remainder.to_fs(:delimited)}만원" : "#{eok}억원"
-    else
-      "#{price_in_manwon.to_fs(:delimited)}만원"
-    end
+  def format_price(price_in_won)
+    helpers.format_price_won(price_in_won)
   end
 end

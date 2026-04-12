@@ -23,7 +23,7 @@ class SnapshotCardComponent < ViewComponent::Base
   private
 
   def formatted_amount
-    number_to_delimited(@max_bid_amount)
+    helpers.format_price_won(@max_bid_amount)
   end
 
   def badge_variant

@@ -7,6 +7,10 @@ class BudgetSetting < ApplicationRecord
   validates :available_cash, numericality: { greater_than: 0 }, allow_nil: true
   validates :loan_ratio, numericality: { greater_than: 0, less_than_or_equal_to: 1 }, allow_nil: true
   RESERVE_FIELDS = %i[repair_cost acquisition_tax scrivener_fee moving_cost maintenance_fee].freeze
+
+  RESERVE_FIELDS.each do |field|
+    validates field, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  end
   REGIONS = [
     "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시",
     "대전광역시", "울산광역시", "세종특별자치시", "경기도", "강원도",

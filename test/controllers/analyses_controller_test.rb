@@ -12,6 +12,13 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type=file]"
   end
 
+  test "GET new with non-existent property_id redirects with alert" do
+    get new_analysis_path(property_id: 99999)
+
+    assert_redirected_to new_analysis_path
+    assert_equal "해당 물건을 찾을 수 없습니다.", flash[:alert]
+  end
+
   test "POST create with Turbo responds with form reset, toast, and indicator" do
     pdf = fixture_file_upload("test/fixtures/files/test.pdf", "application/pdf")
 
