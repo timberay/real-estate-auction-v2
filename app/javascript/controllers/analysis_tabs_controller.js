@@ -88,7 +88,8 @@ export default class extends Controller {
       : this.submitButtonTarget
 
     this.#disableButton(button)
-    button.querySelector("span").textContent = "저장 중..."
+    const textNode = Array.from(button.childNodes).find(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim())
+    if (textNode) textNode.textContent = " 저장 중..."
   }
 
   // --- Prompt copy ---
