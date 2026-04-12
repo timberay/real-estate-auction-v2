@@ -46,15 +46,19 @@
 
     <div class="fixed inset-0 z-20 bg-black/50 hidden md:hidden" data-sidebar-target="backdrop" data-action="click->sidebar#close"></div>
 
+    <% if current_user %>
+      <%= turbo_stream_from "user_notifications_#{current_user.id}" %>
+    <% end %>
+
     <div class="min-h-screen pt-16 transition-[margin] duration-200 md:ml-16 lg:ml-64" data-sidebar-target="content">
-      <% if flash.any? %>
-        <div class="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+      <div class="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none" id="global_toasts">
+        <% if flash.any? %>
           <% flash.each do |type, message| %>
             <% toast_type = { "notice" => :success, "alert" => :danger }.fetch(type.to_s, :info) %>
             <%= render ToastComponent.new(message: message, type: toast_type) %>
           <% end %>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
 
       <main id="main-content" class="px-4 py-4 md:px-6 md:py-6">
         <%= yield %>
