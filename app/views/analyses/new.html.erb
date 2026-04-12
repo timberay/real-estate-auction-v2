@@ -1,16 +1,39 @@
-<div class="max-w-lg mx-auto space-y-4">
+<div class="max-w-lg mx-auto space-y-4" data-controller="analysis-tabs">
   <h1 class="text-lg font-semibold text-slate-900 dark:text-slate-100">새 분석</h1>
 
-  <%= render CardComponent.new(title: "PDF 문서 업로드") do %>
-    <div class="space-y-3">
-      <p class="text-sm text-slate-600 dark:text-slate-400">
-        법원경매 사이트에서 확보한 문서(매각물건명세서, 현황조사서, 감정평가서, 등기부등본 등)를 PDF로 업로드해주세요.
-      </p>
-      <div class="text-xs text-amber-600 dark:text-amber-400">
-        업로드된 문서는 AI 분석을 위해 외부 API(선택한 LLM 제공자)로 전송됩니다.
-      </div>
+  <div class="border-b border-slate-200 dark:border-slate-700">
+    <nav class="-mb-px flex gap-x-4" aria-label="Tabs">
+      <button type="button"
+        data-analysis-tabs-target="autoTab"
+        data-action="click->analysis-tabs#showAuto"
+        class="whitespace-nowrap border-b-2 py-3 px-1 text-sm font-medium border-blue-500 text-blue-600 dark:text-blue-400">
+        AI 자동분석
+      </button>
+      <button type="button"
+        data-analysis-tabs-target="manualTab"
+        data-action="click->analysis-tabs#showManual"
+        class="whitespace-nowrap border-b-2 py-3 px-1 text-sm font-medium border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300">
+        수동분석
+      </button>
+    </nav>
+  </div>
 
-      <%= render "analyses/form" %>
-    </div>
-  <% end %>
+  <div data-analysis-tabs-target="autoPanel">
+    <%= render CardComponent.new(title: "PDF 문서 업로드") do %>
+      <div class="space-y-3">
+        <p class="text-sm text-slate-600 dark:text-slate-400">
+          법원경매 사이트에서 확보한 문서(매각물건명세서, 현황조사서, 감정평가서, 등기부등본 등)를 PDF로 업로드해주세요.
+        </p>
+        <div class="text-xs text-amber-600 dark:text-amber-400">
+          업로드된 문서는 AI 분석을 위해 외부 API(선택한 LLM 제공자)로 전송됩니다.
+        </div>
+
+        <%= render "analyses/form" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div data-analysis-tabs-target="manualPanel" class="hidden">
+    <%= render "analyses/manual_form" %>
+  </div>
 </div>

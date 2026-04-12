@@ -1,0 +1,40 @@
+<div class="space-y-4">
+  <%= render CardComponent.new(title: "프롬프트 다운로드") do %>
+    <div class="space-y-3">
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        아래 버튼을 눌러 AI 분석용 프롬프트를 다운로드하세요.
+        다운로드한 파일의 내용을 AI(ChatGPT, Claude, Gemini 등)에 전달하고,
+        법원경매 PDF 문서와 함께 분석을 요청하세요.
+      </p>
+      <%= link_to prompt_analyses_path, class: "inline-flex items-center gap-1.5 rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        프롬프트 다운로드 (.md)
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= render CardComponent.new(title: "분석 결과 업로드") do %>
+    <div class="space-y-3">
+      <p class="text-sm text-slate-600 dark:text-slate-400">
+        AI로부터 받은 JSON 결과 파일을 업로드하세요.
+      </p>
+
+      <%= form_with url: manual_analyses_path, method: :post, class: "space-y-3", data: { action: "submit->analysis-tabs#submitManual" } do |f| %>
+        <div>
+          <%= f.file_field :json_file, accept: ".json,application/json",
+              data: { analysis_tabs_target: "jsonInput", action: "change->analysis-tabs#selectJson" },
+              class: "block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300 dark:text-slate-400" %>
+        </div>
+        <div data-analysis-tabs-target="fileName"
+             class="hidden text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 rounded-md p-3 border border-slate-200 dark:border-slate-700">
+        </div>
+        <%= f.submit "분석 결과 저장",
+            data: { analysis_tabs_target: "submitButton" },
+            disabled: true,
+            class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
