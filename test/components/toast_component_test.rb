@@ -92,4 +92,34 @@ class ToastComponentTest < ViewComponent::TestCase
     assert_selector "div[class*='px-4']"
     assert_selector "div[class*='py-3']"
   end
+
+  # --- Action link ---
+
+  test "renders action link when action_url and action_label provided" do
+    render_inline(ToastComponent.new(
+      message: "분석 완료",
+      type: :success,
+      action_url: "/properties/1/inspections/tabs/rights_analysis/edit",
+      action_label: "결과 보기"
+    ))
+
+    assert_link "결과 보기", href: "/properties/1/inspections/tabs/rights_analysis/edit"
+  end
+
+  test "does not render action link when action_url is nil" do
+    render_inline(ToastComponent.new(message: "일반 메시지"))
+
+    assert_no_selector "a"
+  end
+
+  test "disables auto-dismiss when action_url is present" do
+    render_inline(ToastComponent.new(
+      message: "분석 완료",
+      type: :success,
+      action_url: "/results",
+      action_label: "보기"
+    ))
+
+    assert_selector "[data-toast-duration-value='0']"
+  end
 end

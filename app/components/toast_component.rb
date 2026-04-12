@@ -10,10 +10,12 @@ class ToastComponent < ViewComponent::Base
 
   CONTAINER_CLASSES = "flex items-start gap-3 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-lg px-4 py-3 min-w-80 max-w-md pointer-events-auto"
 
-  def initialize(message:, type: :info, duration: 5000)
+  def initialize(message:, type: :info, duration: 5000, action_url: nil, action_label: nil)
     @message = message
     @type = type.to_sym
-    @duration = duration
+    @duration = action_url ? 0 : duration
+    @action_url = action_url
+    @action_label = action_label
   end
 
   private

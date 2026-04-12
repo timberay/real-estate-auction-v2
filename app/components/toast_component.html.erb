@@ -1,6 +1,13 @@
 <div class="<%= CONTAINER_CLASSES %>" data-controller="toast" data-toast-duration-value="<%= @duration %>">
   <%= icon_html %>
-  <p class="text-sm text-slate-700 dark:text-slate-300 flex-1"><%= @message %></p>
+  <div class="flex-1">
+    <p class="text-sm text-slate-700 dark:text-slate-300">
+      <%= @message %>
+      <% if @action_url && @action_label %>
+        — <%= link_to @action_label, @action_url, class: "underline font-medium hover:text-slate-900 dark:hover:text-slate-100" %>
+      <% end %>
+    </p>
+  </div>
   <button type="button" data-action="toast#dismiss" class="shrink-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
     <%= close_icon_html %>
   </button>
