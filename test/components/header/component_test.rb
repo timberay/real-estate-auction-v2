@@ -111,5 +111,13 @@ module Header
       assert_selector "button[class*='rounded-md']"
       assert_selector "button[class*='text-slate-300']"
     end
+
+    # --- Analysis indicator ---
+
+    test "renders analysis indicator placeholder" do
+      render_inline(Header::Component.new)
+
+      assert_selector "span#analysis_indicator"
+    end
   end
 end
