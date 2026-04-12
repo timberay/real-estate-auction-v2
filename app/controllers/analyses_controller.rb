@@ -30,11 +30,13 @@ class AnalysesController < ApplicationController
 
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(
-          "analysis_form",
-          partial: "analyses/progress",
-          locals: { status: "analyzing", message: "AI 분석 중..." }
-        )
+        render turbo_stream: [
+          turbo_stream.replace("analysis_form", partial: "analyses/form"),
+          turbo_stream.append("global_toasts", partial: "notifications/toast",
+            locals: { message: "분석이 시작되었습니다", type: :info }),
+          turbo_stream.replace("analysis_indicator", partial: "notifications/analysis_indicator",
+            locals: { active: true })
+        ]
       end
       format.html do
         redirect_to new_analysis_path, notice: "분석이 시작되었습니다."

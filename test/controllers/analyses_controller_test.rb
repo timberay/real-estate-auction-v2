@@ -12,7 +12,7 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[type=file]"
   end
 
-  test "POST create with Turbo replaces form with progress indicator" do
+  test "POST create with Turbo responds with form reset, toast, and indicator" do
     pdf = fixture_file_upload("test/fixtures/files/test.pdf", "application/pdf")
 
     post analyses_path, params: { documents: [ pdf ] },
@@ -20,6 +20,12 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_includes response.content_type, "text/vnd.turbo-stream.html"
+    assert_includes response.body, 'action="replace"'
+    assert_includes response.body, 'target="analysis_form"'
+    assert_includes response.body, 'action="append"'
+    assert_includes response.body, 'target="global_toasts"'
+    assert_includes response.body, "분석이 시작되었습니다"
+    assert_includes response.body, 'target="analysis_indicator"'
   end
 
   test "POST create without Turbo redirects with notice" do

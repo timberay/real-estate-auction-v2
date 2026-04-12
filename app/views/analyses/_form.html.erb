@@ -1,0 +1,14 @@
+<div id="analysis_form" data-controller="file-upload">
+  <%= form_with url: analyses_path, method: :post, class: "space-y-3", data: { action: "submit->file-upload#submit" } do |f| %>
+    <div>
+      <%= f.file_field :documents, multiple: true, accept: "application/pdf",
+          data: { file_upload_target: "input", action: "change->file-upload#select" },
+          class: "block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300 dark:text-slate-400" %>
+    </div>
+    <div data-file-upload-target="fileList" class="hidden text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 rounded-md p-3 border border-slate-200 dark:border-slate-700"></div>
+    <%= f.submit "분석 시작",
+        data: { file_upload_target: "submit" },
+        disabled: true,
+        class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" %>
+  <% end %>
+</div>

@@ -17,6 +17,13 @@ module Inspections
         user_id: current_user.id
       )
 
+      Turbo::StreamsChannel.broadcast_replace_to(
+        "user_notifications_#{current_user.id}",
+        target: "analysis_indicator",
+        partial: "notifications/analysis_indicator",
+        locals: { active: true }
+      )
+
       redirect_to property_path(@property), notice: "분석이 시작되었습니다."
     end
   end
