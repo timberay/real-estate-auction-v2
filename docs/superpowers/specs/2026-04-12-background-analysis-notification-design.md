@@ -55,6 +55,8 @@ Extend to accept optional link parameters:
 
 When both are present, render a link after the message text. Existing usage (without links) remains unchanged.
 
+**Auto-dismiss behavior:** When `action_url` is present, set `duration: 0` to disable auto-dismiss. The user must manually close the toast via the "x" button. This prevents the "결과 보기" link from disappearing before the user notices it. The existing `toast_controller.js` already handles `duration: 0` (skips `setTimeout`) and `element.remove()` on dismiss, so DOM cleanup is covered.
+
 #### 3. Header Component
 
 Add an analysis indicator area next to the bell icon:
@@ -69,25 +71,31 @@ Replace the current `broadcast_progress` method. New broadcast behavior:
 
 | Event | Toast | Indicator |
 |-------|-------|-----------|
-| Analysis started (in job `perform`) | append info toast: "AI 분석 중... (문서가 많으면 수 분 소요)" | replace with spinner |
-| Analysis completed | append success toast: "분석 완료" + "결과 보기" link | replace with empty |
-| Analysis failed | append danger toast: error message | replace with empty |
+| Analysis completed | append success toast: "분석 완료" + "결과 보기" link (no auto-dismiss) | replace with empty |
+| Analysis failed | append danger toast: error message (no auto-dismiss) | replace with empty |
 
-The "saving" intermediate state is removed from user-facing notifications (unnecessary detail).
+The "analyzing" and "saving" intermediate states are removed from job broadcasts. The initial "started" feedback is handled by the controller (see section 5 below), not the job. The job only broadcasts terminal states (completed/failed).
 
 Broadcast target channel: `user_notifications_#{user.id}` (instead of current `analysis_progress_#{user.id}`).
 
 #### 5. AnalysesController#create
 
-Change Turbo Stream response:
+Change Turbo Stream response to provide **immediate feedback** without waiting for the job to start:
 - **Before:** replaces `#analysis_form` with progress partial
-- **After:** resets the form (re-renders clean form state) so the user can immediately upload another file or navigate away
+- **After:** responds with multiple Turbo Stream actions in one response:
+  1. Reset the form (re-render clean form state)
+  2. Append "분석이 시작되었습니다" info toast to `#global_toasts`
+  3. Replace `#analysis_indicator` with spinner
 
-The "분석이 시작되었습니다" feedback comes from the job's first broadcast, not the controller response.
+This ensures the user gets instant visual confirmation even if the job queue has latency. The job only broadcasts terminal states (completed/failed).
 
 #### 6. Inspections::StartController#create
 
-No changes needed. Already uses `redirect_to` with flash notice, which displays as a toast via existing flash handling.
+Change to Turbo Stream response (same pattern as AnalysesController):
+1. Flash notice "분석이 시작되었습니다" (existing redirect handles this)
+2. Replace `#analysis_indicator` with spinner
+
+Since this controller uses `redirect_to`, the flash notice already appears as a toast. The only addition is broadcasting the header spinner indicator on redirect.
 
 ### Files to Remove
 
@@ -118,3 +126,7 @@ No changes needed. Already uses `redirect_to` with flash notice, which displays 
 - Concurrent multi-analysis management
 - Bell icon as notification hub (future work)
 - Cancel analysis feature
+
+## Known Limitations
+
+**Multiple concurrent analyses:** If a user starts two analyses back-to-back, the first to complete will clear the header spinner even though the second is still running. This is acceptable for MVP since concurrent analysis is an uncommon edge case. A future fix would track active job count (e.g., via DB column or cache counter) before clearing the indicator.
