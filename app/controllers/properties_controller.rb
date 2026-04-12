@@ -32,7 +32,7 @@ class PropertiesController < ApplicationController
     @user_property = current_user.user_properties.find_by(property: @property)
 
     unless @property.analyzed?
-      redirect_to new_analysis_path
+      redirect_to new_analysis_path(property_id: @property.id)
       return
     end
 

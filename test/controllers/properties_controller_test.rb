@@ -129,6 +129,6 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     property = properties(:unanalyzed_officetel)
 
     get property_url(property)
-    assert_redirected_to new_analysis_path
+    assert_redirected_to new_analysis_path(property_id: property.id)
   end
 end

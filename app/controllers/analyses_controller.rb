@@ -1,87 +1,30 @@
 class AnalysesController < ApplicationController
   def new
+    @property = Property.find_by(id: params[:property_id])
   end
 
   def prompt
     items = InspectionItem.ordered
     prompts = Inspection::PdfPromptBuilder.call(items: items)
 
-    markdown = <<~MD
-      # 부동산 경매 AI 분석 프롬프트
-
-      아래 내용을 AI에게 전달하고, 법원경매 PDF 문서(매각물건명세서, 현황조사서, 감정평가서, 등기부등본)와 함께 분석을 요청하세요.
-
-      **중요:** 결과는 반드시 마지막 섹션의 JSON 형식으로 받아주세요.
-
-      ---
-
-      ## 시스템 프롬프트
-
-      #{prompts[:system]}
-
-      ---
-
-      ## 사용자 프롬프트
-
-      #{prompts[:user]}
-
-      ---
-
-      ## 기대 응답 형식 (JSON)
-
-      AI의 응답이 아래 구조를 따르는지 확인하세요:
-
-      ```json
-      {
-        "metadata": {
-          "court_name": "관할 법원명",
-          "case_number": "사건번호",
-          "address": "소재지",
-          "property_type": "물건종류",
-          "appraisal_price": 0,
-          "min_bid_price": 0
-        },
-        "results": {
-          "<item_code>": {
-            "has_risk": true,
-            "confidence": "high",
-            "reasoning": "판정 근거"
-          }
-        },
-        "rights_analysis": {
-          "verdict": "safe",
-          "verdict_summary": "한줄 요약",
-          "base_right_type": "근저당권",
-          "base_right_holder": "권리자명",
-          "base_right_date": "YYYY-MM-DD",
-          "opportunity_type": null,
-          "opportunity_reason": null,
-          "tenants": [],
-          "rights_timeline": [],
-          "reasoning": "분석 근거",
-          "checklist_references": []
-        }
-      }
-      ```
-    MD
-
-    send_data markdown,
-      filename: "auction-analysis-prompt.md",
-      type: "text/markdown",
-      disposition: "attachment"
+    render json: { prompt: prompts[:system] + "\n\n" + prompts[:user] }
   end
 
   def manual
-    unless params[:json_file].present?
-      redirect_to new_analysis_path(tab: "manual"), alert: "JSON 파일을 업로드해주세요."
-      return
+    json_string = if params[:json_file].present?
+      extract_json(params[:json_file].read.force_encoding("UTF-8"))
+    elsif params[:json_text].present?
+      extract_json(params[:json_text])
     end
 
-    json_string = params[:json_file].read
+    unless json_string.present?
+      redirect_to new_analysis_path(tab: "manual"), alert: "JSON 파일을 업로드하거나 텍스트를 붙여넣어주세요."
+      return
+    end
     parsed = begin
       JSON.parse(json_string)
     rescue JSON::ParserError
-      redirect_to new_analysis_path(tab: "manual"), alert: "유효한 JSON 파일이 아닙니다."
+      redirect_to new_analysis_path(tab: "manual"), alert: "유효한 JSON 파일이 아닙니다. JSON만 포함된 파일인지 확인해주세요."
       return
     end
 
@@ -109,6 +52,7 @@ class AnalysesController < ApplicationController
       redirect_to new_analysis_path(tab: "manual"), alert: "분석 결과 저장 중 오류가 발생했습니다: #{result.error}"
     end
   rescue => e
+    Rails.logger.error "[ManualUpload] #{e.class}: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
     redirect_to new_analysis_path(tab: "manual"), alert: "분석 결과 저장 중 오류가 발생했습니다: #{e.message}"
   end
 
@@ -151,6 +95,25 @@ class AnalysesController < ApplicationController
       format.html do
         redirect_to new_analysis_path, notice: "분석이 시작되었습니다."
       end
+    end
+  end
+
+  private
+
+  def extract_json(raw)
+    # Strip UTF-8 BOM
+    raw = raw.sub(/\A\xEF\xBB\xBF/, "")
+
+    # Strip markdown code blocks (```json ... ``` or ``` ... ```)
+    if raw.match?(/\A\s*```/)
+      raw = raw.gsub(/\A\s*```(?:json)?\s*\n?/, "").gsub(/\n?\s*```\s*\z/, "")
+    end
+
+    # Extract first JSON object if surrounded by text
+    if (match = raw.match(/(\{[\s\S]*\})\s*\z/))
+      match[1]
+    else
+      raw
     end
   end
 end
