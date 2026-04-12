@@ -17,14 +17,6 @@ Rails.application.routes.draw do
         patch :update_region
       end
     end
-    resources :budget_snapshots, only: [ :index, :show ] do
-      member do
-        post :recalculate
-      end
-      collection do
-        get :compare
-      end
-    end
     resource :data_sources, only: [ :show ]
     resources :api_credentials, only: [ :create, :update, :destroy ] do
       member do

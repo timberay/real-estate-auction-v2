@@ -37,7 +37,6 @@ module Settings
       @setting.max_bid_amount = result[:max_bid_amount]
 
       if @setting.save
-        BudgetSnapshotService.create(user: current_user, trigger: "manual_edit")
         redirect_to settings_budget_url, notice: "예산 설정이 업데이트되었습니다."
       else
         load_show_data

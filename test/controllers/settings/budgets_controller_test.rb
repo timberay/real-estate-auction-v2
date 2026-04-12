@@ -67,6 +67,5 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to settings_budget_url
     @setting.reload
     assert_equal 40000, @setting.available_cash
-    assert_equal 1, @user.budget_snapshots.count
   end
 end

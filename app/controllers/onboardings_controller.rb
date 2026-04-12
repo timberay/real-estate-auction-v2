@@ -8,7 +8,6 @@ class OnboardingsController < ApplicationController
 
   def complete
     @setting = current_user.budget_setting
-    @snapshot = current_user.budget_snapshots.order(version: :desc).first
     redirect_to start_onboarding_url unless @setting&.completed?
   end
 
@@ -43,7 +42,7 @@ class OnboardingsController < ApplicationController
     end
   end
 
-  # POST /onboarding/step3 — calculates, saves, creates snapshot, redirects to complete
+  # POST /onboarding/step3 — calculates, saves, and redirects to complete
   def create_step3
     @setting.assign_attributes(step3_params)
 
@@ -68,7 +67,6 @@ class OnboardingsController < ApplicationController
     @setting.completed_at = Time.current
 
     if @setting.save
-      BudgetSnapshotService.create(user: current_user, trigger: "onboarding")
       redirect_to complete_onboarding_url
     else
       load_step3_data

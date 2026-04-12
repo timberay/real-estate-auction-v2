@@ -76,7 +76,6 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     setting = user.budget_setting
     assert setting.completed?
     assert_equal 96200, setting.max_bid_amount
-    assert_equal 1, user.budget_snapshots.count
   end
 
   test "GET step1 renders budget summary in uncalculated state for new user" do
@@ -126,12 +125,6 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
       max_bid_amount: 96200,
       completed_at: Time.current
     )
-    BudgetSnapshot.create!(
-      user: guest, version: 1, trigger: "onboarding",
-      available_cash: 30000, max_bid_amount: 96200,
-      calculated_at: Time.current
-    )
-
     get complete_onboarding_url
     assert_response :success
   end

@@ -27,12 +27,9 @@
       ) %>
     </div>
 
-    <% if @snapshot %>
-      <p class="text-sm text-slate-400 dark:text-slate-500 text-center mt-4 mb-6">
-        적용 정책: <%= @setting.loan_policy&.policy_name || "직접 설정" %> |
-        계산일: <%= @snapshot.calculated_at.strftime("%Y-%m-%d %H:%M") %>
-      </p>
-    <% end %>
+    <p class="text-sm text-slate-400 dark:text-slate-500 text-center mt-4 mb-6">
+      적용 정책: <%= @setting.loan_policy&.policy_name || "직접 설정" %>
+    </p>
 
     <div class="mt-6 space-y-3">
       <%= render ButtonComponent.new(tag: :a, href: root_path, icon: "magnifying-glass", class: "w-full justify-center") { "내 예산 범위 물건 보기" } %>

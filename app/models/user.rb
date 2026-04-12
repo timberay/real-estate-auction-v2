@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   has_secure_password
   has_one :budget_setting, dependent: :destroy
-  has_many :budget_snapshots, dependent: :destroy
+
   has_many :user_properties, dependent: :destroy
   has_many :properties, through: :user_properties
   has_many :inspection_results, dependent: :destroy
