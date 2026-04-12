@@ -48,7 +48,12 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :analyses, only: [ :new, :create ]
+  resources :analyses, only: [ :new, :create ] do
+    collection do
+      get :prompt
+      post :manual
+    end
+  end
 
   resources :search_results, only: [ :index, :create ] do
     collection do
