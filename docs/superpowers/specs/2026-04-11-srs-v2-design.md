@@ -14,11 +14,12 @@ This document is the consolidated Software Requirements Specification (SRS) v2.0
 
 ### Scope
 
-- Functional requirements for 6 features (F01–F06)
+- Functional requirements for 5 features (F01–F03, F05–F06; F04 removed in v2.1)
 - Priority classification (P0/P1/P2) and deployment order
 - Feature dependencies
 - Inspection item tab reclassification (89 items across 5 tabs + grade summary)
 - Decisions on removed features and rationale
+- External API scope reduction (v2.1): only LLM PDF analysis and court auction search retained
 
 ### Version History
 
@@ -27,7 +28,8 @@ This document is the consolidated Software Requirements Specification (SRS) v2.0
 | v1.0 | 2026-04-05 | Initial SRS with 11 features (F01–F11) |
 | v1.1 | 2026-04-07 | Feature restructure: 11 → 7 features, 6+1 tab structure |
 | v1.2 | 2026-04-11 | PDF-based analysis redesign |
-| **v2.0** | **2026-04-11** | **Full SRS review: 7 → 6 features, tab reclassification, scope refinement** |
+| v2.0 | 2026-04-11 | Full SRS review: 7 → 6 features, tab reclassification, scope refinement |
+| **v2.1** | **2026-04-13** | **External API scope reduction: F04 removed, Ministry of Land API removed, 6 → 5 features** |
 
 ### Deployment Strategy
 
@@ -149,7 +151,7 @@ Upon first visit, the user answers a 3-step questionnaire to determine "what pro
 | Item | Detail |
 |---|---|
 | Priority | P0 (MVP) |
-| Pain Points | P1, P3, P4, P5 |
+| Pain Points | P1, P3 |
 | Deploy Order | 2nd |
 
 #### Description
@@ -182,18 +184,13 @@ Property Inspection Screen
 - Supported LLM providers: Anthropic Claude, Gemini (native PDF support)
 - Unsupported providers return clear error message
 
-**(B) Ministry of Land Real Transaction Price API (~4 items):**
+**(B) Manual Input (Remaining ~50+ items):**
 
-- Integrated in MVP for 수익분석 tab automation
-- Auto-judgment items: market-001 (transaction volume), market-003 (comparable filtering), market-004 (recent transactions), resale-004 (appraisal vs. market price)
-- market-002 (KB price comparison) remains manual — partial automation could mislead
-- Infrastructure reused by F04 (Integrated Market Price) in P1
-
-**(C) Manual Input (Remaining ~50 items):**
-
+- 수익분석 tab: all 29 items (market data from external tools like Naver Real Estate, user-specific conditions)
 - 현장확인 tab: all 13 items (physical site visit required)
-- 수익분석 tab: most items (external data sources, user-specific conditions)
 - 입찰&낙찰 tab: all 7 items (user actions/judgments)
+
+**Note (v2.1):** Ministry of Land Real Transaction Price API integration was removed. Market data (실거래가, 시세) is commodity information better served by dedicated free tools (Naver Real Estate, KB Real Estate, Hogangnono). Users check these tools and manually record their assessment. See `2026-04-13-external-api-scope-reduction-design.md` for full rationale.
 
 #### 최종등급 Tab
 
@@ -219,8 +216,7 @@ Aggregates all inspection results into a final bid decision.
 #### Acceptance Criteria
 
 - [ ] PDF upload and LLM analysis produces auto-judgments for rights/property items
-- [ ] Ministry of Land API auto-populates market-001, market-003, market-004, resale-004
-- [ ] Manual input works for all remaining items
+- [ ] Manual input works for all non-PDF items (수익분석, 현장확인, 입찰&낙찰)
 - [ ] Tab navigation is free-form (any order)
 - [ ] 최종등급 correctly aggregates all 89 items into safety grade
 - [ ] Rights analysis report renders inline in 최종등급 tab
@@ -232,7 +228,7 @@ Aggregates all inspection results into a final bid decision.
 #### Dependencies
 
 - Upstream: F01 (budget filter values)
-- Downstream: F04 (market price data), F05 (PDF report export), F06 (eviction scenario)
+- Downstream: F05 (PDF report export), F06 (eviction scenario)
 
 ---
 
@@ -279,56 +275,10 @@ Based on the user's ownership status and property information, calculate "the am
 
 #### Dependencies
 
-- Upstream: F01 (budget data), F02 (property data), F04 (market price as expected sale price)
+- Upstream: F01 (budget data), F02 (property data)
 - Downstream: None
 
----
-
-### F04. Integrated Market Price Dashboard
-
-| Item | Detail |
-|---|---|
-| Priority | P1 (Early Expansion) |
-| Pain Points | P4 |
-| Deploy Order | 4th |
-
-#### Description
-
-Show actual transaction prices, listing prices, and distressed-sale prices for comparable properties on a single screen. Builds on the Ministry of Land API infrastructure established in MVP (F02). Includes a gap-rate warning system.
-
-#### Requirements
-
-**(A) Data Sources:**
-- Recent actual transaction prices (Ministry of Land API — already integrated in F02)
-- Current listing prices (manual input — KB시세, 네이버부동산 APIs not publicly available)
-- Distressed-sale prices (separately highlighted)
-
-**(B) Gap-Rate Warning:**
-- Auto-calculate gap between listing price and actual transaction price
-- Gap rate > 10%: warning label
-
-**(C) Comparison Criteria:**
-- Same complex same size / nearby similar complex / area average
-- Note: "Exact floor/view differences require on-site agent verification"
-
-**(D) Trends:**
-- 1–3 year actual transaction price trend graph
-- Area supply volume and unsold inventory summary
-
-**(E) Integration:**
-- Market price data feeds F03 net profit calculator's "expected sale price"
-
-#### Acceptance Criteria
-
-- [ ] Actual transaction prices displayed with priority
-- [ ] Gap rate calculated and warning shown for > 10%
-- [ ] Price trend graph covers 1–3 year range
-- [ ] Market price auto-feeds F03 expected sale price field
-
-#### Dependencies
-
-- Upstream: F02 (property data, Ministry of Land API infrastructure)
-- Downstream: F03 (market price as expected sale price)
+**Note (v2.1):** Expected sale price is manually entered by the user based on their own market research (Naver Real Estate, KB Real Estate, etc.). This is more accurate than API-derived averages because the user applies their own judgment about realistic sale price.
 
 ---
 
@@ -435,16 +385,16 @@ Predict eviction difficulty before winning and provide situation-specific proces
 | Priority | Feature ID | Feature Name | Deploy Order | Rationale |
 |---|---|---|---|---|
 | P0 (MVP) | F01 | Onboarding Budget Setup | 1st | Service entry flow. Prerequisite for property search |
-| P0 (MVP) | F02 | Property Inspection (5 tabs + grade) | 2nd | Core analysis feature. PDF + LLM + API + manual input |
+| P0 (MVP) | F02 | Property Inspection (5 tabs + grade) | 2nd | Core analysis feature. PDF + LLM + manual input |
 | P1 (Expansion) | F03 | Net Profit Calculator | 3rd | Complex tax logic, accuracy hard to guarantee in MVP |
-| P1 (Expansion) | F04 | Integrated Market Price Dashboard | 4th | Builds on MVP's Ministry of Land API infrastructure |
-| P1 (Expansion) | F05 | Analysis Report PDF Export | 5th | Enables offline professional consultation |
-| P2 (Growth) | F06 | Eviction Scenario Guide | 6th | Post-winning feature, educational focus |
+| P1 (Expansion) | F05 | Analysis Report PDF Export | 4th | Enables offline professional consultation |
+| P2 (Growth) | F06 | Eviction Scenario Guide | 5th | Post-winning feature, educational focus |
 
 ### Removed Features (with rationale)
 
 | Old ID | Feature Name | Removal Rationale |
 |---|---|---|
+| F04 (v2.0) | Integrated Market Price Dashboard | Removed in v2.1. Market price data is commodity information better served by Naver Real Estate, KB Real Estate, Hogangnono. Building an inferior version adds no value. See `2026-04-13-external-api-scope-reduction-design.md`. |
 | F05 (v1.0) | Process Checklist | Replaced by tab structure in F02 |
 | F07 (v1.0) | Pre-Auction Loan Matching | Replaced by PDF Export (F05 v2.0). Loan decisions require professional consultation; automated matching carries deposit forfeiture risk |
 | F08 (v1.0) | Virtual Bid Simulation | Removed in v1.1. Low priority relative to core analysis |
@@ -467,13 +417,9 @@ F01 Onboarding Budget Setup
  v
 F02 Property Inspection (5 tabs + grade)
  |   - PDF upload + LLM analysis
- |   - Ministry of Land API (reused by F04)
- |   - Manual input for field/market items
+ |   - Manual input for field/market/profit items
  |
- ├──→ F04 Integrated Market Price Dashboard
- |     |
- |     v
- |    F03 Net Profit Calculator
+ ├──→ F03 Net Profit Calculator
  |
  ├──→ F05 Analysis Report PDF Export
  |
@@ -514,7 +460,7 @@ The following items were reclassified from their v1.1 tab assignments to better 
 | 권리분석 | 27 | Court documents (매각물건명세서, 등기부등본, 현황조사서) | Yes (PDF) |
 | 물건분석 | 13 | Building ledger, property listing data | Partial (PDF) |
 | 현장확인 | 13 | Physical site visit | No (all manual) |
-| 수익분석 | 29 | Market data, tax policy, user conditions | Partial (4 items via API) |
+| 수익분석 | 29 | Market data, tax policy, user conditions | No (all manual — users check external tools) |
 | 입찰&낙찰 | 7 | User actions and judgments | No (all manual) |
 | **Total** | **89** | | |
 
@@ -529,6 +475,5 @@ The following items were reclassified from their v1.1 tab assignments to better 
 | F02 Inspection (detailed analysis) | Premium subscription | Core consulting-replacement feature |
 | F02 HUG Opportunity Properties | Premium only | Differentiated profit opportunity |
 | F03 Net Profit Calculator | Premium subscription | Expert bid-pricing replacement |
-| F04 Integrated Market Price | Free basic / Premium detailed | Data value-add |
 | F05 PDF Report Export | Free (included with analysis) | Drives offline consultation and trust |
 | F06 Eviction Guide | Free | Educational value, user retention |
