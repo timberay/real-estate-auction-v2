@@ -5,8 +5,8 @@ class CredentialVerificationJobTest < ActiveJob::TestCase
     @user = users(:guest)
     @credential = ApiCredential.create!(
       user: @user,
-      provider_name: "data_go_kr",
-      api_key: "test-key"
+      provider_name: "court_auction",
+      enabled: true
     )
   end
 

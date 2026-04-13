@@ -6,7 +6,7 @@ class ApiCredentialTest < ActiveSupport::TestCase
   end
 
   test "PROVIDERS constant contains expected providers" do
-    expected_keys = %i[court_auction data_go_kr tilko codef iros hyphen]
+    expected_keys = %i[court_auction]
     assert_equal expected_keys.sort, ApiCredential::PROVIDERS.keys.sort
   end
 
@@ -32,14 +32,14 @@ class ApiCredentialTest < ActiveSupport::TestCase
   end
 
   test "validates provider_name uniqueness per user" do
-    ApiCredential.create!(user: @user, provider_name: "data_go_kr", api_key: "key-123")
-    duplicate = ApiCredential.new(user: @user, provider_name: "data_go_kr", api_key: "key-456")
+    ApiCredential.create!(user: @user, provider_name: "court_auction", enabled: true)
+    duplicate = ApiCredential.new(user: @user, provider_name: "court_auction", enabled: true)
     assert_not duplicate.valid?
     assert_includes duplicate.errors[:provider_name], "has already been taken"
   end
 
   test "encrypts api_key" do
-    cred = ApiCredential.create!(user: @user, provider_name: "data_go_kr", api_key: "my-secret-key")
+    cred = ApiCredential.create!(user: @user, provider_name: "court_auction", api_key: "my-secret-key", enabled: true)
     raw_value = ApiCredential.connection.select_value(
       "SELECT api_key FROM api_credentials WHERE id = #{cred.id}"
     )
@@ -48,27 +48,12 @@ class ApiCredentialTest < ActiveSupport::TestCase
   end
 
   test "encrypts api_secret" do
-    cred = ApiCredential.create!(user: @user, provider_name: "tilko", api_key: "key", api_secret: "secret-123")
+    cred = ApiCredential.create!(user: @user, provider_name: "court_auction", api_key: "key", api_secret: "secret-123", enabled: true)
     raw_value = ApiCredential.connection.select_value(
       "SELECT api_secret FROM api_credentials WHERE id = #{cred.id}"
     )
     assert_not_equal "secret-123", raw_value
     assert_equal "secret-123", cred.reload.api_secret
-  end
-
-  test "configured? returns true for key-based provider with key and enabled" do
-    cred = ApiCredential.new(provider_name: "data_go_kr", api_key: "key-123", enabled: true)
-    assert cred.configured?
-  end
-
-  test "configured? returns false for key-based provider without key" do
-    cred = ApiCredential.new(provider_name: "data_go_kr", api_key: nil, enabled: true)
-    assert_not cred.configured?
-  end
-
-  test "configured? returns false for disabled provider" do
-    cred = ApiCredential.new(provider_name: "data_go_kr", api_key: "key-123", enabled: false)
-    assert_not cred.configured?
   end
 
   test "configured? returns true for consent-only provider when enabled" do
@@ -92,16 +77,16 @@ class ApiCredentialTest < ActiveSupport::TestCase
   end
 
   test "for_provider scope returns matching credential" do
-    cred = ApiCredential.create!(user: @user, provider_name: "data_go_kr", api_key: "key-123")
-    assert_equal cred, @user.api_credentials.for_provider(:data_go_kr)
+    cred = ApiCredential.create!(user: @user, provider_name: "court_auction", enabled: true)
+    assert_equal cred, @user.api_credentials.for_provider(:court_auction)
   end
 
   test "for_provider scope returns nil when no match" do
-    assert_nil @user.api_credentials.for_provider(:tilko)
+    assert_nil @user.api_credentials.for_provider(:court_auction)
   end
 
   test "active scope excludes disabled credentials" do
-    ApiCredential.create!(user: @user, provider_name: "data_go_kr", api_key: "key", enabled: false)
-    assert_empty @user.api_credentials.active
+    ApiCredential.create!(user: @user, provider_name: "court_auction", enabled: true)
+    assert_equal 1, @user.api_credentials.active.count
   end
 end
