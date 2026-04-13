@@ -191,24 +191,65 @@ GET /properties/:id/inspections/grade.pdf
 
 **Implementation:**
 1. Launch Playwright browser (headless Chromium)
-2. `page.set_content(html)` — load rendered HTML
+2. `page.set_content(html)` — load rendered HTML with inline CSS (see Asset Handling below)
 3. `page.pdf(format: "A4", margin: { top: "20mm", bottom: "20mm", left: "15mm", right: "15mm" }, print_background: true)`
 4. Return PDF binary
 5. Close browser
 
+**Synchronous execution (MVP):** PDF generation runs synchronously in the request cycle (~2-5s). Acceptable for MVP with low traffic. Future optimization: move to ActiveJob + ActionCable push notification (same pattern as PdfAnalysisJob).
+
+### Asset Handling (CSS Inlining)
+
+**Problem:** `page.set_content(html)` runs in an empty browser context (`about:blank`). Relative asset paths (`/assets/tailwind-xxx.css`) cannot be resolved, resulting in unstyled PDF output. Using absolute URLs risks Puma deadlock when a single-threaded worker serves both the user request and the Playwright CSS request simultaneously.
+
+**Solution:** Inline all CSS directly into the PDF layout HTML.
+
+The `report_pdf` layout uses `<style>` tags with CSS content read from the compiled asset files at render time:
+
+```erb
+<style><%= Rails.application.assets.load_path.find("tailwind.css")&.content&.html_safe %></style>
+```
+
+This ensures:
+- No external HTTP requests from Playwright
+- No Puma deadlock risk
+- CSS is self-contained in the HTML string
+
 ### PDF Layout (`report_pdf`)
 
-Dedicated layout for PDF rendering:
+Dedicated layout (`app/views/layouts/report_pdf.html.erb`) for PDF rendering:
 - No sidebar, header, navigation, Stimulus controllers
+- Tailwind CSS inlined via `<style>` tag (see Asset Handling above)
 - Light theme only (no dark mode classes)
 - Print-optimized typography
-- Standard web fonts (system fonts for Korean: "Pretendard", "Noto Sans KR", system-ui fallback)
+- Korean font: system `fonts-noto-cjk` package (see Docker Requirements below)
 
-### Print CSS (`@media print`)
+### Docker Requirements
 
-Applied to both the PDF layout and browser print:
+The production Dockerfile (`ruby:3.4.8-slim` based) must include Chromium and Korean fonts for PDF generation.
+
+**Additions to final stage (`FROM base`):**
+
+```dockerfile
+# Install Chromium and Korean fonts for PDF export
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      chromium \
+      fonts-noto-cjk \
+    && rm -rf /var/lib/apt/lists /var/cache/apt/archives
+```
+
+**Why:**
+- `chromium` — Playwright's headless browser for HTML → PDF conversion
+- `fonts-noto-cjk` — Korean/CJK font package. Without this, all Korean text renders as tofu (ㅁㅁㅁ) in the PDF.
+
+**Playwright configuration:** Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium` environment variable so Playwright uses the system Chromium instead of downloading its own.
+
+### Print CSS
+
+Applied to the PDF layout:
 - `DividendSimulatorComponent`: hide input form, show results only
-- Page breaks: `page-break-before` on major sections (3, 5, 7, 9)
+- Page breaks: `break-before: page` on major sections (5, 7, 9) with `page-break-before: always` as fallback for older renderers
 - Hide interactive elements (buttons, forms, links styled as buttons)
 - Force light background colors
 
