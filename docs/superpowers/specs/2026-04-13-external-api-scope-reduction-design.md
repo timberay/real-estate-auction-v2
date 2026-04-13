@@ -43,12 +43,17 @@ The 89 inspection checklist items remain unchanged. Items that previously depend
 ### Files to Delete
 
 - `docs/superpowers/specs/2026-04-12-real-transaction-price-api-design.md` — superseded by this document
-- `app/adapters/government_loan_policy_adapter.rb` — stub adapter, no longer planned
+- `app/adapters/government_loan_policy_adapter.rb` — stub adapter that just delegates to MockLoanPolicyAdapter
 
 ### Code to Modify
 
+- **`app/adapters/loan_policy_adapter.rb`** — remove `:real` branch from factory. Always return `MockLoanPolicyAdapter` (government API will never be implemented).
 - **`ApiCredential::PROVIDERS`** — remove `data_go_kr`, `tilko`, `codef`, `iros`, `hyphen` entries. Keep only `court_auction`.
-- **Settings UI** — verify removed providers don't render cards in `/settings/data_sources`
+- **Settings UI** — verify removed providers don't render cards in `/settings/data_sources`. Check I18n translation files and view templates for hardcoded provider references.
+
+### Explicitly Retained
+
+- `app/adapters/mock_loan_policy_adapter.rb` — seed data source for loan policies used in onboarding step 3 and budget settings. Not an external API; contains static reference data (경락대출 LTV ratios).
 
 ### No Impact
 
