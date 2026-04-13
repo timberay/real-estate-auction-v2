@@ -15,4 +15,10 @@ class Inspections::GradesControllerTest < ActionDispatch::IntegrationTest
     get property_inspections_grade_url(@property)
     assert_response :success
   end
+
+  test "show responds to PDF format" do
+    get property_inspections_grade_url(@property, format: :pdf)
+    assert_response :success
+    assert_equal "application/pdf", response.content_type
+  end
 end

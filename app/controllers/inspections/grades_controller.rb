@@ -16,6 +16,20 @@ module Inspections
         .where(has_risk: true, user: current_user)
         .includes(:inspection_item)
         .order("inspection_items.tab, inspection_items.tab_position")
+
+      respond_to do |format|
+        format.html
+        format.pdf { send_report_pdf }
+      end
+    end
+
+    private
+
+    def send_report_pdf
+      html = render_to_string(template: "inspections/grades/show", formats: [:pdf], layout: "report_pdf")
+      pdf_binary = PdfExportService.call(html: html)
+      filename = "경매분석리포트_#{@property.case_number}_#{Date.current}.pdf"
+      send_data pdf_binary, filename: filename, type: "application/pdf", disposition: "attachment"
     end
   end
 end
