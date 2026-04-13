@@ -1,10 +1,6 @@
 class LoanPolicyAdapter
-  def self.for(config = {})
-    if config[:adapter] == :real
-      GovernmentLoanPolicyAdapter.new
-    else
-      MockLoanPolicyAdapter.new
-    end
+  def self.for(_config = {})
+    MockLoanPolicyAdapter.new
   end
 
   def fetch_policies(property_type_code:)
