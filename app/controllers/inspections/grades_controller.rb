@@ -5,6 +5,7 @@ module Inspections
       @user_property = current_user.user_properties.find_by(property: @property)
       @rating = InspectionRatingService.call(property: @property, user: current_user)
       @report = RightsAnalysisReport.find_by(property: @property, user: current_user)
+      @budget_setting = current_user.budget_setting
 
       @results_by_tab = @property.inspection_results
         .where(user: current_user)

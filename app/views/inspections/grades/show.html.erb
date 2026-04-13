@@ -1,6 +1,15 @@
 <%= render layout: "inspections/layout", locals: { property: @property, user_property: @user_property, active_tab: "grade" } do %>
   <div class="space-y-6">
+    <%= render PropertyInfoComponent.new(property: @property) %>
+    <%= render ReportBudgetComponent.new(budget_setting: @budget_setting) %>
     <%= render GradeSummaryComponent.new(rating: @rating) %>
+    <%= render BidOpinionComponent.new(
+      rating: @rating,
+      report: @report,
+      risk_results: @risk_results,
+      budget_setting: @budget_setting,
+      property: @property
+    ) %>
     <%= render TabSummaryTableComponent.new(results_by_tab: @results_by_tab, property: @property) %>
 
     <% if @risk_results.any? %>
@@ -9,8 +18,14 @@
     <% end %>
 
     <%= render RightsReportSectionComponent.new(report: @report, property: @property) %>
+    <%= render ConsultationGuideComponent.new(risk_results: @risk_results) %>
 
     <div class="flex gap-3">
+      <%= link_to property_inspections_grade_path(@property, format: :pdf),
+          class: "flex-1 rounded-lg bg-blue-600 dark:bg-blue-500 px-4 py-3 text-sm font-semibold text-center text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors",
+          data: { turbo: false } do %>
+        PDF 다운로드
+      <% end %>
       <%= link_to "목록으로 돌아가기", properties_path, class: "flex-1 rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm font-semibold text-center text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" %>
     </div>
   </div>

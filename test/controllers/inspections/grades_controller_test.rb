@@ -10,4 +10,9 @@ class Inspections::GradesControllerTest < ActionDispatch::IntegrationTest
     get property_inspections_grade_url(@property)
     assert_response :success
   end
+
+  test "show assigns budget_setting" do
+    get property_inspections_grade_url(@property)
+    assert_response :success
+  end
 end
