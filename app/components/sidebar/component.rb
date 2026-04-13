@@ -12,7 +12,6 @@ module Sidebar
       ],
       "리포트" => [
         MenuItem.new(label: "순수익 계산기", icon: "banknotes", path: nil, enabled: false),
-        MenuItem.new(label: "통합 시세 조회", icon: "chart-bar", path: nil, enabled: false),
         MenuItem.new(label: "리포트 내보내기", icon: "arrow-down-tray", path: nil, enabled: false)
       ],
       "가이드" => [

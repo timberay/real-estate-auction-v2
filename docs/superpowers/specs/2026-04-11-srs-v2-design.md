@@ -1,10 +1,10 @@
-# Real Estate Auction Service — Software Requirements Specification (SRS) v2.0
+# Real Estate Auction Service — Software Requirements Specification (SRS) v2.2
 
 ## 1. Document Overview
 
 ### Purpose
 
-This document is the consolidated Software Requirements Specification (SRS) v2.0 for a web service designed for real estate auction beginners in Korea. It supersedes all prior SRS and feature restructure documents and reflects the full review conducted on 2026-04-11.
+This document is the consolidated Software Requirements Specification (SRS) v2.2 for a web service designed for real estate auction beginners in Korea. It supersedes all prior SRS and feature restructure documents and reflects the full codebase audit conducted on 2026-04-13.
 
 ### Supersedes
 
@@ -16,6 +16,7 @@ This document is the consolidated Software Requirements Specification (SRS) v2.0
 
 - Functional requirements for 5 features (F01–F03, F05–F06; F04 removed in v2.1)
 - Priority classification (P0/P1/P2) and deployment order
+- **Implementation status per feature** (v2.2: codebase audit)
 - Feature dependencies
 - Inspection item tab reclassification (89 items across 5 tabs + grade summary)
 - Decisions on removed features and rationale
@@ -29,7 +30,8 @@ This document is the consolidated Software Requirements Specification (SRS) v2.0
 | v1.1 | 2026-04-07 | Feature restructure: 11 → 7 features, 6+1 tab structure |
 | v1.2 | 2026-04-11 | PDF-based analysis redesign |
 | v2.0 | 2026-04-11 | Full SRS review: 7 → 6 features, tab reclassification, scope refinement |
-| **v2.1** | **2026-04-13** | **External API scope reduction: F04 removed, Ministry of Land API removed, 6 → 5 features** |
+| v2.1 | 2026-04-13 | External API scope reduction: F04 removed, Ministry of Land API removed, 6 → 5 features |
+| **v2.2** | **2026-04-13** | **Codebase audit: add implementation status per feature, update acceptance criteria checkboxes, remove stale sidebar item** |
 
 ### Deployment Strategy
 
@@ -93,6 +95,7 @@ Three principles derived from expert feedback that govern all feature design dec
 | Priority | P0 (MVP) |
 | Pain Points | P3 |
 | Deploy Order | 1st |
+| **Status** | **✅ Complete** |
 
 #### Description
 
@@ -133,11 +136,11 @@ Upon first visit, the user answers a 3-step questionnaire to determine "what pro
 
 #### Acceptance Criteria
 
-- [ ] 3-step question flow completes and produces a maximum biddable amount
-- [ ] "Use defaults" applies seed-data-based values for each reserve item
-- [ ] Calculation result is persisted and retrievable/editable from My Page
-- [ ] Onboarding completion redirects to the property list screen
-- [ ] Changing budget settings on My Page updates the search filter accordingly
+- [x] 3-step question flow completes and produces a maximum biddable amount
+- [x] "Use defaults" applies seed-data-based values for each reserve item
+- [x] Calculation result is persisted and retrievable/editable from My Page
+- [x] Onboarding completion redirects to the property list screen
+- [x] Changing budget settings on My Page updates the search filter accordingly
 
 #### Dependencies
 
@@ -153,6 +156,7 @@ Upon first visit, the user answers a 3-step questionnaire to determine "what pro
 | Priority | P0 (MVP) |
 | Pain Points | P1, P3 |
 | Deploy Order | 2nd |
+| **Status** | **⚠️ ~85% Complete — 4 items remaining** |
 
 #### Description
 
@@ -213,17 +217,39 @@ Aggregates all inspection results into a final bid decision.
 - Disclaimer: "AI 생성 참고 자료입니다. 원본 서류를 직접 확인하세요"
 - `source_doc_reviewed` tracking per user
 
+#### Implementation Notes (v2.2)
+
+**Implemented:**
+- PDF upload + LLM analysis via 5 adapters (Anthropic Claude, Gemini, OpenAI, Ollama, OpenRouter) + Mock for tests
+- Background analysis with Turbo Stream toast notifications (PdfAnalysisJob)
+- Manual analysis tab with JSON upload fallback
+- 89 inspection items seeded across 5 tabs with property-type-aware `applicable_types` field
+- Free-form tab navigation with completion badges
+- Rights analysis report with verdict (safe/caution/danger), rights timeline, tenant data
+- Dividend simulation (DividendsController)
+- Court auction search via BrowserClient (Playwright) with region/price criteria
+- Search result import to user properties
+- Property deletion from user list
+- LLM analysis logging (llm_analysis_logs table)
+- Source doc reviewed tracking flag
+
+**Not Yet Implemented:**
+- PDF.js source document viewer (overconfidence prevention — original PDF alongside AI results)
+- 최종등급 safety grade aggregation UI (logic exists in service, display incomplete)
+- HUG opportunity auto-detection validation
+- Property-type filtering of inspection items in tab views (applicable_types column exists but filtering not applied)
+
 #### Acceptance Criteria
 
-- [ ] PDF upload and LLM analysis produces auto-judgments for rights/property items
-- [ ] Manual input works for all non-PDF items (수익분석, 현장확인, 입찰&낙찰)
-- [ ] Tab navigation is free-form (any order)
+- [x] PDF upload and LLM analysis produces auto-judgments for rights/property items
+- [x] Manual input works for all non-PDF items (수익분석, 현장확인, 입찰&낙찰)
+- [x] Tab navigation is free-form (any order)
 - [ ] 최종등급 correctly aggregates all 89 items into safety grade
-- [ ] Rights analysis report renders inline in 최종등급 tab
-- [ ] Dividend simulation works with user-input expected bid amount
+- [x] Rights analysis report renders inline in 최종등급 tab
+- [x] Dividend simulation works with user-input expected bid amount
 - [ ] HUG opportunity properties are auto-detected
 - [ ] Source document viewer and disclaimer are present
-- [ ] Each tab shows completion badge (checked/total)
+- [x] Each tab shows completion badge (checked/total)
 
 #### Dependencies
 
@@ -239,6 +265,7 @@ Aggregates all inspection results into a final bid decision.
 | Priority | P1 (Early Expansion) |
 | Pain Points | P2 |
 | Deploy Order | 3rd |
+| **Status** | **❌ Not Started** |
 
 #### Description
 
@@ -288,7 +315,8 @@ Based on the user's ownership status and property information, calculate "the am
 |---|---|
 | Priority | P1 (Early Expansion) |
 | Pain Points | P1, P2, P5 |
-| Deploy Order | 5th |
+| Deploy Order | 4th |
+| **Status** | **❌ Not Started** |
 
 #### Description
 
@@ -335,7 +363,8 @@ Export the property analysis results as a structured PDF report for use in offli
 |---|---|
 | Priority | P2 (Growth) |
 | Pain Points | P6 |
-| Deploy Order | 6th |
+| Deploy Order | 5th |
+| **Status** | **❌ Not Started** |
 
 #### Description
 
@@ -382,13 +411,13 @@ Predict eviction difficulty before winning and provide situation-specific proces
 
 ### Priority Summary
 
-| Priority | Feature ID | Feature Name | Deploy Order | Rationale |
-|---|---|---|---|---|
-| P0 (MVP) | F01 | Onboarding Budget Setup | 1st | Service entry flow. Prerequisite for property search |
-| P0 (MVP) | F02 | Property Inspection (5 tabs + grade) | 2nd | Core analysis feature. PDF + LLM + manual input |
-| P1 (Expansion) | F03 | Net Profit Calculator | 3rd | Complex tax logic, accuracy hard to guarantee in MVP |
-| P1 (Expansion) | F05 | Analysis Report PDF Export | 4th | Enables offline professional consultation |
-| P2 (Growth) | F06 | Eviction Scenario Guide | 5th | Post-winning feature, educational focus |
+| Priority | Feature ID | Feature Name | Deploy Order | Status | Rationale |
+|---|---|---|---|---|---|
+| P0 (MVP) | F01 | Onboarding Budget Setup | 1st | ✅ Complete | Service entry flow. Prerequisite for property search |
+| P0 (MVP) | F02 | Property Inspection (5 tabs + grade) | 2nd | ⚠️ ~85% | Core analysis feature. PDF + LLM + manual input |
+| P1 (Expansion) | F03 | Net Profit Calculator | 3rd | ❌ Not Started | Complex tax logic, accuracy hard to guarantee in MVP |
+| P1 (Expansion) | F05 | Analysis Report PDF Export | 4th | ❌ Not Started | Enables offline professional consultation |
+| P2 (Growth) | F06 | Eviction Scenario Guide | 5th | ❌ Not Started | Post-winning feature, educational focus |
 
 ### Removed Features (with rationale)
 

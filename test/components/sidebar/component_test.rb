@@ -66,7 +66,6 @@ module Sidebar
       render_inline(Sidebar::Component.new)
 
       assert_text "순수익 계산기"
-      assert_text "통합 시세 조회"
       assert_text "리포트 내보내기"
       assert_text "명도 가이드"
     end
@@ -82,7 +81,7 @@ module Sidebar
     test "renders disabled items as disabled buttons" do
       render_inline(Sidebar::Component.new)
 
-      assert_selector "button[disabled]", minimum: 4
+      assert_selector "button[disabled]", minimum: 3
     end
 
     test "renders disabled items with opacity" do
