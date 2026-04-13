@@ -1,9 +1,16 @@
-<div class="space-y-6 p-4">
-  <h1 class="text-2xl font-bold text-center text-slate-900 mb-2">경매 분석 리포트</h1>
-  <p class="text-center text-sm text-slate-500 mb-6">생성일: <%= Date.current.strftime("%Y년 %m월 %d일") %></p>
+<div class="space-y-6" style="padding: 4px;">
+  <%# ===== Header ===== %>
+  <div class="pdf-header">
+    <div class="logo-accent"></div>
+    <h1>경매 분석 리포트</h1>
+    <p class="subtitle"><%= @property.case_number %> | 생성일: <%= Date.current.strftime("%Y년 %m월 %d일") %></p>
+  </div>
 
+  <%# ===== Core Info Sections ===== %>
   <%= render PropertyInfoComponent.new(property: @property) %>
   <%= render ReportBudgetComponent.new(budget_setting: @budget_setting) %>
+
+  <%# ===== Verdict Section ===== %>
   <%= render GradeSummaryComponent.new(rating: @rating) %>
   <%= render BidOpinionComponent.new(
     rating: @rating,
@@ -13,7 +20,7 @@
     property: @property
   ) %>
 
-  <div class="print-break"></div>
+  <%# ===== Analysis Details ===== %>
   <%= render TabSummaryTableComponent.new(results_by_tab: @results_by_tab, property: @property) %>
 
   <% if @risk_results.any? %>
@@ -21,10 +28,15 @@
     <%= render RiskItemsListComponent.new(risk_results: @risk_results) %>
   <% end %>
 
-  <div class="print-break"></div>
+  <%# ===== Rights Analysis ===== %>
   <%= render RightsReportSectionComponent.new(report: @report, property: @property) %>
 
-  <div class="print-break"></div>
+  <%# ===== Consultation & Legal ===== %>
   <%= render ConsultationGuideComponent.new(risk_results: @risk_results) %>
   <%= render LegalDisclaimerComponent.new %>
+
+  <%# ===== Footer ===== %>
+  <div class="pdf-footer">
+    본 리포트는 AI 기반 자동 분석 시스템에 의해 생성되었습니다. | <%= @property.case_number %> | <%= Date.current.strftime("%Y.%m.%d") %>
+  </div>
 </div>
