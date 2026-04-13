@@ -31,7 +31,7 @@ This document is the consolidated Software Requirements Specification (SRS) v2.2
 | v1.2 | 2026-04-11 | PDF-based analysis redesign |
 | v2.0 | 2026-04-11 | Full SRS review: 7 → 6 features, tab reclassification, scope refinement |
 | v2.1 | 2026-04-13 | External API scope reduction: F04 removed, Ministry of Land API removed, 6 → 5 features |
-| **v2.2** | **2026-04-13** | **Codebase audit: add implementation status per feature, update acceptance criteria checkboxes, remove stale sidebar item** |
+| **v2.2** | **2026-04-13** | **Codebase audit: add implementation status per feature, update acceptance criteria checkboxes, remove stale sidebar item, descope PDF.js viewer** |
 
 ### Deployment Strategy
 
@@ -68,7 +68,7 @@ Three principles derived from expert feedback that govern all feature design dec
 | Principle | Description | Implementation Guideline |
 |---|---|---|
 | Repetition & Mastery | Users should not just analyze one property and stop. The service must naturally guide them to "analyze the next property," creating a repeating cycle. | Every analysis completion must show a "Next property" CTA. Track cumulative analysis count. |
-| Overconfidence Prevention | AI analysis results must always be shown alongside original documents. Users who trust AI blindly without checking source documents will make costly mistakes. | Place original document viewer next to AI reports. Show disclaimer on every AI-generated analysis. |
+| Overconfidence Prevention | AI analysis results must always be shown alongside original documents. Users who trust AI blindly without checking source documents will make costly mistakes. | Show structured source data (SourceDocViewerComponent) next to AI reports. Show disclaimer on every AI-generated analysis. Provide original PDF re-download via ActiveStorage. Track `source_doc_reviewed` per user. |
 | Respect for Fieldwork | Online features must never give the impression that they "replace" on-site inspection or professional consultation. All online analysis is "pre-screening." Execution (loan decisions, eviction, legal actions) belongs to offline professionals. | Display fixed notice: "This is for pre-screening only." Never use language suggesting field visits or professional consultations are unnecessary. PDF report export includes "professional consultation guide." |
 
 ---
@@ -156,7 +156,7 @@ Upon first visit, the user answers a 3-step questionnaire to determine "what pro
 | Priority | P0 (MVP) |
 | Pain Points | P1, P3 |
 | Deploy Order | 2nd |
-| **Status** | **⚠️ ~85% Complete — 4 items remaining** |
+| **Status** | **⚠️ ~90% Complete — 2 items remaining** |
 
 #### Description
 
@@ -213,9 +213,11 @@ Aggregates all inspection results into a final bid decision.
 4. Rights analysis report (inline — extinguishment base right, opposing power, assumed amount, dividend simulation, HUG opportunity detection)
 
 **Overconfidence Prevention (Mandatory):**
-- Source document viewer toggle
-- Disclaimer: "AI 생성 참고 자료입니다. 원본 서류를 직접 확인하세요"
+- SourceDocViewerComponent: structured display of key analysis data (extinguishment base right, assumed amount, rights timeline, tenant info) for cross-reference against original documents
+- Disclaimer: "반드시 매각물건명세서 비고란을 직접 확인하세요. 본 서비스는 분석 결과의 정확성을 보증하지 않습니다."
 - `source_doc_reviewed` tracking per user
+- Original PDF re-download via ActiveStorage (users already have local copies from court auction site download)
+- **Note (v2.2):** PDF.js inline viewer removed from scope. Users already download PDFs from the court auction site before uploading. Inline rendering adds complexity (Korean PDF rendering issues, library size) with low marginal value over the existing SourceDocViewerComponent + disclaimer + re-download approach.
 
 #### Implementation Notes (v2.2)
 
@@ -234,10 +236,14 @@ Aggregates all inspection results into a final bid decision.
 - Source doc reviewed tracking flag
 
 **Not Yet Implemented:**
-- PDF.js source document viewer (overconfidence prevention — original PDF alongside AI results)
 - 최종등급 safety grade aggregation UI (logic exists in service, display incomplete)
 - HUG opportunity auto-detection validation
-- Property-type filtering of inspection items in tab views (applicable_types column exists but filtering not applied)
+
+**Descoped (v2.2):**
+- ~~PDF.js source document viewer~~ — Users already have local PDF copies. Overconfidence prevention is covered by SourceDocViewerComponent + disclaimer + source_doc_reviewed flag + ActiveStorage re-download.
+
+**Nice-to-have (post-MVP):**
+- Property-type filtering of inspection items in tab views — applicable_types column exists, LLM prompt already handles it, but tab UI shows all 89 items regardless of property type. Only 3 items affected (apartment/officetel-specific). Low impact.
 
 #### Acceptance Criteria
 
@@ -248,7 +254,7 @@ Aggregates all inspection results into a final bid decision.
 - [x] Rights analysis report renders inline in 최종등급 tab
 - [x] Dividend simulation works with user-input expected bid amount
 - [ ] HUG opportunity properties are auto-detected
-- [ ] Source document viewer and disclaimer are present
+- [x] Source document viewer and disclaimer are present (SourceDocViewerComponent + disclaimer implemented; PDF.js inline viewer descoped in v2.2)
 - [x] Each tab shows completion badge (checked/total)
 
 #### Dependencies
@@ -414,7 +420,7 @@ Predict eviction difficulty before winning and provide situation-specific proces
 | Priority | Feature ID | Feature Name | Deploy Order | Status | Rationale |
 |---|---|---|---|---|---|
 | P0 (MVP) | F01 | Onboarding Budget Setup | 1st | ✅ Complete | Service entry flow. Prerequisite for property search |
-| P0 (MVP) | F02 | Property Inspection (5 tabs + grade) | 2nd | ⚠️ ~85% | Core analysis feature. PDF + LLM + manual input |
+| P0 (MVP) | F02 | Property Inspection (5 tabs + grade) | 2nd | ⚠️ ~90% | Core analysis feature. PDF + LLM + manual input |
 | P1 (Expansion) | F03 | Net Profit Calculator | 3rd | ❌ Not Started | Complex tax logic, accuracy hard to guarantee in MVP |
 | P1 (Expansion) | F05 | Analysis Report PDF Export | 4th | ❌ Not Started | Enables offline professional consultation |
 | P2 (Growth) | F06 | Eviction Scenario Guide | 5th | ❌ Not Started | Post-winning feature, educational focus |
