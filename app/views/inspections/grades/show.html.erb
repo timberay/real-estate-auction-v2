@@ -10,6 +10,11 @@
       budget_setting: @budget_setting,
       property: @property
     ) %>
+    <%= render ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget_setting,
+      report: @report
+    ) %>
     <%= render TabSummaryTableComponent.new(results_by_tab: @results_by_tab, property: @property) %>
 
     <% if @risk_results.any? %>
