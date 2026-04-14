@@ -181,17 +181,17 @@ export default class extends Controller {
     this.netProfitTarget.className = `text-xl font-extrabold ${profitText}`
     this.roiTarget.className = `text-xl font-extrabold ${profitText}`
 
-    // Breakdown rows
+    // Breakdown rows (show "-" prefix only for non-zero amounts)
     this.rowSalePriceTarget.textContent = this.formatEok(r.salePrice)
-    this.rowBidPriceTarget.textContent = `-${this.formatEok(r.bidPrice)}`
-    this.rowAssumedTarget.textContent = `-${this.formatEok(r.assumedAmount)}`
-    this.rowAcqTaxTarget.textContent = `-${this.formatEok(r.acquisitionTax)}`
+    this.rowBidPriceTarget.textContent = this.formatDeduction(r.bidPrice)
+    this.rowAssumedTarget.textContent = this.formatDeduction(r.assumedAmount)
+    this.rowAcqTaxTarget.textContent = this.formatDeduction(r.acquisitionTax)
     this.rowAcqTaxNoteTarget.textContent = `추정 ~${(r.acqTaxRate * 100).toFixed(1)}% (필요경비)`
-    this.rowScrivenerTarget.textContent = `-${this.formatEok(r.scrivenerFee)}`
-    this.rowRepairTarget.textContent = `-${this.formatEok(r.repairCost)}`
-    this.rowMovingTarget.textContent = `-${this.formatEok(r.movingCost)}`
-    this.rowMaintenanceTarget.textContent = `-${this.formatEok(r.maintenanceFee)}`
-    this.rowCgtTarget.textContent = `-${this.formatEok(r.capitalGainsTax)}`
+    this.rowScrivenerTarget.textContent = this.formatDeduction(r.scrivenerFee)
+    this.rowRepairTarget.textContent = this.formatDeduction(r.repairCost)
+    this.rowMovingTarget.textContent = this.formatDeduction(r.movingCost)
+    this.rowMaintenanceTarget.textContent = this.formatDeduction(r.maintenanceFee)
+    this.rowCgtTarget.textContent = this.formatDeduction(r.capitalGainsTax)
     this.rowCgtNoteTarget.textContent = `추정 ~${(r.cgtRate * 100).toFixed(0)}% (필요경비만 공제)`
 
     // Bottom row
@@ -218,6 +218,12 @@ export default class extends Controller {
       const pct = ((manwon / this.appraisalValue) * 100).toFixed(0)
       this.bidPercentTarget.textContent = `감정가의 ${pct}%`
     }
+  }
+
+  // Format a deduction amount: skip "-" prefix for zero values
+  formatDeduction(manwon) {
+    if (!manwon || manwon <= 0) return "0만원"
+    return `-${this.formatEok(manwon)}`
   }
 
   // Parse Korean currency text to 만원 integer
