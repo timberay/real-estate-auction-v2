@@ -91,12 +91,12 @@ tab_results = @property.inspection_results
   .where(inspection_items: { tab: @tab_key }, user: current_user)
 unanswered_count = tab_results.where(has_risk: nil).count
 
-tab_label = InspectionTabsComponent::TAB_LABELS[@tab_key] || @tab_key
+tab_label = TabSummaryTableComponent::TAB_LABELS[@tab_key] || @tab_key
 
 flash[:tab_rating] = {
-  rating: tab_rating,
-  label: tab_label,
-  unanswered_count: unanswered_count
+  "rating" => tab_rating.to_s,
+  "label" => tab_label,
+  "unanswered_count" => unanswered_count
 }
 ```
 
