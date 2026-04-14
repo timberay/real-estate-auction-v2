@@ -4,7 +4,7 @@ class Llm::OpenRouterTest < ActiveSupport::TestCase
   setup do
     @adapter = Llm::OpenRouter.new
     @api_response = {
-      "choices" => [{ "message" => { "content" => '{"results": {"rights-002": {"has_risk": true, "confidence": "high", "reasoning": "test"}}}' } }]
+      "choices" => [ { "message" => { "content" => '{"results": {"rights-002": {"has_risk": true, "confidence": "high", "reasoning": "test"}}}' } } ]
     }
   end
 

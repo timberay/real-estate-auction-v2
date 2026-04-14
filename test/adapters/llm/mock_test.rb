@@ -25,7 +25,7 @@ class Llm::MockTest < ActiveSupport::TestCase
     response = adapter.analyze(system: "ignored", prompt: "ignored")
     item = response["results"]["rights-002"]
     assert_not_nil item
-    assert_includes [true, false, nil], item["has_risk"]
+    assert_includes [ true, false, nil ], item["has_risk"]
     assert_includes %w[high medium none], item["confidence"]
     assert item["reasoning"].present?
   end
