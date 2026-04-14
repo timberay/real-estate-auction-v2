@@ -60,7 +60,7 @@ F02 Property Inspection ──(data feed)──► Simulator (pre-fill)
 | Mode | Storage | Behavior |
 |---|---|---|
 | Property-linked | DB (`eviction_simulations` table) | Persisted, resumable, property FK set |
-| Standalone | Rails session (cookie-based) | Volatile, cleared on session expiry or browser close. Answers stored in `session[:eviction_simulation]` hash. No DB record created. |
+| Standalone | DB with `session_id` | Temporary DB record linked to `session.id`. Background job (Solid Queue) cleans up records older than 24 hours. Avoids CookieStore size limits and provides consistent storage regardless of mode. |
 
 ---
 
@@ -102,7 +102,7 @@ F02 Property Inspection ──(data feed)──► Simulator (pre-fill)
 | help_text | text | Supplementary explanation |
 | yes_next_code | string | Next question on yes |
 | no_next_code | string | Next question on no (may enter branch) |
-| f02_field_mapping | string (nullable) | F02 data field path for auto-fill |
+| f02_field_mapping | string (nullable) | Enum-style identifier for F02 auto-fill (e.g., `has_opposing_tenant`, `has_lien`). Mapped to extraction logic in `F02DataExtractor` via hardcoded Ruby — never eval'd. |
 | difficulty_impact | string (nullable) | Impact on difficulty assessment |
 
 ### Runtime Model
@@ -112,10 +112,13 @@ F02 Property Inspection ──(data feed)──► Simulator (pre-fill)
 | Column | Type | Description |
 |---|---|---|
 | property_id | references (nullable) | FK to property (null for standalone) |
+| session_id | string (nullable) | Rails session ID for standalone mode cleanup |
 | answers | json | `{"Q1": true, "Q2": false, ...}` |
 | result_path | json | Derived eviction path (step + branch code array) |
 | difficulty_level | string | `high` / `medium` / `low` |
 | completed | boolean | Whether simulation is complete |
+
+**Cleanup:** `EvictionSimulationCleanupJob` runs daily via Solid Queue, deletes records where `property_id IS NULL AND created_at < 24.hours.ago`.
 
 ---
 
@@ -303,14 +306,16 @@ Extracts relevant data from a property's F02 analysis results for simulator pre-
 
 **Output:** Hash of question codes → pre-fill values with source descriptions
 
-| Simulator Question | F02 Data Source | Extraction Logic |
+| f02_field_mapping value | F02 Data Source | Extraction Logic (hardcoded in service) |
 |---|---|---|
-| Opposing power tenant exists | `RightsAnalysisReport#effective_tenants` | `any? { \|t\| t["opposing_power"] }` |
-| Dividend requested | `RightsAnalysisReport#report_data` | `dig("tenants", *, "dividend_requested")` |
-| Lien (유치권) claim exists | `InspectionResult` | `find_by(inspection_item_code: "rights-020").has_risk` |
-| Gratuitous residence doc | `InspectionResult` | `find_by(inspection_item_code: "inspect-005").has_risk` |
-| Occupant type | `RightsAnalysisReport#report_data` | `dig("occupant_type")` |
-| Small-sum tenant | `RightsAnalysisReport#effective_tenants` | `any? { \|t\| t["has_priority_repayment"] }` |
+| `has_opposing_tenant` | `RightsAnalysisReport#effective_tenants` | `any? { \|t\| t["opposing_power"] }` |
+| `is_dividend_requested` | `RightsAnalysisReport#report_data` | `dig("tenants", *, "dividend_requested")` |
+| `has_lien` | `InspectionResult` | `find_by(inspection_item_code: "rights-020").has_risk` |
+| `has_gratuitous_residence_doc` | `InspectionResult` | `find_by(inspection_item_code: "inspect-005").has_risk` |
+| `occupant_type` | `RightsAnalysisReport#report_data` | `dig("occupant_type")` |
+| `has_small_sum_tenant` | `RightsAnalysisReport#effective_tenants` | `any? { \|t\| t["has_priority_repayment"] }` |
+
+**Security:** The `f02_field_mapping` column stores only enum-style identifiers (e.g., `has_lien`). The `F02DataExtractor` service maps these to Ruby extraction logic via a hardcoded `case` statement. DB values are never evaluated as code.
 
 **Fallback:** When a mapped field is missing or null, the question is marked as "미확인" and the user must answer manually.
 
@@ -367,4 +372,6 @@ Extracts relevant data from a property's F02 analysis results for simulator pre-
 - [ ] Cross-links work bidirectionally between Guide and Simulator tabs
 - [ ] F02 grade tab includes "명도 시나리오 보기" link
 - [ ] All seed data loads correctly via `rails db:seed`
+- [ ] Seed data graph validation test passes: all `next_step_code`, `branch_codes`, `return_step_code`, `yes_next_code`, `no_next_code` resolve to valid targets; no dead-ends or unreachable nodes from Q1 start
+- [ ] Standalone simulation cleanup job runs and removes stale records (>24h, no property)
 - [ ] Disclaimer displayed on both tabs
