@@ -1,7 +1,7 @@
 module EvictionGuide
   class SimulationsController < ApplicationController
     def create
-      property_id = params.dig(:simulation, :property_id).presence
+      property_id = params.dig(:simulation, :property_id).presence&.to_i
 
       @simulation = if property_id
         EvictionSimulation.find_or_initialize_by(property_id: property_id)
@@ -16,7 +16,14 @@ module EvictionGuide
       @simulation.save!
 
       session[:eviction_simulation_id] = @simulation.id
-      redirect_to eviction_guide_simulator_question_path(code: "Q1")
+
+      if @simulation.property_linked?
+        @property = @simulation.property
+        @prefill_data = EvictionGuide::F02DataExtractor.call(@property)
+        render "eviction_guide/simulator/prefill"
+      else
+        redirect_to eviction_guide_simulator_question_path(code: "Q1")
+      end
     end
 
     def update

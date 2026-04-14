@@ -1,0 +1,8 @@
+<%= render EvictionGuide::TabNavigationComponent.new(active_tab: "simulator") %>
+
+<div class="max-w-2xl mx-auto px-4">
+  <%= render EvictionGuide::F02PrefillComponent.new(
+    prefill_data: @prefill_data,
+    simulation: @simulation
+  ) %>
+</div>
