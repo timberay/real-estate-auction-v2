@@ -1,0 +1,39 @@
+<div class="max-w-2xl mx-auto">
+  <%# Difficulty badge %>
+  <div class="text-center mb-6">
+    <%= render EvictionGuide::DifficultyBadgeComponent.new(level: @simulation.difficulty_level || "medium") %>
+  </div>
+
+  <%# Path visualization %>
+  <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">명도 경로</h3>
+  <div class="space-y-2 mb-6">
+    <% @path.each do |entry| %>
+      <% badge = status_badge(entry["status"]) %>
+      <div class="flex items-center gap-3 text-sm">
+        <span class="<%= badge[:classes] %> px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap">
+          <%= badge[:label] %>
+        </span>
+        <span class="text-slate-700 dark:text-slate-300">
+          <%= entry["code"] %> <%= entry["name"] %>
+        </span>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Stats %>
+  <div class="flex gap-4 mb-6">
+    <div class="flex-1 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
+      <div class="text-xs text-slate-500 dark:text-slate-400">예상 총 단계</div>
+      <div class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= total_steps %></div>
+    </div>
+    <div class="flex-1 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
+      <div class="text-xs text-slate-500 dark:text-slate-400">분기 진입</div>
+      <div class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= branch_count %>건</div>
+    </div>
+  </div>
+
+  <%# Disclaimer %>
+  <div class="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-800 dark:text-red-300">
+    이 결과는 시뮬레이션이며, 실제 명도 작업은 반드시 법률 전문가와 상담 후 진행하세요.
+  </div>
+</div>

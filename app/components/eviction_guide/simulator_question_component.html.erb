@@ -1,0 +1,60 @@
+<div class="max-w-2xl mx-auto">
+  <%# Progress bar %>
+  <div class="mb-6">
+    <div class="h-1 bg-slate-200 dark:bg-slate-700 rounded-full">
+      <div class="h-1 bg-blue-600 dark:bg-blue-400 rounded-full transition-all"
+           style="width: <%= progress_percent %>%"></div>
+    </div>
+    <span class="text-xs text-slate-500 dark:text-slate-400 mt-1 inline-block">진행률 <%= progress_percent %>%</span>
+  </div>
+
+  <%# Step badge %>
+  <% if @step %>
+    <span class="text-xs text-slate-500 dark:text-slate-400 mb-2 inline-block">
+      <%= @step.code %> — <%= @step.name %>
+    </span>
+  <% end %>
+
+  <%# Question %>
+  <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
+    <%= @question.question %>
+  </h3>
+
+  <% if @question.help_text.present? %>
+    <p class="text-sm text-slate-600 dark:text-slate-400 mb-4"><%= @question.help_text %></p>
+  <% end %>
+
+  <%# Yes/No buttons %>
+  <div class="flex gap-4 mb-4">
+    <%= form_with url: helpers.eviction_guide_simulation_path, method: :patch, class: "flex-1" do |f| %>
+      <%= f.hidden_field :question_code, value: @question.code %>
+      <%= f.hidden_field :answer, value: "true" %>
+      <%= f.hidden_field :next_code, value: @question.yes_next_code %>
+      <button type="submit"
+              class="w-full p-4 bg-white dark:bg-slate-800 border-2 border-green-500 rounded-lg hover:bg-green-50 dark:hover:bg-green-900/20 text-left">
+        <strong class="text-green-600 dark:text-green-400">네</strong>
+        <% if @question.yes_next_code && @question.yes_next_code != "END" %>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">→ 다음 단계로</p>
+        <% end %>
+      </button>
+    <% end %>
+
+    <%= form_with url: helpers.eviction_guide_simulation_path, method: :patch, class: "flex-1" do |f| %>
+      <%= f.hidden_field :question_code, value: @question.code %>
+      <%= f.hidden_field :answer, value: "false" %>
+      <%= f.hidden_field :next_code, value: @question.no_next_code %>
+      <button type="submit"
+              class="w-full p-4 bg-white dark:bg-slate-800 border-2 border-red-500 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-left">
+        <strong class="text-red-600 dark:text-red-400">아니오</strong>
+        <% if @question.no_next_code && @question.no_next_code != "END" %>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">→ 분기 대책 확인</p>
+        <% end %>
+      </button>
+    <% end %>
+  </div>
+
+  <%# Legal basis from step %>
+  <% if @step&.legal_basis.present? %>
+    <%= render EvictionGuide::LegalInlineComponent.new(legal_items: @step.legal_basis) %>
+  <% end %>
+</div>

@@ -1,0 +1,95 @@
+<div class="border border-slate-200 dark:border-slate-700 rounded-lg mb-2"
+     data-controller="accordion"
+     data-accordion-open-value="false">
+  <%# Collapsed header %>
+  <button class="w-full px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg"
+          data-action="click->accordion#toggle"
+          type="button">
+    <div class="flex items-center gap-3">
+      <span class="<%= step_badge_classes %> px-2.5 py-0.5 rounded text-xs font-bold">
+        <%= @step.code %>
+      </span>
+      <strong class="text-sm text-slate-900 dark:text-slate-100"><%= @step.name %></strong>
+      <% if @step.estimated_duration.present? %>
+        <span class="text-xs text-slate-500 dark:text-slate-400"><%= @step.estimated_duration %></span>
+      <% end %>
+    </div>
+    <span class="text-slate-400 transition-transform" data-accordion-target="icon">▶</span>
+  </button>
+
+  <%# Expanded content %>
+  <div class="hidden border-t border-slate-200 dark:border-slate-700 px-4 py-4"
+       data-accordion-target="content">
+    <p class="text-sm text-slate-700 dark:text-slate-300 mb-4"><%= @step.description %></p>
+
+    <% if @step.required_documents.present? %>
+      <div class="flex gap-3 mb-4">
+        <div class="flex-1 p-2 bg-slate-50 dark:bg-slate-800 rounded text-xs">
+          <div class="font-bold text-slate-500 dark:text-slate-400 text-[0.7rem] mb-1">필요 서류</div>
+          <%= Array(@step.required_documents).join(", ") %>
+        </div>
+        <% if @step.estimated_cost.present? %>
+          <div class="flex-1 p-2 bg-slate-50 dark:bg-slate-800 rounded text-xs">
+            <div class="font-bold text-slate-500 dark:text-slate-400 text-[0.7rem] mb-1">예상 비용</div>
+            <%= @step.estimated_cost %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @step.main? %>
+      <div class="flex gap-4 mb-4 text-sm">
+        <% if @step.completion_condition.present? %>
+          <div class="flex-1">
+            <span class="text-green-600 dark:text-green-400 font-bold">완료 조건:</span>
+            <span class="text-slate-700 dark:text-slate-300"><%= @step.completion_condition %></span>
+          </div>
+        <% end %>
+        <% if @step.failure_condition.present? %>
+          <div class="flex-1">
+            <span class="text-red-600 dark:text-red-400 font-bold">미완료 시:</span>
+            <span class="text-slate-700 dark:text-slate-300"><%= @step.failure_condition %></span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @step.branch? %>
+      <% if @step.problem_summary.present? %>
+        <p class="text-sm mb-2"><strong>상황:</strong> <%= @step.problem_summary %></p>
+      <% end %>
+      <% if @step.root_cause.present? %>
+        <p class="text-sm mb-2"><strong>근본 원인:</strong> <%= @step.root_cause %></p>
+      <% end %>
+      <% if @step.action_steps.present? %>
+        <div class="mb-3">
+          <strong class="text-sm">대책 절차:</strong>
+          <ol class="list-decimal list-inside text-sm mt-1 space-y-1">
+            <% Array(@step.action_steps).each do |action| %>
+              <li class="text-slate-700 dark:text-slate-300"><%= action %></li>
+            <% end %>
+          </ol>
+        </div>
+      <% end %>
+      <% if @step.return_step_code.present? %>
+        <div class="p-2 bg-slate-50 dark:bg-slate-800 rounded text-sm">
+          <strong>해결 후 복귀:</strong> → <%= @step.return_step_code %> 단계
+        </div>
+      <% end %>
+    <% end %>
+
+    <%# Inline branches %>
+    <% if has_branches? %>
+      <% @branches.each do |branch| %>
+        <div class="border border-yellow-200 dark:border-yellow-900/40 bg-yellow-50/50 dark:bg-yellow-900/10 rounded-md p-3 mb-2">
+          <%= render EvictionGuide::StepCardComponent.new(step: branch) %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%# Legal basis %>
+    <% if @step.legal_basis.present? %>
+      <%= render EvictionGuide::LegalInlineComponent.new(legal_items: @step.legal_basis) %>
+    <% end %>
+  </div>
+</div>
