@@ -3,7 +3,10 @@ module Inspections
     def show
       @property = Property.find(params[:property_id])
       @user_property = current_user.user_properties.find_by(property: @property)
-      @rating = InspectionRatingService.call(property: @property, user: current_user)
+      rating_service = InspectionRatingService.new(property: @property, user: current_user)
+      @rating = rating_service.call
+      @fully_evaluated = rating_service.fully_evaluated?
+      @tabs_evaluated, @tabs_total = rating_service.tabs_evaluated_count
       @report = RightsAnalysisReport.find_by(property: @property, user: current_user)
       @budget_setting = current_user.budget_setting
 

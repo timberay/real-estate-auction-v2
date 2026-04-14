@@ -11,7 +11,7 @@
   <%= render ReportBudgetComponent.new(budget_setting: @budget_setting) %>
 
   <%# ===== Verdict Section ===== %>
-  <%= render GradeSummaryComponent.new(rating: @rating) %>
+  <%= render GradeSummaryComponent.new(rating: @rating, fully_evaluated: @fully_evaluated, tabs_evaluated: @tabs_evaluated, tabs_total: @tabs_total) %>
   <%= render BidOpinionComponent.new(
     rating: @rating,
     report: @report,
