@@ -1,7 +1,7 @@
 module EvictionGuide
   class SimulationsController < ApplicationController
     def create
-      property_id = params.dig(:simulation, :property_id).presence&.to_i
+      property_id = params[:property_id].presence&.to_i
 
       @simulation = if property_id
         EvictionSimulation.find_or_initialize_by(property_id: property_id)
@@ -30,9 +30,9 @@ module EvictionGuide
       @simulation = find_simulation
       return head(:not_found) unless @simulation
 
-      question_code = params.dig(:simulation, :question_code)
-      answer = params.dig(:simulation, :answer) == "true"
-      next_code = params.dig(:simulation, :next_code)
+      question_code = params[:question_code]
+      answer = params[:answer] == "true"
+      next_code = params[:next_code]
 
       @simulation.record_answer(question_code, answer)
       @simulation.save!

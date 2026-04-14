@@ -56,3 +56,4 @@
 .DS_Store
 Thumbs.db
 db/development.sqlite3
+docs/screenshots/

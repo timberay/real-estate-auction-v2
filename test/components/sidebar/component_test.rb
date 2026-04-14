@@ -20,11 +20,10 @@ module Sidebar
 
     # --- Menu groups ---
 
-    test "renders 3 group titles" do
+    test "renders 2 group titles" do
       render_inline(Sidebar::Component.new)
 
       assert_text "물건검색"
-      assert_text "리포트"
       assert_text "가이드"
     end
 
@@ -45,11 +44,11 @@ module Sidebar
       assert_text "AI분석"
     end
 
-    test "renders disabled menu item labels" do
+    test "does not render removed report menu items" do
       render_inline(Sidebar::Component.new)
 
-      assert_text "순수익 계산기"
-      assert_text "리포트 내보내기"
+      assert_no_text "순수익 계산기"
+      assert_no_text "리포트 내보내기"
     end
 
     test "renders eviction guide as enabled links" do
@@ -67,17 +66,10 @@ module Sidebar
       assert_selector "a[href='/analyses/new']", text: "AI분석"
     end
 
-    test "renders disabled items as disabled buttons" do
+    test "renders no disabled buttons" do
       render_inline(Sidebar::Component.new)
 
-      assert_selector "button[disabled]", minimum: 2
-    end
-
-    test "renders disabled items with opacity" do
-      render_inline(Sidebar::Component.new)
-
-      assert_selector "button[disabled][class*='opacity-50']"
-      assert_selector "button[disabled][class*='cursor-not-allowed']"
+      assert_no_selector "button[disabled]"
     end
 
     # --- Active item ---

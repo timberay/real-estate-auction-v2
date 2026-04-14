@@ -1,6 +1,7 @@
+<% content_for(:page_title, "명도 시뮬레이터") %>
 <%= render EvictionGuide::TabNavigationComponent.new(active_tab: "simulator") %>
 
-<div class="max-w-2xl mx-auto px-4">
+<div class="max-w-3xl mx-auto">
   <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">시뮬레이션 결과</h2>
   <%= render EvictionGuide::SimulatorResultComponent.new(simulation: @simulation) %>
 </div>

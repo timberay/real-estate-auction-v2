@@ -1,4 +1,4 @@
-<div class="max-w-2xl mx-auto">
+<div class="max-w-3xl mx-auto">
   <%# Progress bar %>
   <div class="mb-6">
     <div class="h-1 bg-slate-200 dark:bg-slate-700 rounded-full">
@@ -26,7 +26,8 @@
 
   <%# Yes/No buttons %>
   <div class="flex gap-4 mb-4">
-    <%= form_with url: helpers.eviction_guide_simulation_path, method: :patch, class: "flex-1" do |f| %>
+    <%= form_with url: helpers.eviction_guide_simulation_path, method: :patch, class: "flex-1",
+                  data: { turbo_frame: yes_ends? ? "_top" : "simulator_question" } do |f| %>
       <%= f.hidden_field :question_code, value: @question.code %>
       <%= f.hidden_field :answer, value: "true" %>
       <%= f.hidden_field :next_code, value: @question.yes_next_code %>
@@ -39,7 +40,8 @@
       </button>
     <% end %>
 
-    <%= form_with url: helpers.eviction_guide_simulation_path, method: :patch, class: "flex-1" do |f| %>
+    <%= form_with url: helpers.eviction_guide_simulation_path, method: :patch, class: "flex-1",
+                  data: { turbo_frame: no_ends? ? "_top" : "simulator_question" } do |f| %>
       <%= f.hidden_field :question_code, value: @question.code %>
       <%= f.hidden_field :answer, value: "false" %>
       <%= f.hidden_field :next_code, value: @question.no_next_code %>

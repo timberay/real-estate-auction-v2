@@ -1,6 +1,7 @@
+<% content_for(:page_title, "명도 시뮬레이터") %>
 <%= render EvictionGuide::TabNavigationComponent.new(active_tab: "simulator") %>
 
-<div class="max-w-2xl mx-auto px-4">
+<div class="max-w-3xl mx-auto">
   <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">명도 시뮬레이터</h2>
 
   <%# Entry cards %>
@@ -10,7 +11,7 @@
          data-mode="property">
       <div class="text-3xl mb-2">📋</div>
       <strong class="text-sm text-slate-900 dark:text-slate-100">내 물건으로 시뮬레이션</strong>
-      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">분석 완료된 물건의 데이터를 자동 반영</p>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">분석 완료된 물건의 데이터를 자동 반영</p>
     </div>
 
     <%= form_with url: eviction_guide_simulation_path, method: :post, class: "flex-1" do |f| %>
@@ -19,7 +20,7 @@
               class="w-full h-full border-2 border-slate-300 dark:border-slate-600 rounded-lg p-4 text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
         <div class="text-3xl mb-2">✏️</div>
         <strong class="text-sm text-slate-900 dark:text-slate-100">직접 입력으로 시뮬레이션</strong>
-        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">물건 없이 상황을 직접 입력</p>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">물건 없이 상황을 직접 입력</p>
       </button>
     <% end %>
   </div>

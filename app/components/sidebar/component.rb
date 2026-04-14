@@ -10,13 +10,9 @@ module Sidebar
         MenuItem.new(label: "물건 목록", icon: "magnifying-glass", path: "/properties", enabled: true),
         MenuItem.new(label: "AI분석", icon: "document-plus", path: "/analyses/new", enabled: true)
       ],
-      "리포트" => [
-        MenuItem.new(label: "순수익 계산기", icon: "banknotes", path: nil, enabled: false),
-        MenuItem.new(label: "리포트 내보내기", icon: "arrow-down-tray", path: nil, enabled: false)
-      ],
       "가이드" => [
         MenuItem.new(label: "명도 가이드", icon: "book-open", path: "/eviction_guide", enabled: true),
-        MenuItem.new(label: "명도 시뮬레이터", icon: "play-circle", path: "/eviction_guide/simulator", enabled: true)
+        MenuItem.new(label: "명도 시뮬레이터", icon: "play", path: "/eviction_guide/simulator", enabled: true)
       ]
     }.freeze
 
@@ -33,7 +29,15 @@ module Sidebar
     private
 
     def active?(item)
-      item.path.present? && @current_path.start_with?(item.path)
+      return false unless item.path.present? && @current_path.start_with?(item.path)
+
+      # Prefer the longest matching path to avoid /eviction_guide matching /eviction_guide/simulator
+      all_items = MENU_GROUPS.values.flatten
+      all_items.none? do |other|
+        other.path.present? && other.path != item.path &&
+          other.path.length > item.path.length &&
+          @current_path.start_with?(other.path)
+      end
     end
 
     def item_classes(item)
