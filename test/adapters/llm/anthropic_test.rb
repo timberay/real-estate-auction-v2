@@ -4,7 +4,7 @@ class Llm::AnthropicTest < ActiveSupport::TestCase
   setup do
     @adapter = Llm::Anthropic.new
     @api_response = {
-      "content" => [{ "text" => '{"results": {"rights-002": {"has_risk": true, "confidence": "high", "reasoning": "test"}}}' }],
+      "content" => [ { "text" => '{"results": {"rights-002": {"has_risk": true, "confidence": "high", "reasoning": "test"}}}' } ],
       "model" => "claude-sonnet-4-20250514",
       "role" => "assistant"
     }
@@ -71,7 +71,7 @@ class Llm::AnthropicTest < ActiveSupport::TestCase
     ENV["ANTHROPIC_API_KEY"] = "test-key"
 
     wrapped_response = {
-      "content" => [{ "text" => "```json\n{\"results\": {}}\n```" }],
+      "content" => [ { "text" => "```json\n{\"results\": {}}\n```" } ],
       "role" => "assistant"
     }
     stub_request(:post, "https://api.anthropic.com/v1/messages")

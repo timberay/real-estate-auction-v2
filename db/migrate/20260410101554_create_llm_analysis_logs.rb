@@ -16,6 +16,6 @@ class CreateLlmAnalysisLogs < ActiveRecord::Migration[8.1]
     end
 
     add_index :llm_analysis_logs, :status
-    add_index :llm_analysis_logs, [:property_id, :status]
+    add_index :llm_analysis_logs, [ :property_id, :status ]
   end
 end

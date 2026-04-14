@@ -4,7 +4,7 @@ class AnalysesController < ApplicationController
       @property = Property.find_by(id: params[:property_id])
       unless @property
         redirect_to new_analysis_path, alert: "해당 물건을 찾을 수 없습니다."
-        return
+        nil
       end
     end
   end

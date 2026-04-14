@@ -4,7 +4,7 @@ class Llm::OpenAiTest < ActiveSupport::TestCase
   setup do
     @adapter = Llm::OpenAi.new
     @api_response = {
-      "choices" => [{ "message" => { "content" => '{"results": {"rights-002": {"has_risk": true, "confidence": "high", "reasoning": "test"}}}' } }]
+      "choices" => [ { "message" => { "content" => '{"results": {"rights-002": {"has_risk": true, "confidence": "high", "reasoning": "test"}}}' } } ]
     }
   end
 

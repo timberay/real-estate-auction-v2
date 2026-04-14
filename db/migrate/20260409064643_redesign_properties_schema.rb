@@ -25,7 +25,7 @@ class RedesignPropertiesSchema < ActiveRecord::Migration[8.1]
     add_column :properties, :special_conditions_code, :string
     add_column :properties, :remarks, :text
 
-    add_index :properties, [:sido, :sigungu, :dong], name: "idx_properties_location"
+    add_index :properties, [ :sido, :sigungu, :dong ], name: "idx_properties_location"
     add_index :properties, :property_type
 
     # --- Create property_sale_details (1:1) ---
@@ -59,7 +59,7 @@ class RedesignPropertiesSchema < ActiveRecord::Migration[8.1]
       t.bigint :sale_amount
       t.timestamps
     end
-    add_index :auction_schedules, [:property_id, :schedule_date]
+    add_index :auction_schedules, [ :property_id, :schedule_date ]
 
     # --- Create land_details (1:N) ---
     create_table :land_details do |t|
@@ -80,6 +80,6 @@ class RedesignPropertiesSchema < ActiveRecord::Migration[8.1]
       t.text :content
       t.timestamps
     end
-    add_index :appraisal_points, [:property_id, :item_code]
+    add_index :appraisal_points, [ :property_id, :item_code ]
   end
 end
