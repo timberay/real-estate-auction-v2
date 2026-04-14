@@ -7,6 +7,7 @@ class Property < ApplicationRecord
   has_many :inspection_items, through: :inspection_results
   has_many :rights_analysis_reports, dependent: :destroy
   has_many :llm_analysis_logs, dependent: :destroy
+  has_many :eviction_simulations, dependent: :destroy
 
   has_many_attached :documents
 

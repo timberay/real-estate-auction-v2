@@ -1,0 +1,9 @@
+<% content_for(:page_title, "명도 시뮬레이터") %>
+<%= render EvictionGuide::TabNavigationComponent.new(active_tab: "simulator") %>
+
+<div class="max-w-3xl mx-auto">
+  <%= render EvictionGuide::F02PrefillComponent.new(
+    prefill_data: @prefill_data,
+    simulation: @simulation
+  ) %>
+</div>

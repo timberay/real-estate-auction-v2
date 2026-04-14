@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_12_103150) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_14_090614) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -90,6 +90,61 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_12_103150) do
     t.index ["loan_policy_id"], name: "index_budget_settings_on_loan_policy_id"
     t.index ["property_type_id"], name: "index_budget_settings_on_property_type_id"
     t.index ["user_id"], name: "index_budget_settings_on_user_id", unique: true
+  end
+
+  create_table "eviction_simulations", force: :cascade do |t|
+    t.json "answers"
+    t.boolean "completed", default: false, null: false
+    t.datetime "created_at", null: false
+    t.string "difficulty_level"
+    t.integer "property_id"
+    t.json "result_path"
+    t.string "session_id"
+    t.datetime "updated_at", null: false
+    t.index ["property_id"], name: "idx_eviction_simulations_one_per_property", unique: true, where: "property_id IS NOT NULL"
+    t.index ["property_id"], name: "index_eviction_simulations_on_property_id"
+    t.index ["session_id"], name: "index_eviction_simulations_on_session_id"
+  end
+
+  create_table "eviction_simulator_questions", force: :cascade do |t|
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.string "difficulty_impact"
+    t.string "f02_field_mapping"
+    t.text "help_text"
+    t.string "no_next_code"
+    t.integer "phase", default: 0, null: false
+    t.text "question", null: false
+    t.string "step_code", null: false
+    t.datetime "updated_at", null: false
+    t.string "yes_next_code"
+    t.index ["code"], name: "index_eviction_simulator_questions_on_code", unique: true
+    t.index ["step_code"], name: "index_eviction_simulator_questions_on_step_code"
+  end
+
+  create_table "eviction_steps", force: :cascade do |t|
+    t.json "action_steps"
+    t.json "branch_codes"
+    t.string "code", null: false
+    t.text "completion_condition"
+    t.datetime "created_at", null: false
+    t.text "description", null: false
+    t.string "estimated_cost"
+    t.string "estimated_duration"
+    t.text "failure_condition"
+    t.json "legal_basis"
+    t.string "name", null: false
+    t.string "next_step_code"
+    t.integer "position", default: 0, null: false
+    t.text "problem_summary"
+    t.json "required_documents"
+    t.string "return_step_code"
+    t.text "root_cause"
+    t.integer "step_type", default: 0, null: false
+    t.string "trigger_step_code"
+    t.datetime "updated_at", null: false
+    t.index ["code"], name: "index_eviction_steps_on_code", unique: true
+    t.index ["step_type", "position"], name: "index_eviction_steps_on_step_type_and_position"
   end
 
   create_table "inspection_items", force: :cascade do |t|
@@ -294,6 +349,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_12_103150) do
   add_foreign_key "budget_settings", "loan_policies"
   add_foreign_key "budget_settings", "property_types"
   add_foreign_key "budget_settings", "users"
+  add_foreign_key "eviction_simulations", "properties"
   add_foreign_key "inspection_results", "inspection_items"
   add_foreign_key "inspection_results", "properties"
   add_foreign_key "inspection_results", "users"

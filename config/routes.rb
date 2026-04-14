@@ -57,5 +57,17 @@ Rails.application.routes.draw do
     end
   end
 
+  scope :eviction_guide, controller: :eviction_guide do
+    get "/", action: :guide, as: :eviction_guide_guide
+    get "simulator", action: :simulator, as: :eviction_guide_simulator
+  end
+
+  namespace :eviction_guide do
+    resource :simulation, only: [ :create, :update, :show ]
+    get "simulator/question/:code", to: "simulator#question", as: :simulator_question
+    get "steps/:code", to: "steps#show", as: :step_detail
+    get "branches/:code", to: "branches#show", as: :branch_detail
+  end
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

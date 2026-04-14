@@ -1,0 +1,39 @@
+<% content_for(:page_title, "명도 시뮬레이터") %>
+<%= render EvictionGuide::TabNavigationComponent.new(active_tab: "simulator") %>
+
+<div class="max-w-3xl mx-auto">
+  <h2 class="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6">명도 시뮬레이터</h2>
+
+  <%# Entry cards %>
+  <div class="flex gap-4 mb-6">
+    <div class="flex-1 border-2 border-blue-600 dark:border-blue-400 rounded-lg p-4 text-center cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/20"
+         data-action="click->simulator#selectMode"
+         data-mode="property">
+      <div class="text-3xl mb-2">📋</div>
+      <strong class="text-sm text-slate-900 dark:text-slate-100">내 물건으로 시뮬레이션</strong>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">분석 완료된 물건의 데이터를 자동 반영</p>
+    </div>
+
+    <%= form_with url: eviction_guide_simulation_path, method: :post, class: "flex-1" do |f| %>
+      <%= f.hidden_field :property_id, value: "" %>
+      <button type="submit"
+              class="w-full h-full border-2 border-slate-300 dark:border-slate-600 rounded-lg p-4 text-center cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+        <div class="text-3xl mb-2">✏️</div>
+        <strong class="text-sm text-slate-900 dark:text-slate-100">직접 입력으로 시뮬레이션</strong>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">물건 없이 상황을 직접 입력</p>
+      </button>
+    <% end %>
+  </div>
+
+  <%# Property selector (shown when "내 물건으로" is clicked) %>
+  <% if @properties.any? %>
+    <%= render "eviction_guide/simulator/property_selector", properties: @properties, selected_property: @property %>
+  <% end %>
+
+  <%# Guide reverse link %>
+  <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-sm text-slate-600 dark:text-slate-400">
+    명도 절차가 처음이라면
+    <a href="<%= eviction_guide_guide_path %>" class="text-blue-600 dark:text-blue-400 hover:underline">명도 가이드</a>를
+    먼저 읽어보세요.
+  </div>
+</div>

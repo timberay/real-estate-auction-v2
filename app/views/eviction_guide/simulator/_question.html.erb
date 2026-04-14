@@ -1,0 +1,7 @@
+<%= turbo_frame_tag "simulator_question" do %>
+  <%= render EvictionGuide::SimulatorQuestionComponent.new(
+    question: @question,
+    simulation: @simulation,
+    step: @step
+  ) %>
+<% end %>
