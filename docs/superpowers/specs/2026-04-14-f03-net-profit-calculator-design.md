@@ -70,12 +70,20 @@ All amounts in 만원 (10,000 KRW).
 ```
 total_investment = bid_price + assumed_amount
 acquisition_tax = bid_price × acquisition_tax_rate(ownership)
-acquisition_costs = acquisition_tax + scrivener_fee + repair_cost + moving_cost + maintenance_fee
-capital_gain = sale_price - total_investment - acquisition_costs
-capital_gains_tax = max(0, capital_gain × cgt_rate(ownership, holding_period))
-net_profit = sale_price - total_investment - acquisition_costs - capital_gains_tax
-roi_percent = net_profit / total_investment × 100
+all_costs = acquisition_tax + scrivener_fee + repair_cost + moving_cost + maintenance_fee
+deductible_costs = acquisition_tax + scrivener_fee + repair_cost  (세법상 필요경비)
+non_deductible_costs = moving_cost + maintenance_fee              (필요경비 불산입)
+taxable_gain = sale_price - total_investment - deductible_costs
+capital_gains_tax = max(0, taxable_gain × cgt_rate(ownership, holding_period))
+net_profit = sale_price - total_investment - all_costs - capital_gains_tax
+total_outlay = total_investment + all_costs
+roi_percent = net_profit / total_outlay × 100
 ```
+
+**Why deductible vs non-deductible:**
+- 명도비(moving_cost), 미납관리비(maintenance_fee)는 세법상 양도소득세 필요경비로 인정되지 않음
+- 이를 분리하지 않으면 양도소득세가 실제보다 적게 계산되어 수익을 부풀려 보이게 됨
+- 순수익 계산에는 전체 비용(all_costs)을 차감하지만, 과세표준 산정에는 필요경비(deductible_costs)만 차감
 
 **Data sources:**
 - `bid_price` — user slider input
@@ -125,8 +133,8 @@ Simplified rates stored as JS constants in the Stimulus controller. These are ap
 
 | Card | Value | Color |
 |------|-------|-------|
-| 총 투자비용 | total_investment | neutral (slate) |
-| 총 비용 | acquisition_costs + capital_gains_tax | red |
+| 총 투입비용 | total_outlay (= total_investment + all_costs) | neutral (slate) |
+| 총 비용 | all_costs + capital_gains_tax | red |
 | 순수익 | net_profit | green (positive) / red (negative) |
 | 수익률 | roi_percent | green (positive) / red (negative) |
 
@@ -138,12 +146,12 @@ Simplified rates stored as JS constants in the Stimulus controller. These are ap
 | **(-) 차감 항목** | | |
 | 낙찰가 | -bid_price | 슬라이더 입력 |
 | 인수금액 | -assumed_amount | 권리분석 결과 |
-| 취득세 | -acquisition_tax | 추정 ~N% |
-| 법무사비 | -scrivener_fee | 예산 설정값 |
-| 수선비 | -repair_cost | 예산 설정값 |
-| 이사비(명도비) | -moving_cost | 예산 설정값 |
-| 미납 관리비 | -maintenance_fee | 예산 설정값 |
-| 양도소득세 | -capital_gains_tax | 추정 ~N% |
+| 취득세 | -acquisition_tax | 추정 ~N% (필요경비) |
+| 법무사비 | -scrivener_fee | 예산 설정값 (필요경비) |
+| 수선비 | -repair_cost | 예산 설정값 (필요경비) |
+| 이사비(명도비) | -moving_cost | 예산 설정값 (경비 불산입) |
+| 미납 관리비 | -maintenance_fee | 예산 설정값 (경비 불산입) |
+| 양도소득세 | -capital_gains_tax | 추정 ~N% (필요경비만 공제) |
 | **순수익** | **=net_profit** | **수익률 N%** |
 
 ### Disclaimers (3 locations)
@@ -172,15 +180,17 @@ ProfitCalculatorComponent.new(
 )
 ```
 
-The component renders data attributes on the root element for the Stimulus controller to read:
+The component renders data attributes on the root element for the Stimulus controller to read. **All values normalized to 만원 at render time.**
 
-- `data-profit-calculator-min-bid-value` — property.min_bid_price (만원)
-- `data-profit-calculator-appraisal-value` — property.appraisal_price (만원)
-- `data-profit-calculator-assumed-amount-value` — report&.assumed_amount || 0 (만원)
-- `data-profit-calculator-scrivener-fee-value` — budget_setting&.scrivener_fee || 0
-- `data-profit-calculator-repair-cost-value` — budget_setting&.repair_cost || 0
-- `data-profit-calculator-moving-cost-value` — budget_setting&.moving_cost || 0
-- `data-profit-calculator-maintenance-fee-value` — budget_setting&.maintenance_fee || 0
+- `data-profit-calculator-min-bid-value` — property.min_bid_price / 10000 (**원→만원 변환**)
+- `data-profit-calculator-appraisal-value` — property.appraisal_price / 10000 (**원→만원 변환**)
+- `data-profit-calculator-assumed-amount-value` — report&.assumed_amount || 0 (이미 만원 단위)
+- `data-profit-calculator-scrivener-fee-value` — budget_setting&.scrivener_fee || 0 (이미 만원 단위)
+- `data-profit-calculator-repair-cost-value` — budget_setting&.repair_cost || 0 (이미 만원 단위)
+- `data-profit-calculator-moving-cost-value` — budget_setting&.moving_cost || 0 (이미 만원 단위)
+- `data-profit-calculator-maintenance-fee-value` — budget_setting&.maintenance_fee || 0 (이미 만원 단위)
+
+**Unit convention:** Property model stores prices in 원(₩). BudgetSetting and RightsAnalysisReport store amounts in 만원. The component normalizes Property values to 만원 before passing to data attributes, so the Stimulus controller works in a single unit (만원) throughout.
 
 ### Controller/View Changes
 
