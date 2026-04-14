@@ -1,0 +1,54 @@
+module EvictionGuide
+  class SimulationsController < ApplicationController
+    def create
+      property_id = params.dig(:simulation, :property_id).presence
+
+      @simulation = if property_id
+        EvictionSimulation.find_or_initialize_by(property_id: property_id)
+      else
+        EvictionSimulation.new(session_id: session.id.to_s)
+      end
+
+      @simulation.answers = {}
+      @simulation.result_path = []
+      @simulation.completed = false
+      @simulation.difficulty_level = nil
+      @simulation.save!
+
+      session[:eviction_simulation_id] = @simulation.id
+      redirect_to eviction_guide_simulator_question_path(code: "Q1")
+    end
+
+    def update
+      @simulation = find_simulation
+      return head(:not_found) unless @simulation
+
+      question_code = params.dig(:simulation, :question_code)
+      answer = params.dig(:simulation, :answer) == "true"
+      next_code = params.dig(:simulation, :next_code)
+
+      @simulation.record_answer(question_code, answer)
+      @simulation.save!
+
+      if next_code == "END" || next_code.blank?
+        redirect_to eviction_guide_simulation_path
+      else
+        redirect_to eviction_guide_simulator_question_path(code: next_code)
+      end
+    end
+
+    def show
+      @simulation = find_simulation
+      return redirect_to eviction_guide_simulator_path unless @simulation
+
+      @simulation.update!(completed: true)
+      render "eviction_guide/simulator/result", layout: "application"
+    end
+
+    private
+
+    def find_simulation
+      EvictionSimulation.find_by(id: session[:eviction_simulation_id])
+    end
+  end
+end
