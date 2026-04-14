@@ -144,4 +144,46 @@ real_properties.each do |attrs|
 end
 puts "  -> #{Property.count} properties (#{guest.user_properties.count} linked to guest)"
 
+puts "Seeding eviction steps..."
+eviction_data = JSON.parse(File.read(Rails.root.join("db/seeds/eviction_steps.json")))
+
+(eviction_data["steps"] + eviction_data["branches"]).each do |attrs|
+  EvictionStep.find_or_create_by!(code: attrs["code"]) do |step|
+    step.step_type = attrs["step_type"]
+    step.name = attrs["name"]
+    step.description = attrs["description"]
+    step.completion_condition = attrs["completion_condition"]
+    step.failure_condition = attrs["failure_condition"]
+    step.required_documents = attrs["required_documents"]
+    step.estimated_duration = attrs["estimated_duration"]
+    step.estimated_cost = attrs["estimated_cost"]
+    step.legal_basis = attrs["legal_basis"]
+    step.position = attrs["position"]
+    step.next_step_code = attrs["next_step_code"]
+    step.branch_codes = attrs["branch_codes"]
+    step.trigger_step_code = attrs["trigger_step_code"]
+    step.problem_summary = attrs["problem_summary"]
+    step.root_cause = attrs["root_cause"]
+    step.action_steps = attrs["action_steps"]
+    step.return_step_code = attrs["return_step_code"]
+  end
+end
+puts "  -> #{EvictionStep.count} eviction steps"
+
+puts "Seeding eviction simulator questions..."
+questions_data = JSON.parse(File.read(Rails.root.join("db/seeds/eviction_simulator_questions.json")))
+questions_data.each do |attrs|
+  EvictionSimulatorQuestion.find_or_create_by!(code: attrs["code"]) do |q|
+    q.phase = attrs["phase"]
+    q.step_code = attrs["step_code"]
+    q.question = attrs["question"]
+    q.help_text = attrs["help_text"]
+    q.yes_next_code = attrs["yes_next_code"]
+    q.no_next_code = attrs["no_next_code"]
+    q.f02_field_mapping = attrs["f02_field_mapping"]
+    q.difficulty_impact = attrs["difficulty_impact"]
+  end
+end
+puts "  -> #{EvictionSimulatorQuestion.count} simulator questions"
+
 puts "Seed complete!"
