@@ -1,0 +1,19 @@
+q1_rights_done:
+  code: "Q1"
+  phase: 0
+  step_code: "S1"
+  question: "권리분석을 완료했나요?"
+  help_text: "말소기준권리, 대항력 임차인, 배당요구 여부를 확인했는지 체크합니다."
+  yes_next_code: "Q2"
+  no_next_code: "Q1G"
+  f02_field_mapping: "has_rights_analysis"
+
+q5_delivery_order:
+  code: "Q5"
+  phase: 1
+  step_code: "S5"
+  question: "인도명령과 점유이전금지가처분을 동시에 신청했나요?"
+  help_text: "잔금 납부일 당일 세트로 신청하는 것이 실무 정석입니다."
+  yes_next_code: "Q6"
+  no_next_code: "Q5B"
+  difficulty_impact: "high"

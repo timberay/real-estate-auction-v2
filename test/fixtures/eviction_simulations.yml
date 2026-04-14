@@ -1,0 +1,13 @@
+property_linked:
+  property: unanalyzed_officetel
+  answers: '{"Q1": true, "Q2": true}'
+  result_path: '["S1", "S2"]'
+  difficulty_level: "low"
+  completed: false
+
+standalone:
+  session_id: "test_session_123"
+  answers: '{"Q1": true}'
+  result_path: '["S1"]'
+  difficulty_level: ~
+  completed: false

@@ -1,0 +1,40 @@
+s1_rights_analysis:
+  code: "S1"
+  step_type: 0
+  name: "권리분석"
+  description: "말소기준권리, 대항력 있는 임차인 유무, 배당요구 여부를 확인"
+  completion_condition: "인수 권리 없음"
+  failure_condition: "대항력 임차인 배당요구 안 함"
+  required_documents: '["등기부등본", "매각물건명세서"]'
+  estimated_duration: "1~2주"
+  legal_basis: '[{"title": "민사집행법 제91조", "summary": "말소기준권리 판단 근거", "url": "https://law.go.kr"}]'
+  position: 1
+  next_step_code: "S2"
+  branch_codes: '["B1", "B2", "B3"]'
+
+s5_delivery_order:
+  code: "S5"
+  step_type: 0
+  name: "인도명령 + 점유이전금지가처분 동시 신청"
+  description: "잔금 납부일 당일 세트로 신청하는 것이 실무 정석"
+  completion_condition: "두 신청 모두 접수"
+  failure_condition: "6개월 기한 도과"
+  required_documents: '["잔금완납증명서", "인도명령 신청서", "가처분 신청서"]'
+  estimated_duration: "결정: 1주일 이내"
+  legal_basis: '[{"title": "민사집행법 제136조", "summary": "인도명령 신청 근거", "url": "https://law.go.kr"}]'
+  position: 5
+  next_step_code: "S6"
+  branch_codes: '["B6"]'
+
+b1_deposit_risk:
+  code: "B1"
+  step_type: 1
+  name: "대항력 임차인이 배당요구 안 함"
+  description: "보증금 인수 리스크"
+  trigger_step_code: "S1"
+  problem_summary: "낙찰자가 보증금 전액 떠안게 됨"
+  root_cause: "배당요구종기 내 미신청"
+  action_steps: '["입찰 포기 검토", "임차인과 보증금 감액 협상", "매각불허가 신청 검토"]'
+  return_step_code: "S2"
+  position: 16
+  estimated_duration: "1~3개월"
