@@ -44,6 +44,24 @@ module Inspections
         end
       end
 
+      rating_service = InspectionRatingService.new(property: @property, user: current_user)
+      rating_service.call
+
+      tab_rating_value = rating_service.tab_rating(@tab_key)
+
+      tab_results = @property.inspection_results
+        .joins(:inspection_item)
+        .where(inspection_items: { tab: InspectionItem.tabs[@tab_key] }, user: current_user)
+      unanswered_count = tab_results.where(has_risk: nil).count
+
+      tab_label = TabSummaryTableComponent::TAB_LABELS[@tab_key] || @tab_key
+
+      flash[:tab_rating] = {
+        "rating" => tab_rating_value.to_s,
+        "label" => tab_label,
+        "unanswered_count" => unanswered_count
+      }
+
       redirect_to edit_property_inspections_tab_url(@property, tab_key: @tab_key, anchor: "top")
     end
 

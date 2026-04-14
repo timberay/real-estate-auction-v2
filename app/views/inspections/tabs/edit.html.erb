@@ -1,5 +1,24 @@
 <%= render layout: "inspections/layout", locals: { property: @property, user_property: @user_property, active_tab: @tab_key } do %>
   <div id="top"></div>
+  <% if (tab_rating = flash[:tab_rating]) %>
+    <% rating_key = tab_rating["rating"] %>
+    <% badge_config = {
+      "safe" => { label: "안전", bg: "bg-green-50 dark:bg-green-900/20", border: "border-green-300 dark:border-green-700", text: "text-green-800 dark:text-green-300", badge_bg: "bg-green-600 dark:bg-green-500" },
+      "caution" => { label: "주의", bg: "bg-yellow-50 dark:bg-yellow-900/20", border: "border-yellow-300 dark:border-yellow-700", text: "text-yellow-800 dark:text-yellow-300", badge_bg: "bg-yellow-600 dark:bg-yellow-500" },
+      "danger" => { label: "경고", bg: "bg-red-50 dark:bg-red-900/20", border: "border-red-300 dark:border-red-700", text: "text-red-800 dark:text-red-300", badge_bg: "bg-red-600 dark:bg-red-500" },
+      "incomplete" => { label: "미평가", bg: "bg-slate-50 dark:bg-slate-800/50", border: "border-slate-300 dark:border-slate-600", text: "text-slate-700 dark:text-slate-300", badge_bg: "bg-slate-500 dark:bg-slate-400" }
+    } %>
+    <% config = badge_config[rating_key] || badge_config["incomplete"] %>
+    <div class="mb-4 rounded-lg border <%= config[:border] %> <%= config[:bg] %> px-4 py-3 flex items-center gap-3">
+      <span class="<%= config[:badge_bg] %> text-white text-sm font-bold px-2.5 py-1 rounded-md"><%= config[:label] %></span>
+      <span class="<%= config[:text] %> text-sm font-medium">
+        <strong><%= tab_rating["label"] %></strong> 평가 완료
+        <% if tab_rating["unanswered_count"].to_i > 0 %>
+          — <span class="font-semibold">미응답 <%= tab_rating["unanswered_count"] %>개</span>가 남아있습니다
+        <% end %>
+      </span>
+    </div>
+  <% end %>
   <%= form_with url: property_inspections_tab_path(@property, tab_key: @tab_key), method: :patch,
       data: { turbo: false, controller: "unified-form", unified_form_total_value: @results.size,
               action: "change->unified-form#validate" } do |f| %>

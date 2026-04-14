@@ -12,6 +12,7 @@ class InspectionTabsComponent < ViewComponent::Base
     @property = property
     @user = user
     @active_tab = active_tab
+    @tab_stats = load_tab_stats
   end
 
   private
@@ -19,27 +20,34 @@ class InspectionTabsComponent < ViewComponent::Base
   def tabs
     rating_service = InspectionRatingService.new(property: @property, user: @user)
     TAB_CONFIG.map do |tab|
-      counts = tab_counts(tab[:key])
+      stats = @tab_stats[tab[:key]] || { checked: 0, total: 0 }
       tab.merge(
         active: tab[:key] == @active_tab,
         url: tab_url(tab[:key]),
-        checked: counts[:checked],
-        total: counts[:total],
+        checked: stats[:checked],
+        total: stats[:total],
         rating: tab[:key] == "grade" ? nil : rating_service.tab_rating(tab[:key])
       )
     end
   end
 
-  def tab_counts(key)
-    return { checked: 0, total: 0 } if key == "grade"
-    tab_int = InspectionItem.tabs[key]
-    return { checked: 0, total: 0 } unless tab_int
-
+  def load_tab_stats
     results = @property.inspection_results
       .joins(:inspection_item)
-      .where(inspection_items: { tab: tab_int }, user: @user)
+      .where(user: @user)
+      .group("inspection_items.tab")
+      .select(
+        "inspection_items.tab",
+        "COUNT(*) AS total_count",
+        "COUNT(CASE WHEN inspection_results.has_risk IS NOT NULL THEN 1 END) AS checked_count"
+      )
 
-    { checked: results.where.not(has_risk: nil).count, total: results.count }
+    tab_int_to_key = InspectionItem.tabs.invert
+    results.each_with_object({}) do |row, hash|
+      key = tab_int_to_key[row.tab.to_i]
+      next unless key
+      hash[key] = { checked: row.checked_count.to_i, total: row.total_count.to_i }
+    end
   end
 
   def tab_url(key)

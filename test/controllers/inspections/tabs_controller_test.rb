@@ -65,4 +65,35 @@ class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "문서 재확인 결과 위험", auto_result.resolution_note
     assert_equal "false", auto_result.auto_value
   end
+
+  test "update sets flash with tab rating and unanswered count" do
+    result = @property.inspection_results
+      .where(user: users(:guest))
+      .joins(:inspection_item)
+      .where(inspection_items: { tab: InspectionItem.tabs["rights_analysis"] })
+      .first
+
+    patch property_inspections_tab_url(@property, tab_key: "rights_analysis"), params: {
+      resolutions: {
+        result.id => {
+          has_risk: "false"
+        }
+      }
+    }
+
+    assert_response :redirect
+    tab_rating_flash = flash[:tab_rating]
+    assert_not_nil tab_rating_flash
+    assert_includes %w[safe caution danger incomplete], tab_rating_flash["rating"]
+    assert_equal "권리분석", tab_rating_flash["label"]
+    assert tab_rating_flash.key?("unanswered_count")
+  end
+
+  test "update with no resolutions still sets flash" do
+    patch property_inspections_tab_url(@property, tab_key: "rights_analysis"), params: {}
+
+    assert_response :redirect
+    tab_rating_flash = flash[:tab_rating]
+    assert_not_nil tab_rating_flash
+  end
 end
