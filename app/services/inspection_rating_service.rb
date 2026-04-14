@@ -1,4 +1,6 @@
 class InspectionRatingService
+  ANALYSIS_TABS = %w[rights_analysis property_analysis profit_analysis field_check bidding].freeze
+
   def self.call(property:, user:)
     new(property:, user:).call
   end
@@ -10,12 +12,11 @@ class InspectionRatingService
 
   def call
     results = @property.inspection_results.where(user: @user)
+    answered = results.where.not(has_risk: nil)
 
-    if results.exists?(has_risk: nil)
-      return :incomplete
-    end
+    return :incomplete if answered.empty?
 
-    risk_results = results.where(has_risk: true)
+    risk_results = answered.where(has_risk: true)
 
     rating = if risk_results.exists?(resolvable: false)
       :danger
@@ -37,9 +38,11 @@ class InspectionRatingService
       .where(inspection_items: { tab: tab_int }, user: @user)
 
     return nil if results.empty?
-    return :incomplete if results.exists?(has_risk: nil)
 
-    risk_results = results.where(has_risk: true)
+    answered = results.where.not(has_risk: nil)
+    return :incomplete if answered.empty?
+
+    risk_results = answered.where(has_risk: true)
 
     if risk_results.exists?(resolvable: false)
       :danger
@@ -48,5 +51,18 @@ class InspectionRatingService
     else
       :safe
     end
+  end
+
+  def fully_evaluated?
+    results = @property.inspection_results.where(user: @user)
+    results.any? && results.where(has_risk: nil).none?
+  end
+
+  def tabs_evaluated_count
+    evaluated = ANALYSIS_TABS.count do |tab_key|
+      rating = tab_rating(tab_key)
+      rating && rating != :incomplete
+    end
+    [ evaluated, ANALYSIS_TABS.size ]
   end
 end
