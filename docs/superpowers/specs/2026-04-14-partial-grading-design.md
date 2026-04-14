@@ -82,9 +82,10 @@ Same logic change applied at tab scope — evaluate only answered items within t
 After saving individual results (existing logic), add:
 
 ```ruby
-# After result updates
-rating = InspectionRatingService.call(property: @property, user: current_user)
-tab_rating = InspectionRatingService.new(property: @property, user: current_user).tab_rating(@tab_key)
+# After result updates — reuse single service instance for both calls
+rating_service = InspectionRatingService.new(property: @property, user: current_user)
+overall_rating = rating_service.call
+tab_rating = rating_service.tab_rating(@tab_key)
 
 tab_results = @property.inspection_results
   .joins(:inspection_item)
@@ -135,6 +136,8 @@ Display conditions:
 
 When all items are answered, the badge disappears and only the existing counter remains.
 
+**N+1 query prevention:** `InspectionTabsComponent` already calls `tab_counts` per tab which issues individual queries. The existing `tab_rating` calls also query per tab. To avoid N+1, the implementation should batch-load all tab statistics in a single grouped query during `initialize` and cache the results, rather than querying per-tab in the loop.
+
 ### 6. GradeSummaryComponent Semantics
 
 **File:** `app/components/grade_summary_component.rb`
@@ -144,6 +147,13 @@ When all items are answered, the badge disappears and only the existing counter 
 - **New:** "미평가" — shown only when zero items are answered across all tabs
 
 The component should also show progress info: "5개 중 3개 탭 분석 완료" alongside the overall grade when not all tabs have been evaluated.
+
+**Partial evaluation visual distinction:** When the grade is based on partial data (not all tabs fully answered), the grade badge should be visually differentiated from a fully-completed evaluation:
+- Append "(진행 중)" to the grade label — e.g., "안전 (진행 중)" vs "안전"
+- Use reduced opacity (e.g., `opacity-75`) on the badge to subtly indicate incomplete status
+- This prevents users from mistaking a partial "안전" for a fully-evaluated "안전"
+
+Fully evaluated = all `inspection_results` for this property+user have `has_risk != nil`.
 
 ### 7. Data Flow Summary
 
