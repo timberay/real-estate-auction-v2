@@ -15,7 +15,8 @@ module Sidebar
         MenuItem.new(label: "리포트 내보내기", icon: "arrow-down-tray", path: nil, enabled: false)
       ],
       "가이드" => [
-        MenuItem.new(label: "명도 가이드", icon: "key", path: nil, enabled: false)
+        MenuItem.new(label: "명도 가이드", icon: "book-open", path: "/eviction_guide", enabled: true),
+        MenuItem.new(label: "명도 시뮬레이터", icon: "play-circle", path: "/eviction_guide/simulator", enabled: true)
       ]
     }.freeze
 
@@ -51,15 +52,6 @@ module Sidebar
         name: name,
         variant: :outline,
         options: { class: "w-5 h-5 flex-shrink-0" },
-        path_options: {}
-      )
-    end
-
-    def chevron_icon
-      raw Heroicon::Icon.render(
-        name: "chevron-down",
-        variant: :outline,
-        options: { class: "w-4 h-4 transition-transform duration-200" },
         path_options: {}
       )
     end

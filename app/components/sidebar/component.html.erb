@@ -2,17 +2,13 @@
   <div class="flex flex-col py-4 h-full">
     <div class="flex-1 space-y-2 px-2 overflow-y-auto overflow-x-hidden">
       <% MENU_GROUPS.each do |group_title, items| %>
-        <div data-controller="dropdown">
-          <%# Group header — hidden when collapsed %>
-          <button type="button"
-                  class="hidden lg:flex items-center justify-between w-full px-2 py-2 text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400"
-                  data-action="dropdown#toggle"
-                  data-sidebar-group>
+        <div>
+          <%# Group header %>
+          <div class="hidden lg:flex items-center w-full px-2 py-2 text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             <span><%= group_title %></span>
-            <span data-dropdown-target="chevron" class="rotate-180"><%= chevron_icon %></span>
-          </button>
+          </div>
 
-          <div data-dropdown-target="menu" class="space-y-1">
+          <div class="space-y-1">
             <% items.each do |item| %>
               <% if item.enabled %>
                 <a href="<%= item.path %>"

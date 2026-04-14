@@ -28,28 +28,11 @@ module Sidebar
       assert_text "가이드"
     end
 
-    test "renders group titles with dropdown controller" do
+    test "renders all menu items without dropdown collapse" do
       render_inline(Sidebar::Component.new)
 
-      assert_selector "[data-controller='dropdown']", count: 3
-    end
-
-    test "renders group toggle buttons" do
-      render_inline(Sidebar::Component.new)
-
-      assert_selector "[data-action='dropdown#toggle']", count: 3
-    end
-
-    test "renders dropdown menu targets" do
-      render_inline(Sidebar::Component.new)
-
-      assert_selector "[data-dropdown-target='menu']", count: 3
-    end
-
-    test "renders chevron targets" do
-      render_inline(Sidebar::Component.new)
-
-      assert_selector "[data-dropdown-target='chevron']", count: 3
+      assert_no_selector "[data-controller='dropdown']"
+      assert_no_selector "[data-action='dropdown#toggle']"
     end
 
     # --- Menu items ---
@@ -67,7 +50,13 @@ module Sidebar
 
       assert_text "순수익 계산기"
       assert_text "리포트 내보내기"
-      assert_text "명도 가이드"
+    end
+
+    test "renders eviction guide as enabled links" do
+      render_inline(Sidebar::Component.new)
+
+      assert_selector "a[href='/eviction_guide']", text: "명도 가이드"
+      assert_selector "a[href='/eviction_guide/simulator']", text: "명도 시뮬레이터"
     end
 
     test "renders enabled items as links" do
@@ -81,7 +70,7 @@ module Sidebar
     test "renders disabled items as disabled buttons" do
       render_inline(Sidebar::Component.new)
 
-      assert_selector "button[disabled]", minimum: 3
+      assert_selector "button[disabled]", minimum: 2
     end
 
     test "renders disabled items with opacity" do
