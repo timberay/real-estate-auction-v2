@@ -41,7 +41,11 @@ module EvictionGuide
       @simulation = find_simulation
       return redirect_to eviction_guide_simulator_path unless @simulation
 
-      @simulation.update!(completed: true)
+      @simulation.result_path = EvictionGuide::PathBuilder.call(@simulation.answers)
+      @simulation.difficulty_level = EvictionGuide::DifficultyAssessor.call(@simulation.answers)
+      @simulation.completed = true
+      @simulation.save!
+
       render "eviction_guide/simulator/result", layout: "application"
     end
 
