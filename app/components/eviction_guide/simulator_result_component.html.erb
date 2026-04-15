@@ -1,4 +1,13 @@
 <div class="max-w-2xl mx-auto">
+  <%# Occupant type badge %>
+  <% if occupant_type_label %>
+    <div class="text-center mb-2">
+      <span class="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-semibold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300">
+        점유자 유형: <%= occupant_type_label %>
+      </span>
+    </div>
+  <% end %>
+
   <%# Difficulty badge %>
   <div class="text-center mb-6">
     <%= render EvictionGuide::DifficultyBadgeComponent.new(level: @simulation.difficulty_level || "medium") %>

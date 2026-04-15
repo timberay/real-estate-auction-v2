@@ -24,5 +24,9 @@ module EvictionGuide
     def status_badge(status)
       STATUS_BADGE[status] || STATUS_BADGE["needed"]
     end
+
+    def occupant_type_label
+      @simulation.occupant_type_label
+    end
   end
 end

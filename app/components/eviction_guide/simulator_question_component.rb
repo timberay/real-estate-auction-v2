@@ -8,20 +8,18 @@ module EvictionGuide
 
     private
 
-    def progress_percent
-      answered = @simulation&.answers&.size || 0
-      remaining = count_remaining_steps(@question.code)
-      total = answered + remaining
-      return 0 if total.zero?
-      ((answered.to_f / total) * 100).round
+    def occupant_type_label
+      @simulation&.occupant_type_label
     end
 
-    def count_remaining_steps(code, visited = Set.new)
-      return 0 if code.blank? || code == "END" || visited.include?(code)
-      visited.add(code)
-      q = EvictionSimulatorQuestion.find_by(code: code)
-      return 0 unless q
-      1 + count_remaining_steps(q.yes_next_code, visited)
+    def progress_percent
+      answered = @simulation&.answers&.size || 0
+      total_main = EvictionStep
+        .for_occupant_type(@simulation&.occupant_type)
+        .main
+        .count
+      return 0 if total_main.zero?
+      [ ((answered.to_f / total_main) * 100).round, 100 ].min
     end
 
     def yes_ends?
