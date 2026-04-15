@@ -57,7 +57,9 @@
       }
     ],
     "reasoning": "말소기준권리는 2024-01-15 설정된 ○○은행 근저당권(채권최고액 2억원)입니다. 이보다 선순위인 임차인 김○○(전입 2023-06-01, 보증금 5천만원)은 대항력이 있어 낙찰자가 인수해야 합니다. 후순위 전세권과 가압류는 매각으로 소멸합니다.",
-    "checklist_references": ["rights-002"]
+    "checklist_references": [
+      "rights-002"
+    ]
   },
   "results": {
     "rights-002": {
@@ -114,6 +116,11 @@
       "has_risk": null,
       "confidence": "none",
       "reasoning": "해당 물건은 단독주택이므로 이 항목(아파트 전용)은 직접 확인이 필요합니다. AI 의견: 등기부등본에서 HUG 관련 기재를 확인할 수 없었습니다."
+    },
+    "rights-024": {
+      "has_risk": false,
+      "confidence": "high",
+      "reasoning": "대항력 있는 임차인이 확인되지 않습니다."
     }
   }
 }
