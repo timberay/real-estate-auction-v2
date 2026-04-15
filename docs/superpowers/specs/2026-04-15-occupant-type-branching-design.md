@@ -19,6 +19,8 @@ Eviction simulator currently uses a single linear step sequence (S1~S15) for all
 
 Add `occupant_type` column (string, nullable). Null means legacy simulation without type selection.
 
+**Validation**: Do NOT add model-level `validates :occupant_type, presence: true` — this would break legacy records on any save (e.g., `record_answer`). Enforce presence at the controller level for new simulations only.
+
 ### EvictionStep
 
 Add `occupant_type` column (string, nullable). Null means shared/legacy step. Non-null means type-specific step.
@@ -65,7 +67,8 @@ Each occupant type has a `type_summary` entry in seed data for the result screen
 3. Extracted type displayed on prefill screen, user can confirm or change via select/radio
 4. "AI가 권리분석 보고서에서 추출" label shown next to auto-selected type
 5. If F02 extraction returns nil (occupant_type not in report), field shows as unselected — user must manually choose before proceeding
-6. Confirmed type saved to `EvictionSimulation.occupant_type`
+6. **F02 value normalization**: F02DataExtractor must map/sanitize the LLM-extracted value to one of the 4 valid enum strings (`junior_tenant`, `senior_tenant`, `debtor_owner`, `illegal_occupant`). Unrecognized values are treated as nil (manual selection required).
+7. Confirmed type saved to `EvictionSimulation.occupant_type`
 7. Simulator starts with that type's step sequence
 
 ### Scenario B: Standalone (No Property)
@@ -138,7 +141,7 @@ Existing F02PrefillComponent gains occupant type field:
 ### Simulator Progress
 
 - Occupant type badge displayed at top throughout simulation
-- Progress bar calculated against that type's total step count
+- Progress bar calculated against that type's **main steps only** (`step_type: :main`). Branch steps are conditional and must not inflate the denominator.
 
 ### Result Screen
 
