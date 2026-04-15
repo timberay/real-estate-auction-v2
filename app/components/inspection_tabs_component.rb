@@ -32,21 +32,21 @@ class InspectionTabsComponent < ViewComponent::Base
   end
 
   def load_tab_stats
-    results = @property.inspection_results
-      .joins(:inspection_item)
+    all_results = @property.inspection_results
       .where(user: @user)
-      .group("inspection_items.tab")
-      .select(
-        "inspection_items.tab",
-        "COUNT(*) AS total_count",
-        "COUNT(CASE WHEN inspection_results.has_risk IS NOT NULL THEN 1 END) AS checked_count"
-      )
+      .includes(:inspection_item)
+    answered_context = all_results.index_by { |r| r.inspection_item.code }
+    property_type = @property.property_type
 
-    tab_int_to_key = InspectionItem.tabs.invert
-    results.each_with_object({}) do |row, hash|
-      key = tab_int_to_key[row.tab.to_i]
-      next unless key
-      hash[key] = { checked: row.checked_count.to_i, total: row.total_count.to_i }
+    visible = all_results.select do |r|
+      r.inspection_item.visible_for?(property_type: property_type, answered_results: answered_context)
+    end
+
+    visible.group_by { |r| r.inspection_item.tab }.each_with_object({}) do |(tab_key, results_in_tab), hash|
+      hash[tab_key] = {
+        checked: results_in_tab.count { |r| !r.has_risk.nil? },
+        total: results_in_tab.size
+      }
     end
   end
 
