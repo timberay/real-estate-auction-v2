@@ -35,6 +35,18 @@ class EvictionStepTest < ActiveSupport::TestCase
     branches.each { |s| assert s.branch? }
   end
 
+  test "for_occupant_type returns only matching occupant_type steps" do
+    jt_steps = EvictionStep.for_occupant_type("junior_tenant")
+    assert jt_steps.any?
+    jt_steps.each { |s| assert_equal "junior_tenant", s.occupant_type }
+  end
+
+  test "for_occupant_type with nil returns only legacy steps" do
+    legacy_steps = EvictionStep.for_occupant_type(nil)
+    assert legacy_steps.any?
+    legacy_steps.each { |s| assert_nil s.occupant_type }
+  end
+
   test "branches_for returns branches triggered by a main step" do
     s1 = eviction_steps(:s1_rights_analysis)
     branches = EvictionStep.branches_for(s1.code)

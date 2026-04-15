@@ -7,6 +7,7 @@ class EvictionSimulatorQuestion < ApplicationRecord
   validates :question, presence: true
 
   scope :ordered, -> { order(:id) }
+  scope :for_occupant_type, ->(type) { where(occupant_type: type) }
 
   def step
     EvictionStep.find_by(code: step_code)

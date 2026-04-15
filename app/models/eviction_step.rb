@@ -9,6 +9,7 @@ class EvictionStep < ApplicationRecord
 
   scope :ordered, -> { order(:position) }
   scope :branches_for, ->(step_code) { branch.where(trigger_step_code: step_code).ordered }
+  scope :for_occupant_type, ->(type) { where(occupant_type: type) }
 
   def branches
     return EvictionStep.none unless main? && branch_codes.present?

@@ -8,6 +8,16 @@ q1_rights_done:
   no_next_code: "Q1G"
   f02_field_mapping: "has_rights_analysis"
 
+jt_q1_dividend:
+  code: "JT-Q1"
+  phase: 0
+  step_code: "JT-S1"
+  question: "배당표에서 임차인이 배당을 수령했나요?"
+  help_text: "배당 수령 여부에 따라 협상 전략이 달라집니다."
+  yes_next_code: "JT-Q2"
+  no_next_code: "JT-Q1G"
+  occupant_type: "junior_tenant"
+
 q5_delivery_order:
   code: "Q5"
   phase: 1

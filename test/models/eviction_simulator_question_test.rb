@@ -17,6 +17,18 @@ class EvictionSimulatorQuestionTest < ActiveSupport::TestCase
     assert_not dup.valid?
   end
 
+  test "for_occupant_type returns only matching occupant_type questions" do
+    jt_questions = EvictionSimulatorQuestion.for_occupant_type("junior_tenant")
+    assert jt_questions.any?
+    jt_questions.each { |q| assert_equal "junior_tenant", q.occupant_type }
+  end
+
+  test "for_occupant_type with nil returns only legacy questions" do
+    legacy_questions = EvictionSimulatorQuestion.for_occupant_type(nil)
+    assert legacy_questions.any?
+    legacy_questions.each { |q| assert_nil q.occupant_type }
+  end
+
   test "phase enum" do
     q = EvictionSimulatorQuestion.new(phase: "summary")
     assert q.summary?

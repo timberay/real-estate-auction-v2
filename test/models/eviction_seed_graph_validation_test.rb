@@ -18,14 +18,14 @@ class EvictionSeedGraphValidationTest < ActiveSupport::TestCase
   end
 
   test "all next_step_code values resolve to valid steps" do
-    EvictionStep.main.where.not(next_step_code: nil).find_each do |step|
+    EvictionStep.main.for_occupant_type(nil).where.not(next_step_code: nil).find_each do |step|
       target = EvictionStep.find_by(code: step.next_step_code)
       assert target, "Step #{step.code} points to missing next_step_code: #{step.next_step_code}"
     end
   end
 
   test "all branch_codes resolve to valid branch steps" do
-    EvictionStep.main.find_each do |step|
+    EvictionStep.main.for_occupant_type(nil).find_each do |step|
       codes = step.branch_codes
       next unless codes.present?
       codes = JSON.parse(codes) if codes.is_a?(String)
@@ -38,7 +38,7 @@ class EvictionSeedGraphValidationTest < ActiveSupport::TestCase
   end
 
   test "all return_step_code values resolve to valid main steps" do
-    EvictionStep.branch.where.not(return_step_code: nil).find_each do |branch|
+    EvictionStep.branch.for_occupant_type(nil).where.not(return_step_code: nil).find_each do |branch|
       target = EvictionStep.find_by(code: branch.return_step_code)
       assert target, "Branch #{branch.code} points to missing return_step_code: #{branch.return_step_code}"
       assert target.main?, "Branch #{branch.code} return_step_code #{branch.return_step_code} is not a main type"
@@ -46,7 +46,7 @@ class EvictionSeedGraphValidationTest < ActiveSupport::TestCase
   end
 
   test "all trigger_step_code values resolve to valid main steps" do
-    EvictionStep.branch.find_each do |branch|
+    EvictionStep.branch.for_occupant_type(nil).find_each do |branch|
       next unless branch.trigger_step_code
       target = EvictionStep.find_by(code: branch.trigger_step_code)
       assert target, "Branch #{branch.code} has missing trigger_step_code: #{branch.trigger_step_code}"
@@ -55,7 +55,7 @@ class EvictionSeedGraphValidationTest < ActiveSupport::TestCase
   end
 
   test "all yes_next_code and no_next_code resolve to valid questions or END" do
-    EvictionSimulatorQuestion.find_each do |q|
+    EvictionSimulatorQuestion.for_occupant_type(nil).find_each do |q|
       [ q.yes_next_code, q.no_next_code ].compact.each do |code|
         next if code == "END"
         target = EvictionSimulatorQuestion.find_by(code: code)
@@ -71,7 +71,7 @@ class EvictionSeedGraphValidationTest < ActiveSupport::TestCase
   end
 
   test "no orphan questions — all are reachable from Q1" do
-    all_codes = EvictionSimulatorQuestion.pluck(:code).to_set
+    all_codes = EvictionSimulatorQuestion.for_occupant_type(nil).pluck(:code).to_set
     reachable = Set.new
     queue = [ "Q1" ]
 

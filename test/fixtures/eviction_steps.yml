@@ -26,6 +26,34 @@ s5_delivery_order:
   next_step_code: "S6"
   branch_codes: '["B6"]'
 
+jt_s1_dividend_check:
+  code: "JT-S1"
+  step_type: 0
+  name: "배당표 확인"
+  description: "배당 수령 여부와 금액을 확인"
+  completion_condition: "배당 수령 확인 완료"
+  failure_condition: "배당 미수령"
+  required_documents: '["배당표"]'
+  estimated_duration: "1~2주"
+  position: 1
+  next_step_code: "JT-S2"
+  branch_codes: '["JT-B1"]'
+  occupant_type: "junior_tenant"
+
+jt_b1_no_dividend:
+  code: "JT-B1"
+  step_type: 1
+  name: "배당 미수령"
+  description: "임차인이 배당을 수령하지 않은 경우"
+  trigger_step_code: "JT-S1"
+  problem_summary: "임차인 배당 미수령으로 퇴거 의무 불명확"
+  root_cause: "배당요구 미신청 또는 배당금 미수령"
+  action_steps: '["배당요구 여부 재확인", "임차인과 직접 협의"]'
+  return_step_code: "JT-S2"
+  position: 101
+  estimated_duration: "2~4주"
+  occupant_type: "junior_tenant"
+
 b1_deposit_risk:
   code: "B1"
   step_type: 1
