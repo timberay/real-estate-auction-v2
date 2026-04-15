@@ -41,4 +41,26 @@ class EvictionGuide::PathBuilderTest < ActiveSupport::TestCase
     path = EvictionGuide::PathBuilder.call({})
     assert_equal [], path
   end
+
+  test "filters steps by occupant_type when provided" do
+    answers = { "JT-Q1" => true }
+    path = EvictionGuide::PathBuilder.call(answers, occupant_type: "junior_tenant")
+    assert_kind_of Array, path
+    step_codes = path.map { |e| e[:code] }
+    step_codes.each do |code|
+      step = EvictionStep.find_by(code: code)
+      assert_equal "junior_tenant", step.occupant_type
+    end
+  end
+
+  test "legacy behavior unchanged when occupant_type is nil" do
+    answers = { "Q1" => true, "Q2" => true }
+    path = EvictionGuide::PathBuilder.call(answers, occupant_type: nil)
+    assert_kind_of Array, path
+    step_codes = path.map { |e| e[:code] }
+    step_codes.each do |code|
+      step = EvictionStep.find_by(code: code)
+      assert_nil step.occupant_type
+    end
+  end
 end

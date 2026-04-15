@@ -1,13 +1,13 @@
 module EvictionGuide
   class PathBuilder
-    def self.call(answers)
-      new(answers).call
+    def self.call(answers, occupant_type: nil)
+      new(answers, occupant_type).call
     end
 
-    def initialize(answers)
+    def initialize(answers, occupant_type = nil)
       @answers = answers || {}
-      @questions = EvictionSimulatorQuestion.all.index_by(&:code)
-      @steps = EvictionStep.all.index_by(&:code)
+      @questions = EvictionSimulatorQuestion.for_occupant_type(occupant_type).index_by(&:code)
+      @steps = EvictionStep.for_occupant_type(occupant_type).index_by(&:code)
     end
 
     def call
