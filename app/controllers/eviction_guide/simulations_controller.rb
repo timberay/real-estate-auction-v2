@@ -3,6 +3,7 @@ module EvictionGuide
     def create
       property_id = params[:property_id].presence&.to_i
       occupant_type = params[:occupant_type].presence
+      occupant_type = nil unless EvictionSimulation::OCCUPANT_TYPES.include?(occupant_type)
 
       @simulation = if property_id
         EvictionSimulation.find_or_initialize_by(property_id: property_id)
@@ -36,6 +37,16 @@ module EvictionGuide
     def update
       @simulation = find_simulation
       return head(:not_found) unless @simulation
+
+      # Handle occupant_type selection from select_type page
+      if params[:occupant_type].present?
+        occupant_type = params[:occupant_type]
+        return redirect_to eviction_guide_simulator_select_type_path unless EvictionSimulation::OCCUPANT_TYPES.include?(occupant_type)
+
+        @simulation.occupant_type = occupant_type
+        @simulation.save!
+        return redirect_to eviction_guide_simulator_question_path(code: first_question_code(occupant_type))
+      end
 
       question_code = params[:question_code]
       answer = params[:answer] == "true"

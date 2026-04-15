@@ -50,20 +50,21 @@ class EvictionGuideControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "full junior_tenant standalone flow" do
-    # Step 1: Create with type
-    post eviction_guide_simulation_url, params: { occupant_type: "junior_tenant" }
+  test "full junior_tenant standalone flow via select_type" do
+    # Step 1: Create without type → redirects to select_type
+    post eviction_guide_simulation_url
+    assert_redirected_to eviction_guide_simulator_select_type_path
+
+    # Step 2: Select type via PATCH → updates existing simulation
+    patch eviction_guide_simulation_url, params: { occupant_type: "junior_tenant" }
     assert_response :redirect
     follow_redirect!
     assert_response :success
 
-    # Step 2: Answer JT-Q1 = yes
+    # Step 3: Answer JT-Q1 through JT-Q6 = yes
     patch eviction_guide_simulation_url, params: {
       question_code: "JT-Q1", answer: "true", next_code: "JT-Q2"
     }
-    assert_response :redirect
-
-    # Step 3: Answer remaining questions yes
     patch eviction_guide_simulation_url, params: {
       question_code: "JT-Q2", answer: "true", next_code: "JT-Q3"
     }
@@ -84,5 +85,12 @@ class EvictionGuideControllerTest < ActionDispatch::IntegrationTest
     # Step 4: View result
     get eviction_guide_simulation_url
     assert_response :success
+  end
+
+  test "invalid occupant_type is rejected" do
+    post eviction_guide_simulation_url, params: { occupant_type: "malicious_type" }
+    sim = EvictionSimulation.order(:created_at).last
+    assert_nil sim.occupant_type
+    assert_redirected_to eviction_guide_simulator_select_type_path
   end
 end
