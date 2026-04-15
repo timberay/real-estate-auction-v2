@@ -64,6 +64,7 @@ Rails.application.routes.draw do
 
   namespace :eviction_guide do
     resource :simulation, only: [ :create, :update, :show ]
+    get "simulator/prefill", to: "simulations#prefill", as: :simulator_prefill
     get "simulator/question/:code", to: "simulator#question", as: :simulator_question
     get "steps/:code", to: "steps#show", as: :step_detail
     get "branches/:code", to: "branches#show", as: :branch_detail

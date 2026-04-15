@@ -18,9 +18,7 @@ module EvictionGuide
       session[:eviction_simulation_id] = @simulation.id
 
       if @simulation.property_linked?
-        @property = @simulation.property
-        @prefill_data = EvictionGuide::F02DataExtractor.call(@property)
-        render "eviction_guide/simulator/prefill"
+        redirect_to eviction_guide_simulator_prefill_path
       else
         redirect_to eviction_guide_simulator_question_path(code: "Q1")
       end
@@ -54,6 +52,15 @@ module EvictionGuide
       @simulation.save!
 
       render "eviction_guide/simulator/result", layout: "application"
+    end
+
+    def prefill
+      @simulation = find_simulation
+      return redirect_to eviction_guide_simulator_path unless @simulation&.property_linked?
+
+      @property = @simulation.property
+      @prefill_data = EvictionGuide::F02DataExtractor.call(@property)
+      render "eviction_guide/simulator/prefill"
     end
 
     private
