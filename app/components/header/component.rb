@@ -38,6 +38,5 @@ module Header
         path_options: {}
       )
     end
-
   end
 end
