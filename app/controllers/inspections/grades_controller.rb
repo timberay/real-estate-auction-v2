@@ -14,10 +14,11 @@ module Inspections
         .where(user: current_user)
         .includes(:inspection_item)
       answered_context = all_results.index_by { |r| r.inspection_item.code }
+      all_items_by_code = all_results.map(&:inspection_item).index_by(&:code)
       property_type = @property.property_type
 
       @results_by_tab = all_results
-        .select { |r| r.inspection_item.visible_for?(property_type:, answered_results: answered_context) }
+        .select { |r| r.inspection_item.visible_for?(property_type:, answered_results: answered_context, all_items_by_code: all_items_by_code) }
         .group_by { |r| r.inspection_item.tab }
 
       @risk_results = @property.inspection_results
