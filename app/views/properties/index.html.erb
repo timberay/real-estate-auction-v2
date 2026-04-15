@@ -53,7 +53,8 @@
       <%= form_with url: properties_path, method: :post, class: "contents", data: { action: "submit->criteria-search#submitCaseNumber" } do |f| %>
         <%= f.text_field :case_number,
             placeholder: "예: 2026타경1234",
-            data: { criteria_search_target: "caseInput" },
+            required: true,
+            data: { criteria_search_target: "caseInput", action: "input->criteria-search#clearCaseError" },
             class: "flex-1 min-w-0 h-10 rounded-md border px-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" %>
         <button type="submit" data-criteria-search-target="addButton"
                 class="inline-flex items-center justify-center gap-1.5 w-24 h-10 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 text-white transition-colors">
@@ -68,6 +69,7 @@
         </button>
       <% end %>
     </div>
+    <p class="hidden text-sm text-red-500 dark:text-red-400 mt-1" data-criteria-search-target="caseError">사건번호를 입력해주세요</p>
     <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">법원을 선택하면 빠르게 검색됩니다</p>
   </div>
 

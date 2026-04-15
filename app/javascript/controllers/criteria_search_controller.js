@@ -4,7 +4,8 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   static targets = [
     "submitButton", "buttonText", "buttonSpinner",
-    "caseInput", "addButton", "addButtonText", "addButtonSpinner"
+    "caseInput", "addButton", "addButtonText", "addButtonSpinner",
+    "caseError"
   ]
 
   connect() {
@@ -50,8 +51,20 @@ export default class extends Controller {
     this.showSpinner("buttonText", "buttonSpinner")
   }
 
-  // Case number form submit — use readOnly instead of disabled so value is submitted
-  submitCaseNumber() {
+  // Case number form submit — validate then use readOnly so value is submitted
+  submitCaseNumber(event) {
+    if (this.hasCaseErrorTarget) {
+      this.caseErrorTarget.classList.add("hidden")
+    }
+
+    if (this.hasCaseInputTarget && this.caseInputTarget.value.trim() === "") {
+      event.preventDefault()
+      if (this.hasCaseErrorTarget) {
+        this.caseErrorTarget.classList.remove("hidden")
+      }
+      return
+    }
+
     if (this.hasCaseInputTarget) this.caseInputTarget.readOnly = true
     if (this.hasSubmitButtonTarget) {
       this.submitButtonTarget.disabled = true
@@ -62,6 +75,12 @@ export default class extends Controller {
       this.addButtonTarget.classList.add("opacity-50", "cursor-not-allowed")
     }
     this.showSpinner("addButtonText", "addButtonSpinner")
+  }
+
+  clearCaseError() {
+    if (this.hasCaseErrorTarget) {
+      this.caseErrorTarget.classList.add("hidden")
+    }
   }
 
   enable() {
