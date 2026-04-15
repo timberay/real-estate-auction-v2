@@ -11,7 +11,7 @@
           <div class="space-y-1">
             <% items.each do |item| %>
               <% if item.enabled %>
-                <a href="<%= item.path %>"
+                <a href="<%= resolve_path(item) %>"
                    class="<%= item_classes(item) %>"
                    data-sidebar-item
                    title="<%= item.label %>">

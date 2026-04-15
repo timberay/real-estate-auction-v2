@@ -6,13 +6,13 @@ module Sidebar
 
     MENU_GROUPS = {
       "물건검색" => [
-        MenuItem.new(label: "예산 설정", icon: "calculator", path: "/onboarding", enabled: true),
-        MenuItem.new(label: "물건 목록", icon: "magnifying-glass", path: "/properties", enabled: true),
-        MenuItem.new(label: "AI분석", icon: "document-plus", path: "/analyses/new", enabled: true)
+        MenuItem.new(label: "예산 설정", icon: "calculator", path: :start_onboarding_path, enabled: true),
+        MenuItem.new(label: "물건 목록", icon: "magnifying-glass", path: :properties_path, enabled: true),
+        MenuItem.new(label: "AI분석", icon: "document-plus", path: :new_analysis_path, enabled: true)
       ],
       "가이드" => [
-        MenuItem.new(label: "명도 가이드", icon: "book-open", path: "/eviction_guide", enabled: true),
-        MenuItem.new(label: "명도 시뮬레이터", icon: "play", path: "/eviction_guide/simulator", enabled: true)
+        MenuItem.new(label: "명도 가이드", icon: "book-open", path: :eviction_guide_guide_path, enabled: true),
+        MenuItem.new(label: "명도 시뮬레이터", icon: "play", path: :eviction_guide_simulator_path, enabled: true)
       ]
     }.freeze
 
@@ -28,15 +28,21 @@ module Sidebar
 
     private
 
+    def resolve_path(item)
+      helpers.public_send(item.path)
+    end
+
     def active?(item)
-      return false unless item.path.present? && @current_path.start_with?(item.path)
+      resolved = resolve_path(item)
+      return false unless resolved.present? && @current_path.start_with?(resolved)
 
       # Prefer the longest matching path to avoid /eviction_guide matching /eviction_guide/simulator
       all_items = MENU_GROUPS.values.flatten
       all_items.none? do |other|
-        other.path.present? && other.path != item.path &&
-          other.path.length > item.path.length &&
-          @current_path.start_with?(other.path)
+        other_resolved = resolve_path(other)
+        other_resolved.present? && other_resolved != resolved &&
+          other_resolved.length > resolved.length &&
+          @current_path.start_with?(other_resolved)
       end
     end
 
