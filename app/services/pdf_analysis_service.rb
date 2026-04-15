@@ -29,7 +29,11 @@ class PdfAnalysisService
     pdf_blobs = collect_documents
     return Result.new(success?: false, error: "문서를 먼저 업로드해주세요.") if pdf_blobs.empty?
 
-    items = InspectionItem.ordered
+    items = if @property&.property_type.present?
+      InspectionItem.applicable_for_type(@property.property_type).ordered
+    else
+      InspectionItem.ordered
+    end
     prompts = Inspection::PdfPromptBuilder.call(items: items)
 
     llm = Llm::Base.for
