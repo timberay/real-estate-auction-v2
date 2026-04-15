@@ -273,6 +273,7 @@ rights_009:
   data_source_name: "수동 입력"
   priority: "상"
   yes_means_safe: true
+  depends_on: '<%= { code: "rights-003", show_when_risk: true }.to_json %>'
 
 bidding_001:
   code: "bidding-001"

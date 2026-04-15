@@ -28,6 +28,16 @@ manual_unanswered:
   inspection_item: manual_001
   user: guest
 
+safe_apartment_rights_009:
+  property: safe_apartment
+  inspection_item: rights_009
+  user: guest
+
+risky_villa_rights_009:
+  property: risky_villa
+  inspection_item: rights_009
+  user: guest
+
 manual_risk:
   property: risky_villa
   inspection_item: manual_001

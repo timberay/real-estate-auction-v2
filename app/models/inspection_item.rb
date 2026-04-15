@@ -32,13 +32,18 @@ class InspectionItem < ApplicationRecord
     applicable_for?(property_type) && !skip_for?(answered_results)
   end
 
+  def depends_on
+    val = super
+    val.is_a?(String) ? JSON.parse(val) : val
+  end
+
   def skip_for?(answered_results_by_code)
     return false if depends_on.blank?
 
     parent_code = depends_on["code"]
     parent_result = answered_results_by_code[parent_code]
 
-    return false if parent_result.nil? || parent_result.has_risk.nil?
+    return true if parent_result.nil? || parent_result.has_risk.nil?
 
     parent_result.has_risk != depends_on["show_when_risk"]
   end

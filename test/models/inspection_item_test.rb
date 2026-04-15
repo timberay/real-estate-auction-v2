@@ -133,19 +133,19 @@ class InspectionItemTest < ActiveSupport::TestCase
     assert_equal false, item.skip_for?({})
   end
 
-  test "skip_for? returns false when parent is unanswered (conservative)" do
+  test "skip_for? returns true when parent result does not exist" do
     item = InspectionItem.new(code: "child-002", tab: "rights_analysis", tab_position: 1,
       category: "권리분석", question: "Q?", priority: "상",
       depends_on: { "code" => "rights-003", "show_when_risk" => true })
-    assert_equal false, item.skip_for?({})
+    assert_equal true, item.skip_for?({})
   end
 
-  test "skip_for? returns false when parent has_risk is nil" do
+  test "skip_for? returns true when parent has_risk is nil" do
     item = InspectionItem.new(code: "child-003", tab: "rights_analysis", tab_position: 1,
       category: "권리분석", question: "Q?", priority: "상",
       depends_on: { "code" => "parent-001", "show_when_risk" => true })
     parent_result = OpenStruct.new(has_risk: nil)
-    assert_equal false, item.skip_for?({ "parent-001" => parent_result })
+    assert_equal true, item.skip_for?({ "parent-001" => parent_result })
   end
 
   test "skip_for? returns true when parent has_risk does not match show_when_risk" do
