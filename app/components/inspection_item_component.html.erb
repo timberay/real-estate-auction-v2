@@ -142,11 +142,11 @@
       <div class="flex items-center gap-4 rounded-md bg-slate-50 dark:bg-slate-700/50 px-3 py-2">
         <label class="inline-flex items-center text-sm font-medium text-slate-800 dark:text-slate-100">
           <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", yes_radio_value, @result.has_risk == (yes_radio_value == "true"),
-              data: { action: "change->inspection-item#toggleManualRisk" }, class: "mr-1.5" %> 예
+              data: { action: "change->inspection-item#toggleManualRisk change->checklist-dependency#toggle" }, class: "mr-1.5" %> 예
         </label>
         <label class="inline-flex items-center text-sm font-medium text-slate-800 dark:text-slate-100">
           <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", no_radio_value, @result.has_risk == (no_radio_value == "true"),
-              data: { action: "change->inspection-item#toggleManualRisk" }, class: "mr-1.5" %> 아니오
+              data: { action: "change->inspection-item#toggleManualRisk change->checklist-dependency#toggle" }, class: "mr-1.5" %> 아니오
         </label>
       </div>
       <div data-inspection-item-target="resolutionSection" class="<%= 'hidden' unless @result.has_risk %> mt-3 rounded-md border border-dashed border-yellow-400 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-900/20 p-3">
