@@ -1,5 +1,216 @@
 # E2E Test Report
 
+## Run 8: Bugfix & Polish Re-verification (2026-04-15)
+
+- **Test date**: 2026-04-15
+- **Target URL**: http://localhost:3000
+- **Context**: Re-verification of all fixes from Run 7 audit (Tasks 1–6 of E2E Bugfix & Polish plan)
+- **Total checks**: 6 | **Passed**: 6 | **Failed**: 0
+
+---
+
+### Verification Results
+
+| Check | Issue | Fix Applied | Result | Screenshot |
+|-------|-------|-------------|--------|------------|
+| Header buttons (T1) | H-3, H-4: 알림/사용자 메뉴 미구현 | Buttons removed entirely | ✅ PASS — only dark mode toggle remains | `verify-t1-header-cleanup.png` |
+| Dark mode toggle (T2) | H-5: 토글 시 페이지 이동 | `event.preventDefault()` + `stopPropagation()` added | ✅ PASS — URL stays on `/properties`, theme toggles | `verify-t2-darkmode-no-nav.png` |
+| Korean app title (T3) | L-1: 앱 타이틀 영어/한국어 불일치 | Default changed to "부동산 경매 도우미" | ✅ PASS — Korean title displayed | `verify-t3-korean-title.png` |
+| Case number validation (T4) | H-1: 사건번호 폼 유효성 검사 없음 | Client-side empty check + inline error + `required` attr | ✅ PASS — error "사건번호를 입력해주세요" shown, clears on input | `verify-t4-empty-validation.png` |
+| Simulator prefill (T5) | H-2: "내 물건" 모드 Turbo 에러 | POST→redirect to GET prefill route | ✅ PASS — redirects to `/eviction_guide/simulator/prefill`, no Turbo error | `verify-t5-simulator-prefill.png` |
+| Console 404 (T6) | M-3: `/onboarding/step1` 404 | Not reproducible — skipped per plan | ✅ PASS — 0 console errors on `/settings/budget` | `verify-t6-no-console-404.png` |
+
+### Run 7 Issue Resolution Summary
+
+| # | Issue | Status |
+|---|-------|--------|
+| H-1 | 사건번호 폼 유효성 검사 없음 | **FIXED** |
+| H-2 | 명도 시뮬레이터 "내 물건" 모드 Turbo 에러 | **FIXED** |
+| H-3 | 알림 버튼 미구현 | **FIXED** (removed) |
+| H-4 | 사용자 메뉴 미구현 | **FIXED** (removed) |
+| H-5 | 다크 모드 토글 시 페이지 이동 | **FIXED** |
+| M-3 | Console 404: `/onboarding/step1` | **NOT REPRODUCIBLE** |
+| L-1 | 앱 타이틀 영어/한국어 불일치 | **FIXED** |
+
+### Remaining (out of scope)
+
+| # | Issue | Reason |
+|---|-------|--------|
+| M-1 | 첫 사용자 온보딩/환영 화면 없음 | Post-MVP |
+| M-2 | 미분석 물건 기본 상세 페이지 없음 | Post-MVP |
+| M-4 | 예산 설정 지역 변경 시 무경고 리다이렉트 | Investigated — working correctly (fetch + "✓ 저장됨") |
+| L-2–L-5 | Polish items | Post-MVP |
+
+### Screenshot Index (Run 8)
+
+```
+docs/screenshots/
+├── verify-t1-header-cleanup.png
+├── verify-t2-darkmode-no-nav.png
+├── verify-t3-korean-title.png
+├── verify-t4-empty-validation.png
+├── verify-t5-simulator-prefill.png
+└── verify-t6-no-console-404.png
+```
+
+Total: 6 screenshots
+
+---
+
+## Run 7: Full App E2E Audit — Dual Persona (2026-04-15)
+
+- **Test date**: 2026-04-15
+- **Target URL**: http://localhost:3000
+- **Total scenarios**: 18 (Beginner: 8, Expert: 10)
+- **Passed**: 12 | **Passed with issues**: 2 | **Failed**: 4
+- **Screenshots captured**: 38
+
+---
+
+### Beginner Persona Results (8 scenarios)
+
+> Persona: 앱을 처음 사용하는 초심자. 온보딩, 기본 네비게이션, 직관성, 에러 메시지 이해도 검증.
+
+#### S-001: First Landing Experience — FAIL (minor)
+- **Screenshot**: `docs/screenshots/beginner-s001-landing.png`
+- Issues: 첫 사용자 안내/온보딩 없음, 앱 타이틀 영어, CTA 없음
+
+#### S-002: Onboarding Flow — FAIL
+- **Screenshots**: `beginner-s002-budget-settings.png`, `beginner-s002-onboarding-step1-error.png`
+- Issues: 단계별 온보딩 플로우 부재, 예산 설정 페이지 복잡, 플로팅 버튼 라벨 없음
+
+#### S-003: Basic Navigation (Sidebar) — PASS
+- **Screenshots**: `beginner-s003-*.png`
+- 사이드바 5개 링크 모두 정상. 접기 시 아이콘만 표시(minor)
+
+#### S-004: Header Buttons — FAIL
+- **Screenshots**: `beginner-s004-*.png`
+- Issues: 다크모드 토글 시 페이지 이동(BUG), 알림 버튼 미구현, 사용자 메뉴 미구현
+
+#### S-005: Property List & Detail — PASS (with issues)
+- **Screenshots**: `beginner-s005-*.png`
+- Issues: 물건 기본 상세 없음, 리다이렉트 체인, 삭제 확인 없음
+
+#### S-006: Simple Search — PASS
+- **Screenshot**: `beginner-s006-search-results.png`
+
+#### S-007: 명도 가이드 — PASS
+- **Screenshots**: `beginner-s007-*.png`
+- 15단계 아코디언 구조, 초심자에게 가장 양호한 페이지
+
+#### S-008: Error Handling (Form Validation) — FAIL
+- **Screenshots**: `beginner-s008-*.png`
+- Issues: 사건번호 폼 유효성 검사 완전 부재 (빈 입력/잘못된 형식 모두 무반응)
+
+---
+
+### Expert Persona Results (10 scenarios)
+
+> Persona: 부동산 경매 파워유저. 설정, 분석, 검색, 인스펙션 고급 기능 + 엣지케이스 검증.
+
+#### S-101: Budget Settings Deep Dive — PASS
+- **Screenshot**: `expert-s101-budget-full.png`
+- 예산 계산 정확. Console 404: `/onboarding/step1`, 지역 변경 시 무경고 리다이렉트
+
+#### S-102: Property Detail — Full Inspection (2024타경9770) — PASS
+- **Screenshots**: `expert-s102-*.png`
+- 5개 인스펙션 탭, 등급 평가, 위험 요약, 순수익 계산기, PDF 다운로드 모두 정상
+
+#### S-103: Property Detail — Unanalyzed (2025타경102421) — PASS (with note)
+- **Screenshot**: `expert-s103-property25-redirected.png`
+- 미분석 물건 → 분석 페이지로 직접 이동, 기본 정보 확인 불가
+
+#### S-104: AI Analysis Page — PASS
+- **Screenshots**: `expert-s104-*.png`
+- AI 자동분석 + 수동분석 UI 완성
+
+#### S-105: Search Results & Filtering — PASS
+- **Screenshots**: `expert-s105-*.png`
+- 지역/등급/예산 필터 모두 정상. 조건검색 66건, 예산 필터 3건
+
+#### S-106: 명도 시뮬레이터 — PARTIAL FAIL
+- **Screenshots**: `expert-s106-*.png`
+- "직접 입력" 모드 정상 (Q1~Q15 전체 플로우)
+- **BUG**: "내 물건으로 시뮬레이션" → Turbo 에러 "Form responses must redirect"
+
+#### S-107: Data Sources Settings — PASS
+- **Screenshot**: `expert-s107-data-sources.png`
+
+#### S-108: Property CRUD — PASS
+- **Screenshots**: `expert-s108-*.png`
+- 물건 추가/삭제 정상. 에러 토스트 표시 정상. 삭제 확인 다이얼로그 있음
+
+#### S-109: Dark Mode Persistence — PASS
+- **Screenshots**: `expert-s109-*.png`
+- 다크 모드 전환/유지 정상
+
+#### S-110: Console Errors — PASS (with notes)
+- Console 404: `/onboarding/step1`, Turbo redirect 에러 (시뮬레이터)
+
+---
+
+### Consolidated Issue List
+
+#### HIGH — Bugs
+
+| # | Issue | Scenario |
+|---|-------|----------|
+| H-1 | 사건번호 폼 유효성 검사 없음 (빈 입력/잘못된 형식 모두 무반응) | S-008 |
+| H-2 | 명도 시뮬레이터 "내 물건" 모드 Turbo 에러 (redirect 필요) | S-106 |
+| H-3 | 알림 버튼 미구현 (클릭 무반응) | S-004 |
+| H-4 | 사용자 메뉴 미구현 (클릭 무반응) | S-004 |
+| H-5 | 다크 모드 토글 시 `/settings/budget`으로 페이지 이동 | S-004 |
+
+#### MEDIUM — UX
+
+| # | Issue | Scenario |
+|---|-------|----------|
+| M-1 | 첫 사용자 온보딩/환영 화면 없음 | S-001, S-002 |
+| M-2 | 미분석 물건 기본 상세 페이지 없음 | S-005, S-103 |
+| M-3 | Console 404: `/onboarding/step1` | S-101, S-110 |
+| M-4 | 예산 설정 지역 변경 시 무경고 리다이렉트 | S-101 |
+
+#### LOW — Polish
+
+| # | Issue | Scenario |
+|---|-------|----------|
+| L-1 | 앱 타이틀 영어/한국어 불일치 | S-001 |
+| L-2 | 사이드바 접기 시 텍스트 라벨 없음 | S-003 |
+| L-3 | 검색 초기화 버튼 없음 | S-006 |
+| L-4 | 리다이렉트 체인으로 뒤로가기 불편 | S-005 |
+| L-5 | 예산 설정 예비비 항목 툴팁 부재 | S-002 |
+
+---
+
+### Screenshot Index (Run 7)
+
+```
+docs/screenshots/
+├── beginner-s001-landing.png
+├── beginner-s002-budget-settings.png
+├── beginner-s002-onboarding-step1-error.png
+├── beginner-s003-ai-analysis.png ~ beginner-s003-properties.png (4 files)
+├── beginner-s004-darkmode-*.png ~ beginner-s004-user-menu.png (4 files)
+├── beginner-s005-property-*.png (2 files)
+├── beginner-s006-search-results.png
+├── beginner-s007-eviction-guide-expanded.png
+├── beginner-s008-*.png (2 files)
+├── expert-s101-budget-full.png
+├── expert-s102-*.png (4 files)
+├── expert-s103-property25-redirected.png
+├── expert-s104-*.png (2 files)
+├── expert-s105-*.png (3 files)
+├── expert-s106-*.png (5 files)
+├── expert-s107-data-sources.png
+├── expert-s108-*.png (2 files)
+├── expert-s109-*.png (2 files)
+└── expert-s110-final-check.png
+```
+
+Total: 38 screenshots (beginner: 18, expert: 20)
+
+---
+
 ## Run 6: Checklist Items Filtering E2E Verification (2026-04-15)
 
 - **Test date:** 2026-04-15T06:23~06:31Z
