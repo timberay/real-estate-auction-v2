@@ -3,17 +3,19 @@ module EvictionGuide
     LEVELS = { "high" => 3, "medium" => 2, "low" => 1 }.freeze
     LEVEL_FROM_SCORE = LEVELS.invert.freeze
 
-    def self.call(answers, questions: nil)
-      new(answers, questions).call
+    def self.call(answers, occupant_type: nil, questions: nil)
+      new(answers, occupant_type, questions).call
     end
 
-    def initialize(answers, questions = nil)
+    def initialize(answers, occupant_type = nil, questions = nil)
       @answers = answers || {}
+      @occupant_type = occupant_type
       @questions = questions || load_questions
     end
 
     def call
-      max_score = 0
+      base_score = LEVELS[EvictionSimulation::BASE_DIFFICULTY[@occupant_type]] || 0
+      max_score = base_score
 
       @answers.each do |code, answer|
         next if answer # only "no" answers trigger difficulty
@@ -31,7 +33,7 @@ module EvictionGuide
     private
 
     def load_questions
-      EvictionSimulatorQuestion.all.index_by(&:code)
+      EvictionSimulatorQuestion.for_occupant_type(@occupant_type).index_by(&:code)
     end
   end
 end

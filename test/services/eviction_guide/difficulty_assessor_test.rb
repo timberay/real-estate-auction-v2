@@ -43,4 +43,50 @@ class EvictionGuide::DifficultyAssessorTest < ActiveSupport::TestCase
     result = EvictionGuide::DifficultyAssessor.call(answers, questions: questions)
     assert_equal "high", result
   end
+
+  test "returns base difficulty for junior_tenant with all-yes answers" do
+    answers = { "JT-Q1" => true }
+    result = EvictionGuide::DifficultyAssessor.call(answers, occupant_type: "junior_tenant")
+    assert_equal "low", result
+  end
+
+  test "returns base difficulty for senior_tenant with all-yes answers" do
+    answers = { "ST-Q1" => true }
+    result = EvictionGuide::DifficultyAssessor.call(answers, occupant_type: "senior_tenant")
+    assert_equal "high", result
+  end
+
+  test "base difficulty overridden by higher answer-based difficulty" do
+    answers = { "JT-Q1" => false }
+    questions = {
+      "JT-Q1" => EvictionSimulatorQuestion.new(
+        code: "JT-Q1", step_code: "JT-S1", no_next_code: "JT-Q1G",
+        difficulty_impact: "high", occupant_type: "junior_tenant"
+      )
+    }
+    result = EvictionGuide::DifficultyAssessor.call(
+      answers, occupant_type: "junior_tenant", questions: questions
+    )
+    assert_equal "high", result
+  end
+
+  test "base difficulty wins when answer-based is lower" do
+    answers = { "DO-Q1" => false }
+    questions = {
+      "DO-Q1" => EvictionSimulatorQuestion.new(
+        code: "DO-Q1", step_code: "DO-S1", no_next_code: "DO-Q1G",
+        difficulty_impact: "low", occupant_type: "debtor_owner"
+      )
+    }
+    result = EvictionGuide::DifficultyAssessor.call(
+      answers, occupant_type: "debtor_owner", questions: questions
+    )
+    assert_equal "medium", result
+  end
+
+  test "legacy behavior unchanged when occupant_type is nil" do
+    answers = { "Q1" => true }
+    result = EvictionGuide::DifficultyAssessor.call(answers, occupant_type: nil)
+    assert_equal "low", result
+  end
 end
