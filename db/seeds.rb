@@ -91,7 +91,8 @@ inspection_data.each do |attrs|
     merged_from: attrs["merged_from"],
     answer_type: attrs["answer_type"],
     yes_means_safe: attrs.fetch("yes_means_safe", true),
-    applicable_types: attrs["applicable_types"]
+    applicable_types: attrs["applicable_types"],
+    depends_on: attrs["depends_on"]
   )
   item.save!
   seeded_codes << code
