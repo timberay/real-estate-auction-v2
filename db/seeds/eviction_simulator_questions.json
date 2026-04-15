@@ -1,6 +1,7 @@
 [
   {
     "code": "Q1",
+    "occupant_type": null,
     "phase": "summary",
     "step_code": "S1",
     "question": "권리분석을 완료했나요?",
@@ -12,6 +13,7 @@
   },
   {
     "code": "Q1G",
+    "occupant_type": null,
     "phase": "summary",
     "step_code": "S1",
     "question": "권리분석 리스크가 있나요? (대항력 임차인 배당요구 미신청 / 유치권 신고 / 무상거주확인서)",
@@ -23,6 +25,7 @@
   },
   {
     "code": "Q1R",
+    "occupant_type": null,
     "phase": "summary",
     "step_code": "S1",
     "question": "리스크를 확인했지만 그래도 진행하시겠습니까?",
@@ -34,6 +37,7 @@
   },
   {
     "code": "Q2",
+    "occupant_type": null,
     "phase": "summary",
     "step_code": "S2",
     "question": "현황조사를 통해 점유자의 신원과 권원을 파악했나요?",
@@ -45,6 +49,7 @@
   },
   {
     "code": "Q2G",
+    "occupant_type": null,
     "phase": "summary",
     "step_code": "S2",
     "question": "점유자 파악에 문제가 있나요? (위장 전입 / 다수 점유자 / 신원 불명)",
@@ -56,6 +61,7 @@
   },
   {
     "code": "Q2R",
+    "occupant_type": null,
     "phase": "summary",
     "step_code": "S2",
     "question": "점유자 문제를 인지한 상태로 계속 진행하시겠습니까?",
@@ -67,6 +73,7 @@
   },
   {
     "code": "Q3",
+    "occupant_type": null,
     "phase": "summary",
     "step_code": "S3",
     "question": "매각허가결정이 확정되었나요?",
@@ -78,6 +85,7 @@
   },
   {
     "code": "Q3G",
+    "occupant_type": null,
     "phase": "summary",
     "step_code": "S3",
     "question": "즉시항고가 제기되었나요?",
@@ -89,6 +97,7 @@
   },
   {
     "code": "Q3R",
+    "occupant_type": null,
     "phase": "summary",
     "step_code": "S3",
     "question": "즉시항고에 대응서면을 준비하고 결과를 기다리고 계신가요?",
@@ -100,6 +109,7 @@
   },
   {
     "code": "Q4",
+    "occupant_type": null,
     "phase": "summary",
     "step_code": "S4",
     "question": "잔금을 납부했나요?",
@@ -111,6 +121,7 @@
   },
   {
     "code": "Q4G",
+    "occupant_type": null,
     "phase": "summary",
     "step_code": "S4",
     "question": "자금 조달에 문제가 있나요?",
@@ -122,6 +133,7 @@
   },
   {
     "code": "Q5",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S5",
     "question": "인도명령과 점유이전금지가처분을 동시에 신청했나요?",
@@ -133,6 +145,7 @@
   },
   {
     "code": "Q5B",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S5",
     "question": "잔금 납부일로부터 6개월이 아직 지나지 않았나요?",
@@ -144,6 +157,7 @@
   },
   {
     "code": "Q5C",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S5",
     "question": "6개월 기한이 도과되어 명도소송 전환이 필요합니다. 계속 진행하시겠습니까?",
@@ -155,6 +169,7 @@
   },
   {
     "code": "Q6",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S6",
     "question": "소유권이전등기를 완료하고 점유자와 1차 접촉을 했나요?",
@@ -166,6 +181,7 @@
   },
   {
     "code": "Q6G",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S6",
     "question": "점유자와 연락이 되나요?",
@@ -177,6 +193,7 @@
   },
   {
     "code": "Q6R",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S6",
     "question": "연락두절 상태입니다. 내용증명을 발송하고 강제집행 절차로 진행하시겠습니까?",
@@ -188,6 +205,7 @@
   },
   {
     "code": "Q7",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S7",
     "question": "이사비·이사일정에 대해 점유자와 합의에 도달했나요?",
@@ -199,6 +217,7 @@
   },
   {
     "code": "Q7G",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S7",
     "question": "점유자가 과도한 이사비를 요구하거나 협상이 결렬되었나요?",
@@ -210,6 +229,7 @@
   },
   {
     "code": "Q8",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S8",
     "question": "인도명령 결정문을 받고 점유자에게 송달이 완료되었나요?",
@@ -221,6 +241,7 @@
   },
   {
     "code": "Q8G",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S8",
     "question": "송달이 안 되고 있나요? (점유자가 수령 거부)",
@@ -232,6 +253,7 @@
   },
   {
     "code": "Q8R",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S8",
     "question": "특별송달 또는 공시송달을 신청하시겠습니까?",
@@ -243,6 +265,7 @@
   },
   {
     "code": "Q9",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S9",
     "question": "점유자가 자진 퇴거했나요?",
@@ -254,6 +277,7 @@
   },
   {
     "code": "Q10",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S10",
     "question": "강제집행을 신청하셨나요?",
@@ -265,6 +289,7 @@
   },
   {
     "code": "Q10G",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S10",
     "question": "강제집행 비용이 부담되시나요?",
@@ -276,6 +301,7 @@
   },
   {
     "code": "Q11",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S11",
     "question": "집행관 계고 후 점유자가 자진 퇴거했나요?",
@@ -287,6 +313,7 @@
   },
   {
     "code": "Q12",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S12",
     "question": "강제집행이 실행되어 점유를 확보했나요?",
@@ -298,6 +325,7 @@
   },
   {
     "code": "Q13",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S13",
     "question": "명도확인서 교부가 필요한 배당 대상 임차인이 있나요?",
@@ -309,6 +337,7 @@
   },
   {
     "code": "Q13A",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S13",
     "question": "공실 확인과 공과금 정산을 완료한 후에 명도확인서를 교부하셨나요?",
@@ -320,6 +349,7 @@
   },
   {
     "code": "Q14",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S14",
     "question": "관리비·공과금 정산이 완료되었나요?",
@@ -331,6 +361,7 @@
   },
   {
     "code": "Q14G",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S14",
     "question": "관리사무소가 일괄 청구하거나 단수·단전을 위협하고 있나요?",
@@ -342,6 +373,7 @@
   },
   {
     "code": "Q15",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S15",
     "question": "시설물 인수가 정상적으로 완료되었나요?",
@@ -353,6 +385,7 @@
   },
   {
     "code": "Q15G",
+    "occupant_type": null,
     "phase": "detail",
     "step_code": "S15",
     "question": "시설물에 고의적 파손이 발견되었나요?",
@@ -361,5 +394,137 @@
     "no_next_code": "END",
     "f02_field_mapping": null,
     "difficulty_impact": "high"
+  },
+  {
+    "code": "JT-Q1",
+    "occupant_type": "junior_tenant",
+    "phase": "summary",
+    "step_code": "JT-S1",
+    "question": "배당표에서 임차인이 배당을 수령했나요?",
+    "help_text": "배당 수령 여부에 따라 협상 전략이 달라집니다. 법원 배당표를 확인해주세요.",
+    "yes_next_code": "JT-Q2",
+    "no_next_code": "JT-Q1G",
+    "f02_field_mapping": "is_dividend_requested",
+    "difficulty_impact": null
+  },
+  {
+    "code": "JT-Q1G",
+    "occupant_type": "junior_tenant",
+    "phase": "summary",
+    "step_code": "JT-S1",
+    "question": "배당 미수령 상태로 계속 진행하시겠습니까?",
+    "help_text": "배당을 수령하지 않은 경우 퇴거 의무 근거가 약해질 수 있습니다.",
+    "yes_next_code": "JT-Q2",
+    "no_next_code": "END",
+    "f02_field_mapping": null,
+    "difficulty_impact": "medium"
+  },
+  {
+    "code": "JT-Q2",
+    "occupant_type": "junior_tenant",
+    "phase": "summary",
+    "step_code": "JT-S2",
+    "question": "잔금 납부와 동시에 인도명령을 신청했나요?",
+    "help_text": "잔금 납부일부터 6개월 이내에만 인도명령 신청이 가능합니다. 당일 신청이 실무 정석입니다.",
+    "yes_next_code": "JT-Q3",
+    "no_next_code": "JT-Q2G",
+    "f02_field_mapping": null,
+    "difficulty_impact": null
+  },
+  {
+    "code": "JT-Q2G",
+    "occupant_type": "junior_tenant",
+    "phase": "summary",
+    "step_code": "JT-S2",
+    "question": "인도명령 6개월 기한이 아직 남아있나요?",
+    "help_text": "기한이 지나면 정식 명도소송만 가능하여 4~10개월 추가 소요됩니다.",
+    "yes_next_code": "JT-Q3",
+    "no_next_code": "END",
+    "f02_field_mapping": null,
+    "difficulty_impact": "high"
+  },
+  {
+    "code": "JT-Q3",
+    "occupant_type": "junior_tenant",
+    "phase": "summary",
+    "step_code": "JT-S3",
+    "question": "점유자와 1차 접촉에 성공했나요?",
+    "help_text": "소유권이전등기 후 내용증명 또는 방문으로 새 소유자임을 통보합니다.",
+    "yes_next_code": "JT-Q4",
+    "no_next_code": "JT-Q3G",
+    "f02_field_mapping": null,
+    "difficulty_impact": null
+  },
+  {
+    "code": "JT-Q3G",
+    "occupant_type": "junior_tenant",
+    "phase": "summary",
+    "step_code": "JT-S3",
+    "question": "연락두절/퇴거거부 상태에서도 진행하시겠습니까?",
+    "help_text": "인도명령 결정문을 근거로 강제집행 절차를 진행할 수 있습니다.",
+    "yes_next_code": "JT-Q4",
+    "no_next_code": "END",
+    "f02_field_mapping": null,
+    "difficulty_impact": "high"
+  },
+  {
+    "code": "JT-Q4",
+    "occupant_type": "junior_tenant",
+    "phase": "summary",
+    "step_code": "JT-S4",
+    "question": "명도확인서 교부 조건이 합의되었나요?",
+    "help_text": "공실 확인 + 공과금 정산 완료 후에 명도확인서를 교부하는 것이 철칙입니다.",
+    "yes_next_code": "JT-Q5",
+    "no_next_code": "JT-Q4G",
+    "f02_field_mapping": null,
+    "difficulty_impact": null
+  },
+  {
+    "code": "JT-Q4G",
+    "occupant_type": "junior_tenant",
+    "phase": "summary",
+    "step_code": "JT-S4",
+    "question": "명도확인서 교부 없이 계속 진행하시겠습니까?",
+    "help_text": "명도확인서는 임차인이 배당금을 수령하기 위해 필요합니다. 강력한 협상 도구입니다.",
+    "yes_next_code": "JT-Q5",
+    "no_next_code": "END",
+    "f02_field_mapping": null,
+    "difficulty_impact": "medium"
+  },
+  {
+    "code": "JT-Q5",
+    "occupant_type": "junior_tenant",
+    "phase": "summary",
+    "step_code": "JT-S5",
+    "question": "관리비 정산이 완료되었나요?",
+    "help_text": "공용 관리비만 낙찰자 부담, 전용 부분은 점유자 부담이 원칙입니다.",
+    "yes_next_code": "JT-Q6",
+    "no_next_code": "JT-Q5G",
+    "f02_field_mapping": null,
+    "difficulty_impact": null
+  },
+  {
+    "code": "JT-Q5G",
+    "occupant_type": "junior_tenant",
+    "phase": "summary",
+    "step_code": "JT-S5",
+    "question": "관리비 문제를 인지한 상태로 계속 진행하시겠습니까?",
+    "help_text": "관리사무소가 일괄 청구하거나 단수·단전으로 위협할 수 있습니다.",
+    "yes_next_code": "JT-Q6",
+    "no_next_code": "END",
+    "f02_field_mapping": null,
+    "difficulty_impact": "low"
+  },
+  {
+    "code": "JT-Q6",
+    "occupant_type": "junior_tenant",
+    "phase": "summary",
+    "step_code": "JT-S6",
+    "question": "시설물 인수가 완료되었나요?",
+    "help_text": "파손·훼손 여부를 사진·영상으로 채증하고 잠금장치를 교체합니다.",
+    "yes_next_code": "END",
+    "no_next_code": "END",
+    "f02_field_mapping": null,
+    "difficulty_impact": null
   }
 ]

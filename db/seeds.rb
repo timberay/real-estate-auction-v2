@@ -167,6 +167,7 @@ eviction_data = JSON.parse(File.read(Rails.root.join("db/seeds/eviction_steps.js
     step.root_cause = attrs["root_cause"]
     step.action_steps = attrs["action_steps"]
     step.return_step_code = attrs["return_step_code"]
+    step.occupant_type = attrs["occupant_type"]
   end
 end
 puts "  -> #{EvictionStep.count} eviction steps"
@@ -183,6 +184,7 @@ questions_data.each do |attrs|
     q.no_next_code = attrs["no_next_code"]
     q.f02_field_mapping = attrs["f02_field_mapping"]
     q.difficulty_impact = attrs["difficulty_impact"]
+    q.occupant_type = attrs["occupant_type"]
   end
 end
 puts "  -> #{EvictionSimulatorQuestion.count} simulator questions"

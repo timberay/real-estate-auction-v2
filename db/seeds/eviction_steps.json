@@ -2,6 +2,7 @@
   "steps": [
     {
       "code": "S1",
+      "occupant_type": null,
       "step_type": "main",
       "name": "권리분석",
       "description": "말소기준권리, 대항력 있는 임차인 유무, 배당요구 여부를 확인해 보증금 인수 리스크를 판단. 이 단계의 결과가 이후 모든 협상·법적 조치의 강도를 결정한다.",
@@ -28,6 +29,7 @@
     },
     {
       "code": "S2",
+      "occupant_type": null,
       "step_type": "main",
       "name": "현황조사 & 점유자 파악",
       "description": "전입세대열람, 임장, 매각물건명세서 대조로 실제 점유자의 신원과 권원을 확정. '누가, 어떤 자격으로, 왜 살고 있는가'를 모르면 인도명령 대상자조차 특정 불가.",
@@ -43,6 +45,7 @@
     },
     {
       "code": "S3",
+      "occupant_type": null,
       "step_type": "main",
       "name": "입찰 → 매각허가결정",
       "description": "법원이 낙찰을 공식 승인. 허가결정일로부터 2주 즉시항고 기간이 지나야 잔금 납부 통지가 나온다.",
@@ -58,6 +61,7 @@
     },
     {
       "code": "S4",
+      "occupant_type": null,
       "step_type": "main",
       "name": "잔금 납부",
       "description": "매각대금 완납 시점에 소유권이 이전되며, 동시에 인도명령 6개월 카운트다운이 시작된다. 가장 중요한 기산일.",
@@ -73,6 +77,7 @@
     },
     {
       "code": "S5",
+      "occupant_type": null,
       "step_type": "main",
       "name": "인도명령 + 점유이전금지가처분 동시 신청",
       "description": "인도명령은 집행권원 확보, 점유이전금지가처분은 소송·집행 중 점유자 바꿔치기를 방지. 잔금 납부일 당일 세트로 신청하는 것이 실무 정석.",
@@ -94,6 +99,7 @@
     },
     {
       "code": "S6",
+      "occupant_type": null,
       "step_type": "main",
       "name": "소유권이전등기 & 1차 접촉",
       "description": "소유권을 등기부에 올려 법적 지위 확정. 동시에 점유자에게 내용증명 또는 방문으로 '새 소유자입니다' 통보. 협상의 문을 연다.",
@@ -109,6 +115,7 @@
     },
     {
       "code": "S7",
+      "occupant_type": null,
       "step_type": "main",
       "name": "명도 협상 (이사비·이사일정)",
       "description": "강제집행 예상 실비(면적 비례)의 50~70%를 이사비로 제시하는 것이 경제적. 소송·집행에 드는 2~3개월 기회비용을 감안하면 이사비 지급이 수익률 측면에서 유리한 경우가 많다.",
@@ -124,6 +131,7 @@
     },
     {
       "code": "S8",
+      "occupant_type": null,
       "step_type": "main",
       "name": "인도명령 결정 & 송달",
       "description": "결정은 접수 후 약 1주일, 점유자에게 결정문이 송달되어야만 강제집행 신청이 가능. 송달은 강제집행의 전제조건이다.",
@@ -145,6 +153,7 @@
     },
     {
       "code": "S9",
+      "occupant_type": null,
       "step_type": "main",
       "name": "자진 명도 이행 여부 확인",
       "description": "결정문을 받은 점유자 대부분이 이 단계에서 협상 테이블로 복귀한다. 심리적 전환점.",
@@ -160,6 +169,7 @@
     },
     {
       "code": "S10",
+      "occupant_type": null,
       "step_type": "main",
       "name": "강제집행 신청",
       "description": "집행문·송달증명원을 첨부해 집행관 사무실에 접수. 예납금 100~300만 원(면적·보관 물량 기준). 강제집행신청을 취하하면 예납금이 환불되므로 이사비 원천으로 재활용 가능.",
@@ -181,6 +191,7 @@
     },
     {
       "code": "S11",
+      "occupant_type": null,
       "step_type": "main",
       "name": "집행관 계고 (1차 방문)",
       "description": "집행관이 현장 방문, '2주 내 자진 퇴거' 최고. 부재 시 계고장 부착. 점유자에게 가장 강력한 심리적 압박. 계고 단계에서 합의로 선회하는 경우가 많다.",
@@ -196,6 +207,7 @@
     },
     {
       "code": "S12",
+      "occupant_type": null,
       "step_type": "main",
       "name": "강제집행 실행",
       "description": "집행관 주도로 잠금 해제·짐 반출. 점유자 부재 시 채권자+증인 2인 입회로 진행 가능. 유체동산은 창고 보관 → 일정 기간 후 매각 → 집행비용 충당.",
@@ -211,6 +223,7 @@
     },
     {
       "code": "S13",
+      "occupant_type": null,
       "step_type": "main",
       "name": "명도확인서 & 인감증명 교부",
       "description": "배당받는 대항력 임차인은 명도확인서가 있어야 법원에서 배당금 수령 가능. 공실 확인·공과금 정산 완료 후에 교부하는 것이 철칙. 선(先)교부는 협상 레버리지 상실.",
@@ -226,6 +239,7 @@
     },
     {
       "code": "S14",
+      "occupant_type": null,
       "step_type": "main",
       "name": "관리비·공과금 정산",
       "description": "판례상 경매 낙찰자는 공용 관리비만 인수, 전용 부분 관리비는 점유자 부담이 원칙. 구분 청구가 핵심.",
@@ -241,6 +255,7 @@
     },
     {
       "code": "S15",
+      "occupant_type": null,
       "step_type": "main",
       "name": "시설물 인수 & 집행비용 청구",
       "description": "파손·훼손 여부 사진·영상 채증. 집행에 소요된 노무비·보관비는 추후 점유자에게 청구 가능(회수는 별개 문제). 판결문 기반 가압류 등 병행 고려.",
@@ -253,11 +268,120 @@
       "position": 15,
       "next_step_code": null,
       "branch_codes": ["B11"]
+    },
+    {
+      "code": "JT-S1",
+      "occupant_type": "junior_tenant",
+      "step_type": "main",
+      "name": "배당표 확인",
+      "description": "법원 배당표에서 임차인의 배당 수령 여부와 금액을 확인한다. 배당을 수령한 후순위 임차인은 퇴거 의무가 명확하므로 협상 레버리지가 된다.",
+      "completion_condition": "배당 수령 여부 및 금액 확인 완료",
+      "failure_condition": "배당 미수령 / 배당요구 미신청",
+      "required_documents": ["배당표", "매각물건명세서"],
+      "estimated_duration": "3~5일",
+      "estimated_cost": null,
+      "legal_basis": [
+        {
+          "title": "민사집행법 제145조 (배당표)",
+          "summary": "배당을 받을 채권자와 배당 순위·금액을 기재",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "position": 201,
+      "next_step_code": "JT-S2",
+      "branch_codes": ["JT-B1"]
+    },
+    {
+      "code": "JT-S2",
+      "occupant_type": "junior_tenant",
+      "step_type": "main",
+      "name": "잔금 납부 & 인도명령 신청",
+      "description": "매각대금 완납과 동시에 인도명령 + 점유이전금지가처분을 세트로 신청한다. 잔금 납부일부터 6개월 이내에만 인도명령 신청이 가능하므로 당일 신청이 실무 정석.",
+      "completion_condition": "잔금 납부 + 인도명령·가처분 접수 완료",
+      "failure_condition": "6개월 기한 도과",
+      "required_documents": ["잔금완납증명서", "인도명령 신청서", "점유이전금지가처분 신청서"],
+      "estimated_duration": "잔금 납부일 당일",
+      "estimated_cost": "인지대·송달료",
+      "legal_basis": [
+        {
+          "title": "민사집행법 제136조 (인도명령)",
+          "summary": "매수인은 매각대금 납부 후 6개월 이내에 인도명령 신청 가능",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "position": 202,
+      "next_step_code": "JT-S3",
+      "branch_codes": []
+    },
+    {
+      "code": "JT-S3",
+      "occupant_type": "junior_tenant",
+      "step_type": "main",
+      "name": "1차 접촉 & 퇴거 통보",
+      "description": "소유권이전등기 후 점유자에게 내용증명 또는 직접 방문으로 새 소유자임을 통보한다. 배당 수령 사실을 근거로 퇴거 의무를 설명하고 이사일정을 협의한다.",
+      "completion_condition": "점유자와 연락 성공, 이사일정 협의 시작",
+      "failure_condition": "연락 두절 / 퇴거 거부",
+      "required_documents": ["소유권이전등기 완료 확인서", "내용증명"],
+      "estimated_duration": "1~2주",
+      "estimated_cost": "등기비용·취득세",
+      "legal_basis": [],
+      "position": 203,
+      "next_step_code": "JT-S4",
+      "branch_codes": ["JT-B2"]
+    },
+    {
+      "code": "JT-S4",
+      "occupant_type": "junior_tenant",
+      "step_type": "main",
+      "name": "명도확인서 교환 협상",
+      "description": "배당받는 임차인은 명도확인서가 있어야 법원에서 배당금 수령이 가능하다. 공실 확인·공과금 정산이 완료된 후에 교부하는 것이 철칙. 선(先)교부는 협상 레버리지 상실.",
+      "completion_condition": "공실 확인 + 명도확인서 교부",
+      "failure_condition": "명도확인서 선교부 요구 / 이사일 불이행",
+      "required_documents": ["명도확인서", "인감증명서"],
+      "estimated_duration": "합의 후 1~3일",
+      "estimated_cost": null,
+      "legal_basis": [],
+      "position": 204,
+      "next_step_code": "JT-S5",
+      "branch_codes": []
+    },
+    {
+      "code": "JT-S5",
+      "occupant_type": "junior_tenant",
+      "step_type": "main",
+      "name": "관리비 정산",
+      "description": "판례상 경매 낙찰자는 공용 관리비만 인수, 전용 부분 관리비는 점유자 부담이 원칙. 관리사무소에 구분 청구서를 요청하여 공용·전용을 분리 납부한다.",
+      "completion_condition": "구분 청구서 수령 / 공용 관리비 납부 완료",
+      "failure_condition": "관리사무소 일괄 청구·단수·단전 위협",
+      "required_documents": ["구분 청구서"],
+      "estimated_duration": "1~2주",
+      "estimated_cost": "공용 관리비",
+      "legal_basis": [],
+      "position": 205,
+      "next_step_code": "JT-S6",
+      "branch_codes": []
+    },
+    {
+      "code": "JT-S6",
+      "occupant_type": "junior_tenant",
+      "step_type": "main",
+      "name": "인수 완료",
+      "description": "시설물 인수 확인. 파손·훼손 여부를 사진·영상으로 채증하고, 잠금장치를 즉시 교체한다.",
+      "completion_condition": "시설 정상 확인 / 잠금장치 교체",
+      "failure_condition": "고의적 파손 발견",
+      "required_documents": [],
+      "estimated_duration": "1~3일",
+      "estimated_cost": "잠금장치 교체비",
+      "legal_basis": [],
+      "position": 206,
+      "next_step_code": null,
+      "branch_codes": []
     }
   ],
   "branches": [
     {
       "code": "B1",
+      "occupant_type": null,
       "step_type": "branch",
       "name": "대항력 임차인이 배당요구 안 함 (보증금 인수 리스크)",
       "description": "낙찰자가 보증금 전액 떠안게 되는 최악의 시나리오",
@@ -282,6 +406,7 @@
     },
     {
       "code": "B2",
+      "occupant_type": null,
       "step_type": "branch",
       "name": "유치권 신고 존재",
       "description": "공사대금 등 채권자의 점유 주장으로 인한 리스크",
@@ -317,6 +442,7 @@
     },
     {
       "code": "B3",
+      "occupant_type": null,
       "step_type": "branch",
       "name": "무상거주확인서 정황 포착",
       "description": "임차인이 근저당권자에게 써준 무상거주확인서가 발견된 경우",
@@ -341,6 +467,7 @@
     },
     {
       "code": "B4",
+      "occupant_type": null,
       "step_type": "branch",
       "name": "점유자 세탁 / 불법 제3자 점유",
       "description": "소송·집행 중 점유 이전이 발생하여 점유자가 바뀐 경우",
@@ -359,6 +486,7 @@
     },
     {
       "code": "B5",
+      "occupant_type": null,
       "step_type": "branch",
       "name": "매각허가결정에 대한 즉시항고",
       "description": "채무자·이해관계인이 매각허가결정에 불복하여 즉시항고를 제기한 경우",
@@ -377,6 +505,7 @@
     },
     {
       "code": "B6",
+      "occupant_type": null,
       "step_type": "branch",
       "name": "인도명령 6개월 기한 도과",
       "description": "협상에 집중하다 인도명령 신청 6개월 기한을 놓친 경우",
@@ -401,6 +530,7 @@
     },
     {
       "code": "B7",
+      "occupant_type": null,
       "step_type": "branch",
       "name": "연락두절 / 폐문부동",
       "description": "점유자가 잠적하고 짐만 있는 상태",
@@ -419,6 +549,7 @@
     },
     {
       "code": "B8",
+      "occupant_type": null,
       "step_type": "branch",
       "name": "과도한 이사비 요구 / 협상 결렬",
       "description": "점유자가 비합리적인 이사비를 요구하거나 협상을 거부하는 경우",
@@ -437,6 +568,7 @@
     },
     {
       "code": "B9",
+      "occupant_type": null,
       "step_type": "branch",
       "name": "송달 불능 (고의 회피)",
       "description": "점유자가 인도명령 결정문 수령을 고의적으로 회피하는 경우",
@@ -455,6 +587,7 @@
     },
     {
       "code": "B10",
+      "occupant_type": null,
       "step_type": "branch",
       "name": "관리사무소 일괄 청구 / 단수·단전 위협",
       "description": "관리사무소가 전용부 관리비까지 낙찰자에게 일괄 청구하거나 단수·단전으로 위협하는 경우",
@@ -473,6 +606,7 @@
     },
     {
       "code": "B11",
+      "occupant_type": null,
       "step_type": "branch",
       "name": "시설물 고의 파손 / 보복 훼손",
       "description": "점유자가 퇴거 시 감정적으로 시설물을 고의 파손한 경우",
@@ -489,6 +623,51 @@
       "return_step_code": null,
       "estimated_duration": "1~3개월",
       "position": 26
+    },
+    {
+      "code": "JT-B1",
+      "occupant_type": "junior_tenant",
+      "step_type": "branch",
+      "name": "배당 미수령",
+      "description": "임차인이 배당을 수령하지 않은 경우. 배당요구 미신청 또는 배당금 미수령 상태에서는 퇴거 의무 근거가 약화된다.",
+      "trigger_step_code": "JT-S1",
+      "problem_summary": "임차인 배당 미수령으로 퇴거 의무 불명확",
+      "root_cause": "배당요구 미신청 또는 배당금 미수령",
+      "action_steps": [
+        "배당요구 여부 재확인 (법원 기록 열람)",
+        "임차인과 직접 협의하여 배당금 수령 유도",
+        "배당금 수령 거부 시 공탁 절차 안내"
+      ],
+      "legal_basis": [],
+      "return_step_code": "JT-S2",
+      "estimated_duration": "2~4주",
+      "position": 211
+    },
+    {
+      "code": "JT-B2",
+      "occupant_type": "junior_tenant",
+      "step_type": "branch",
+      "name": "협상 결렬 → 강제집행",
+      "description": "임차인이 퇴거를 거부하거나 과도한 이사비를 요구하여 협상이 결렬된 경우. 인도명령 결정문을 근거로 강제집행 절차를 진행한다.",
+      "trigger_step_code": "JT-S3",
+      "problem_summary": "점유자 퇴거 거부로 협상 교착",
+      "root_cause": "점유자의 버티기 전략 또는 과도한 이사비 요구",
+      "action_steps": [
+        "인도명령 결정문 송달 확인",
+        "강제집행 신청 + 예납금 납부",
+        "집행관 계고 (1차 방문) 후 2주 대기",
+        "계고 불응 시 본집행 실시"
+      ],
+      "legal_basis": [
+        {
+          "title": "민사집행법 제136조",
+          "summary": "확정된 인도명령은 강제집행 신청의 기초",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "return_step_code": "JT-S4",
+      "estimated_duration": "1~2개월",
+      "position": 212
     }
   ]
 }
