@@ -11,14 +11,12 @@ class InspectionRatingService
   end
 
   def call
-    results = @property.inspection_results.where(user: @user)
-    answered = results.where.not(has_risk: nil)
-
+    answered = visible_results.select { |r| !r.has_risk.nil? }
     return :incomplete if answered.empty?
 
-    risk_results = answered.where(has_risk: true)
+    risk_results = answered.select { |r| r.has_risk }
 
-    rating = if risk_results.exists?(resolvable: false)
+    rating = if risk_results.any? { |r| r.resolvable == false }
       :danger
     elsif risk_results.any?
       :caution
@@ -32,19 +30,15 @@ class InspectionRatingService
   end
 
   def tab_rating(tab_key)
-    tab_int = InspectionItem.tabs[tab_key]
-    results = @property.inspection_results
-      .joins(:inspection_item)
-      .where(inspection_items: { tab: tab_int }, user: @user)
+    visible = visible_results.select { |r| r.inspection_item.tab == tab_key }
+    return nil if visible.empty?
 
-    return nil if results.empty?
-
-    answered = results.where.not(has_risk: nil)
+    answered = visible.select { |r| !r.has_risk.nil? }
     return :incomplete if answered.empty?
 
-    risk_results = answered.where(has_risk: true)
+    risk_results = answered.select { |r| r.has_risk }
 
-    if risk_results.exists?(resolvable: false)
+    if risk_results.any? { |r| r.resolvable == false }
       :danger
     elsif risk_results.any?
       :caution
@@ -54,8 +48,7 @@ class InspectionRatingService
   end
 
   def fully_evaluated?
-    results = @property.inspection_results.where(user: @user)
-    results.any? && results.where(has_risk: nil).none?
+    visible_results.any? && visible_results.all? { |r| !r.has_risk.nil? }
   end
 
   def tabs_evaluated_count
@@ -64,5 +57,19 @@ class InspectionRatingService
       rating && rating != :incomplete
     end
     [ evaluated, ANALYSIS_TABS.size ]
+  end
+
+  private
+
+  def visible_results
+    @visible_results ||= begin
+      all_results = @property.inspection_results.where(user: @user).includes(:inspection_item)
+      answered_context = all_results.index_by { |r| r.inspection_item.code }
+      property_type = @property.property_type
+
+      all_results.select do |r|
+        r.inspection_item.visible_for?(property_type: property_type, answered_results: answered_context)
+      end
+    end
   end
 end
