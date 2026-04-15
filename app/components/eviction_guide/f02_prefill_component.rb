@@ -36,5 +36,15 @@ module EvictionGuide
       else value.to_s
       end
     end
+
+    def occupant_type_options
+      EvictionSimulation::OCCUPANT_TYPES.map { |type|
+        [ EvictionSimulation::OCCUPANT_TYPE_LABELS[type], type ]
+      }
+    end
+
+    def extracted_occupant_type
+      @prefill_data[:occupant_type]
+    end
   end
 end
