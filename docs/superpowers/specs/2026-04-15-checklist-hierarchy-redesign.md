@@ -63,7 +63,7 @@ Move from `rights-003` to `rights-024`:
 | eviction-004 | `{ "code": "rights-003", "show_when_risk": true }` | "명도 난이도" → "권리분석" |
 | eviction-006 | `{ "code": "rights-003", "show_when_risk": true }` | "명도 난이도" → "권리분석" |
 
-### Question text cleanup (9 items)
+### Question text cleanup (9 items — hierarchy-related)
 
 Remove parent-covered condition phrases:
 
@@ -79,17 +79,30 @@ Remove parent-covered condition phrases:
 | eviction-004 | 임차인이 없거나, 소액임차인 요건을 충족하여 최우선변제금을 배당받습니까? | 소액임차인 요건을 충족하여 최우선변제금을 배당받습니까? |
 | eviction-006 | 점유자가 없거나, 배당금 수령을 위해 명도확인서가 필수적인 상황입니까? | 배당금 수령을 위해 명도확인서가 필수적인 상황입니까? |
 
-### Deletion
+### Additional question cleanup (4 items — condition/type simplification)
 
-`rights-015` (임차권/전세권이 없거나, 모두 말소기준권리 이후(후순위)여서 소멸 대상입니까?)
-— redundant with `rights-024` "아니오" answer (no 대항력 = already extinguished).
+Remove redundant "~거나" conditions and correct `applicable_types`:
 
-### Data cleanup for `rights-015` deletion
+| Code | Change | Before | After |
+|------|--------|--------|-------|
+| property-003 | question + applicable_types → null | 상가가 아니거나, 1층일 경우 외부에서 잘 보이는 위치입니까? | 해당 물건 내부에서 외부가 잘 보입니까? |
+| resale-004 | question + applicable_types → null | 준공 2년 이내 신축이 아니거나, 감정가가 주변 시세 수준입니까? | 감정가가 주변 시세 수준입니까? |
+| inspect-004 | question + applicable_types → ["오피스텔"] | 오피스텔이 아니거나, 관할 구청에서 주거용/업무용을 확인했습니까? | 주거용/업무용을 확인했습니까? |
+| rights-019 | question + applicable_types → null | 아파트이거나, 토지와 건물이 일체로 매각되는 물건입니까? | 토지와 건물이 일체로 매각되는 물건입니까? |
+
+### Deletion (2 items)
+
+- `rights-015` (임차권/전세권이 없거나, 모두 말소기준권리 이후(후순위)여서 소멸 대상입니까?)
+  — redundant with `rights-024` "아니오" answer (no 대항력 = already extinguished).
+- `inspect-007` (현장 우편함에 공과금 통지서가 없거나, 수신인이 소유자(채무자) 이름입니까?)
+  — removed per requirement.
+
+### Data cleanup for deleted items
 
 `InspectionItem` has `has_many :inspection_results, dependent: :destroy`. When
-`rights-015` is removed from the seed and `db/seeds.rb` runs the stale-item cleanup
-(`InspectionItem.where.not(code: seeded_codes).destroy_all`), all associated
-`InspectionResult` records are automatically cascade-deleted.
+`rights-015` and `inspect-007` are removed from the seed and `db/seeds.rb` runs the
+stale-item cleanup (`InspectionItem.where.not(code: seeded_codes).destroy_all`), all
+associated `InspectionResult` records are automatically cascade-deleted.
 
 The rating service (`InspectionRatingService`) and grade controller both use
 `visible_for?` which filters by live `InspectionItem` records — orphaned results
