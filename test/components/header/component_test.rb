@@ -12,10 +12,10 @@ module Header
       assert_selector "header"
     end
 
-    test "renders app name" do
+    test "renders app name in Korean" do
       render_inline(Header::Component.new)
 
-      assert_text "Real Estate Auction"
+      assert_text "부동산 경매 도우미"
     end
 
     test "renders custom app name" do
@@ -27,7 +27,7 @@ module Header
     test "renders app name with correct classes" do
       render_inline(Header::Component.new)
 
-      assert_selector "span.font-bold", text: "Real Estate Auction"
+      assert_selector "span.font-bold", text: "부동산 경매 도우미"
       assert_selector "span[class*='text-lg']"
       assert_selector "span[class*='text-white']"
     end
