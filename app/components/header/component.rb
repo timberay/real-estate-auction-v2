@@ -39,22 +39,5 @@ module Header
       )
     end
 
-    def bell_icon
-      raw Heroicon::Icon.render(
-        name: "bell",
-        variant: :outline,
-        options: { class: "w-5 h-5" },
-        path_options: {}
-      )
-    end
-
-    def user_icon
-      raw Heroicon::Icon.render(
-        name: "user-circle",
-        variant: :outline,
-        options: { class: "w-6 h-6" },
-        path_options: {}
-      )
-    end
   end
 end

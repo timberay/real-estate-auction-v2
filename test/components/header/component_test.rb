@@ -97,19 +97,19 @@ module Header
 
     # --- Right side buttons ---
 
-    test "renders notification bell button" do
+    test "does not render notification or user menu buttons" do
       render_inline(Header::Component.new)
 
-      html = page.native.inner_html
-      assert_includes html, "svg"
+      assert_no_selector "button[aria-label='알림']"
+      assert_no_selector "button[aria-label='사용자 메뉴']"
     end
 
-    test "renders buttons with correct styling" do
+    test "renders only hamburger and dark mode buttons" do
       render_inline(Header::Component.new)
 
-      assert_selector "button[class*='p-2']"
-      assert_selector "button[class*='rounded-md']"
-      assert_selector "button[class*='text-slate-300']"
+      # hamburger + dark-mode toggle = 2 buttons in the header
+      assert_selector "button[aria-label='메뉴 열기']"
+      assert_selector "button[aria-label='다크 모드 전환']"
     end
 
     # --- Analysis indicator ---
