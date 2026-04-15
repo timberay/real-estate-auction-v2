@@ -11,3 +11,11 @@ standalone:
   result_path: '["S1"]'
   difficulty_level: ~
   completed: false
+
+junior_tenant_sim:
+  session_id: "jt_session_123"
+  occupant_type: "junior_tenant"
+  answers: '{}'
+  result_path: '[]'
+  difficulty_level: ~
+  completed: false
