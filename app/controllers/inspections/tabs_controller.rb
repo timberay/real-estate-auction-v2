@@ -12,6 +12,7 @@ module Inspections
         .where(user: current_user)
         .includes(:inspection_item)
       answered_context = all_results.index_by { |r| r.inspection_item.code }
+      all_items_by_code = all_results.map(&:inspection_item).index_by(&:code)
 
       property_type = @property.property_type
 
@@ -21,7 +22,7 @@ module Inspections
         .sort_by { |r| r.inspection_item.tab_position }
 
       @dependency_hidden_ids = tab_results
-        .select { |r| r.inspection_item.skip_for?(answered_context) }
+        .select { |r| r.inspection_item.skip_for?(answered_context, all_items_by_code: all_items_by_code) }
         .map(&:id).to_set
 
       @results = tab_results
@@ -64,11 +65,12 @@ module Inspections
         .where(user: current_user)
         .includes(:inspection_item)
       answered_context = all_results_for_count.index_by { |r| r.inspection_item.code }
+      all_items_by_code = all_results_for_count.map(&:inspection_item).index_by(&:code)
       property_type = @property.property_type
 
       visible_tab_results = all_results_for_count
         .select { |r| r.inspection_item.tab == @tab_key }
-        .select { |r| r.inspection_item.visible_for?(property_type: property_type, answered_results: answered_context) }
+        .select { |r| r.inspection_item.visible_for?(property_type: property_type, answered_results: answered_context, all_items_by_code: all_items_by_code) }
       unanswered_count = visible_tab_results.count { |r| r.has_risk.nil? }
 
       tab_label = TabSummaryTableComponent::TAB_LABELS[@tab_key] || @tab_key
