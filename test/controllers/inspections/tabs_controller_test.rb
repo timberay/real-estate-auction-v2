@@ -89,6 +89,26 @@ class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
     assert tab_rating_flash.key?("unanswered_count")
   end
 
+  test "edit renders dependent items hidden when parent has_risk is false" do
+    # rights-003 has_risk=false, rights-009 depends_on rights-003 show_when_risk=true
+    get edit_property_inspections_tab_url(@property, tab_key: "rights_analysis")
+    assert_response :success
+    assert_select "[data-depends-on-code='rights-003']" do |elements|
+      elements.each { |el| assert_match(/hidden/, el["class"].to_s) }
+    end
+  end
+
+  test "edit renders dependent items visible when parent has_risk matches show_when_risk" do
+    risky = properties(:risky_villa)
+    UserProperty.find_or_create_by!(user: users(:guest), property: risky)
+    # risky_villa rights-003 has_risk=true, rights-009 depends_on rights-003 show_when_risk=true
+    get edit_property_inspections_tab_url(risky, tab_key: "rights_analysis")
+    assert_response :success
+    assert_select "[data-depends-on-code='rights-003']" do |elements|
+      elements.each { |el| refute_match(/hidden/, el["class"].to_s) }
+    end
+  end
+
   test "update with no resolutions still sets flash" do
     patch property_inspections_tab_url(@property, tab_key: "rights_analysis"), params: {}
 

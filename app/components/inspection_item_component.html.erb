@@ -1,11 +1,16 @@
-<div class="rounded-lg border p-4 <%= risk_classes %>"
+<div class="rounded-lg border p-4 <%= risk_classes %><%= ' hidden' if @dependency_hidden %>"
      data-controller="inspection-item"
      data-inspection-item-result-id-value="<%= @result.id %>"
      data-inspection-item-auto-value="<%= auto_or_ai_source? && !ai_reference? %>"
      data-inspection-item-original-has-risk-value="<%= @result.has_risk.nil? ? '' : @result.has_risk %>"
      data-inspection-item-original-badge-text-value="<%= source_badge_text %>"
      data-inspection-item-original-badge-classes-value="<%= source_badge_classes %>"
-     data-inspection-item-yes-means-safe-value="<%= @item.yes_means_safe? %>">
+     data-inspection-item-yes-means-safe-value="<%= @item.yes_means_safe? %>"
+     data-item-code="<%= @item.code %>"
+     <% if @item.depends_on.present? %>
+     data-depends-on-code="<%= @item.depends_on['code'] %>"
+     data-depends-on-show-when-risk="<%= @item.depends_on['show_when_risk'] %>"
+     <% end %>>
   <div class="flex items-start justify-between">
     <div class="flex items-center gap-2">
       <span class="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-semibold <%= source_badge_classes %>"

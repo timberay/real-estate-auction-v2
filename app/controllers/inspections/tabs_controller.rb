@@ -15,10 +15,16 @@ module Inspections
 
       property_type = @property.property_type
 
-      @results = all_results
+      tab_results = all_results
         .select { |r| r.inspection_item.tab == @tab_key }
-        .select { |r| r.inspection_item.visible_for?(property_type: property_type, answered_results: answered_context) }
+        .select { |r| r.inspection_item.applicable_for?(property_type) }
         .sort_by { |r| r.inspection_item.tab_position }
+
+      @dependency_hidden_ids = tab_results
+        .select { |r| r.inspection_item.skip_for?(answered_context) }
+        .map(&:id).to_set
+
+      @results = tab_results
     end
 
     def update

@@ -1,7 +1,8 @@
 class InspectionGroupComponent < ViewComponent::Base
-  def initialize(category:, results:)
+  def initialize(category:, results:, dependency_hidden_ids: Set.new)
     @category = category
     @results = results
+    @dependency_hidden_ids = dependency_hidden_ids
   end
 
   private
