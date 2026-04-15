@@ -10,9 +10,14 @@ module Inspections
       @report = RightsAnalysisReport.find_by(property: @property, user: current_user)
       @budget_setting = current_user.budget_setting
 
-      @results_by_tab = @property.inspection_results
+      all_results = @property.inspection_results
         .where(user: current_user)
         .includes(:inspection_item)
+      answered_context = all_results.index_by { |r| r.inspection_item.code }
+      property_type = @property.property_type
+
+      @results_by_tab = all_results
+        .select { |r| r.inspection_item.visible_for?(property_type:, answered_results: answered_context) }
         .group_by { |r| r.inspection_item.tab }
 
       @risk_results = @property.inspection_results

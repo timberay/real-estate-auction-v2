@@ -1,5 +1,103 @@
 # E2E Test Report
 
+## Run 6: Checklist Items Filtering E2E Verification (2026-04-15)
+
+- **Test date:** 2026-04-15T06:23~06:31Z
+- **Target URL:** http://localhost:3000
+- **Context:** Full verification after checklist_items_summary.json changes — merged 89→81 items, added depends_on + applicable_types filtering
+- **Total scenarios:** 13
+- **Passed:** 12 | **Failed:** 0 | **Bug Found:** 1
+- **Test property:** Property #16 (2024타경6008, 아파트, 81 results manually seeded)
+
+### Results Summary
+
+| # | Scenario | Status | Screenshots | Notes |
+|---|----------|--------|-------------|-------|
+| S-001 | 물건 목록 (/properties) | PASS | before/s001, after/s001 | 5건 정상 표시, 콘솔 에러 없음 |
+| S-002 | 물건 상세 (/properties/16) | PASS | after/s002 | 분석결과보기/다시분석 링크 정상 |
+| S-003 | 권리분석 탭 (depends_on=hidden) | PASS | after/s003 | 17/25 항목 표시 (8개 depends_on 필터링) |
+| S-003b | 권리분석 탭 (depends_on=visible) | PASS | after/s003b | rights-003 위험 시 25/25 항목 표시 |
+| S-004 | 물건분석 탭 | PASS | after/s004 | 12개 항목, 에러 없음 |
+| S-005 | 수익분석 탭 | PASS | after/s005 | 25개 항목, applicable_types 필터 정상 |
+| S-006 | 현장확인 탭 | PASS | after/s006 | 12개 항목, 에러 없음 |
+| S-007 | 입찰&낙찰 탭 | PASS | after/s007 | 7개 항목, 에러 없음 |
+| S-008 | 종합등급 페이지 | BUG | after/s008 | 통계 테이블 필터링 미적용 (아래 상세) |
+| S-009 | 명도 시뮬레이터 | PASS | after/s009 | property_id 파라미터 전달 정상 |
+| S-010 | AI분석 (자동분석 탭) | PASS | after/s010 | PDF 업로드 UI 정상 |
+| S-011 | AI분석 (수동분석 탭) | PASS | after/s011 | 프롬프트 복사/원본 업로드 정상 |
+| S-012 | 명도 가이드 | PASS | after/s012 | 에러 없음 |
+| S-013 | 예산 설정 | PASS | after/s013 | /onboarding → /settings/budget 리다이렉트 정상 |
+
+### Bug Found
+
+**BUG: TabSummaryTable on Grade Page — `visible_for?` filtering not applied**
+
+- **Severity:** Medium
+- **Location:** `app/controllers/inspections/grades_controller.rb:13-16`
+- **Component:** `TabSummaryTableComponent`
+
+**Expected:** Grade page statistics table uses `visible_for?` filtering (same as tab navigation).
+**Actual:** `@results_by_tab` uses unfiltered `inspection_results`, showing all 25 rights_analysis items instead of 17.
+
+| Tab | Tab Nav (filtered) | Grade Table (unfiltered) | Diff |
+|-----|-------------------|-------------------------|------|
+| 권리분석 | 10/17 | 8+6+11=25 | **+8** |
+| 물건분석 | 8/12 | 7+1+4=12 | 0 |
+| 수익분석 | 14/25 | 7+7+11=25 | 0 |
+| 현장확인 | 8/12 | 5+3+4=12 | 0 |
+| 입찰&낙찰 | 6/7 | 4+2+1=7 | 0 |
+
+**Root cause:**
+```ruby
+# grades_controller.rb:13-16 — NO filtering applied
+@results_by_tab = @property.inspection_results
+  .where(user: current_user)
+  .includes(:inspection_item)
+  .group_by { |r| r.inspection_item.tab }
+```
+
+**Recommended fix:**
+```ruby
+all_results = @property.inspection_results
+  .where(user: current_user).includes(:inspection_item)
+answered_context = all_results.index_by { |r| r.inspection_item.code }
+property_type = @property.property_type
+
+@results_by_tab = all_results
+  .select { |r| r.inspection_item.visible_for?(property_type:, answered_results: answered_context) }
+  .group_by { |r| r.inspection_item.tab }
+```
+
+### Filtering Verification Summary
+
+**depends_on filtering:**
+- `rights-003` has_risk=false → 8 child items hidden (show_when_risk: true) ✅
+- `rights-003` has_risk=true → 8 child items shown ✅
+- `rights-008` has_risk=nil → `rights-017` hidden ✅
+
+**property_type filtering (logic verification):**
+- `finance-003` (applicable_types: ["아파트"]) → visible for 아파트 ✅
+- `finance-003` → hidden for 빌라/다세대 ✅
+- `finance-003` → hidden for 상가 ✅
+- Items with nil applicable_types → visible for all types ✅
+
+**Tab item counts (after filtering, rights-003=safe):**
+
+| Tab | DB Total | Visible | Hidden |
+|-----|----------|---------|--------|
+| rights_analysis | 25 | 17 | 8 (depends_on) |
+| property_analysis | 12 | 12 | 0 |
+| profit_analysis | 25 | 25 | 0 |
+| field_check | 12 | 12 | 0 |
+| bidding | 7 | 7 | 0 |
+| **Total** | **81** | **73** | **8** |
+
+### Console Errors
+
+No JavaScript errors detected across all 13 tested pages.
+
+---
+
 ## Run 5: Full Menu Crawl & Feature Verification (2026-04-11)
 
 - **Test date:** 2026-04-11T02:53Z
