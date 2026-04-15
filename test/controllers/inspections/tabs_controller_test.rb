@@ -90,7 +90,8 @@ class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "edit renders dependent items hidden when parent has_risk is false" do
-    # rights-003 has_risk=false, rights-009 depends_on rights-003 show_when_risk=true
+    # rights-003 has_risk=false → rights-024 should be hidden
+    # rights-024 depends_on rights-003 show_when_risk=true
     get edit_property_inspections_tab_url(@property, tab_key: "rights_analysis")
     assert_response :success
     assert_select "[data-depends-on-code='rights-003']" do |elements|
@@ -101,7 +102,7 @@ class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
   test "edit renders dependent items visible when parent has_risk matches show_when_risk" do
     risky = properties(:risky_villa)
     UserProperty.find_or_create_by!(user: users(:guest), property: risky)
-    # risky_villa rights-003 has_risk=true, rights-009 depends_on rights-003 show_when_risk=true
+    # risky_villa: rights-003 has_risk=true → rights-024 visible
     get edit_property_inspections_tab_url(risky, tab_key: "rights_analysis")
     assert_response :success
     assert_select "[data-depends-on-code='rights-003']" do |elements|

@@ -28,6 +28,22 @@ manual_unanswered:
   inspection_item: manual_001
   user: guest
 
+safe_apartment_rights_024:
+  property: safe_apartment
+  inspection_item: rights_024
+  user: guest
+  source_type: 0
+  has_risk: false
+  evidence: '{"source_label": "AI", "confidence": "high", "reasoning": "대항력 임차인 없음"}'
+
+risky_villa_rights_024:
+  property: risky_villa
+  inspection_item: rights_024
+  user: guest
+  source_type: 0
+  has_risk: true
+  evidence: '{"source_label": "AI", "confidence": "high", "reasoning": "대항력 임차인 있음"}'
+
 safe_apartment_rights_009:
   property: safe_apartment
   inspection_item: rights_009

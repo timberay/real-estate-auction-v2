@@ -36,10 +36,11 @@ class InspectionTabsComponent < ViewComponent::Base
       .where(user: @user)
       .includes(:inspection_item)
     answered_context = all_results.index_by { |r| r.inspection_item.code }
+    all_items_by_code = all_results.map(&:inspection_item).index_by(&:code)
     property_type = @property.property_type
 
     visible = all_results.select do |r|
-      r.inspection_item.visible_for?(property_type: property_type, answered_results: answered_context)
+      r.inspection_item.visible_for?(property_type: property_type, answered_results: answered_context, all_items_by_code: all_items_by_code)
     end
 
     visible.group_by { |r| r.inspection_item.tab }.each_with_object({}) do |(tab_key, results_in_tab), hash|

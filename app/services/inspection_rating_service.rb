@@ -65,10 +65,11 @@ class InspectionRatingService
     @visible_results ||= begin
       all_results = @property.inspection_results.where(user: @user).includes(:inspection_item)
       answered_context = all_results.index_by { |r| r.inspection_item.code }
+      all_items_by_code = all_results.map(&:inspection_item).index_by(&:code)
       property_type = @property.property_type
 
       all_results.select do |r|
-        r.inspection_item.visible_for?(property_type: property_type, answered_results: answered_context)
+        r.inspection_item.visible_for?(property_type: property_type, answered_results: answered_context, all_items_by_code: all_items_by_code)
       end
     end
   end
