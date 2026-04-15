@@ -4,7 +4,7 @@ class InspectionRatingServiceTest < ActiveSupport::TestCase
   setup do
     @user = users(:guest)
     @property = properties(:safe_apartment)
-    @item = inspection_items(:rights_011)
+    @item = inspection_items(:rights_003)
     InspectionResult.where(property: @property, user: @user).destroy_all
     UserProperty.find_or_create_by!(user: @user, property: @property)
   end

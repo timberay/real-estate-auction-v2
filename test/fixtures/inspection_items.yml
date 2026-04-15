@@ -10,14 +10,14 @@ rights_002:
   priority: "상"
   yes_means_safe: true
 
-rights_011:
-  code: "rights-011"
+rights_003:
+  code: "rights-003"
   tab: 0
-  tab_position: 2
+  tab_position: 4
   category: "권리분석"
-  question: "매각물건명세서 비고란에 유치권 또는 법정지상권 기재가 있습니까?"
-  description: "유치권은 공사대금 미지급 등으로 점유를 주장하는 것이고, 법정지상권은 토지와 건물 소유자가 달라질 때 발생합니다."
-  logic: '{"yes": "인수해야 할 중대 권리가 명시되어 있습니다.", "no": "치명적인 특수 권리가 없습니다."}'
+  question: "전입신고된 제3자 임차인이 거주하고 있습니까?"
+  description: "임차인 확인"
+  logic: '{"yes": "임차인 있음", "no": "없음"}'
   data_source_name: "수동 입력"
   priority: "상"
   yes_means_safe: false
@@ -176,18 +176,6 @@ property_006:
   logic: '{"yes": "아파트는 초보자에게 적합합니다.", "no": "변수가 많습니다."}'
   data_source_name: "수동 입력"
   priority: "중"
-  yes_means_safe: true
-
-resale_002:
-  code: "resale-002"
-  tab: 1
-  tab_position: 8
-  category: "물건 기본 필터링"
-  question: "세대수 대비 주차 공간이 충분합니까?"
-  description: "주차 공간 확인"
-  logic: '{"yes": "충분", "no": "부족"}'
-  data_source_name: "수동 입력"
-  priority: "상"
   yes_means_safe: true
 
 resale_003:

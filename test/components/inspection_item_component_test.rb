@@ -69,7 +69,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
   # --- Inverted polarity (yes_means_safe: false) tests ---
 
   test "inverted polarity: highlights YES when has_risk is true" do
-    result = inspection_results(:risky_villa_rights_011)
+    result = inspection_results(:risky_villa_rights_003)
     assert_equal true, result.has_risk
     assert_equal false, result.inspection_item.yes_means_safe
     render_inline(InspectionItemComponent.new(result: result))
@@ -79,7 +79,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
   end
 
   test "inverted polarity: highlights NO when has_risk is false" do
-    result = inspection_results(:safe_apartment_rights_011)
+    result = inspection_results(:safe_apartment_rights_003)
     assert_equal false, result.has_risk
     assert_equal false, result.inspection_item.yes_means_safe
     render_inline(InspectionItemComponent.new(result: result))
@@ -89,7 +89,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
   end
 
   test "inverted polarity: YES row uses red (danger) classes when selected" do
-    result = inspection_results(:risky_villa_rights_011)
+    result = inspection_results(:risky_villa_rights_003)
     render_inline(InspectionItemComponent.new(result: result))
 
     yes_row = page.find("[data-inspection-item-target='logicYes']")
@@ -98,7 +98,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
   end
 
   test "inverted polarity: NO row uses green (safe) classes when selected" do
-    result = inspection_results(:safe_apartment_rights_011)
+    result = inspection_results(:safe_apartment_rights_003)
     render_inline(InspectionItemComponent.new(result: result))
 
     no_row = page.find("[data-inspection-item-target='logicNo']")
@@ -134,7 +134,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
   end
 
   test "renders evidence block with keyword data for auto result" do
-    result = inspection_results(:safe_apartment_rights_011)
+    result = inspection_results(:safe_apartment_rights_003)
     result.update!(evidence: {
       "source_label" => "비고, 물건명세서, 현황조사서",
       "keywords" => { "searched" => [ "유치권", "법정지상권" ], "found" => false }
@@ -156,7 +156,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
   end
 
   test "renders AI 분석 badge for ai source" do
-    result = inspection_results(:risky_villa_rights_011)
+    result = inspection_results(:risky_villa_rights_003)
     result.update!(
       source_type: :ai, has_risk: true,
       evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "테스트 근거" }
@@ -167,7 +167,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
   end
 
   test "renders evidence block for ai result with reasoning" do
-    result = inspection_results(:risky_villa_rights_011)
+    result = inspection_results(:risky_villa_rights_003)
     result.update!(
       source_type: :ai, has_risk: true,
       evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "유치권 신고가 있습니다." }
@@ -179,7 +179,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
   end
 
   test "renders keyword found state with 발견 text" do
-    result = inspection_results(:risky_villa_rights_011)
+    result = inspection_results(:risky_villa_rights_003)
     result.update!(evidence: {
       "source_label" => "비고, 물건명세서, 현황조사서",
       "keywords" => { "searched" => [ "유치권", "법정지상권" ], "found" => true }
@@ -191,7 +191,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
   end
 
   test "renders reasoning with line breaks preserved" do
-    result = inspection_results(:risky_villa_rights_011)
+    result = inspection_results(:risky_villa_rights_003)
     result.update!(
       source_type: :ai, has_risk: true,
       evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "첫째 줄입니다.\n둘째 줄입니다." }
@@ -202,7 +202,7 @@ class InspectionItemComponentTest < ViewComponent::TestCase
   end
 
   test "renders evidence block for ai result with none confidence (참고)" do
-    result = inspection_results(:risky_villa_rights_011)
+    result = inspection_results(:risky_villa_rights_003)
     result.update!(
       source_type: :ai, has_risk: nil,
       evidence: { "source_label" => "AI 분석 (참고)", "confidence" => "none", "reasoning" => "해당 물건은 단독주택이므로 직접 확인이 필요합니다." }

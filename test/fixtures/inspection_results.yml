@@ -6,22 +6,22 @@ safe_apartment_rights_002:
   has_risk: false
   evidence: '{"source_label":"매각물건명세서","fields":[{"label":"소멸되지 않는 권리","value":"없음"}]}'
 
-safe_apartment_rights_011:
+safe_apartment_rights_003:
   property: safe_apartment
-  inspection_item: rights_011
+  inspection_item: rights_003
   user: guest
   source_type: 0
   has_risk: false
-  evidence: '{"source_label":"비고, 물건명세서, 현황조사서","keywords":{"searched":["유치권","법정지상권"],"found":false}}'
+  evidence: '{"source_label":"임차인 확인","keywords":{"searched":["임차인","전입신고"],"found":false}}'
 
-risky_villa_rights_011:
+risky_villa_rights_003:
   property: risky_villa
-  inspection_item: rights_011
+  inspection_item: rights_003
   user: guest
   source_type: 0
   has_risk: true
   resolvable: false
-  evidence: '{"source_label":"비고, 물건명세서, 현황조사서","keywords":{"searched":["유치권","법정지상권"],"found":true}}'
+  evidence: '{"source_label":"임차인 확인","keywords":{"searched":["임차인","전입신고"],"found":true}}'
 
 manual_unanswered:
   property: safe_apartment

@@ -28,4 +28,4 @@ risky_villa_report:
   source_doc_reviewed: false
   analyzed_at: <%= Time.current %>
   user_confirmed_at:
-  report_data: '<%= { registry_timeline: [], tenants: [], dividend_simulation: { expected_bid: nil, distribution: [] }, bidder_burden: { assumed_amount: 30000000, unconfirmed_risk: 0, total_burden: 30000000, verdict: "danger" }, checklist_references: ["rights-011"] }.to_json %>'
+  report_data: '<%= { registry_timeline: [], tenants: [], dividend_simulation: { expected_bid: nil, distribution: [] }, bidder_burden: { assumed_amount: 30000000, unconfirmed_risk: 0, total_burden: 30000000, verdict: "danger" }, checklist_references: ["rights-003"] }.to_json %>'

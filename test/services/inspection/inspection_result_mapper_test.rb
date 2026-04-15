@@ -49,7 +49,7 @@ class Inspection::InspectionResultMapperTest < ActiveSupport::TestCase
     Inspection::InspectionResultMapper.call(
       response: @response, property: @property, user: @user, items: @items
     )
-    result = find_result("rights-011")
+    result = find_result("rights-003")
     assert result.ai?
   end
 

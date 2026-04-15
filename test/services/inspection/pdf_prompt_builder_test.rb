@@ -23,7 +23,7 @@ class Inspection::PdfPromptBuilderTest < ActiveSupport::TestCase
   end
 
   test "includes yes_means_safe and priority for each item" do
-    items = InspectionItem.where(code: "rights-011").to_a
+    items = InspectionItem.where(code: "rights-008").to_a
     result = Inspection::PdfPromptBuilder.call(items: items)
 
     assert result[:user].include?("yes_means_safe=false")

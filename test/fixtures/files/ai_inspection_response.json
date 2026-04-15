@@ -85,7 +85,7 @@
       "confidence": "medium",
       "reasoning": "매각물건명세서에 선순위 세금 압류 관련 기재가 없습니다."
     },
-    "rights-011": {
+    "rights-003": {
       "has_risk": true,
       "confidence": "high",
       "reasoning": "비고란에 '유치권 신고 있음'으로 기재되어 있습니다."
