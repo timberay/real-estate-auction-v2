@@ -208,4 +208,69 @@ class InspectionItemTest < ActiveSupport::TestCase
     assert_includes InspectionItem.applicable_for_type(nil), item
     assert_includes InspectionItem.applicable_for_type(""), item
   end
+
+  # Multi-level skip_for? tests
+  test "skip_for? cascades when parent is skipped (grandparent unanswered)" do
+    grandparent = InspectionItem.new(code: "gp-001", tab: "rights_analysis", tab_position: 1,
+      category: "권리분석", question: "Q?", priority: "상", depends_on: nil)
+    parent = InspectionItem.new(code: "p-001", tab: "rights_analysis", tab_position: 2,
+      category: "권리분석", question: "Q?", priority: "상",
+      depends_on: { "code" => "gp-001", "show_when_risk" => true })
+    child = InspectionItem.new(code: "c-001", tab: "rights_analysis", tab_position: 3,
+      category: "권리분석", question: "Q?", priority: "상",
+      depends_on: { "code" => "p-001", "show_when_risk" => true })
+
+    all_items = { "gp-001" => grandparent, "p-001" => parent, "c-001" => child }
+    # grandparent unanswered → parent skipped → child skipped
+    assert child.skip_for?({}, all_items_by_code: all_items)
+  end
+
+  test "skip_for? shows grandchild when full chain matches" do
+    grandparent = InspectionItem.new(code: "gp-002", tab: "rights_analysis", tab_position: 1,
+      category: "권리분석", question: "Q?", priority: "상", depends_on: nil)
+    parent = InspectionItem.new(code: "p-002", tab: "rights_analysis", tab_position: 2,
+      category: "권리분석", question: "Q?", priority: "상",
+      depends_on: { "code" => "gp-002", "show_when_risk" => true })
+    child = InspectionItem.new(code: "c-002", tab: "rights_analysis", tab_position: 3,
+      category: "권리분석", question: "Q?", priority: "상",
+      depends_on: { "code" => "p-002", "show_when_risk" => true })
+
+    gp_result = OpenStruct.new(has_risk: true)
+    p_result = OpenStruct.new(has_risk: true)
+    answered = { "gp-002" => gp_result, "p-002" => p_result }
+    all_items = { "gp-002" => grandparent, "p-002" => parent, "c-002" => child }
+
+    refute child.skip_for?(answered, all_items_by_code: all_items)
+  end
+
+  test "skip_for? skips grandchild when intermediate parent is safe" do
+    grandparent = InspectionItem.new(code: "gp-003", tab: "rights_analysis", tab_position: 1,
+      category: "권리분석", question: "Q?", priority: "상", depends_on: nil)
+    parent = InspectionItem.new(code: "p-003", tab: "rights_analysis", tab_position: 2,
+      category: "권리분석", question: "Q?", priority: "상",
+      depends_on: { "code" => "gp-003", "show_when_risk" => true })
+    child = InspectionItem.new(code: "c-003", tab: "rights_analysis", tab_position: 3,
+      category: "권리분석", question: "Q?", priority: "상",
+      depends_on: { "code" => "p-003", "show_when_risk" => true })
+
+    gp_result = OpenStruct.new(has_risk: true)
+    p_result = OpenStruct.new(has_risk: false) # safe → child should be skipped
+    answered = { "gp-003" => gp_result, "p-003" => p_result }
+    all_items = { "gp-003" => grandparent, "p-003" => parent, "c-003" => child }
+
+    assert child.skip_for?(answered, all_items_by_code: all_items)
+  end
+
+  test "skip_for? handles circular dependency without infinite loop" do
+    item_a = InspectionItem.new(code: "circ-a", tab: "rights_analysis", tab_position: 1,
+      category: "권리분석", question: "Q?", priority: "상",
+      depends_on: { "code" => "circ-b", "show_when_risk" => true })
+    item_b = InspectionItem.new(code: "circ-b", tab: "rights_analysis", tab_position: 2,
+      category: "권리분석", question: "Q?", priority: "상",
+      depends_on: { "code" => "circ-a", "show_when_risk" => true })
+
+    all_items = { "circ-a" => item_a, "circ-b" => item_b }
+    # Should not raise SystemStackError, should return true (skip)
+    assert item_a.skip_for?({}, all_items_by_code: all_items)
+  end
 end

@@ -28,8 +28,9 @@ class InspectionItem < ApplicationRecord
     applicable_types.blank? || applicable_types.include?(property_type)
   end
 
-  def visible_for?(property_type:, answered_results: {})
-    applicable_for?(property_type) && !skip_for?(answered_results)
+  def visible_for?(property_type:, answered_results: {}, all_items_by_code: {})
+    applicable_for?(property_type) &&
+      !skip_for?(answered_results, all_items_by_code: all_items_by_code)
   end
 
   def depends_on
@@ -37,12 +38,18 @@ class InspectionItem < ApplicationRecord
     val.is_a?(String) ? JSON.parse(val) : val
   end
 
-  def skip_for?(answered_results_by_code)
+  def skip_for?(answered_results_by_code, all_items_by_code: {}, visited: Set.new)
     return false if depends_on.blank?
+    return true if visited.include?(code)
 
     parent_code = depends_on["code"]
-    parent_result = answered_results_by_code[parent_code]
+    parent_item = all_items_by_code[parent_code]
 
+    if parent_item&.skip_for?(answered_results_by_code, all_items_by_code: all_items_by_code, visited: visited | [ code ])
+      return true
+    end
+
+    parent_result = answered_results_by_code[parent_code]
     return true if parent_result.nil? || parent_result.has_risk.nil?
 
     parent_result.has_risk != depends_on["show_when_risk"]
