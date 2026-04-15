@@ -17,8 +17,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.string "name", null: false
     t.bigint "record_id", null: false
     t.string "record_type", null: false
-    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
-    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+    t.index [ "blob_id" ], name: "index_active_storage_attachments_on_blob_id"
+    t.index [ "record_type", "record_id", "name", "blob_id" ], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
   create_table "active_storage_blobs", force: :cascade do |t|
@@ -30,13 +30,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.string "key", null: false
     t.text "metadata"
     t.string "service_name", null: false
-    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+    t.index [ "key" ], name: "index_active_storage_blobs_on_key", unique: true
   end
 
   create_table "active_storage_variant_records", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
-    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+    t.index [ "blob_id", "variation_digest" ], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
   create_table "api_credentials", force: :cascade do |t|
@@ -48,8 +48,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.string "provider_name", null: false
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
-    t.index ["user_id", "provider_name"], name: "index_api_credentials_on_user_id_and_provider_name", unique: true
-    t.index ["user_id"], name: "index_api_credentials_on_user_id"
+    t.index [ "user_id", "provider_name" ], name: "index_api_credentials_on_user_id_and_provider_name", unique: true
+    t.index [ "user_id" ], name: "index_api_credentials_on_user_id"
   end
 
   create_table "auction_schedules", force: :cascade do |t|
@@ -65,8 +65,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.string "schedule_time"
     t.string "schedule_type"
     t.datetime "updated_at", null: false
-    t.index ["property_id", "schedule_date"], name: "index_auction_schedules_on_property_id_and_schedule_date"
-    t.index ["property_id"], name: "index_auction_schedules_on_property_id"
+    t.index [ "property_id", "schedule_date" ], name: "index_auction_schedules_on_property_id_and_schedule_date"
+    t.index [ "property_id" ], name: "index_auction_schedules_on_property_id"
   end
 
   create_table "budget_settings", force: :cascade do |t|
@@ -87,9 +87,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.integer "scrivener_fee"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
-    t.index ["loan_policy_id"], name: "index_budget_settings_on_loan_policy_id"
-    t.index ["property_type_id"], name: "index_budget_settings_on_property_type_id"
-    t.index ["user_id"], name: "index_budget_settings_on_user_id", unique: true
+    t.index [ "loan_policy_id" ], name: "index_budget_settings_on_loan_policy_id"
+    t.index [ "property_type_id" ], name: "index_budget_settings_on_property_type_id"
+    t.index [ "user_id" ], name: "index_budget_settings_on_user_id", unique: true
   end
 
   create_table "eviction_simulations", force: :cascade do |t|
@@ -101,9 +101,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.json "result_path"
     t.string "session_id"
     t.datetime "updated_at", null: false
-    t.index ["property_id"], name: "idx_eviction_simulations_one_per_property", unique: true, where: "property_id IS NOT NULL"
-    t.index ["property_id"], name: "index_eviction_simulations_on_property_id"
-    t.index ["session_id"], name: "index_eviction_simulations_on_session_id"
+    t.index [ "property_id" ], name: "idx_eviction_simulations_one_per_property", unique: true, where: "property_id IS NOT NULL"
+    t.index [ "property_id" ], name: "index_eviction_simulations_on_property_id"
+    t.index [ "session_id" ], name: "index_eviction_simulations_on_session_id"
   end
 
   create_table "eviction_simulator_questions", force: :cascade do |t|
@@ -118,8 +118,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.string "step_code", null: false
     t.datetime "updated_at", null: false
     t.string "yes_next_code"
-    t.index ["code"], name: "index_eviction_simulator_questions_on_code", unique: true
-    t.index ["step_code"], name: "index_eviction_simulator_questions_on_step_code"
+    t.index [ "code" ], name: "index_eviction_simulator_questions_on_code", unique: true
+    t.index [ "step_code" ], name: "index_eviction_simulator_questions_on_step_code"
   end
 
   create_table "eviction_steps", force: :cascade do |t|
@@ -143,8 +143,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.integer "step_type", default: 0, null: false
     t.string "trigger_step_code"
     t.datetime "updated_at", null: false
-    t.index ["code"], name: "index_eviction_steps_on_code", unique: true
-    t.index ["step_type", "position"], name: "index_eviction_steps_on_step_type_and_position"
+    t.index [ "code" ], name: "index_eviction_steps_on_code", unique: true
+    t.index [ "step_type", "position" ], name: "index_eviction_steps_on_step_type_and_position"
   end
 
   create_table "inspection_items", force: :cascade do |t|
@@ -164,8 +164,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.integer "tab_position", default: 0, null: false
     t.datetime "updated_at", null: false
     t.boolean "yes_means_safe", default: true, null: false
-    t.index ["code"], name: "index_inspection_items_on_code", unique: true
-    t.index ["tab", "tab_position"], name: "index_inspection_items_on_tab_and_tab_position"
+    t.index [ "code" ], name: "index_inspection_items_on_code", unique: true
+    t.index [ "tab", "tab_position" ], name: "index_inspection_items_on_tab_and_tab_position"
   end
 
   create_table "inspection_results", force: :cascade do |t|
@@ -181,10 +181,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.integer "source_type"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
-    t.index ["inspection_item_id"], name: "index_inspection_results_on_inspection_item_id"
-    t.index ["property_id", "inspection_item_id", "user_id"], name: "idx_inspection_results_unique", unique: true
-    t.index ["property_id"], name: "index_inspection_results_on_property_id"
-    t.index ["user_id"], name: "index_inspection_results_on_user_id"
+    t.index [ "inspection_item_id" ], name: "index_inspection_results_on_inspection_item_id"
+    t.index [ "property_id", "inspection_item_id", "user_id" ], name: "idx_inspection_results_unique", unique: true
+    t.index [ "property_id" ], name: "index_inspection_results_on_property_id"
+    t.index [ "user_id" ], name: "index_inspection_results_on_user_id"
   end
 
   create_table "llm_analysis_logs", force: :cascade do |t|
@@ -200,10 +200,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.text "user_prompt", null: false
-    t.index ["property_id", "status"], name: "index_llm_analysis_logs_on_property_id_and_status"
-    t.index ["property_id"], name: "index_llm_analysis_logs_on_property_id"
-    t.index ["status"], name: "index_llm_analysis_logs_on_status"
-    t.index ["user_id"], name: "index_llm_analysis_logs_on_user_id"
+    t.index [ "property_id", "status" ], name: "index_llm_analysis_logs_on_property_id_and_status"
+    t.index [ "property_id" ], name: "index_llm_analysis_logs_on_property_id"
+    t.index [ "status" ], name: "index_llm_analysis_logs_on_status"
+    t.index [ "user_id" ], name: "index_llm_analysis_logs_on_user_id"
   end
 
   create_table "loan_policies", force: :cascade do |t|
@@ -217,8 +217,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.integer "property_type_id", null: false
     t.string "source_url"
     t.datetime "updated_at", null: false
-    t.index ["property_type_id", "enabled"], name: "index_loan_policies_on_property_type_id_and_enabled"
-    t.index ["property_type_id"], name: "index_loan_policies_on_property_type_id"
+    t.index [ "property_type_id", "enabled" ], name: "index_loan_policies_on_property_type_id_and_enabled"
+    t.index [ "property_type_id" ], name: "index_loan_policies_on_property_type_id"
   end
 
   create_table "properties", force: :cascade do |t|
@@ -249,9 +249,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.string "status"
     t.datetime "updated_at", null: false
     t.integer "view_count", default: 0
-    t.index ["case_number"], name: "index_properties_on_case_number", unique: true
-    t.index ["property_type"], name: "index_properties_on_property_type"
-    t.index ["sido", "sigungu", "dong"], name: "idx_properties_location"
+    t.index [ "case_number" ], name: "index_properties_on_case_number", unique: true
+    t.index [ "property_type" ], name: "index_properties_on_property_type"
+    t.index [ "sido", "sigungu", "dong" ], name: "idx_properties_location"
   end
 
   create_table "property_types", force: :cascade do |t|
@@ -261,8 +261,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.string "name", null: false
     t.integer "sort_order", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.index ["code"], name: "index_property_types_on_code", unique: true
-    t.index ["enabled", "sort_order"], name: "index_property_types_on_enabled_and_sort_order"
+    t.index [ "code" ], name: "index_property_types_on_code", unique: true
+    t.index [ "enabled", "sort_order" ], name: "index_property_types_on_enabled_and_sort_order"
   end
 
   create_table "reserve_fund_defaults", force: :cascade do |t|
@@ -277,8 +277,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.integer "repair_cost", null: false
     t.integer "scrivener_fee", null: false
     t.datetime "updated_at", null: false
-    t.index ["property_type_id", "area_range_min", "area_range_max"], name: "idx_reserve_defaults_type_area", unique: true
-    t.index ["property_type_id"], name: "index_reserve_fund_defaults_on_property_type_id"
+    t.index [ "property_type_id", "area_range_min", "area_range_max" ], name: "idx_reserve_defaults_type_area", unique: true
+    t.index [ "property_type_id" ], name: "index_reserve_fund_defaults_on_property_type_id"
   end
 
   create_table "rights_analysis_reports", force: :cascade do |t|
@@ -299,9 +299,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.integer "user_id", null: false
     t.integer "verdict", default: 0, null: false
     t.text "verdict_summary"
-    t.index ["property_id"], name: "index_rights_analysis_reports_on_property_id"
-    t.index ["user_id", "property_id"], name: "idx_rights_reports_user_property", unique: true
-    t.index ["user_id"], name: "index_rights_analysis_reports_on_user_id"
+    t.index [ "property_id" ], name: "index_rights_analysis_reports_on_property_id"
+    t.index [ "user_id", "property_id" ], name: "idx_rights_reports_user_property", unique: true
+    t.index [ "user_id" ], name: "index_rights_analysis_reports_on_user_id"
   end
 
   create_table "search_results", force: :cascade do |t|
@@ -319,8 +319,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.string "status"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
-    t.index ["user_id", "case_number"], name: "index_search_results_on_user_id_and_case_number", unique: true
-    t.index ["user_id"], name: "index_search_results_on_user_id"
+    t.index [ "user_id", "case_number" ], name: "index_search_results_on_user_id_and_case_number", unique: true
+    t.index [ "user_id" ], name: "index_search_results_on_user_id"
   end
 
   create_table "user_properties", force: :cascade do |t|
@@ -330,9 +330,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.integer "safety_rating"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
-    t.index ["property_id"], name: "index_user_properties_on_property_id"
-    t.index ["user_id", "property_id"], name: "index_user_properties_on_user_id_and_property_id", unique: true
-    t.index ["user_id"], name: "index_user_properties_on_user_id"
+    t.index [ "property_id" ], name: "index_user_properties_on_property_id"
+    t.index [ "user_id", "property_id" ], name: "index_user_properties_on_user_id_and_property_id", unique: true
+    t.index [ "user_id" ], name: "index_user_properties_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -340,7 +340,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_15_053435) do
     t.string "email", null: false
     t.string "password_digest", null: false
     t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index [ "email" ], name: "index_users_on_email", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

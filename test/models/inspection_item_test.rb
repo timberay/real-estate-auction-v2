@@ -175,7 +175,7 @@ class InspectionItemTest < ActiveSupport::TestCase
   test "visible_for? returns false when not applicable for property type" do
     item = InspectionItem.new(code: "vis-002", tab: "rights_analysis", tab_position: 1,
       category: "권리분석", question: "Q?", priority: "상",
-      applicable_types: ["상가"], depends_on: nil)
+      applicable_types: [ "상가" ], depends_on: nil)
     refute item.visible_for?(property_type: "아파트", answered_results: {})
   end
 
@@ -197,14 +197,14 @@ class InspectionItemTest < ActiveSupport::TestCase
 
   test "applicable_for_type scope returns items matching the property type" do
     item = InspectionItem.create!(code: "scope-match", tab: "rights_analysis", tab_position: 99,
-      category: "권리분석", question: "아파트 전용?", priority: "상", applicable_types: ["아파트", "오피스텔"])
+      category: "권리분석", question: "아파트 전용?", priority: "상", applicable_types: [ "아파트", "오피스텔" ])
     assert_includes InspectionItem.applicable_for_type("아파트"), item
     assert_not_includes InspectionItem.applicable_for_type("상가"), item
   end
 
   test "applicable_for_type scope returns all when property_type is blank" do
     item = InspectionItem.create!(code: "scope-blank", tab: "rights_analysis", tab_position: 99,
-      category: "권리분석", question: "제한된 타입?", priority: "상", applicable_types: ["상가"])
+      category: "권리분석", question: "제한된 타입?", priority: "상", applicable_types: [ "상가" ])
     assert_includes InspectionItem.applicable_for_type(nil), item
     assert_includes InspectionItem.applicable_for_type(""), item
   end
