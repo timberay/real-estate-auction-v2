@@ -1,4 +1,5 @@
 require "test_helper"
+require "ostruct"
 
 class InspectionItemTest < ActiveSupport::TestCase
   test "valid with all required fields" do
@@ -123,5 +124,88 @@ class InspectionItemTest < ActiveSupport::TestCase
       applicable_types: [ "아파트" ]
     )
     refute item.applicable_for?("단독주택")
+  end
+
+  # skip_for? tests
+  test "skip_for? returns false when depends_on is blank" do
+    item = InspectionItem.new(code: "child-001", tab: "rights_analysis", tab_position: 1,
+      category: "권리분석", question: "Q?", priority: "상", depends_on: nil)
+    assert_equal false, item.skip_for?({})
+  end
+
+  test "skip_for? returns false when parent is unanswered (conservative)" do
+    item = InspectionItem.new(code: "child-002", tab: "rights_analysis", tab_position: 1,
+      category: "권리분석", question: "Q?", priority: "상",
+      depends_on: { "code" => "rights-003", "show_when_risk" => true })
+    assert_equal false, item.skip_for?({})
+  end
+
+  test "skip_for? returns false when parent has_risk is nil" do
+    item = InspectionItem.new(code: "child-003", tab: "rights_analysis", tab_position: 1,
+      category: "권리분석", question: "Q?", priority: "상",
+      depends_on: { "code" => "parent-001", "show_when_risk" => true })
+    parent_result = OpenStruct.new(has_risk: nil)
+    assert_equal false, item.skip_for?({ "parent-001" => parent_result })
+  end
+
+  test "skip_for? returns true when parent has_risk does not match show_when_risk" do
+    item = InspectionItem.new(code: "child-004", tab: "rights_analysis", tab_position: 1,
+      category: "권리분석", question: "Q?", priority: "상",
+      depends_on: { "code" => "parent-001", "show_when_risk" => true })
+    parent_result = OpenStruct.new(has_risk: false)
+    assert_equal true, item.skip_for?({ "parent-001" => parent_result })
+  end
+
+  test "skip_for? returns false when parent has_risk matches show_when_risk" do
+    item = InspectionItem.new(code: "child-005", tab: "rights_analysis", tab_position: 1,
+      category: "권리분석", question: "Q?", priority: "상",
+      depends_on: { "code" => "parent-001", "show_when_risk" => true })
+    parent_result = OpenStruct.new(has_risk: true)
+    assert_equal false, item.skip_for?({ "parent-001" => parent_result })
+  end
+
+  # visible_for? tests
+  test "visible_for? returns true when applicable and not skipped" do
+    item = InspectionItem.new(code: "vis-001", tab: "rights_analysis", tab_position: 1,
+      category: "권리분석", question: "Q?", priority: "상",
+      applicable_types: nil, depends_on: nil)
+    assert item.visible_for?(property_type: "아파트", answered_results: {})
+  end
+
+  test "visible_for? returns false when not applicable for property type" do
+    item = InspectionItem.new(code: "vis-002", tab: "rights_analysis", tab_position: 1,
+      category: "권리분석", question: "Q?", priority: "상",
+      applicable_types: ["상가"], depends_on: nil)
+    refute item.visible_for?(property_type: "아파트", answered_results: {})
+  end
+
+  test "visible_for? returns false when skipped by parent dependency" do
+    item = InspectionItem.new(code: "vis-003", tab: "rights_analysis", tab_position: 1,
+      category: "권리분석", question: "Q?", priority: "상",
+      applicable_types: nil,
+      depends_on: { "code" => "parent-001", "show_when_risk" => true })
+    parent_result = OpenStruct.new(has_risk: false)
+    refute item.visible_for?(property_type: "아파트", answered_results: { "parent-001" => parent_result })
+  end
+
+  # applicable_for_type scope tests
+  test "applicable_for_type scope returns items with nil applicable_types" do
+    item = InspectionItem.create!(code: "scope-all", tab: "rights_analysis", tab_position: 99,
+      category: "권리분석", question: "모든 타입?", priority: "상", applicable_types: nil)
+    assert_includes InspectionItem.applicable_for_type("아파트"), item
+  end
+
+  test "applicable_for_type scope returns items matching the property type" do
+    item = InspectionItem.create!(code: "scope-match", tab: "rights_analysis", tab_position: 99,
+      category: "권리분석", question: "아파트 전용?", priority: "상", applicable_types: ["아파트", "오피스텔"])
+    assert_includes InspectionItem.applicable_for_type("아파트"), item
+    assert_not_includes InspectionItem.applicable_for_type("상가"), item
+  end
+
+  test "applicable_for_type scope returns all when property_type is blank" do
+    item = InspectionItem.create!(code: "scope-blank", tab: "rights_analysis", tab_position: 99,
+      category: "권리분석", question: "제한된 타입?", priority: "상", applicable_types: ["상가"])
+    assert_includes InspectionItem.applicable_for_type(nil), item
+    assert_includes InspectionItem.applicable_for_type(""), item
   end
 end

@@ -19,8 +19,27 @@ class InspectionItem < ApplicationRecord
 
   scope :ordered, -> { order(:tab, :tab_position) }
   scope :for_tab, ->(tab) { where(tab: tab).order(:tab_position) }
+  scope :applicable_for_type, ->(property_type) {
+    return all if property_type.blank?
+    where("applicable_types IS NULL OR EXISTS (SELECT 1 FROM json_each(applicable_types) WHERE json_each.value = ?)", property_type)
+  }
 
   def applicable_for?(property_type)
     applicable_types.blank? || applicable_types.include?(property_type)
+  end
+
+  def visible_for?(property_type:, answered_results: {})
+    applicable_for?(property_type) && !skip_for?(answered_results)
+  end
+
+  def skip_for?(answered_results_by_code)
+    return false if depends_on.blank?
+
+    parent_code = depends_on["code"]
+    parent_result = answered_results_by_code[parent_code]
+
+    return false if parent_result.nil? || parent_result.has_risk.nil?
+
+    parent_result.has_risk != depends_on["show_when_risk"]
   end
 end
