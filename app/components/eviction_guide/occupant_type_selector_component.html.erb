@@ -1,0 +1,23 @@
+<div class="max-w-2xl mx-auto">
+  <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">점유자 유형 선택</h3>
+  <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+    명도 대상 점유자의 유형을 선택해주세요. 유형에 따라 명도 절차가 달라집니다.
+  </p>
+
+  <div class="space-y-3">
+    <% cards.each do |card| %>
+      <%= form_with url: helpers.eviction_guide_simulation_path, method: :post do |f| %>
+        <%= f.hidden_field :occupant_type, value: card[:type] %>
+        <button type="submit"
+                class="w-full text-left border-2 border-slate-200 dark:border-slate-700 rounded-lg p-4 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+          <div class="flex items-center justify-between">
+            <strong class="text-sm text-slate-900 dark:text-slate-100"><%= card[:label] %></strong>
+            <span class="text-xs font-medium px-2 py-0.5 rounded-full <%= difficulty_classes(card[:difficulty]) %>">
+              난이도: <%= difficulty_label(card[:difficulty]) %>
+            </span>
+          </div>
+        </button>
+      <% end %>
+    <% end %>
+  </div>
+</div>
