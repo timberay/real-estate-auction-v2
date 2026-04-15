@@ -8,12 +8,17 @@ module Inspections
       @tab_key = params[:tab_key]
       return head(:not_found) unless VALID_TABS.include?(@tab_key)
 
-      @results = @property.inspection_results
+      all_results = @property.inspection_results
         .where(user: current_user)
-        .joins(:inspection_item)
-        .where(inspection_items: { tab: InspectionItem.tabs[@tab_key] })
         .includes(:inspection_item)
-        .order("inspection_items.tab_position")
+      answered_context = all_results.index_by { |r| r.inspection_item.code }
+
+      property_type = @property.property_type
+
+      @results = all_results
+        .select { |r| r.inspection_item.tab == @tab_key }
+        .select { |r| r.inspection_item.visible_for?(property_type: property_type, answered_results: answered_context) }
+        .sort_by { |r| r.inspection_item.tab_position }
     end
 
     def update
@@ -49,10 +54,16 @@ module Inspections
 
       tab_rating_value = rating_service.tab_rating(@tab_key)
 
-      tab_results = @property.inspection_results
-        .joins(:inspection_item)
-        .where(inspection_items: { tab: InspectionItem.tabs[@tab_key] }, user: current_user)
-      unanswered_count = tab_results.where(has_risk: nil).count
+      all_results_for_count = @property.inspection_results
+        .where(user: current_user)
+        .includes(:inspection_item)
+      answered_context = all_results_for_count.index_by { |r| r.inspection_item.code }
+      property_type = @property.property_type
+
+      visible_tab_results = all_results_for_count
+        .select { |r| r.inspection_item.tab == @tab_key }
+        .select { |r| r.inspection_item.visible_for?(property_type: property_type, answered_results: answered_context) }
+      unanswered_count = visible_tab_results.count { |r| r.has_risk.nil? }
 
       tab_label = TabSummaryTableComponent::TAB_LABELS[@tab_key] || @tab_key
 
