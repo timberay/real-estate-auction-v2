@@ -44,7 +44,8 @@ module EvictionGuide
       when :has_gratuitous_residence_doc
         find_inspection_risk("inspect-005")
       when :occupant_type
-        @report&.parsed_data&.dig("occupant_type")
+        raw = @report&.parsed_data&.dig("occupant_type")
+        raw if EvictionSimulation::OCCUPANT_TYPES.include?(raw)
       when :has_small_sum_tenant
         tenants = @report&.effective_tenants
         return nil unless tenants.present?

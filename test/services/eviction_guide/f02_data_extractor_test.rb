@@ -28,4 +28,20 @@ class EvictionGuide::F02DataExtractorTest < ActiveSupport::TestCase
     result = EvictionGuide::F02DataExtractor.call(@property)
     assert_nil result[:nonexistent_field]
   end
+
+  test "normalizes valid occupant_type from report" do
+    report = @property.rights_analysis_reports.last
+    next skip("No report fixture") unless report
+    report.update!(report_data: (report.parsed_data || {}).merge("occupant_type" => "junior_tenant"))
+    result = EvictionGuide::F02DataExtractor.call(@property)
+    assert_equal "junior_tenant", result[:occupant_type]
+  end
+
+  test "returns nil for unrecognized occupant_type" do
+    report = @property.rights_analysis_reports.last
+    next skip("No report fixture") unless report
+    report.update!(report_data: (report.parsed_data || {}).merge("occupant_type" => "some_llm_garbage"))
+    result = EvictionGuide::F02DataExtractor.call(@property)
+    assert_nil result[:occupant_type]
+  end
 end
