@@ -7,7 +7,9 @@ export default class extends Controller {
     this.updateIcons()
   }
 
-  toggle() {
+  toggle(event) {
+    event.preventDefault()
+    event.stopPropagation()
     const isDark = document.documentElement.classList.contains("dark")
     this.setDarkMode(!isDark)
     localStorage.setItem("dark-mode", !isDark)
