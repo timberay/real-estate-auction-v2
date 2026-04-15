@@ -56,7 +56,7 @@ class EvictionSeedGraphValidationTest < ActiveSupport::TestCase
 
   test "all yes_next_code and no_next_code resolve to valid questions or END" do
     EvictionSimulatorQuestion.find_each do |q|
-      [q.yes_next_code, q.no_next_code].compact.each do |code|
+      [ q.yes_next_code, q.no_next_code ].compact.each do |code|
         next if code == "END"
         target = EvictionSimulatorQuestion.find_by(code: code)
         assert target, "Question #{q.code} points to missing code: #{code}"
@@ -73,7 +73,7 @@ class EvictionSeedGraphValidationTest < ActiveSupport::TestCase
   test "no orphan questions — all are reachable from Q1" do
     all_codes = EvictionSimulatorQuestion.pluck(:code).to_set
     reachable = Set.new
-    queue = ["Q1"]
+    queue = [ "Q1" ]
 
     while queue.any?
       code = queue.shift

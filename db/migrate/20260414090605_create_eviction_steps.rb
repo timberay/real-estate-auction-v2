@@ -23,6 +23,6 @@ class CreateEvictionSteps < ActiveRecord::Migration[8.1]
     end
 
     add_index :eviction_steps, :code, unique: true
-    add_index :eviction_steps, [:step_type, :position]
+    add_index :eviction_steps, [ :step_type, :position ]
   end
 end

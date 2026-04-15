@@ -11,7 +11,7 @@ class CreateEvictionSimulations < ActiveRecord::Migration[8.1]
     end
 
     add_index :eviction_simulations, :session_id
-    add_index :eviction_simulations, [:property_id], unique: true, where: "property_id IS NOT NULL",
+    add_index :eviction_simulations, [ :property_id ], unique: true, where: "property_id IS NOT NULL",
               name: "idx_eviction_simulations_one_per_property"
   end
 end

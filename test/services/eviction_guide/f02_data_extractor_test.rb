@@ -16,12 +16,12 @@ class EvictionGuide::F02DataExtractorTest < ActiveSupport::TestCase
     next skip("No report fixture") unless report
 
     result = EvictionGuide::F02DataExtractor.call(@property)
-    assert_includes [true, false, nil], result[:has_opposing_tenant]
+    assert_includes [ true, false, nil ], result[:has_opposing_tenant]
   end
 
   test "extracts has_lien from inspection results" do
     result = EvictionGuide::F02DataExtractor.call(@property)
-    assert_includes [true, false, nil], result[:has_lien]
+    assert_includes [ true, false, nil ], result[:has_lien]
   end
 
   test "returns nil for unmapped fields" do
