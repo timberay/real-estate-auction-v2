@@ -59,12 +59,6 @@ export default class extends Controller {
       el.classList.toggle("hidden", collapsed)
     })
 
-    // Hide group headers when collapsed
-    this.sidebarTarget.querySelectorAll("[data-sidebar-group]").forEach(el => {
-      el.classList.remove("lg:flex")
-      el.classList.toggle("hidden", collapsed)
-    })
-
     // Center icons when collapsed
     this.sidebarTarget.querySelectorAll("[data-sidebar-item]").forEach(el => {
       el.classList.remove("lg:justify-start", "lg:gap-3", "lg:px-4")

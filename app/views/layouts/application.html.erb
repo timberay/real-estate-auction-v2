@@ -55,6 +55,7 @@
       <div class="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none" id="global_toasts">
         <% if flash.any? %>
           <% flash.each do |type, message| %>
+            <% next if type.to_s == "tab_rating" %>
             <% toast_type = { "notice" => :success, "alert" => :danger }.fetch(type.to_s, :info) %>
             <%= render ToastComponent.new(message: message, type: toast_type) %>
           <% end %>

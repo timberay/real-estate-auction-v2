@@ -3,30 +3,33 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["progress"]
-  static values = { total: Number }
 
   connect() {
     this.validate()
   }
 
   validate() {
-    const manualCards = this.element.querySelectorAll(
-      "[data-inspection-item-auto-value='false']"
-    )
-    const total = this.totalValue
-    let completedManual = 0
+    const allCards = this.element.querySelectorAll("[data-inspection-item-auto-value]")
+    let completed = 0
+    let total = 0
 
-    manualCards.forEach(card => {
+    allCards.forEach(card => {
+      if (card.closest(".hidden")) return
+
+      total++
+
+      const isAuto = card.dataset.inspectionItemAutoValue === "true"
+      if (isAuto) {
+        completed++
+        return
+      }
+
       const hasRiskRadios = card.querySelectorAll("input[name*='[has_risk]']:not(:disabled)")
       const hasRiskChecked = Array.from(hasRiskRadios).some(r => r.checked)
-
       if (hasRiskChecked) {
-        completedManual++
+        completed++
       }
     })
-
-    const autoCount = total - manualCards.length
-    const completed = autoCount + completedManual
 
     if (this.hasProgressTarget) {
       this.progressTarget.textContent = `${completed}/${total}`

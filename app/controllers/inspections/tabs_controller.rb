@@ -46,6 +46,8 @@ module Inspections
           if values[:override] == "true" && result.auto?
             apply_override(result, values)
           elsif result.auto?
+            next unless values.key?(:resolvable)
+
             result.update!(
               resolvable: values[:resolvable] == "true",
               resolution_note: values[:resolution_note]
@@ -106,6 +108,8 @@ module Inspections
     end
 
     def apply_manual_input(result, values)
+      return unless values.key?(:has_risk)
+
       has_risk = values[:has_risk] == "true"
       attrs = { source_type: "manual", has_risk: has_risk }
 

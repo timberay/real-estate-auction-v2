@@ -3,11 +3,6 @@
     <div class="flex-1 space-y-2 px-2 overflow-y-auto overflow-x-hidden">
       <% MENU_GROUPS.each do |group_title, items| %>
         <div>
-          <%# Group header %>
-          <div class="hidden lg:flex items-center w-full px-2 py-2 text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            <span><%= group_title %></span>
-          </div>
-
           <div class="space-y-1">
             <% items.each do |item| %>
               <% if item.enabled %>

@@ -20,11 +20,12 @@ module Sidebar
 
     # --- Menu groups ---
 
-    test "renders 2 group titles" do
+    test "renders menu groups without group titles" do
       render_inline(Sidebar::Component.new)
 
-      assert_text "물건검색"
-      assert_text "가이드"
+      assert_no_text "물건검색"
+      # "가이드" appears in menu item "명도 가이드", so check no standalone group header exists
+      assert_no_selector "[data-sidebar-group]"
     end
 
     test "renders all menu items without dropdown collapse" do

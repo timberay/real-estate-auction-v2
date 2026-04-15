@@ -110,6 +110,46 @@ class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "unselected manual item preserves nil has_risk when saved" do
+    result = inspection_results(:manual_unanswered)
+    assert_nil result.has_risk, "precondition: has_risk should be nil"
+
+    tab_key = result.inspection_item.tab
+
+    patch property_inspections_tab_url(@property, tab_key: tab_key), params: {
+      resolutions: {
+        result.id => {
+          resolution_note: ""
+        }
+      }
+    }
+
+    result.reload
+    assert_nil result.has_risk, "has_risk should remain nil when user did not select any radio"
+  end
+
+  test "unselected auto resolvable preserves nil when saved" do
+    auto_result = inspection_results(:risky_villa_rights_003)
+    auto_result.update_columns(resolvable: nil)
+    assert auto_result.auto?, "precondition: source_type should be auto"
+    assert auto_result.has_risk, "precondition: has_risk should be true"
+    assert_nil auto_result.resolvable, "precondition: resolvable should be nil"
+
+    risky = properties(:risky_villa)
+    tab_key = auto_result.inspection_item.tab
+
+    patch property_inspections_tab_url(risky, tab_key: tab_key), params: {
+      resolutions: {
+        auto_result.id => {
+          resolution_note: ""
+        }
+      }
+    }
+
+    auto_result.reload
+    assert_nil auto_result.resolvable, "resolvable should remain nil when user did not select any radio"
+  end
+
   test "update with no resolutions still sets flash" do
     patch property_inspections_tab_url(@property, tab_key: "rights_analysis"), params: {}
 

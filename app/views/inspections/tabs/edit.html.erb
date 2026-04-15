@@ -20,7 +20,7 @@
     </div>
   <% end %>
   <%= form_with url: property_inspections_tab_path(@property, tab_key: @tab_key), method: :patch,
-      data: { turbo: false, controller: "unified-form checklist-dependency", unified_form_total_value: @results.size,
+      data: { turbo: false, controller: "unified-form checklist-dependency",
               action: "change->unified-form#validate" } do |f| %>
     <div class="space-y-6">
       <% @results.group_by { |r| r.inspection_item.category }.each do |category, results| %>
