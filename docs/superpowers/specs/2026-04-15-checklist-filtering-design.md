@@ -20,7 +20,7 @@ Combined with **7 question merges** to reduce total count from 89 to 82.
 ### New column: `depends_on` (JSON) on `inspection_items`
 
 ```json
-{ "id": "rights-003", "show_when_risk": true }
+{ "code": "rights-003", "show_when_risk": true }
 ```
 
 Meaning: show this question only when `rights-003` has `has_risk == true`.
@@ -80,7 +80,7 @@ end
 def skip_for?(answered_results_by_code)
   return false if depends_on.blank?
 
-  parent_code = depends_on["id"]
+  parent_code = depends_on["code"]
   parent_result = answered_results_by_code[parent_code]
 
   # Unanswered parent → show (conservative)
@@ -114,24 +114,43 @@ end
 
 ### 2. TabsController#edit — display filtering
 
+Load **all results for the property** (not just the current tab) to build the dependency evaluation context. This prevents cross-tab dependency bugs where a child question's parent lives in a different tab.
+
 ```ruby
-@results = @property.inspection_results
+# 1. Load all results for dependency evaluation context (~82 items, no performance concern)
+all_results = @property.inspection_results
   .where(user: current_user)
-  .joins(:inspection_item)
-  .where(inspection_items: { tab: InspectionItem.tabs[@tab_key] })
   .includes(:inspection_item)
-  .order("inspection_items.tab_position")
+answered_context = all_results.index_by { |r| r.inspection_item.code }
 
 property_type = @property.property_type
-answered = @results.index_by { |r| r.inspection_item.code }
-@results = @results.select do |r|
-  r.inspection_item.visible_for?(property_type: property_type, answered_results: answered)
-end
+tab_int = InspectionItem.tabs[@tab_key]
+
+# 2. Filter to current tab + apply visibility
+@results = all_results
+  .select { |r| r.inspection_item.tab == tab_int }
+  .select { |r| r.inspection_item.visible_for?(property_type: property_type, answered_results: answered_context) }
+  .sort_by { |r| r.inspection_item.tab_position }
 ```
 
 ### 3. InspectionTabsComponent — tab counts
 
-`load_tab_stats` must apply the same filtering. Hidden questions are excluded from both `checked` and `total` counts.
+Same approach: load all results once, filter in Ruby, then group by tab for stats. SQL-level `GROUP BY` cannot handle the dynamic `skip_for?` logic.
+
+```ruby
+all_results = @property.inspection_results
+  .where(user: @user)
+  .includes(:inspection_item)
+answered_context = all_results.index_by { |r| r.inspection_item.code }
+
+visible = all_results.select do |r|
+  r.inspection_item.visible_for?(property_type: @property.property_type, answered_results: answered_context)
+end
+
+@tab_stats = visible.group_by { |r| r.inspection_item.tab }.transform_values do |results_in_tab|
+  { total: results_in_tab.count, checked: results_in_tab.count { |r| !r.has_risk.nil? } }
+end
+```
 
 ### 4. InspectionRatingService — grade calculation
 
