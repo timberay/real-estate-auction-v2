@@ -2,6 +2,7 @@ module EvictionGuide
   class SimulationsController < ApplicationController
     def create
       property_id = params[:property_id].presence&.to_i
+      occupant_type = params[:occupant_type].presence
 
       @simulation = if property_id
         EvictionSimulation.find_or_initialize_by(property_id: property_id)
@@ -13,15 +14,23 @@ module EvictionGuide
       @simulation.result_path = []
       @simulation.completed = false
       @simulation.difficulty_level = nil
+      @simulation.occupant_type = occupant_type
       @simulation.save!
 
       session[:eviction_simulation_id] = @simulation.id
 
       if @simulation.property_linked?
         redirect_to eviction_guide_simulator_prefill_path
+      elsif occupant_type.blank?
+        redirect_to eviction_guide_simulator_select_type_path
       else
-        redirect_to eviction_guide_simulator_question_path(code: "Q1")
+        redirect_to eviction_guide_simulator_question_path(code: first_question_code(occupant_type))
       end
+    end
+
+    def select_type
+      @simulation = find_simulation || EvictionSimulation.new
+      render "eviction_guide/simulator/select_type"
     end
 
     def update
@@ -46,8 +55,8 @@ module EvictionGuide
       @simulation = find_simulation
       return redirect_to eviction_guide_simulator_path unless @simulation
 
-      @simulation.result_path = EvictionGuide::PathBuilder.call(@simulation.answers)
-      @simulation.difficulty_level = EvictionGuide::DifficultyAssessor.call(@simulation.answers)
+      @simulation.result_path = EvictionGuide::PathBuilder.call(@simulation.answers, occupant_type: @simulation.occupant_type)
+      @simulation.difficulty_level = EvictionGuide::DifficultyAssessor.call(@simulation.answers, occupant_type: @simulation.occupant_type)
       @simulation.completed = true
       @simulation.save!
 
@@ -67,6 +76,10 @@ module EvictionGuide
 
     def find_simulation
       EvictionSimulation.find_by(id: session[:eviction_simulation_id])
+    end
+
+    def first_question_code(occupant_type)
+      EvictionSimulatorQuestion.for_occupant_type(occupant_type).ordered.first&.code || "Q1"
     end
   end
 end
