@@ -23,7 +23,7 @@
             <span class="ml-1 text-sm <%= tab[:active] ? 'text-blue-200' : 'text-slate-400 dark:text-slate-500' %>"><%= tab[:checked] %>/<%= tab[:total] %></span>
             <% unanswered = tab[:total] - tab[:checked] %>
             <% if unanswered > 0 && tab[:rating] && tab[:rating] != :incomplete %>
-              <span class="ml-1 bg-amber-400 text-amber-900 dark:bg-amber-500 dark:text-amber-950 text-xs font-bold px-1.5 py-0.5 rounded-full"><%= unanswered %></span>
+              <span class="ml-1 bg-amber-400 text-amber-900 dark:bg-amber-500 dark:text-amber-950 text-sm font-bold px-1.5 py-0.5 rounded-full"><%= unanswered %></span>
             <% end %>
           <% end %>
         <% end %>

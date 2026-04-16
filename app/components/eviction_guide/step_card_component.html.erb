@@ -6,12 +6,12 @@
           data-action="click->accordion#toggle"
           type="button">
     <div class="flex items-center gap-3">
-      <span class="<%= step_badge_classes %> px-2.5 py-0.5 rounded text-xs font-bold">
+      <span class="<%= step_badge_classes %> px-2.5 py-0.5 rounded text-sm font-bold">
         <%= @step.code %>
       </span>
       <strong class="text-sm text-slate-900 dark:text-slate-100"><%= @step.name %></strong>
       <% if @step.estimated_duration.present? %>
-        <span class="text-xs text-slate-500 dark:text-slate-400"><%= @step.estimated_duration %></span>
+        <span class="text-sm text-slate-500 dark:text-slate-400"><%= @step.estimated_duration %></span>
       <% end %>
     </div>
     <span class="text-slate-400 transition-transform" data-accordion-target="icon">▶</span>
@@ -24,13 +24,13 @@
 
     <% if @step.required_documents.present? %>
       <div class="flex gap-3 mb-4">
-        <div class="flex-1 p-2 bg-slate-50 dark:bg-slate-800 rounded text-xs text-slate-700 dark:text-slate-300">
-          <div class="font-bold text-slate-500 dark:text-slate-400 text-[0.7rem] mb-1">필요 서류</div>
+        <div class="flex-1 p-2 bg-slate-50 dark:bg-slate-800 rounded text-sm text-slate-700 dark:text-slate-300">
+          <div class="font-bold text-slate-500 dark:text-slate-400 text-sm mb-1">필요 서류</div>
           <%= Array(@step.required_documents).join(", ") %>
         </div>
         <% if @step.estimated_cost.present? %>
-          <div class="flex-1 p-2 bg-slate-50 dark:bg-slate-800 rounded text-xs text-slate-700 dark:text-slate-300">
-            <div class="font-bold text-slate-500 dark:text-slate-400 text-[0.7rem] mb-1">예상 비용</div>
+          <div class="flex-1 p-2 bg-slate-50 dark:bg-slate-800 rounded text-sm text-slate-700 dark:text-slate-300">
+            <div class="font-bold text-slate-500 dark:text-slate-400 text-sm mb-1">예상 비용</div>
             <%= @step.estimated_cost %>
           </div>
         <% end %>

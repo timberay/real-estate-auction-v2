@@ -7,7 +7,7 @@
       <ul class="mt-2 space-y-1">
         <% rec[:items].each do |result| %>
           <li class="text-sm text-blue-700 dark:text-blue-300">
-            • <span class="font-mono text-xs"><%= result.inspection_item.code %></span> <%= result.inspection_item.question %>
+            • <span class="font-mono text-sm"><%= result.inspection_item.code %></span> <%= result.inspection_item.question %>
           </li>
         <% end %>
       </ul>

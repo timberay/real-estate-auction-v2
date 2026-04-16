@@ -19,7 +19,7 @@
     <% @path.each do |entry| %>
       <% badge = status_badge(entry["status"]) %>
       <div class="flex items-center gap-3 text-sm">
-        <span class="<%= badge[:classes] %> px-2 py-0.5 rounded text-xs font-medium whitespace-nowrap">
+        <span class="<%= badge[:classes] %> px-2 py-0.5 rounded text-sm font-medium whitespace-nowrap">
           <%= badge[:label] %>
         </span>
         <span class="text-slate-700 dark:text-slate-300">
@@ -32,11 +32,11 @@
   <%# Stats %>
   <div class="flex gap-4 mb-6">
     <div class="flex-1 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
-      <div class="text-xs text-slate-500 dark:text-slate-400">예상 총 단계</div>
+      <div class="text-sm text-slate-500 dark:text-slate-400">예상 총 단계</div>
       <div class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= total_steps %></div>
     </div>
     <div class="flex-1 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
-      <div class="text-xs text-slate-500 dark:text-slate-400">분기 진입</div>
+      <div class="text-sm text-slate-500 dark:text-slate-400">분기 진입</div>
       <div class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= branch_count %>건</div>
     </div>
   </div>
