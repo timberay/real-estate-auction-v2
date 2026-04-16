@@ -7,10 +7,10 @@
       <% @legal_items.each do |item| %>
         <div class="p-3 bg-slate-50 dark:bg-slate-800 rounded">
           <strong class="text-sm text-slate-900 dark:text-slate-100"><%= item["title"] %></strong>
-          <p class="text-xs text-slate-600 dark:text-slate-400 mt-1"><%= item["summary"] %></p>
+          <p class="text-sm text-slate-600 dark:text-slate-400 mt-1"><%= item["summary"] %></p>
           <% if item["url"].present? %>
             <a href="<%= item["url"] %>" target="_blank" rel="noopener"
-               class="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1 inline-block">
+               class="text-sm text-blue-600 dark:text-blue-400 hover:underline mt-1 inline-block">
               원문 보기 →
             </a>
           <% end %>
