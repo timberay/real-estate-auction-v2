@@ -4,25 +4,25 @@ class BidOpinionComponent < ViewComponent::Base
   VERDICT_CONFIG = {
     safe: {
       label: "입찰 검토 가능합니다",
-      bg: "bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700",
+      bg: "bg-green-100 dark:bg-green-900/20 border-green-400 dark:border-green-700",
       text: "text-green-800 dark:text-green-200",
       icon_bg: "bg-green-100 dark:bg-green-800/40"
     },
     caution: {
       label: "입찰 검토 가능하나 확인 필요",
-      bg: "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-300 dark:border-yellow-700",
+      bg: "bg-yellow-100 dark:bg-yellow-900/20 border-yellow-400 dark:border-yellow-700",
       text: "text-yellow-800 dark:text-yellow-200",
       icon_bg: "bg-yellow-100 dark:bg-yellow-800/40"
     },
     danger: {
       label: "입찰을 권하지 않습니다",
-      bg: "bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700",
+      bg: "bg-red-100 dark:bg-red-900/20 border-red-400 dark:border-red-700",
       text: "text-red-800 dark:text-red-200",
       icon_bg: "bg-red-100 dark:bg-red-800/40"
     },
     incomplete: {
       label: "분석이 완료되지 않았습니다",
-      bg: "bg-slate-50 dark:bg-slate-800/50 border-slate-300 dark:border-slate-600",
+      bg: "bg-slate-100 dark:bg-slate-800/50 border-slate-400 dark:border-slate-600",
       text: "text-slate-700 dark:text-slate-300",
       icon_bg: "bg-slate-100 dark:bg-slate-700"
     }
