@@ -44,6 +44,10 @@ module EvictionGuide
         return redirect_to eviction_guide_simulator_select_type_path unless EvictionSimulation::OCCUPANT_TYPES.include?(occupant_type)
 
         @simulation.occupant_type = occupant_type
+        @simulation.answers = {}
+        @simulation.result_path = []
+        @simulation.completed = false
+        @simulation.difficulty_level = nil
         @simulation.save!
         return redirect_to eviction_guide_simulator_question_path(code: first_question_code(occupant_type))
       end

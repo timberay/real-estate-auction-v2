@@ -32,6 +32,30 @@ class EvictionGuide::SimulationsControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil sim.session_id
   end
 
+  test "update with occupant_type resets answers and progress for new simulation" do
+    # Create simulation and complete it
+    post eviction_guide_simulation_url, params: { property_id: "" }
+    sim = EvictionSimulation.last
+    sim.update!(
+      occupant_type: "junior_tenant",
+      answers: { "JT-Q1" => true, "JT-Q2" => true, "JT-Q3" => true },
+      result_path: [ "JT-S1", "JT-S2" ],
+      completed: true,
+      difficulty_level: "low"
+    )
+
+    # Re-enter: select a new occupant type via update
+    patch eviction_guide_simulation_url, params: { occupant_type: "debtor_owner" }
+    sim.reload
+
+    assert_equal "debtor_owner", sim.occupant_type
+    assert_empty sim.answers, "answers should be reset when occupant_type changes"
+    assert_empty sim.result_path, "result_path should be reset when occupant_type changes"
+    assert_equal false, sim.completed, "completed should be reset when occupant_type changes"
+    assert_nil sim.difficulty_level, "difficulty_level should be reset when occupant_type changes"
+    assert_response :redirect
+  end
+
   test "update records answer and redirects to next question" do
     # Create simulation via the create action to set session
     post eviction_guide_simulation_url, params: { property_id: "" }
