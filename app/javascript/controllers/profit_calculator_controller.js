@@ -176,8 +176,8 @@ export default class extends Controller {
 
     this.profitCardTarget.className = `rounded-lg p-3 text-center ${profitBg}`
     this.roiCardTarget.className = `rounded-lg p-3 text-center ${profitBg}`
-    this.profitLabelTarget.className = `text-xs mb-1 ${positive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`
-    this.roiLabelTarget.className = `text-xs mb-1 ${positive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`
+    this.profitLabelTarget.className = `text-sm mb-1 ${positive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`
+    this.roiLabelTarget.className = `text-sm mb-1 ${positive ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`
     this.netProfitTarget.className = `text-xl font-extrabold ${profitText}`
     this.roiTarget.className = `text-xl font-extrabold ${profitText}`
 
