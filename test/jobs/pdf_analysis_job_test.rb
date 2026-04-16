@@ -1,6 +1,8 @@
 require "test_helper"
 
 class PdfAnalysisJobTest < ActiveSupport::TestCase
+  include ActionCable::TestHelper
+
   setup do
     ENV["USE_MOCK"] = "true"
     @user = users(:guest)
