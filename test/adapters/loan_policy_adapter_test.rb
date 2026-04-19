@@ -1,8 +1,8 @@
 require "test_helper"
 
 class LoanPolicyAdapterTest < ActiveSupport::TestCase
-  test ".for returns MockLoanPolicyAdapter" do
+  test ".for returns StaticLoanPolicyAdapter" do
     adapter = LoanPolicyAdapter.for
-    assert_instance_of MockLoanPolicyAdapter, adapter
+    assert_instance_of StaticLoanPolicyAdapter, adapter
   end
 end

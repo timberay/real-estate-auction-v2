@@ -1,5 +1,5 @@
-class MockLoanPolicyAdapter < LoanPolicyAdapter
-  MOCK_DATA = {
+class StaticLoanPolicyAdapter < LoanPolicyAdapter
+  POLICIES = {
     "apartment" => [
       { policy_name: "경락대출 (1금융)", loan_ratio: 0.8, description: "시중은행 경락대출 — 감정가 기준 LTV 80% (비규제지역 기준)", source_url: "https://www.fsc.go.kr", effective_date: Date.new(2026, 1, 1) },
       { policy_name: "경락대출 (2금융)", loan_ratio: 0.9, description: "캐피탈·저축은행 경락대출 — 감정가 기준 LTV 90% (금리 높음)", source_url: "https://www.fsc.go.kr", effective_date: Date.new(2026, 1, 1) }
@@ -15,6 +15,6 @@ class MockLoanPolicyAdapter < LoanPolicyAdapter
   }.freeze
 
   def fetch_policies(property_type_code:)
-    MOCK_DATA.fetch(property_type_code, [])
+    POLICIES.fetch(property_type_code, [])
   end
 end

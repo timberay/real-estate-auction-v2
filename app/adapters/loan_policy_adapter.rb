@@ -1,6 +1,6 @@
 class LoanPolicyAdapter
   def self.for(_config = {})
-    MockLoanPolicyAdapter.new
+    StaticLoanPolicyAdapter.new
   end
 
   def fetch_policies(property_type_code:)

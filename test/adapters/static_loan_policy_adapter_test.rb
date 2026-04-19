@@ -1,8 +1,8 @@
 require "test_helper"
 
-class MockLoanPolicyAdapterTest < ActiveSupport::TestCase
+class StaticLoanPolicyAdapterTest < ActiveSupport::TestCase
   setup do
-    @adapter = MockLoanPolicyAdapter.new
+    @adapter = StaticLoanPolicyAdapter.new
   end
 
   test "fetch_policies returns array of policy hashes" do
