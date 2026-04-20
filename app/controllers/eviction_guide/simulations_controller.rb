@@ -20,12 +20,12 @@ module EvictionGuide
 
       session[:eviction_simulation_id] = @simulation.id
 
-      if @simulation.property_linked?
-        redirect_to eviction_guide_simulator_prefill_path
-      elsif occupant_type.blank?
-        redirect_to eviction_guide_simulator_select_type_path
-      else
+      if occupant_type.present?
         redirect_to eviction_guide_simulator_question_path(code: first_question_code(occupant_type))
+      elsif @simulation.property_linked?
+        redirect_to eviction_guide_simulator_prefill_path
+      else
+        redirect_to eviction_guide_simulator_select_type_path
       end
     end
 
