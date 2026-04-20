@@ -12,40 +12,10 @@ class SearchResultsController < ApplicationController
       max_bid_price: bs&.max_bid_amount.to_i * 10_000
     )
 
-    respond_to do |format|
-      format.html do
-        if result.error
-          redirect_to search_results_path, alert: error_message_for(result.error)
-        else
-          redirect_to search_results_path, notice: "#{result.count}건의 검색 결과를 가져왔습니다."
-        end
-      end
-      format.turbo_stream do
-        if result.error
-          render turbo_stream: turbo_stream.update("criteria-search-results",
-            partial: "search_results/inline_error",
-            locals: { message: error_message_for(result.error) })
-        else
-          existing_case_numbers = current_user.properties.pluck(:case_number)
-          search_results = current_user.search_results
-            .where.not(case_number: existing_case_numbers)
-            .order(created_at: :desc)
-          api_total_count = current_user.last_search_api_total_count
-          over_api_limit = api_total_count.to_i > 100
-          total_count = search_results.count
-          total_pages = (total_count / 20.0).ceil.clamp(1, Float::INFINITY).to_i
-          search_results = search_results.limit(20)
-          render turbo_stream: turbo_stream.update("criteria-search-results",
-            partial: "search_results/inline_results",
-            locals: {
-              search_results: search_results,
-              search_page: 1,
-              total_pages: total_pages,
-              api_total_count: api_total_count,
-              over_api_limit: over_api_limit
-            })
-        end
-      end
+    if result.error
+      redirect_to properties_path, alert: error_message_for(result.error)
+    else
+      redirect_to properties_path, notice: "#{result.count}건의 검색 결과를 가져왔습니다."
     end
   end
 
