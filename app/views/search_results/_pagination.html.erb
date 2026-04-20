@@ -1,0 +1,30 @@
+<%# app/views/search_results/_pagination.html.erb
+    Locals:
+      current_page  — Integer, the page currently displayed (1-based)
+      total_pages   — Integer, number of pages; if <= 1, partial renders nothing
+%>
+<% return if total_pages.to_i <= 1 %>
+
+<% base_params = request.query_parameters.except("search_page") %>
+<% page_link = ->(page, label, disabled: false, current: false) {
+     classes = [
+       "inline-flex items-center justify-center min-w-9 h-9 px-3 rounded-md text-sm border",
+       current ? "bg-violet-600 border-violet-600 text-white font-semibold" :
+                 "border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-violet-500 dark:hover:border-violet-500",
+       disabled ? "opacity-40 pointer-events-none" : ""
+     ].join(" ")
+     if disabled
+       content_tag(:span, label, class: classes)
+     else
+       link_to label, url_for(base_params.merge(search_page: page)), class: classes,
+               data: { turbo_frame: "search-results-frame" }
+     end
+   } %>
+
+<nav class="flex items-center justify-center gap-1 mt-4" aria-label="Pagination">
+  <%= page_link.call([ current_page - 1, 1 ].max, "‹", disabled: current_page <= 1) %>
+  <% (1..total_pages).each do |p| %>
+    <%= page_link.call(p, p.to_s, current: p == current_page) %>
+  <% end %>
+  <%= page_link.call([ current_page + 1, total_pages ].min, "›", disabled: current_page >= total_pages) %>
+</nav>
