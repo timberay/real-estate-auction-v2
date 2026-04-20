@@ -809,3 +809,123 @@ docs/screenshots/
 └── error/
     └── s004-inspection-sale-document-ERROR.png
 ```
+
+---
+
+## Run 11: Post-Pagination + 명도 시뮬레이션 전수 검사 (2026-04-20)
+
+- **Test date:** 2026-04-20
+- **Target URL:** http://localhost:3000
+- **Branch:** `feat/court-auction-pagination` (HEAD: `bcf0886`)
+- **Test strategy:** 신규 페이지네이션 검증 + 명도 시뮬레이션 post-selection 전수 + novice/expert 페르소나 관점
+- **Tester:** Playwright MCP (headless Chrome)
+
+### Results Summary
+
+| # | Scenario | Status | Key Finding |
+|---|----------|--------|-------------|
+| R11-S000 | 신규 Pagination E2E | ✅ PASS | URL `?search_page=N` advance, 브라우저 뒤로가기 복원 |
+| R11-S001 | GNB 5개 메뉴 순회 | ✅ PASS | 모든 메뉴 2xx |
+| R11-S002 | 명도 가이드 S1 전개 | ✅ PASS | B1-B3 브랜치 표시 정상 |
+| R11-S010 | **시뮬레이터 내물건 → prefill 제출** | ❌ **FAIL** | **무한 루프 (Critical Bug)** |
+| R11-S011 | 시뮬레이터 직접입력 happy path (JT-Q1~Q6 전부 '네') | ✅ PASS | 결과 페이지 정상 |
+| R11-S012 | 법률 근거 토글 | ✅ PASS | 민사집행법 제91조, 주택임대차보호법 제3조 표시 |
+| R11-S013 | Q1 '아니오' 분기 → Q1G | ✅ PASS | 분기 질문 정상 노출 |
+| R11-S020 | 유효하지 않은 question code | ⚠️ 404 | UX상 redirect가 나음 |
+| R11-S030 | 인라인 import DB 반영 | ✅ PASS | DB 업데이트 확인 |
+
+### 🐛 Critical Bug — R11-BUG-001: Simulator prefill 무한 루프
+
+**위치:** `app/controllers/eviction_guide/simulations_controller.rb:22-29`
+
+**재현 경로:**
+1. `/eviction_guide/simulator` 접속
+2. "내 물건으로 시뮬레이션" (기본 선택) → 드롭다운에서 물건 선택 → "선택 완료"
+3. `/eviction_guide/simulator/prefill` 도착 → 점유자 유형 라디오 선택 → "확인 완료"
+4. **➜ 다시 prefill 페이지로 리다이렉트. 영원히 빠져나갈 수 없음.**
+
+**원인 코드:**
+```ruby
+if @simulation.property_linked?                              # ⚠️ occupant_type 무시
+  redirect_to eviction_guide_simulator_prefill_path
+elsif occupant_type.blank?
+  redirect_to eviction_guide_simulator_select_type_path
+else
+  redirect_to eviction_guide_simulator_question_path(code: first_question_code(occupant_type))
+end
+```
+
+**권장 수정:**
+```ruby
+if occupant_type.present?
+  redirect_to eviction_guide_simulator_question_path(code: first_question_code(occupant_type))
+elsif @simulation.property_linked?
+  redirect_to eviction_guide_simulator_prefill_path
+else
+  redirect_to eviction_guide_simulator_select_type_path
+end
+```
+
+**영향도:** 물건 연결 시뮬레이션 경로 **완전 차단**. 직접 입력 경로는 정상.
+
+**스크린샷:** `docs/screenshots/error/s012-prefill-stuck.png`
+
+### ⚠️ UX Issues
+
+| ID | 위치 | 관찰 | 권장 |
+|---|---|---|---|
+| R11-UX-001 | prefill 페이지 | "AI 분석 결과 확인"이라 표기하지만 모든 물건이 "미분석"이라 사전 선택된 라디오 없음 | 분석 완료 상태에 따라 헤더/드롭다운 분기 처리 |
+| R11-UX-002 | 시뮬레이션 결과 페이지 | "다시 시작"/"저장"/"인쇄" CTA 부재 | 결과 하단에 "다시 시뮬레이션하기" 버튼 추가 |
+| R11-UX-003 | 분기 질문 (Q1G) | 진행률 0% 고정 | 분기 진행률 표시 또는 "분기 경로 진입" 표시기 |
+| R11-UX-004 | `/settings/budget` submit | ✓ 아이콘만, 텍스트 레이블 없음 | "저장" 또는 "완료" 텍스트 추가 |
+| R11-UX-005 | 유효하지 않은 question code | 404 반환 | 진행 중 시뮬레이션 이어가기 CTA가 있는 friendly 404 |
+
+### ✅ 검증 완료 기능
+
+**1. Pagination (신규 구현)**
+- `/properties?search_page=2` 정상 로드 (페이지 2, 7건)
+- 페이지 1 ↔ 2 숫자 링크 클릭 → URL에 `search_page` 반영
+- 브라우저 뒤로가기 → 페이지 1 URL 복원 (`data-turbo-action="advance"` 작동 확인)
+- ‹ › 이전/다음 버튼 disabled 상태 정상
+
+**2. 시뮬레이터 직접입력 happy path**
+```
+landing → 직접 입력 → select_type → JT-Q1 (0%) → JT-Q2 (17%) → JT-Q3 (33%) → JT-Q4 (50%) → JT-Q5 (67%) → JT-Q6 (83%) → /eviction_guide/simulation
+```
+결과: 후순위 임차인 / 난이도 낮음 / 6단계 모두 완료 / 분기 진입 0건
+
+**3. 법률 근거 (선순위 임차인 Q1)**
+- 민사집행법 제91조 (말소주의): "말소기준권리보다 후에 등기된 권리는 매수인에게 인수되지 않고 소멸"
+- 주택임대차보호법 제3조 (대항력): "주택 인도 + 전입신고를 마친 임차인은 다음날부터 제3자에 대하여 효력 발생"
+- "원문 보기 →" 링크 제공
+
+**4. 분기 질문 (Q1 "아니오" → Q1G)**
+- "권리분석 리스크가 있나요? (대항력 임차인 배당요구 미신청 / 유치권 신고 / 무상거주확인서)" 정상 노출
+- "리스크 있으면 B1/B2/B3 분기로 안내합니다." 안내 문구
+
+### Persona Observations
+
+**초심자 (Novice):**
+- 예산 설정 submit 버튼 레이블 부재 → "진짜 저장되나?" 불안
+- 물건 목록 카드 클릭 시 상세/import 의도 구분 어려움 (카드 전체가 import 트리거)
+- 시뮬레이션 결과 후 "다시 해보기" CTA 없어서 재시도 어려움
+- 법률 용어(대항력, 선순위/후순위, 말소기준권리) → "법률 근거" 토글이 학습 도움
+
+**전문가 (Expert):**
+- question code URL 직접 접근 — 세션 없으면 404, 있으면 상태 기반 이동
+- 세션 격리 — 다른 브라우저/시크릿 창은 독립 시뮬레이션
+- 엣지 케이스: 존재하지 않는 `property_id` POST 시 거동 미검증 (향후)
+- 4×N×2 분기 완전 조합은 단위 테스트 영역 권장
+
+### Artifacts
+- Screenshots: `docs/screenshots/{before,after,error,eviction}/`
+- Console errors: 0
+- HTTP 5xx: 0
+- HTTP 4xx: 1 (의도된 `JT-Q99` 404)
+
+### Recommended Next Steps (우선순위 순)
+1. **즉시**: R11-BUG-001 (prefill 루프) 수정 + 회귀 테스트 추가
+2. **단기**: R11-UX-001/002/004
+3. **중기**: R11-UX-003/005
+4. **테스트 보강**: `EvictionGuide::SimulationsController` property-linked flow integration test 강화
+

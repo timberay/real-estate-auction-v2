@@ -34,7 +34,7 @@ class SearchResultsControllerTest < ActionDispatch::IntegrationTest
     GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
 
     post search_results_url
-    assert_redirected_to search_results_path
+    assert_redirected_to properties_path
     follow_redirect!
     assert_match "0건", flash[:notice]
   ensure
@@ -49,7 +49,7 @@ class SearchResultsControllerTest < ActionDispatch::IntegrationTest
     GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
 
     post search_results_url
-    assert_redirected_to search_results_path
+    assert_redirected_to properties_path
     follow_redirect!
     assert_match "시간이 초과", flash[:alert]
   ensure

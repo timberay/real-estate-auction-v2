@@ -1,4 +1,6 @@
 class CourtAuctionSearchService
+  MAX_ITEMS = 100
+
   Result = Data.define(:count, :error)
 
   def self.call(user:, address:, max_bid_price:)
@@ -20,9 +22,13 @@ class CourtAuctionSearchService
     max_price = CourtAuction::CriteriaSearchClient.next_price_tier(@max_bid_price)
 
     adapter = GovernmentCourtAuctionAdapter.new
-    response = adapter.search_by_criteria(region_code: region_code, max_price: max_price)
+    response = adapter.search_by_criteria(
+      region_code: region_code,
+      max_price: max_price,
+      max_items: MAX_ITEMS
+    )
 
-    saved_count = persist_results(response[:items])
+    saved_count = persist_results(response[:items], response[:total_count])
 
     Rails.logger.info(
       "[CourtAuctionSearch] region=#{region_code} max_price=#{max_price} " \
@@ -36,28 +42,31 @@ class CourtAuctionSearchService
 
   private
 
-  def persist_results(items)
-    @user.search_results.destroy_all
+  def persist_results(items, api_total_count)
+    ActiveRecord::Base.transaction do
+      @user.update!(last_search_api_total_count: api_total_count)
+      @user.search_results.destroy_all
 
-    deduplicated = deduplicate_by_case_number(items)
+      deduplicated = deduplicate_by_case_number(items)
 
-    deduplicated.each do |item, property_count|
-      @user.search_results.create!(
-        case_number: item["srnSaNo"],
-        court_name: item["jiwonNm"],
-        address: item["printSt"],
-        appraisal_price: item["gamevalAmt"].to_i,
-        min_bid_price: item["minmaePrice"].to_i,
-        property_type: item["dspslUsgNm"],
-        status: item["mulJinYn"] == "Y" ? "진행중" : "종결",
-        failed_bid_count: item["yuchalCnt"].to_i,
-        auction_date: item["maeGiil"],
-        remarks: item["mulBigo"],
-        property_count: property_count
-      )
+      deduplicated.each do |item, property_count|
+        @user.search_results.create!(
+          case_number: item["srnSaNo"],
+          court_name: item["jiwonNm"],
+          address: item["printSt"],
+          appraisal_price: item["gamevalAmt"].to_i,
+          min_bid_price: item["minmaePrice"].to_i,
+          property_type: item["dspslUsgNm"],
+          status: item["mulJinYn"] == "Y" ? "진행중" : "종결",
+          failed_bid_count: item["yuchalCnt"].to_i,
+          auction_date: item["maeGiil"],
+          remarks: item["mulBigo"],
+          property_count: property_count
+        )
+      end
+
+      deduplicated.size
     end
-
-    deduplicated.size
   end
 
   def deduplicate_by_case_number(items)

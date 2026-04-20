@@ -1,0 +1,27 @@
+{
+  "status": 200,
+  "message": "검색 결과가 조회되었습니다.",
+  "data": {
+    "dma_pageInfo": {
+      "pageNo": 1,
+      "pageSize": 10,
+      "totalYn": "Y",
+      "startRowNo": 1,
+      "totalCnt": "150",
+      "groupTotalCount": 150
+    },
+    "ipcheck": true,
+    "dlt_srchResult": [
+      {"srnSaNo": "2024타경00001", "jiwonNm": "서울중앙지방법원", "printSt": "서울특별시 강남구 역삼동 1-1", "gamevalAmt": "100000000", "minmaePrice": "80000000", "yuchalCnt": "1", "maeGiil": "20260501", "dspslUsgNm": "아파트", "mulJinYn": "Y", "mulBigo": ""},
+      {"srnSaNo": "2024타경00002", "jiwonNm": "서울중앙지방법원", "printSt": "서울특별시 강남구 역삼동 1-2", "gamevalAmt": "100000000", "minmaePrice": "80000000", "yuchalCnt": "1", "maeGiil": "20260501", "dspslUsgNm": "아파트", "mulJinYn": "Y", "mulBigo": ""},
+      {"srnSaNo": "2024타경00003", "jiwonNm": "서울중앙지방법원", "printSt": "서울특별시 강남구 역삼동 1-3", "gamevalAmt": "100000000", "minmaePrice": "80000000", "yuchalCnt": "1", "maeGiil": "20260501", "dspslUsgNm": "아파트", "mulJinYn": "Y", "mulBigo": ""},
+      {"srnSaNo": "2024타경00004", "jiwonNm": "서울중앙지방법원", "printSt": "서울특별시 강남구 역삼동 1-4", "gamevalAmt": "100000000", "minmaePrice": "80000000", "yuchalCnt": "1", "maeGiil": "20260501", "dspslUsgNm": "아파트", "mulJinYn": "Y", "mulBigo": ""},
+      {"srnSaNo": "2024타경00005", "jiwonNm": "서울중앙지방법원", "printSt": "서울특별시 강남구 역삼동 1-5", "gamevalAmt": "100000000", "minmaePrice": "80000000", "yuchalCnt": "1", "maeGiil": "20260501", "dspslUsgNm": "아파트", "mulJinYn": "Y", "mulBigo": ""},
+      {"srnSaNo": "2024타경00006", "jiwonNm": "서울중앙지방법원", "printSt": "서울특별시 강남구 역삼동 1-6", "gamevalAmt": "100000000", "minmaePrice": "80000000", "yuchalCnt": "1", "maeGiil": "20260501", "dspslUsgNm": "아파트", "mulJinYn": "Y", "mulBigo": ""},
+      {"srnSaNo": "2024타경00007", "jiwonNm": "서울중앙지방법원", "printSt": "서울특별시 강남구 역삼동 1-7", "gamevalAmt": "100000000", "minmaePrice": "80000000", "yuchalCnt": "1", "maeGiil": "20260501", "dspslUsgNm": "아파트", "mulJinYn": "Y", "mulBigo": ""},
+      {"srnSaNo": "2024타경00008", "jiwonNm": "서울중앙지방법원", "printSt": "서울특별시 강남구 역삼동 1-8", "gamevalAmt": "100000000", "minmaePrice": "80000000", "yuchalCnt": "1", "maeGiil": "20260501", "dspslUsgNm": "아파트", "mulJinYn": "Y", "mulBigo": ""},
+      {"srnSaNo": "2024타경00009", "jiwonNm": "서울중앙지방법원", "printSt": "서울특별시 강남구 역삼동 1-9", "gamevalAmt": "100000000", "minmaePrice": "80000000", "yuchalCnt": "1", "maeGiil": "20260501", "dspslUsgNm": "아파트", "mulJinYn": "Y", "mulBigo": ""},
+      {"srnSaNo": "2024타경00010", "jiwonNm": "서울중앙지방법원", "printSt": "서울특별시 강남구 역삼동 1-10", "gamevalAmt": "100000000", "minmaePrice": "80000000", "yuchalCnt": "1", "maeGiil": "20260501", "dspslUsgNm": "아파트", "mulJinYn": "Y", "mulBigo": ""}
+    ]
+  }
+}

@@ -156,4 +156,60 @@ class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
   ensure
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end
+
+  test "updates user.last_search_api_total_count with API total" do
+    mock_response = {
+      items: [ { "srnSaNo" => "X1", "mulJinYn" => "Y" } ],
+      total_count: 150
+    }
+    adapter = Object.new
+    adapter.define_singleton_method(:search_by_criteria) { |**_args| mock_response }
+
+    original_new = GovernmentCourtAuctionAdapter.method(:new)
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
+
+    CourtAuctionSearchService.call(
+      user: @user,
+      address: "서울특별시 강남구",
+      max_bid_price: 100_000_000
+    )
+
+    assert_equal 150, @user.reload.last_search_api_total_count
+  ensure
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
+  end
+
+  test "passes max_items to adapter" do
+    captured_args = nil
+    adapter = Object.new
+    adapter.define_singleton_method(:search_by_criteria) do |**args|
+      captured_args = args
+      { items: [], total_count: 0 }
+    end
+
+    original_new = GovernmentCourtAuctionAdapter.method(:new)
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
+
+    CourtAuctionSearchService.call(
+      user: @user,
+      address: "서울특별시 강남구",
+      max_bid_price: 100_000_000
+    )
+
+    assert_equal 100, captured_args[:max_items]
+  ensure
+    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
+  end
+
+  test "does not update user when address is unrecognized" do
+    @user.update!(last_search_api_total_count: 42)
+
+    CourtAuctionSearchService.call(
+      user: @user,
+      address: "알수없는주소",
+      max_bid_price: 100_000_000
+    )
+
+    assert_equal 42, @user.reload.last_search_api_total_count
+  end
 end

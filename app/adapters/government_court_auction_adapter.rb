@@ -6,8 +6,8 @@ class GovernmentCourtAuctionAdapter < CourtAuctionAdapter
     @rate_limiter = CourtAuction::RateLimiter.new
   end
 
-  def search_by_criteria(region_code:, max_price:)
+  def search_by_criteria(region_code:, max_price:, max_items: 100)
     @rate_limiter.throttle
-    @criteria_search_client.search_all(region_code: region_code, max_price: max_price)
+    @criteria_search_client.search_all(region_code: region_code, max_price: max_price, max_items: max_items)
   end
 end

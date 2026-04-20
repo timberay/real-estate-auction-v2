@@ -109,6 +109,45 @@ class CourtAuction::CriteriaSearchClientTest < ActiveSupport::TestCase
     assert_equal [], result[:items]
   end
 
+  test "search_all stops at max_items even when totalCnt is higher" do
+    large_response = file_fixture("court_auction_criteria_search_large_page.json").read
+
+    stub = stub_request(:post, ENDPOINT_URL)
+      .to_return(status: 200, body: large_response, headers: { "Content-Type" => "application/json" })
+
+    result = @client.search_all(region_code: "11", max_price: 150_000_000, max_items: 100)
+
+    assert_equal 150, result[:total_count]
+    assert_equal 100, result[:items].size
+    assert_requested stub, times: 10
+  end
+
+  test "search_all defaults max_items to 100" do
+    large_response = file_fixture("court_auction_criteria_search_large_page.json").read
+
+    stub = stub_request(:post, ENDPOINT_URL)
+      .to_return(status: 200, body: large_response, headers: { "Content-Type" => "application/json" })
+
+    result = @client.search_all(region_code: "11", max_price: 150_000_000)
+
+    assert_equal 100, result[:items].size
+    assert_requested stub, times: 10
+  end
+
+  test "search_all stops naturally when totalCnt is below max_items" do
+    stub_request(:post, ENDPOINT_URL)
+      .with { |req| JSON.parse(req.body)["dma_pageInfo"]["pageNo"] == 1 }
+      .to_return(status: 200, body: @page1_response, headers: { "Content-Type" => "application/json" })
+    stub_request(:post, ENDPOINT_URL)
+      .with { |req| JSON.parse(req.body)["dma_pageInfo"]["pageNo"] == 2 }
+      .to_return(status: 200, body: @page2_response, headers: { "Content-Type" => "application/json" })
+
+    result = @client.search_all(region_code: "11", max_price: 150_000_000, max_items: 100)
+
+    assert_equal 12, result[:total_count]
+    assert_equal 3, result[:items].size
+  end
+
   # -- region code mapping -----------------------------------------------------
 
   test "region_code_for extracts region from full address" do
