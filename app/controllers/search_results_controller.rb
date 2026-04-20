@@ -30,12 +30,20 @@ class SearchResultsController < ApplicationController
           search_results = current_user.search_results
             .where.not(case_number: existing_case_numbers)
             .order(created_at: :desc)
+          api_total_count = current_user.last_search_api_total_count
+          over_api_limit = api_total_count.to_i > 100
           total_count = search_results.count
-          over_limit = total_count > 20
+          total_pages = (total_count / 20.0).ceil.clamp(1, Float::INFINITY).to_i
           search_results = search_results.limit(20)
           render turbo_stream: turbo_stream.update("criteria-search-results",
             partial: "search_results/inline_results",
-            locals: { search_results: search_results, over_limit: over_limit })
+            locals: {
+              search_results: search_results,
+              search_page: 1,
+              total_pages: total_pages,
+              api_total_count: api_total_count,
+              over_api_limit: over_api_limit
+            })
         end
       end
     end

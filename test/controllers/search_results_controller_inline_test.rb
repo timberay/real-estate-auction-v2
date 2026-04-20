@@ -138,7 +138,6 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     post search_results_url, as: :turbo_stream
     assert_response :success
     assert_match "20건", response.body
-    assert_match "최대 20건까지 조회됩니다", response.body
   ensure
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end

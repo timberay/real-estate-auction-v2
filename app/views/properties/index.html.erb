@@ -78,7 +78,10 @@
     <% if @search_results&.any? %>
       <%= render "search_results/inline_results",
                  search_results: @search_results,
-                 over_limit: @over_limit %>
+                 search_page: @search_page,
+                 total_pages: @total_pages,
+                 api_total_count: @api_total_count,
+                 over_api_limit: @over_api_limit %>
     <% end %>
   </div>
 

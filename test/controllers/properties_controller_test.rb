@@ -167,4 +167,24 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "[id^='inline_search_result_']", 5
   end
+
+  test "GET index shows over-100 banner when API total exceeds 100" do
+    user = User.find_by(email: "guest@auction.local")
+    user.update!(last_search_api_total_count: 150)
+    user.search_results.create!(case_number: "ONE001", address: "x", appraisal_price: 1, min_bid_price: 1)
+
+    get properties_url
+    assert_response :success
+    assert_match "전체 150건 중 상위 100건만", response.body
+  end
+
+  test "GET index hides banner when API total is 100 or below" do
+    user = User.find_by(email: "guest@auction.local")
+    user.update!(last_search_api_total_count: 50)
+    user.search_results.create!(case_number: "ONE001", address: "x", appraisal_price: 1, min_bid_price: 1)
+
+    get properties_url
+    assert_response :success
+    assert_no_match "상위 100건만", response.body
+  end
 end
