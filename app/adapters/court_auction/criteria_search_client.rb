@@ -7,6 +7,7 @@ module CourtAuction
     PAGE_SIZE = 10
     TIMEOUT = 30
     MIN_BID_PRICE = "50000000"
+    MAX_ITEMS_DEFAULT = 100
 
     REGION_CODES = {
       "서울특별시" => "11", "부산광역시" => "26", "대구광역시" => "27",
@@ -45,19 +46,20 @@ module CourtAuction
       raise DataProvider::ConnectionError, "Court auction criteria search failed: #{e.message}"
     end
 
-    def search_all(region_code:, max_price:)
+    def search_all(region_code:, max_price:, max_items: MAX_ITEMS_DEFAULT)
       first_page = search(region_code: region_code, max_price: max_price, page: 1)
       all_items = first_page[:items].dup
       total_count = first_page[:total_count]
 
       total_pages = (total_count.to_f / PAGE_SIZE).ceil
       (2..total_pages).each do |page_no|
+        break if all_items.size >= max_items
         sleep(rand(1.0..2.0))
         page_result = search(region_code: region_code, max_price: max_price, page: page_no)
         all_items.concat(page_result[:items])
       end
 
-      { items: all_items, total_count: total_count }
+      { items: all_items.first(max_items), total_count: total_count }
     end
 
     private
