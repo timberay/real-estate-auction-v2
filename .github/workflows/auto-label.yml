@@ -1,0 +1,40 @@
+name: Auto-label sensitive PRs
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            sensitive:
+              - 'db/migrate/**'
+              - 'db/schema.rb'
+              - 'config/deploy*.yml'
+              - 'config/credentials/**'
+              - 'config/master.key'
+              - 'Dockerfile'
+              - '.kamal/**'
+              - '.github/workflows/**'
+              - 'Gemfile'
+              - 'Gemfile.lock'
+
+      - name: Add needs-human-review and disable auto-merge
+        if: steps.changes.outputs.sensitive == 'true' && github.actor != 'dependabot[bot]'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr edit "$PR_NUMBER" --add-label needs-human-review
+          gh pr edit "$PR_NUMBER" --remove-label automerge || true
+          gh pr merge "$PR_NUMBER" --disable-auto || true
