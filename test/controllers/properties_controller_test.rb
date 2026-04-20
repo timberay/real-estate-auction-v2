@@ -131,4 +131,40 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     get property_url(property)
     assert_redirected_to new_analysis_path(property_id: property.id)
   end
+
+  test "GET index paginates search_results 20 per page (page 1 default)" do
+    user = User.find_by(email: "guest@auction.local")
+    user.update!(last_search_api_total_count: 30)
+    25.times do |i|
+      user.search_results.create!(case_number: "PAG#{format('%03d', i)}", address: "주소 #{i}", appraisal_price: 1, min_bid_price: 1)
+    end
+
+    get properties_url
+    assert_response :success
+    assert_select "[id^='inline_search_result_']", 20
+  end
+
+  test "GET index shows page 2 with search_page=2" do
+    user = User.find_by(email: "guest@auction.local")
+    user.update!(last_search_api_total_count: 30)
+    25.times do |i|
+      user.search_results.create!(case_number: "PAG#{format('%03d', i)}", address: "주소 #{i}", appraisal_price: 1, min_bid_price: 1)
+    end
+
+    get properties_url, params: { search_page: 2 }
+    assert_response :success
+    assert_select "[id^='inline_search_result_']", 5
+  end
+
+  test "GET index clamps search_page above total_pages" do
+    user = User.find_by(email: "guest@auction.local")
+    user.update!(last_search_api_total_count: 30)
+    25.times do |i|
+      user.search_results.create!(case_number: "PAG#{format('%03d', i)}", address: "주소 #{i}", appraisal_price: 1, min_bid_price: 1)
+    end
+
+    get properties_url, params: { search_page: 99 }
+    assert_response :success
+    assert_select "[id^='inline_search_result_']", 5
+  end
 end
