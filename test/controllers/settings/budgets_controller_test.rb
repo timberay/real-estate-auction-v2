@@ -32,6 +32,11 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[data-reserve-fund-target='autoCalc'][checked]"
   end
 
+  test "GET show submit button renders visible save label" do
+    get settings_budget_url
+    assert_select "button[type='submit']", text: /저장/
+  end
+
   test "PATCH update_region saves region and returns ok" do
     patch update_region_settings_budget_url, params: {
       budget_setting: { region: "서울특별시" }
