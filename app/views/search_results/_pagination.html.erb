@@ -17,6 +17,7 @@
        content_tag(:span, label, class: classes)
      else
        link_to label, url_for(base_params.merge(search_page: page)), class: classes,
+               "aria-current": (current ? "page" : nil),
                data: { turbo_frame: "search-results-frame" }
      end
    } %>
