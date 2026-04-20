@@ -128,6 +128,20 @@ jobs:
         with:
           bundler-cache: true
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-1.59-chromium
+
+      - name: Install Playwright browsers
+        run: npx -y playwright@1.59 install --with-deps chromium
+
       - name: Run System Tests
         env:
           RAILS_ENV: test
