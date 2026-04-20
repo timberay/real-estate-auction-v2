@@ -154,7 +154,11 @@
     </div>
 
     <div class="flex gap-4">
-      <%= render ButtonComponent.new(icon: "check", class: "flex-1 justify-center", type: "submit") { "저장" } %>
+      <button type="submit"
+              class="inline-flex flex-1 items-center justify-center gap-2 h-10 px-4 text-base font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-400 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+        예산 저장
+      </button>
     </div>
   <% end %>
 </div>
