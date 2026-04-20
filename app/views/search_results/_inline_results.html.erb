@@ -6,7 +6,7 @@
       api_total_count    — Integer or nil (users.last_search_api_total_count)
       over_api_limit     — Boolean
 %>
-<turbo-frame id="search-results-frame">
+<turbo-frame id="search-results-frame" data-turbo-action="advance">
   <div id="criteria-search-results-inner"
        class="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 mt-3">
     <div class="flex items-center gap-2 mb-3">

@@ -35,7 +35,7 @@
           <% end %>
         </select>
         <span class="text-sm text-slate-500 dark:text-slate-400 transition-opacity duration-300 opacity-0" data-region-select-target="feedback"></span>
-        <%= form_with url: search_results_path, method: :post, class: "contents", data: { turbo_stream: true, action: "submit->criteria-search#submit turbo:submit-end->criteria-search#enable" } do %>
+        <%= form_with url: search_results_path, method: :post, class: "contents", data: { action: "submit->criteria-search#submit turbo:submit-end->criteria-search#enable" } do %>
           <button type="submit"
                   data-criteria-search-target="submitButton"
                   class="inline-flex items-center justify-center gap-1.5 w-24 h-10 rounded-md bg-violet-600 hover:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-500 text-white text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900">

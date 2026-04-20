@@ -187,4 +187,15 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_no_match "상위 100건만", response.body
   end
+
+  test "GET index treats non-integer search_page as page 1" do
+    user = User.find_by(email: "guest@auction.local")
+    25.times do |i|
+      user.search_results.create!(case_number: "PAG#{format('%03d', i)}", address: "주소 #{i}", appraisal_price: 1, min_bid_price: 1)
+    end
+
+    get properties_url, params: { search_page: "abc" }
+    assert_response :success
+    assert_select "[id^='inline_search_result_']", 20
+  end
 end
