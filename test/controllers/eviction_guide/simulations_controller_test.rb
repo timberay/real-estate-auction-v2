@@ -13,6 +13,20 @@ class EvictionGuide::SimulationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to eviction_guide_simulator_prefill_path
   end
 
+  test "create with property_id and occupant_type advances to first question (no prefill loop)" do
+    property = properties(:safe_apartment)
+    post eviction_guide_simulation_url, params: {
+      property_id: property.id,
+      occupant_type: "junior_tenant"
+    }
+    sim = EvictionSimulation.last
+    assert_equal property.id, sim.property_id
+    assert_equal "junior_tenant", sim.occupant_type
+    assert_response :redirect
+    expected_code = EvictionSimulatorQuestion.for_occupant_type("junior_tenant").ordered.first&.code || "Q1"
+    assert_redirected_to eviction_guide_simulator_question_path(code: expected_code)
+  end
+
   test "prefill loads simulation from session and renders" do
     property = properties(:safe_apartment)
     # Create simulation via the create action to set session
