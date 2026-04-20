@@ -1,23 +1,30 @@
 <div>
-  <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">AI 분석 결과 확인</h3>
-  <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
-    물건분석(F02)에서 가져온 결과입니다. 각 항목이 맞는지 확인해주세요.
-  </p>
+  <% if analysis_available? %>
+    <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">AI 분석 결과 확인</h3>
+    <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+      물건분석(F02)에서 가져온 결과입니다. 각 항목이 맞는지 확인해주세요.
+    </p>
 
-  <div class="space-y-3 mb-6">
-    <% fields.each do |field| %>
-      <% next if field[:key] == :occupant_type %>
-      <div class="border border-slate-200 dark:border-slate-700 rounded-md p-3">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2">
-            <span class="text-sm bg-blue-600 text-white px-1.5 py-0.5 rounded">AI 분석</span>
-            <strong class="text-sm text-slate-900 dark:text-slate-100"><%= field[:label] %></strong>
+    <div class="space-y-3 mb-6">
+      <% fields.each do |field| %>
+        <% next if field[:key] == :occupant_type %>
+        <div class="border border-slate-200 dark:border-slate-700 rounded-md p-3">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-sm bg-blue-600 text-white px-1.5 py-0.5 rounded">AI 분석</span>
+              <strong class="text-sm text-slate-900 dark:text-slate-100"><%= field[:label] %></strong>
+            </div>
+            <span class="text-sm font-medium text-slate-700 dark:text-slate-300"><%= field[:display_value] %></span>
           </div>
-          <span class="text-sm font-medium text-slate-700 dark:text-slate-300"><%= field[:display_value] %></span>
         </div>
-      </div>
-    <% end %>
-  </div>
+      <% end %>
+    </div>
+  <% else %>
+    <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">점유자 유형 직접 선택</h3>
+    <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+      AI 분석 결과가 없습니다. 점유자 유형을 직접 선택하면 시뮬레이션을 시작합니다. 분석을 먼저 진행하면 자동으로 후보가 추천됩니다.
+    </p>
+  <% end %>
 
   <%= form_with url: helpers.eviction_guide_simulation_path, method: :post do |f| %>
     <%= f.hidden_field :property_id, value: @simulation&.property_id %>

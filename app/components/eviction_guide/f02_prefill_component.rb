@@ -5,6 +5,10 @@ module EvictionGuide
       @simulation = simulation
     end
 
+    def analysis_available?
+      @prefill_data.any?
+    end
+
     private
 
     FIELD_LABELS = {
