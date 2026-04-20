@@ -12,4 +12,8 @@ class EvictionSimulatorQuestion < ApplicationRecord
   def step
     EvictionStep.find_by(code: step_code)
   end
+
+  def branch?
+    code.to_s.match?(/[A-Z]\z/)
+  end
 end

@@ -35,4 +35,18 @@ class EvictionSimulatorQuestionTest < ActiveSupport::TestCase
     q.phase = "detail"
     assert q.detail?
   end
+
+  test "branch? returns false for main question codes" do
+    %w[Q1 Q2 Q15 JT-Q1 JT-Q6].each do |code|
+      q = EvictionSimulatorQuestion.new(code: code)
+      assert_not q.branch?, "#{code} should not be a branch question"
+    end
+  end
+
+  test "branch? returns true for branch question codes (letter suffix)" do
+    %w[Q1G Q1R Q5B Q5C Q13A JT-Q1G JT-Q5G].each do |code|
+      q = EvictionSimulatorQuestion.new(code: code)
+      assert q.branch?, "#{code} should be a branch question"
+    end
+  end
 end
