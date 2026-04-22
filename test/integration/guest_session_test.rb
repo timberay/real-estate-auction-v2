@@ -20,4 +20,16 @@ class GuestSessionTest < ActionDispatch::IntegrationTest
 
     refute_equal uid1, uid2, "two browsers must get distinct guest users"
   end
+
+  test "GET request captures return_to_url in session" do
+    get "/properties"
+    assert_equal "/properties", session[:return_to_url]
+  end
+
+  test "POST request does NOT capture return_to_url" do
+    get root_path
+    before = session[:return_to_url]
+    post "/properties", params: { case_number: "2024-test" }
+    assert_equal before, session[:return_to_url], "POST must not overwrite return_to_url"
+  end
 end

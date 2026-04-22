@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   stale_when_importmap_changes
 
   before_action :ensure_current_user
+  before_action :capture_return_to_url
 
   rescue_from DataProvider::MissingCredentialError, with: :handle_missing_credential
   rescue_from DataProvider::ConsentRequiredError, with: :handle_consent_required
@@ -27,6 +28,14 @@ class ApplicationController < ActionController::Base
       @current_user = User.create!
       session[:user_id] = @current_user.id
     end
+  end
+
+  def capture_return_to_url
+    return unless request.get?
+    return if request.path.start_with?("/auth")
+    return if request.xhr? || turbo_frame_request?
+
+    session[:return_to_url] = request.fullpath
   end
 
   def current_user
