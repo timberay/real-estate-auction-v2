@@ -75,4 +75,17 @@ class GuestMergerTest < ActiveSupport::TestCase
     assert_equal 1, @target.api_credentials.count
     assert_equal "GUEST_ONLY", @target.api_credentials.first.api_key
   end
+
+  test "associations without merge_policy are left untouched (safe default)" do
+    prop = Property.create!(case_number: "2024-merge-1004")
+    log = @guest.llm_analysis_logs.create!(
+      property: prop, system_prompt: "sys", user_prompt: "u"
+    )
+
+    GuestMerger.new(from: @guest, to: @target).call
+
+    log.reload
+    assert_nil log.user_id,
+      "llm_analysis_logs has dependent: :nullify — user_id is cleared on @from.destroy!"
+  end
 end
