@@ -57,7 +57,7 @@ params.fetch(:page, 1)
 
 ### Rate Limiting
 
-Limit API requests with `Rack::Attack`.
+Limit API requests with `Rack::Attack` (`config/initializers/rack_attack.rb`). `/auth/*` POST endpoints throttled at 10/min/IP.
 
 ### Credentials
 

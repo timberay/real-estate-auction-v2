@@ -39,6 +39,7 @@ Before starting work, read the documents mapped to your task type:
 | Bug fix / Debugging | QUALITY |
 | Testing | QUALITY (Testing Strategy) |
 | API integration | STACK (Adapter Pattern), TOOLS |
+| Authentication / OAuth | STACK (Authentication), QUALITY (Security) |
 | Database / Migration | STACK (Database & Infrastructure), TOOLS (Database commands) |
 | Deployment / DevOps | STACK (Deployment), TOOLS (Deployment commands) |
 | Code review / PR | QUALITY (Code Review Checklist) |

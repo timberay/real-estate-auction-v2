@@ -160,6 +160,27 @@ end
 
 Define in `app/errors/custom_error.rb` with `rescue_from` in controllers.
 
+### Authentication
+
+OAuth-only via OmniAuth 2.x (no password). Providers: Google (`omniauth-google-oauth2`), Naver (`omniauth-naver`), Kakao (`omniauth-kakao-oauth2` — plain `omniauth-kakao` is pinned to omniauth 1.x and incompatible).
+
+Session model: every visitor gets a `User` row. Guests (`guest: true`) are per-session, identified by a `guest_token`; account users (`guest: false`) have at least one row in `identities` (`provider`, `uid`, unique scope). `ApplicationController#ensure_current_user` restores the session from `session[:user_id]`, then from a signed `remember_token` cookie (account users only), otherwise creates a new guest.
+
+OAuth callback pipeline:
+
+1. `Auth::{Google,Kakao,Naver}Adapter#to_profile` — normalize omniauth `auth_hash` into `Auth::ProviderProfile` (`provider`, `uid`, `email`, `name`, `avatar_url`, `raw_info`).
+2. `SessionCreator` — three cases:
+   - **Case A** — existing `Identity(provider, uid)` → attach, merge current guest in.
+   - **Case B** — `email` matches existing account user → attach new identity, merge.
+   - **Case C** — new user → promote current guest in place (preserves all guest-owned data).
+3. `GuestMerger` — dispatches per-association via `User.mergeable_reflections` (associations annotated with `merge_policy:` + `natural_key:`). Policies: `:prefer_guest` (guest wins on natural-key collisions), `:keep_target` (target wins; used for `api_credentials`).
+
+Defense: `reset_session` after every successful callback, `rack-attack` throttles `/auth/*` POST at 10/min/IP, `Auth::Error` hierarchy is `rescue_from`-caught in `ApplicationController`.
+
+Ops: `GuestCleanupJob` (scheduled daily 3am in `config/recurring.yml`) destroys guests inactive for 30 days; `last_seen_at` is throttled to one write per minute via `Rails.cache`.
+
+Test helpers: `mock_omniauth` in `test_helper.rb`, `/testing/sign_in` and `/testing/set_remember_cookie` routes (test env only) for integration tests that need to seed session or cookie state.
+
 ### Caching Strategy
 
 - **Fragment caching**: UI components that don't change frequently
