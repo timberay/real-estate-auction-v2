@@ -26,6 +26,11 @@ class GuestSessionTest < ActionDispatch::IntegrationTest
     assert_equal "/properties", session[:return_to_url]
   end
 
+  test "HEAD request captures return_to_url in session" do
+    head "/properties"
+    assert_equal "/properties", session[:return_to_url]
+  end
+
   test "POST request does NOT capture return_to_url" do
     get root_path
     before = session[:return_to_url]
