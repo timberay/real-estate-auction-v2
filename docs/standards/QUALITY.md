@@ -151,3 +151,11 @@ For diagnosis workflow, follow the `systematic-debugging` skill.
 - [ ] Accessibility requirements are met for UI changes
 - [ ] No N+1 queries introduced
 - [ ] Fragment caching applied where appropriate
+
+## Pre-commit Failure Recovery
+
+When a pre-commit hook (rubocop, test, etc.) fails, fix it yourself and retry — do not stop and ask the user.
+
+- **Rubocop violation**: Run `bin/rubocop -a` to auto-fix, then re-stage and re-commit
+- **Test failure**: Diagnose the failing test, fix the code, verify with `bin/rails test`, then re-commit
+- **Multiple issues**: Fix rubocop first, then tests, then re-commit
