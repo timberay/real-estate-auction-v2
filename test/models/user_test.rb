@@ -18,4 +18,21 @@ class UserTest < ActiveSupport::TestCase
     account = User.create!(guest: false, email: "a@example.com")
     assert_nil account.guest_token
   end
+
+  test "two guests with null email coexist" do
+    User.create!
+    assert_nothing_raised { User.create! }
+  end
+
+  test "two account users with same email are rejected at DB level" do
+    User.create!(guest: false, email: "dup@example.com")
+    assert_raises(ActiveRecord::RecordNotUnique) do
+      User.create!(guest: false, email: "dup@example.com")
+    end
+  end
+
+  test "account user and guest with same email coexist" do
+    User.create!(guest: false, email: "shared@example.com")
+    assert_nothing_raised { User.create!(email: "shared@example.com") }
+  end
 end
