@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_20_023129) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_235851) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -341,12 +341,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_023129) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.string "avatar_url"
     t.datetime "created_at", null: false
-    t.string "email", null: false
+    t.string "email"
+    t.boolean "guest", default: true, null: false
+    t.string "guest_token"
     t.integer "last_search_api_total_count"
-    t.string "password_digest", null: false
+    t.datetime "last_seen_at"
+    t.string "name"
+    t.datetime "terms_accepted_at"
     t.datetime "updated_at", null: false
-    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["email"], name: "index_users_on_email_when_account", unique: true, where: "guest = 0 AND email IS NOT NULL"
+    t.index ["guest", "last_seen_at"], name: "index_users_on_guest_and_last_seen_at"
+    t.index ["guest_token"], name: "index_users_on_guest_token", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

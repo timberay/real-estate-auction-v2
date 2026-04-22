@@ -23,9 +23,7 @@ class ApplicationController < ActionController::Base
   def set_guest_user
     return if session[:user_id] && User.exists?(session[:user_id])
 
-    guest = User.find_or_create_by!(email: "guest@auction.local") do |u|
-      u.password = "123456"
-    end
+    guest = User.find_or_create_by!(email: "guest@auction.local")
     session[:user_id] = guest.id
   end
 

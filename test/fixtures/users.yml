@@ -1,7 +1,17 @@
 guest:
   email: "guest@auction.local"
-  password_digest: <%= BCrypt::Password.create("123456") %>
+  guest: true
+  guest_token: "guest-token-one"
+  last_seen_at: <%= 1.hour.ago %>
+
+guest_two:
+  guest: true
+  guest_token: "guest-token-two"
+  last_seen_at: <%= 5.minutes.ago %>
 
 budget_user:
   email: "budget@auction.local"
-  password_digest: <%= BCrypt::Password.create("123456") %>
+  name: "Budget User"
+  guest: false
+  terms_accepted_at: <%= 1.day.ago %>
+  last_seen_at: <%= 10.minutes.ago %>
