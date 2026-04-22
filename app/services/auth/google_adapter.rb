@@ -11,9 +11,9 @@ module Auth
         provider: PROVIDER,
         uid: @auth_hash["uid"],
         email: @auth_hash.dig("info", "email"),
+        email_verified: @auth_hash.dig("info", "email_verified"),
         name: @auth_hash.dig("info", "name"),
-        avatar_url: @auth_hash.dig("info", "image"),
-        raw_info: @auth_hash.dig("extra", "raw_info").to_h
+        avatar_url: @auth_hash.dig("info", "image")
       )
     end
   end

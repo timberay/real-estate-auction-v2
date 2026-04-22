@@ -13,7 +13,7 @@ class ConcurrentLoginTest < ActiveSupport::TestCase
     guest = User.create!
     profile = Auth::ProviderProfile.new(
       provider: "kakao", uid: "race-1", email: "race@example.com",
-      name: "R", avatar_url: nil, raw_info: {}
+      email_verified: nil, name: "R", avatar_url: nil
     )
 
     errors = []

@@ -10,7 +10,7 @@ class SessionCreatorTest < ActiveSupport::TestCase
   test "Case A: existing identity matches - logs into existing user and merges guest" do
     profile = Auth::ProviderProfile.new(
       provider: "kakao", uid: "100", email: "me@example.com",
-      name: "Me", avatar_url: nil, raw_info: {}
+      email_verified: nil, name: "Me", avatar_url: nil
     )
     result = SessionCreator.new(current_guest: @guest, profile: profile).call
     assert_equal @existing, result
@@ -23,7 +23,7 @@ class SessionCreatorTest < ActiveSupport::TestCase
 
     profile = Auth::ProviderProfile.new(
       provider: "google", uid: "google-1", email: "alice@example.com",
-      name: "Alice", avatar_url: nil, raw_info: {}
+      email_verified: nil, name: "Alice", avatar_url: nil
     )
     result = SessionCreator.new(current_guest: @guest, profile: profile).call
 
@@ -36,7 +36,7 @@ class SessionCreatorTest < ActiveSupport::TestCase
     User.create!(guest: false, email: nil, name: "AnonOne")
     profile = Auth::ProviderProfile.new(
       provider: "kakao", uid: "k-2", email: nil,
-      name: "AnonTwo", avatar_url: nil, raw_info: {}
+      email_verified: nil, name: "AnonTwo", avatar_url: nil
     )
     result = SessionCreator.new(current_guest: @guest, profile: profile).call
     refute_equal "AnonOne", result.name
@@ -50,7 +50,7 @@ class SessionCreatorTest < ActiveSupport::TestCase
 
     profile = Auth::ProviderProfile.new(
       provider: "google", uid: "new-1", email: "new@example.com",
-      name: "New User", avatar_url: "http://x/y.jpg", raw_info: {}
+      email_verified: nil, name: "New User", avatar_url: "http://x/y.jpg"
     )
     result = SessionCreator.new(current_guest: @guest, profile: profile).call
 

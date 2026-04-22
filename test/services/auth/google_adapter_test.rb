@@ -18,6 +18,35 @@ class Auth::GoogleAdapterTest < ActiveSupport::TestCase
     assert_equal "me@gmail.com", profile.email
     assert_equal "Jane Doe", profile.name
     assert_equal "https://lh3.googleusercontent.com/a/x.jpg", profile.avatar_url
-    assert_equal "ko", profile.raw_info["locale"]
+  end
+
+  test "maps info.email_verified true" do
+    auth_hash = OmniAuth::AuthHash.new(
+      "provider" => "google_oauth2", "uid" => "1",
+      "info"  => { "email" => "x@y.com", "name" => "X", "image" => nil, "email_verified" => true },
+      "extra" => { "raw_info" => {} }
+    )
+    profile = Auth::GoogleAdapter.new(auth_hash).to_profile
+    assert_equal true, profile.email_verified
+  end
+
+  test "maps info.email_verified false" do
+    auth_hash = OmniAuth::AuthHash.new(
+      "provider" => "google_oauth2", "uid" => "2",
+      "info"  => { "email" => "x@y.com", "name" => "X", "image" => nil, "email_verified" => false },
+      "extra" => { "raw_info" => {} }
+    )
+    profile = Auth::GoogleAdapter.new(auth_hash).to_profile
+    assert_equal false, profile.email_verified
+  end
+
+  test "maps missing email_verified as nil" do
+    auth_hash = OmniAuth::AuthHash.new(
+      "provider" => "google_oauth2", "uid" => "3",
+      "info"  => { "email" => "x@y.com", "name" => "X", "image" => nil },
+      "extra" => { "raw_info" => {} }
+    )
+    profile = Auth::GoogleAdapter.new(auth_hash).to_profile
+    assert_nil profile.email_verified
   end
 end

@@ -24,4 +24,31 @@ class Auth::NaverAdapterTest < ActiveSupport::TestCase
     profile = Auth::NaverAdapter.new(auth_hash).to_profile
     assert_equal "https://fallback/x.jpg", profile.avatar_url
   end
+
+  test "maps response.email_verified true" do
+    auth_hash = OmniAuth::AuthHash.new(
+      "provider" => "naver", "uid" => "1",
+      "info"  => { "email" => "a@b.com", "name" => "X", "image" => nil },
+      "extra" => { "raw_info" => { "response" => { "email_verified" => true } } }
+    )
+    assert_equal true, Auth::NaverAdapter.new(auth_hash).to_profile.email_verified
+  end
+
+  test "response.email_verified absent → nil" do
+    auth_hash = OmniAuth::AuthHash.new(
+      "provider" => "naver", "uid" => "2",
+      "info"  => { "email" => "a@b.com", "name" => "X", "image" => nil },
+      "extra" => { "raw_info" => { "response" => {} } }
+    )
+    assert_nil Auth::NaverAdapter.new(auth_hash).to_profile.email_verified
+  end
+
+  test "raw_info absent → nil (no exception)" do
+    auth_hash = OmniAuth::AuthHash.new(
+      "provider" => "naver", "uid" => "3",
+      "info"  => { "email" => "a@b.com", "name" => "X", "image" => nil },
+      "extra" => {}
+    )
+    assert_nil Auth::NaverAdapter.new(auth_hash).to_profile.email_verified
+  end
 end

@@ -168,7 +168,7 @@ Session model: every visitor gets a `User` row. Guests (`guest: true`) are per-s
 
 OAuth callback pipeline:
 
-1. `Auth::{Google,Kakao,Naver}Adapter#to_profile` — normalize omniauth `auth_hash` into `Auth::ProviderProfile` (`provider`, `uid`, `email`, `name`, `avatar_url`, `raw_info`).
+1. `Auth::{Google,Kakao,Naver}Adapter#to_profile` — normalize omniauth `auth_hash` into `Auth::ProviderProfile` (`provider`, `uid`, `email`, `email_verified`, `name`, `avatar_url`). `email_verified` is tri-state: `true`, `false`, or `nil` (provider did not report).
 2. `SessionCreator` — three cases:
    - **Case A** — existing `Identity(provider, uid)` → attach, merge current guest in.
    - **Case B** — `email` matches existing account user → attach new identity, merge.
