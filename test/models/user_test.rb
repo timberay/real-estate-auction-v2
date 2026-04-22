@@ -35,4 +35,24 @@ class UserTest < ActiveSupport::TestCase
     User.create!(guest: false, email: "shared@example.com")
     assert_nothing_raised { User.create!(email: "shared@example.com") }
   end
+
+  test "User.mergeable_reflections returns only associations with merge_policy" do
+    names = User.mergeable_reflections.map(&:name).sort
+    expected = %i[
+      api_credentials budget_setting inspection_results
+      rights_analysis_reports search_results user_properties
+    ]
+    assert_equal expected, names
+  end
+
+  test "merge_policy metadata is preserved on reflections" do
+    r = User.reflect_on_association(:api_credentials)
+    assert_equal :keep_target, r.options[:merge_policy]
+    assert_equal :provider_name, r.options[:natural_key]
+  end
+
+  test "llm_analysis_logs is not mergeable (has no merge_policy)" do
+    names = User.mergeable_reflections.map(&:name)
+    refute_includes names, :llm_analysis_logs
+  end
 end
