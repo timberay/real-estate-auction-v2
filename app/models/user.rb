@@ -15,6 +15,7 @@ class User < ApplicationRecord
   has_many :search_results, dependent: :destroy,
            merge_policy: :prefer_guest, natural_key: :case_number
   has_many :llm_analysis_logs, dependent: :nullify
+  has_many :identities, dependent: :destroy
 
   def self.mergeable_reflections
     reflect_on_all_associations.select { |r| r.options[:merge_policy].present? }
