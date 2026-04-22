@@ -3,6 +3,7 @@ require "test_helper"
 class PropertiesControllerTest < ActionDispatch::IntegrationTest
   setup do
     get start_onboarding_url  # creates guest session
+    @user = inherit_fixture_guest_ownership
   end
 
   test "GET index shows user properties" do
@@ -23,7 +24,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
   test "POST create with existing case number adds to user list" do
     # guest already has safe_apartment via fixture; remove it first
     UserProperty.where(
-      user: User.find_by(email: "guest@auction.local"),
+      user: @user,
       property: properties(:safe_apartment)
     ).destroy_all
 
@@ -86,7 +87,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
 
   test "DELETE destroy removes user_property and user-scoped analysis data" do
     property = properties(:safe_apartment)
-    user = User.find_by(email: "guest@auction.local")
+    user = @user
 
     # Create user-scoped analysis data
     item = inspection_items(:rights_002)
@@ -133,7 +134,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET index paginates search_results 20 per page (page 1 default)" do
-    user = User.find_by(email: "guest@auction.local")
+    user = @user
     user.update!(last_search_api_total_count: 30)
     25.times do |i|
       user.search_results.create!(case_number: "PAG#{format('%03d', i)}", address: "주소 #{i}", appraisal_price: 1, min_bid_price: 1)
@@ -145,7 +146,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET index shows page 2 with search_page=2" do
-    user = User.find_by(email: "guest@auction.local")
+    user = @user
     user.update!(last_search_api_total_count: 30)
     25.times do |i|
       user.search_results.create!(case_number: "PAG#{format('%03d', i)}", address: "주소 #{i}", appraisal_price: 1, min_bid_price: 1)
@@ -157,7 +158,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET index clamps search_page above total_pages" do
-    user = User.find_by(email: "guest@auction.local")
+    user = @user
     user.update!(last_search_api_total_count: 30)
     25.times do |i|
       user.search_results.create!(case_number: "PAG#{format('%03d', i)}", address: "주소 #{i}", appraisal_price: 1, min_bid_price: 1)
@@ -169,7 +170,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET index shows over-100 banner when API total exceeds 100" do
-    user = User.find_by(email: "guest@auction.local")
+    user = @user
     user.update!(last_search_api_total_count: 150)
     user.search_results.create!(case_number: "ONE001", address: "x", appraisal_price: 1, min_bid_price: 1)
 
@@ -179,7 +180,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET index hides banner when API total is 100 or below" do
-    user = User.find_by(email: "guest@auction.local")
+    user = @user
     user.update!(last_search_api_total_count: 50)
     user.search_results.create!(case_number: "ONE001", address: "x", appraisal_price: 1, min_bid_price: 1)
 
@@ -189,7 +190,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "GET index treats non-integer search_page as page 1" do
-    user = User.find_by(email: "guest@auction.local")
+    user = @user
     25.times do |i|
       user.search_results.create!(case_number: "PAG#{format('%03d', i)}", address: "주소 #{i}", appraisal_price: 1, min_bid_price: 1)
     end

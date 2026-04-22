@@ -3,7 +3,9 @@ require "test_helper"
 class Inspections::StartControllerTest < ActionDispatch::IntegrationTest
   setup do
     @property = properties(:safe_apartment)
-    UserProperty.find_or_create_by!(user: users(:guest), property: @property)
+    get root_path
+    @user = inherit_fixture_guest_ownership
+    UserProperty.find_or_create_by!(user: @user, property: @property)
   end
 
   test "redirects with alert when no documents attached" do
@@ -35,8 +37,7 @@ class Inspections::StartControllerTest < ActionDispatch::IntegrationTest
     )
     @property.documents.attach(pdf_blob)
 
-    user = users(:guest)
-    assert_broadcasts("user_notifications_#{user.id}", 1) do
+    assert_broadcasts("user_notifications_#{@user.id}", 1) do
       post property_inspections_start_url(@property)
     end
   end

@@ -3,7 +3,9 @@ require "test_helper"
 class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @property = properties(:safe_apartment)
-    UserProperty.find_or_create_by!(user: users(:guest), property: @property)
+    get root_path
+    @user = inherit_fixture_guest_ownership
+    UserProperty.find_or_create_by!(user: @user, property: @property)
   end
 
   test "edit renders tab items" do
@@ -18,7 +20,7 @@ class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
 
   test "override auto result changes source_type to manual and preserves auto_value" do
     auto_result = @property.inspection_results
-      .where(user: users(:guest), source_type: "auto")
+      .where(user: @user, source_type: "auto")
       .first
 
     original_has_risk = auto_result.has_risk
@@ -42,7 +44,7 @@ class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
 
   test "override auto result with risk includes resolvable and note" do
     auto_result = @property.inspection_results
-      .where(user: users(:guest), source_type: "auto", has_risk: false)
+      .where(user: @user, source_type: "auto", has_risk: false)
       .first
 
     tab_key = auto_result.inspection_item.tab
@@ -68,7 +70,7 @@ class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
 
   test "update sets flash with tab rating and unanswered count" do
     result = @property.inspection_results
-      .where(user: users(:guest))
+      .where(user: @user)
       .joins(:inspection_item)
       .where(inspection_items: { tab: InspectionItem.tabs["rights_analysis"] })
       .first
@@ -101,7 +103,7 @@ class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
 
   test "edit renders dependent items visible when parent has_risk matches show_when_risk" do
     risky = properties(:risky_villa)
-    UserProperty.find_or_create_by!(user: users(:guest), property: risky)
+    UserProperty.find_or_create_by!(user: @user, property: risky)
     # risky_villa: rights-003 has_risk=true → rights-024 visible
     get edit_property_inspections_tab_url(risky, tab_key: "rights_analysis")
     assert_response :success

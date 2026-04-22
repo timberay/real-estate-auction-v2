@@ -4,11 +4,11 @@ class Inspections::DividendsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @property = properties(:risky_villa)
     @report = rights_analysis_reports(:risky_villa_report)
-    # set_guest_user sets session[:user_id] = guest user automatically
-    # risky_villa_report belongs to guest user — no extra auth needed
+    get root_path
+    @user = inherit_fixture_guest_ownership
 
     # Fixtures store json columns as strings in SQLite; normalise to Hash before each test
-    @report.update!(report_data: parse_data(@report.report_data))
+    @report.reload.update!(report_data: parse_data(@report.report_data))
   end
 
   # Helpers

@@ -3,7 +3,7 @@ require "test_helper"
 class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
   setup do
     get root_url  # create guest session
-    @user = User.find_by(email: "guest@auction.local")
+    @user = User.find(session[:user_id])
     @setting = BudgetSetting.create!(
       user: @user,
       available_cash: 30000,

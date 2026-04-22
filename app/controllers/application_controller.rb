@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
-  before_action :set_guest_user
+  before_action :ensure_current_user
 
   rescue_from DataProvider::MissingCredentialError, with: :handle_missing_credential
   rescue_from DataProvider::ConsentRequiredError, with: :handle_consent_required
@@ -20,11 +20,13 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def set_guest_user
-    return if session[:user_id] && User.exists?(session[:user_id])
-
-    guest = User.find_or_create_by!(email: "guest@auction.local")
-    session[:user_id] = guest.id
+  def ensure_current_user
+    if session[:user_id] && (user = User.find_by(id: session[:user_id]))
+      @current_user = user
+    else
+      @current_user = User.create!
+      session[:user_id] = @current_user.id
+    end
   end
 
   def current_user

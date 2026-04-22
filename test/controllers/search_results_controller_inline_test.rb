@@ -4,7 +4,7 @@ require "test_helper"
 class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
   setup do
     get start_onboarding_url
-    @user = User.find_by(email: "guest@auction.local")
+    @user = User.find(session[:user_id])
   end
 
   test "POST inline_import returns turbo stream with fade-out and card append" do

@@ -9,7 +9,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   test "redirects to properties when budget settings completed" do
     # Create guest user with completed budget settings
     get root_url  # creates guest session
-    user = User.find_by!(email: "guest@auction.local")
+    user = User.find(session[:user_id])
     BudgetSetting.create!(
       user: user,
       available_cash: 30000,
@@ -22,7 +22,6 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "auto-creates guest session on first visit" do
-    User.where(email: "guest@auction.local").destroy_all
     assert_difference "User.count", 1 do
       get root_url
     end

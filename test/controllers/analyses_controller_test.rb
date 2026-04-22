@@ -3,7 +3,7 @@ require "test_helper"
 class AnalysesControllerTest < ActionDispatch::IntegrationTest
   setup do
     get start_onboarding_url # creates guest session
-    @user = User.find_by(email: "guest@auction.local")
+    @user = User.find(session[:user_id])
   end
 
   test "GET new renders upload form" do

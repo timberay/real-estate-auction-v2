@@ -14,7 +14,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "turbo-frame#onboarding_wizard"
 
-    user = User.find_by(email: "guest@auction.local")
+    user = User.find(session[:user_id])
     assert_equal 30000, user.budget_setting.available_cash
   end
 
@@ -43,7 +43,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     }
     assert_response :success
 
-    user = User.find_by(email: "guest@auction.local")
+    user = User.find(session[:user_id])
     assert_equal apt.id, user.budget_setting.property_type_id
     assert_equal 500, user.budget_setting.repair_cost
     assert_equal 60, user.budget_setting.area_range_min
@@ -72,7 +72,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     }
     assert_redirected_to complete_onboarding_url
 
-    user = User.find_by(email: "guest@auction.local")
+    user = User.find(session[:user_id])
     setting = user.budget_setting
     assert setting.completed?
     assert_equal 96200, setting.max_bid_amount
@@ -94,13 +94,13 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     }
     assert_response :success
 
-    user = User.find_by(email: "guest@auction.local")
+    user = User.find(session[:user_id])
     assert_equal "서울특별시", user.budget_setting.region
   end
 
   test "GET step1 redirects to budget settings for returning user" do
     get start_onboarding_url
-    guest = User.find_by(email: "guest@auction.local")
+    guest = User.find(session[:user_id])
     apt = property_types(:apartment)
     policy = loan_policies(:auction_bank_apartment)
 
@@ -119,7 +119,7 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
 
   test "GET complete shows results" do
     get start_onboarding_url
-    guest = User.find_by(email: "guest@auction.local")
+    guest = User.find(session[:user_id])
     BudgetSetting.create!(
       user: guest, available_cash: 30000, loan_ratio: 0.7,
       max_bid_amount: 96200,
