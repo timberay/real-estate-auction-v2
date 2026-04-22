@@ -88,4 +88,24 @@ class GuestMergerTest < ActiveSupport::TestCase
     assert_nil log.user_id,
       "llm_analysis_logs has dependent: :nullify — user_id is cleared on @from.destroy!"
   end
+
+  test "all merges roll back if destroy! fails at the end" do
+    prop = Property.create!(case_number: "2024-merge-1005")
+    @guest.user_properties.create!(property: prop)
+    @target.api_credentials.create!(provider_name: "court_auction", api_key: "T")
+
+    def @guest.destroy!
+      raise ActiveRecord::StatementInvalid, "boom"
+    end
+
+    assert_raises(Auth::MergeError) do
+      GuestMerger.new(from: @guest, to: @target).call
+    end
+
+    @guest = User.find(@guest.id)
+    @target.reload
+    assert_equal 1, @guest.user_properties.count, "guest user_properties restored on rollback"
+    assert_equal 0, @target.user_properties.count, "target user_properties never received guest row"
+    assert_equal "T", @target.api_credentials.first.api_key, "target api_credentials untouched"
+  end
 end
