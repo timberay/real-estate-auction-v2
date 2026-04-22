@@ -15,6 +15,10 @@ module ActiveSupport
     fixtures :all
 
     # Add more helper methods to be used by all tests here...
+
+    setup do
+      Rails.cache.clear if Rails.cache.respond_to?(:clear)
+    end
   end
 end
 

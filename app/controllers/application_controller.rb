@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
 
   before_action :ensure_current_user
   before_action :capture_return_to_url
+  before_action :touch_last_seen
 
   rescue_from Auth::Error, with: :handle_auth_error
   rescue_from DataProvider::MissingCredentialError, with: :handle_missing_credential
@@ -37,6 +38,14 @@ class ApplicationController < ActionController::Base
     return if request.xhr? || turbo_frame_request?
 
     session[:return_to_url] = request.fullpath
+  end
+
+  def touch_last_seen
+    return unless @current_user
+    return if Rails.cache.exist?("last_seen:#{@current_user.id}")
+
+    Rails.cache.write("last_seen:#{@current_user.id}", true, expires_in: 1.minute)
+    @current_user.update_column(:last_seen_at, Time.current)
   end
 
   def current_user

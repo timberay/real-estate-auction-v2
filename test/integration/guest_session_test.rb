@@ -50,4 +50,27 @@ class GuestSessionTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  test "last_seen_at updates on request, throttled to once per minute" do
+    original_cache = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+
+    get root_path
+    user = User.find(session[:user_id])
+    first = user.reload.last_seen_at
+    assert_not_nil first
+
+    travel 30.seconds do
+      get root_path
+    end
+    assert_equal first, user.reload.last_seen_at, "throttle must skip writes within 1 minute"
+
+    travel 70.seconds do
+      get root_path
+    end
+    second = user.reload.last_seen_at
+    assert second > first
+  ensure
+    Rails.cache = original_cache if original_cache
+  end
 end
