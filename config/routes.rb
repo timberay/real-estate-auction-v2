@@ -1,6 +1,21 @@
 Rails.application.routes.draw do
   root "home#index"
 
+  if Rails.env.test?
+    post "/testing/sign_in", to: ->(env) {
+      req = ActionDispatch::Request.new(env)
+      req.session[:user_id] = req.params["user_id"].to_i
+      [ 200, {}, [ "ok" ] ]
+    }
+  end
+
+  namespace :auth do
+    get    "login",    to: "sessions#new",     as: :login
+    delete "logout",   to: "sessions#destroy", as: :logout
+    get    ":provider/callback", to: "omniauth_callbacks#create", as: :callback
+    get    "failure",  to: "omniauth_callbacks#failure"
+  end
+
   resource :onboarding, only: [] do
     collection do
       get "/", action: :step1, as: :start

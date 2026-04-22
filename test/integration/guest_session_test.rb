@@ -51,6 +51,17 @@ class GuestSessionTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "auth login route renders login page" do
+    get "/auth/login"
+    assert_response :success
+  end
+
+  test "auth logout route accepts DELETE" do
+    get root_path
+    delete "/auth/logout"
+    assert_redirected_to root_path
+  end
+
   test "last_seen_at updates on request, throttled to once per minute" do
     original_cache = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new

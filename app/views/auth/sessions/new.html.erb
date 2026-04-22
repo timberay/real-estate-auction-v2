@@ -1,0 +1,6 @@
+<div class="login-modal">
+  <h2>로그인</h2>
+  <%= button_to "카카오로 계속하기", "/auth/kakao", method: :post, data: { turbo: false } %>
+  <%= button_to "네이버로 계속하기", "/auth/naver", method: :post, data: { turbo: false } %>
+  <%= button_to "Google로 계속하기", "/auth/google_oauth2", method: :post, data: { turbo: false } %>
+</div>
