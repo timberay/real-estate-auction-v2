@@ -13,6 +13,8 @@ Rails.application.routes.draw do
       req.params.each { |k, v| req.session[k.to_sym] = v }
       [ 200, {}, [ "ok" ] ]
     }
+
+    post "/testing/set_remember_cookie", to: "testing#set_remember_cookie"
   end
 
   namespace :auth do

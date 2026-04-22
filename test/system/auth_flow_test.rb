@@ -14,4 +14,13 @@ class AuthFlowTest < ApplicationSystemTestCase
 
     assert_text "환영합니다, 시스템유저님"
   end
+
+  test "permanent remember_token cookie logs user back in on revisit" do
+    visit "/auth/login"
+    click_on "카카오로 계속하기"
+    assert_text "환영합니다"
+
+    visit "/"
+    assert_text "시스템유저"
+  end
 end

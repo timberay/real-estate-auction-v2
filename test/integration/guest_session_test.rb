@@ -70,6 +70,23 @@ class GuestSessionTest < ActionDispatch::IntegrationTest
     assert_match(/로그아웃/, response.body)
   end
 
+  test "signed remember_token cookie restores session for returning account user" do
+    user = User.create!(guest: false, email: "r@s.com", name: "Returnee")
+    post "/testing/set_remember_cookie", params: { user_id: user.id }
+
+    get "/auth/login"
+    assert_match "Returnee", response.body
+    assert_equal user.id, session[:user_id]
+  end
+
+  test "remember_token cookie is ignored for guest users" do
+    guest = User.create!
+    post "/testing/set_remember_cookie", params: { user_id: guest.id }
+
+    get "/auth/login"
+    refute_equal guest.id, session[:user_id], "should NOT reuse guest via remember cookie"
+  end
+
   test "auth logout route accepts DELETE" do
     get root_path
     delete "/auth/logout"
