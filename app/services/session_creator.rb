@@ -26,7 +26,7 @@ class SessionCreator
       Identity.find_or_create_by!(provider: @profile.provider, uid: @profile.uid) do |i|
         i.user = existing
         i.email = @profile.email
-        i.raw_info = @profile.raw_info
+        i.email_verified = @profile.email_verified
       end
       return attach_and_merge(existing)
     end
@@ -53,7 +53,7 @@ class SessionCreator
     Identity.find_or_create_by!(provider: @profile.provider, uid: @profile.uid) do |i|
       i.user = @current_guest
       i.email = @profile.email
-      i.raw_info = @profile.raw_info
+      i.email_verified = @profile.email_verified
     end
   rescue ActiveRecord::RecordNotUnique
     Identity.find_by!(provider: @profile.provider, uid: @profile.uid)

@@ -18,6 +18,5 @@ class Auth::GoogleAdapterTest < ActiveSupport::TestCase
     assert_equal "me@gmail.com", profile.email
     assert_equal "Jane Doe", profile.name
     assert_equal "https://lh3.googleusercontent.com/a/x.jpg", profile.avatar_url
-    assert_equal "ko", profile.raw_info["locale"]
   end
 end

@@ -1,6 +1,6 @@
 module Auth
   ProviderProfile = Struct.new(
-    :provider, :uid, :email, :name, :avatar_url, :raw_info,
+    :provider, :uid, :email, :email_verified, :name, :avatar_url,
     keyword_init: true
   )
 end
