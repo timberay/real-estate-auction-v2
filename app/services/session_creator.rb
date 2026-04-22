@@ -34,22 +34,29 @@ class SessionCreator
   end
 
   def promote_guest
-    @current_guest.update!(
-      guest: false,
-      guest_token: nil,
-      email: @profile.email,
-      name: @profile.name,
-      avatar_url: @profile.avatar_url,
-      terms_accepted_at: Time.current
-    )
-    Identity.create!(
-      user: @current_guest,
-      provider: @profile.provider,
-      uid: @profile.uid,
-      email: @profile.email,
-      raw_info: @profile.raw_info
-    )
+    @current_guest.reload
+    if @current_guest.guest?
+      @current_guest.update!(
+        guest: false,
+        guest_token: nil,
+        email: @profile.email,
+        name: @profile.name,
+        avatar_url: @profile.avatar_url,
+        terms_accepted_at: Time.current
+      )
+    end
+    upsert_identity
     @current_guest
+  end
+
+  def upsert_identity
+    Identity.find_or_create_by!(provider: @profile.provider, uid: @profile.uid) do |i|
+      i.user = @current_guest
+      i.email = @profile.email
+      i.raw_info = @profile.raw_info
+    end
+  rescue ActiveRecord::RecordNotUnique
+    Identity.find_by!(provider: @profile.provider, uid: @profile.uid)
   end
 
   def attach_and_merge(target_user)
