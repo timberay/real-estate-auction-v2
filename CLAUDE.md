@@ -23,11 +23,7 @@ Detailed standards are in `docs/standards/`. **Read the relevant document(s) bef
 
 ## Pre-commit Failure Recovery
 
-When a pre-commit hook (rubocop, test, etc.) fails, fix it yourself and retry — do not stop and ask the user.
-
-- **Rubocop violation**: Run `bin/rubocop -a` to auto-fix, then re-stage and re-commit
-- **Test failure**: Diagnose the failing test, fix the code, verify with `bin/rails test`, then re-commit
-- **Multiple issues**: Fix rubocop first, then tests, then re-commit
+When a pre-commit hook fails, fix it yourself and retry — do not stop and ask the user. **Details**: [QUALITY.md](docs/standards/QUALITY.md#pre-commit-failure-recovery).
 
 ## Pipeline Phases (summary)
 
