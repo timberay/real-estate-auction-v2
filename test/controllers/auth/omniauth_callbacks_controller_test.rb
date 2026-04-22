@@ -71,4 +71,20 @@ class Auth::OmniauthCallbacksControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to "/auth/login"
     assert_match(/문제가 발생/, flash[:alert])
   end
+
+  test "successful callback rotates session id (fixation defense)" do
+    get root_path
+    old_session_data = session.to_hash.dup
+
+    mock_omniauth(:google_oauth2, uid: "g-x", email: "x@y.com", name: "X")
+    get "/auth/google_oauth2/callback"
+
+    assert session[:user_id].present?
+    refute_equal old_session_data["return_to_url"], session[:return_to_url]
+  end
+
+  test "GET /auth/google_oauth2 request phase is rejected (POST only)" do
+    get "/auth/google_oauth2"
+    assert_response :not_found
+  end
 end
