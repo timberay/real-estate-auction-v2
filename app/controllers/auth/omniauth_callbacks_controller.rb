@@ -13,6 +13,7 @@ class Auth::OmniauthCallbacksController < ApplicationController
 
     profile = adapter_class.new(request.env["omniauth.auth"]).to_profile
     return_to = session.delete(:return_to_url) || root_path
+    pending = session.delete(:pending_post_action)
 
     target_user = SessionCreator.new(current_guest: current_user, profile: profile).call
 
@@ -21,7 +22,9 @@ class Auth::OmniauthCallbacksController < ApplicationController
     cookies.permanent.signed[:remember_token] = { value: target_user.id, httponly: true, same_site: :lax }
     cookies.permanent[:last_provider] = profile.provider
 
-    flash[:notice] = "환영합니다, #{target_user.name}님"
+    notice = "환영합니다, #{target_user.name}님"
+    notice = "#{notice} — #{pending}를 다시 눌러주세요." if pending
+    flash[:notice] = notice
     redirect_to return_to
   end
 

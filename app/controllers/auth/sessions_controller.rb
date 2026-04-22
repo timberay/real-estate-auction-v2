@@ -1,5 +1,6 @@
 class Auth::SessionsController < ApplicationController
   def new
+    session[:pending_post_action] = params[:pending] if params[:pending].present?
   end
 
   def destroy

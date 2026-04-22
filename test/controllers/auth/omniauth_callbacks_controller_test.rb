@@ -87,4 +87,14 @@ class Auth::OmniauthCallbacksControllerTest < ActionDispatch::IntegrationTest
     get "/auth/google_oauth2"
     assert_response :not_found
   end
+
+  test "post-origin trigger surfaces 'try again' toast after login" do
+    get root_path
+    post "/testing/set_session", params: { pending_post_action: "PDF 내보내기" }
+
+    mock_omniauth(:kakao, uid: "x", email: "x@y.com", name: "X")
+    get "/auth/kakao/callback"
+
+    assert_match "PDF 내보내기를 다시 눌러주세요", flash[:notice]
+  end
 end

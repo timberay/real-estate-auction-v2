@@ -7,6 +7,12 @@ Rails.application.routes.draw do
       req.session[:user_id] = req.params["user_id"].to_i
       [ 200, {}, [ "ok" ] ]
     }
+
+    post "/testing/set_session", to: ->(env) {
+      req = ActionDispatch::Request.new(env)
+      req.params.each { |k, v| req.session[k.to_sym] = v }
+      [ 200, {}, [ "ok" ] ]
+    }
   end
 
   namespace :auth do
