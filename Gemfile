@@ -17,8 +17,15 @@ gem "stimulus-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
-# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-gem "bcrypt", "~> 3.1.7"
+# OAuth login providers
+gem "omniauth", "~> 2.1"
+gem "omniauth-rails_csrf_protection", "~> 1.0"
+gem "omniauth-google-oauth2", "~> 1.1"
+gem "omniauth-naver", "~> 0.1"
+gem "omniauth-kakao-oauth2", "~> 1.0"
+
+# Rate limiting for auth endpoints
+gem "rack-attack"
 
 # Browser automation for government site scraping
 gem "playwright-ruby-client", require: "playwright"
