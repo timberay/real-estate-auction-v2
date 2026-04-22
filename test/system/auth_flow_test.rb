@@ -23,4 +23,17 @@ class AuthFlowTest < ApplicationSystemTestCase
     visit "/"
     assert_text "시스템유저"
   end
+
+  test "logout creates a new guest session distinct from the logged-in user" do
+    visit "/auth/login"
+    click_on "카카오로 계속하기"
+    assert_text "환영합니다"
+
+    visit "/onboarding"  # a real page — toast from login is gone, header still signed in
+    click_on "시스템유저"
+    click_on "로그아웃"
+
+    assert_text "로그아웃되었습니다"
+    refute_text "시스템유저"
+  end
 end
