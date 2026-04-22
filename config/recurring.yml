@@ -16,3 +16,13 @@ production:
   loan_policy_sync:
     class: LoanPolicySyncJob
     schedule: every day at 6am
+  guest_cleanup:
+    class: GuestCleanupJob
+    queue: default
+    schedule: every day at 3am
+
+development:
+  guest_cleanup:
+    class: GuestCleanupJob
+    queue: default
+    schedule: every day at 3am
