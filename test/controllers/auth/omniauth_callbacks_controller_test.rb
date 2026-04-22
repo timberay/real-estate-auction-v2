@@ -53,4 +53,22 @@ class Auth::OmniauthCallbacksControllerTest < ActionDispatch::IntegrationTest
     assert_equal guest_id, promoted.id, "should promote the CURRENT guest, not link to OldAnon"
     refute_equal "OldAnon", promoted.name
   end
+
+  test "failure with access_denied shows cancel message" do
+    get "/auth/failure?message=access_denied"
+    assert_redirected_to "/auth/login"
+    assert_equal "로그인이 취소되었습니다.", flash[:alert]
+  end
+
+  test "failure with csrf_detected shows security message" do
+    get "/auth/failure?message=csrf_detected"
+    assert_redirected_to "/auth/login"
+    assert_match(/보안 검증/, flash[:alert])
+  end
+
+  test "failure with unknown code shows generic message" do
+    get "/auth/failure?message=something_weird"
+    assert_redirected_to "/auth/login"
+    assert_match(/문제가 발생/, flash[:alert])
+  end
 end
