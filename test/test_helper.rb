@@ -19,6 +19,19 @@ module ActiveSupport
     setup do
       Rails.cache.clear if Rails.cache.respond_to?(:clear)
     end
+
+    def mock_omniauth(provider, uid:, email: nil, name: "Test User", avatar: nil)
+      OmniAuth.config.mock_auth[provider.to_sym] = OmniAuth::AuthHash.new(
+        "provider" => provider.to_s,
+        "uid"      => uid.to_s,
+        "info"     => { "email" => email, "name" => name, "image" => avatar },
+        "extra"    => { "raw_info" => {} }
+      )
+    end
+
+    teardown do
+      OmniAuth.config.mock_auth.clear
+    end
   end
 end
 
