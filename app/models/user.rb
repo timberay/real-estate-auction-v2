@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  before_validation :assign_guest_token, on: :create
+
   has_one :budget_setting, dependent: :destroy
 
   has_many :user_properties, dependent: :destroy
@@ -24,5 +26,14 @@ class User < ApplicationRecord
 
   def preferred_area_category
     budget_setting&.selected_area_category
+  end
+
+  private
+
+  def assign_guest_token
+    return unless guest?
+    return if guest_token.present?
+
+    self.guest_token = SecureRandom.urlsafe_base64(32)
   end
 end
