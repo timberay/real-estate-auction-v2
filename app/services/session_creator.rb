@@ -30,7 +30,26 @@ class SessionCreator
       end
       return attach_and_merge(existing)
     end
-    raise NotImplementedError, "Case C promote_guest not implemented yet"
+    promote_guest
+  end
+
+  def promote_guest
+    @current_guest.update!(
+      guest: false,
+      guest_token: nil,
+      email: @profile.email,
+      name: @profile.name,
+      avatar_url: @profile.avatar_url,
+      terms_accepted_at: Time.current
+    )
+    Identity.create!(
+      user: @current_guest,
+      provider: @profile.provider,
+      uid: @profile.uid,
+      email: @profile.email,
+      raw_info: @profile.raw_info
+    )
+    @current_guest
   end
 
   def attach_and_merge(target_user)
