@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_21_235851) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_22_004708) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -150,6 +150,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_235851) do
     t.index ["code"], name: "index_eviction_steps_on_code", unique: true
     t.index ["occupant_type"], name: "index_eviction_steps_on_occupant_type"
     t.index ["step_type", "position"], name: "index_eviction_steps_on_step_type_and_position"
+  end
+
+  create_table "identities", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "provider", null: false
+    t.text "raw_info"
+    t.string "uid", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["provider", "uid"], name: "index_identities_on_provider_and_uid", unique: true
+    t.index ["user_id", "provider"], name: "index_identities_on_user_id_and_provider"
+    t.index ["user_id"], name: "index_identities_on_user_id"
   end
 
   create_table "inspection_items", force: :cascade do |t|
@@ -364,6 +377,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_21_235851) do
   add_foreign_key "budget_settings", "property_types"
   add_foreign_key "budget_settings", "users"
   add_foreign_key "eviction_simulations", "properties"
+  add_foreign_key "identities", "users"
   add_foreign_key "inspection_results", "inspection_items"
   add_foreign_key "inspection_results", "properties"
   add_foreign_key "inspection_results", "users"
