@@ -54,4 +54,25 @@ class GuestMergerTest < ActiveSupport::TestCase
     assert_equal true, @target.inspection_results.first.has_risk
     assert_raises(ActiveRecord::RecordNotFound) { InspectionResult.find(target_ir.id) }
   end
+
+  test "keep_target preserves target's api_credentials when collision exists" do
+    @target.api_credentials.create!(provider_name: "court_auction", api_key: "REAL_KEY")
+    @guest.api_credentials.create!(provider_name: "court_auction", api_key: "GUEST_KEY")
+
+    GuestMerger.new(from: @guest, to: @target).call
+
+    @target.reload
+    assert_equal 1, @target.api_credentials.count
+    assert_equal "REAL_KEY", @target.api_credentials.first.api_key
+  end
+
+  test "keep_target still migrates guest api_credentials when target has none" do
+    @guest.api_credentials.create!(provider_name: "court_auction", api_key: "GUEST_ONLY")
+
+    GuestMerger.new(from: @guest, to: @target).call
+
+    @target.reload
+    assert_equal 1, @target.api_credentials.count
+    assert_equal "GUEST_ONLY", @target.api_credentials.first.api_key
+  end
 end
