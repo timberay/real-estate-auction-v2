@@ -5,12 +5,17 @@ module Header
     HEADER_CLASSES = "fixed top-0 left-0 right-0 z-40 h-16 bg-slate-800 dark:bg-slate-900 flex items-center justify-between px-4 md:px-6"
     BUTTON_CLASSES = "p-2 rounded-md text-slate-300 hover:text-white hover:bg-slate-700 transition-colors duration-150"
 
-    def initialize(app_name: "부동산 경매 도우미", page_title: nil)
+    def initialize(app_name: "부동산 경매 도우미", page_title: nil, current_user: nil)
       @app_name = app_name
       @page_title = page_title.presence
+      @current_user = current_user
     end
 
     private
+
+    def signed_in?
+      @current_user && !@current_user.guest?
+    end
 
     def hamburger_icon
       raw Heroicon::Icon.render(

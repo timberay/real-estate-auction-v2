@@ -56,6 +56,20 @@ class GuestSessionTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "header shows 로그인 link for guest" do
+    get "/auth/login"  # a page that actually renders the layout (root redirects)
+    assert_match(/로그인/, response.body)
+    refute_match(/로그아웃/, response.body)
+  end
+
+  test "header shows user menu when logged in" do
+    user = User.create!(guest: false, email: "m@n.com", name: "Menu User")
+    post "/testing/sign_in", params: { user_id: user.id }
+    get "/auth/login"
+    assert_match "Menu User", response.body
+    assert_match(/로그아웃/, response.body)
+  end
+
   test "auth logout route accepts DELETE" do
     get root_path
     delete "/auth/logout"

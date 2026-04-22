@@ -18,6 +18,30 @@
       </button>
     </div>
 
+    <% if signed_in? %>
+      <div class="relative" data-controller="dropdown">
+        <button type="button" class="<%= BUTTON_CLASSES %> flex items-center gap-2" data-action="dropdown#toggle" aria-label="사용자 메뉴">
+          <% if @current_user.avatar_url.present? %>
+            <img src="<%= @current_user.avatar_url %>" alt="" class="w-7 h-7 rounded-full">
+          <% else %>
+            <span class="w-7 h-7 rounded-full bg-slate-600 text-white text-xs flex items-center justify-center font-medium">
+              <%= @current_user.name.to_s[0] %>
+            </span>
+          <% end %>
+          <span class="hidden md:inline text-sm text-white"><%= @current_user.name %></span>
+        </button>
+        <div data-dropdown-target="menu" class="hidden absolute right-0 mt-2 w-44 bg-white dark:bg-slate-800 rounded-md shadow-lg border border-slate-200 dark:border-slate-700 py-1">
+          <%= link_to "설정", "/settings/budget", class: "block px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700" %>
+          <%= button_to "로그아웃", "/auth/logout", method: :delete, form_class: "w-full",
+              class: "block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700" %>
+        </div>
+      </div>
+    <% else %>
+      <%= link_to "로그인", "/auth/login",
+          class: "text-sm text-white hover:text-slate-200 px-3 py-2 rounded-md hover:bg-slate-700",
+          data: { turbo_frame: "auth_modal" } %>
+    <% end %>
+
     <span id="analysis_indicator"></span>
   </div>
 </header>
