@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
   before_action :ensure_current_user
   before_action :capture_return_to_url
 
+  rescue_from Auth::Error, with: :handle_auth_error
   rescue_from DataProvider::MissingCredentialError, with: :handle_missing_credential
   rescue_from DataProvider::ConsentRequiredError, with: :handle_consent_required
   rescue_from DataProvider::InvalidCredentialError, with: :handle_invalid_credential
@@ -42,6 +43,11 @@ class ApplicationController < ActionController::Base
     @current_user ||= User.find_by(id: session[:user_id])
   end
   helper_method :current_user
+
+  def handle_auth_error(error)
+    Rails.logger.warn("[Auth::Error] #{error.class}: #{error.message}")
+    redirect_to "/auth/login", alert: "로그인 중 문제가 발생했습니다. 다시 시도해주세요."
+  end
 
   def handle_missing_credential(_error)
     redirect_to settings_data_sources_path, alert: "이 기능을 사용하려면 API 키를 설정해주세요."
