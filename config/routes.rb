@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
   root "home#index"
 
+  post "/csp_reports", to: "csp_reports#create"
+
   if Rails.env.test?
     post "/testing/sign_in", to: ->(env) {
       req = ActionDispatch::Request.new(env)
