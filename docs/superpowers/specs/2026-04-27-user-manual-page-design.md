@@ -98,11 +98,13 @@ resource :manual, only: [:show]   # GET /manual → manuals#show, manual_path
 | 1 | 예산 정하기 | `BudgetSetting`이 있고 `completed_at not nil` | row 존재하나 `completed_at` nil | row 없음 |
 | 2 | 물건 찾기 | `UserProperty.exists?(user_id: u)` | (없음 — 추가 즉시 ✓) | 0건 |
 | 3 | AI 분석 | `UserProperty.exists?(user_id: u, analyzed_at: not nil)` | user_property 있으나 모든 `analyzed_at` nil | step 2 미시작 |
-| 4 | 89체크 | 사용자별 distinct `inspection_results.inspection_item_id` 수 ≥ 89 | 1 ≤ count < 89 | 0건 |
+| 4 | 89체크 | 사용자가 보유한 user_property 중 **단일 property 기준** distinct `inspection_results.inspection_item_id` 수 ≥ 89 인 것이 1개라도 존재 | 1개 이상 inspection_result 보유, 단 어떤 property도 89 미달 | 0건 |
 | 5 | 명도 가이드 | (트래킹 안 함 — 라벨만, 상태 아이콘 없음) | — | — |
 | 6 | 시뮬레이터 | `EvictionSimulation.exists?(property_id IN user's, completed: true)` | row 있고 `completed=false` | 0건 |
 
-> **89체크 ✓ 정의:** "전체 89개 다 채움". "필수 항목" 개념을 도입하지 않음(현재 도메인 단순화 유지).
+> **89체크 ✓ 정의:** "단일 property 안에서 전체 89개 다 채움". 사용자 전체 합산이 아님 — A물건 40개 + B물건 49개는 ✓가 아니라 ▶. "필수 항목" 개념은 도입하지 않음(현재 도메인 단순화 유지).
+>
+> **89체크 ▶ 진행률 표시:** 사용자의 user_properties 중 **단일 property 최댓값** count (예: A=40, B=49 → "49/89"). 이는 step 4 in_progress 라벨과 "이어서 하기" 카드의 진행률 모두에 적용.
 
 ### "현재 단계" 결정
 
@@ -120,14 +122,20 @@ resource :manual, only: [:show]   # GET /manual → manuals#show, manual_path
 | 2 (·) | "물건 추가하기" | `properties_path` |
 | 3 (▶) | "분석 이어서 하기" | `properties_path` (또는 가장 최근 user_property) |
 | 3 (·) | "AI 분석할 물건 고르기" | `properties_path` |
-| 4 (▶) | "이어서 채우기 (32/89)" | 가장 최근 `user_property` (=`updated_at` MAX) → inspection deep link |
+| 4 (▶) | "이어서 채우기 (49/89)" — 단일 property 최댓값 | `inspection_results.updated_at` MAX의 `property_id` → 해당 property inspection deep link |
 | 4 (·) | "체크리스트 시작" | `properties_path` |
 | 6 (▶) | "시뮬레이션 이어서 하기" | `eviction_guide_simulator_path` |
 | 6 (·) | "시뮬레이터 돌려보기" | `eviction_guide_simulator_path` |
 
-### "가장 최근 active property"
+### "가장 최근 active property" (step 4 CTA deep link 대상)
 
-`user_property.updated_at` 최댓값 — 가장 마지막에 어떤 변경이라도 발생한 항목 = 사용자가 가장 최근 다룬 물건이라는 합리적 추론.
+**기준:** 해당 사용자의 `inspection_results` 중 `updated_at` MAX인 row의 `property_id`.
+
+`user_property.updated_at` MAX를 쓰지 않는 이유: 현재 스키마에서 `inspection_results`는 `user_property`를 직접 참조하지 않고 `property_id`만 가짐. 따라서 `belongs_to :user_property, touch: true` 같은 cascade 설정이 자동으로 흐르지 않아, user_property.updated_at은 "체크리스트 활동 시점"을 정확히 반영하지 못함.
+
+`inspection_results.updated_at` MAX 기준은 step 4 컨텍스트에 정확히 부합하며 추가 모델 설정 없이 의도한 동작 보장.
+
+**Edge case:** inspection_results가 0건이면 (step 4 ·) 가장 최근 user_property를 fallback으로 (`user_property.updated_at` MAX). 그것도 0건이면 step 4 CTA는 `properties_path`로.
 
 ### 쿼리 비용
 
@@ -291,6 +299,13 @@ CLAUDE.md의 Red-Green-Refactor 원칙 준수. **단위 → 컴포넌트 → 시
 ### 1. `Manuals::Progress` 단위 테스트 (~18개)
 
 `test/models/manuals/progress_test.rb` — 6스텝 × {empty, in_progress, done} 조합 + current_step 결정 + 진행률 carry. 가장 빠르고 가장 핵심.
+
+**필수 추가 테스트 (multi-property edge cases):**
+- `step 4: A property 40개 + B property 49개 합산해도 done이 아니라 in_progress` (cross-property 합산 방지)
+- `step 4: A property 89개 채우면 다른 property 0개여도 done`
+- `step 4 진행률은 단일 property 최댓값을 carry (예: A=40, B=49 → "49/89")`
+- `step 4 CTA target은 inspection_results.updated_at MAX의 property — 가장 최근 활동 물건` (user_property.updated_at MAX와 일치하지 않는 케이스 명시)
+- `step 4 in_progress이지만 inspection_results 0건일 때 fallback: user_property.updated_at MAX 사용` (▶ 정의상 이 케이스는 발생 불가하지만, 가드 테스트)
 
 ### 2. ViewComponent 테스트 (~12개)
 
