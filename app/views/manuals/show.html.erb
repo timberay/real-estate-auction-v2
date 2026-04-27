@@ -1,2 +1,1 @@
-<%# Placeholder until Manual::Component is wired in Task 16. %>
-<h1><%= t("manuals.show.hero.headline") %></h1>
+<%= render Manual::Component.new(progress: @progress) %>
