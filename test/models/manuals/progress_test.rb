@@ -146,5 +146,41 @@ module Manuals
 
       assert step.done?
     end
+
+    # ---- Step 5: eviction_guide ----
+
+    test "step 5 has status :none regardless of state" do
+      step = Manuals::Progress.for(@user).fetch_step(:eviction_guide)
+
+      assert step.none?
+    end
+
+    # ---- Step 6: simulator ----
+
+    test "step 6 done when user has completed simulation" do
+      property = Property.create!(case_number: "2026타경100008")
+      UserProperty.create!(user: @user, property: property)
+      EvictionSimulation.create!(property: property, completed: true, occupant_type: "owner", answers: {})
+
+      step = Manuals::Progress.for(@user).fetch_step(:simulator)
+
+      assert step.done?
+    end
+
+    test "step 6 in_progress when simulation exists but not completed" do
+      property = Property.create!(case_number: "2026타경100009")
+      UserProperty.create!(user: @user, property: property)
+      EvictionSimulation.create!(property: property, completed: false, occupant_type: "owner", answers: {})
+
+      step = Manuals::Progress.for(@user).fetch_step(:simulator)
+
+      assert step.in_progress?
+    end
+
+    test "step 6 pending when no simulation" do
+      step = Manuals::Progress.for(@user).fetch_step(:simulator)
+
+      assert step.pending?
+    end
   end
 end

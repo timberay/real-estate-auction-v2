@@ -35,7 +35,8 @@ module Manuals
       when :properties then properties_status
       when :ai_analysis then ai_analysis_status
       when :checklist then checklist_status
-      else :pending
+      when :eviction_guide then :none
+      when :simulator then simulator_status
       end
     end
 
@@ -84,6 +85,12 @@ module Manuals
 
     def checklist_total
       @checklist_total ||= InspectionItem.count
+    end
+
+    def simulator_status
+      simulations = EvictionSimulation.where(property_id: @user.user_properties.select(:property_id))
+      return :pending unless simulations.exists?
+      simulations.where(completed: true).exists? ? :done : :in_progress
     end
   end
 end
