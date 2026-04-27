@@ -1,0 +1,9 @@
+<article class="max-w-5xl mx-auto px-4 lg:px-8">
+  <%= render Manual::Hero::Component.new(progress: progress) %>
+  <%= render Manual::FlowStrip::Component.new(steps: progress.steps, current_step_key: current_step_key) %>
+  <%= render Manual::PhaseSection::Component.new(phase: :pre, steps: pre_auction_steps, current_step_key: current_step_key) %>
+  <%= render Manual::PhaseSection::Component.new(phase: :post, steps: post_auction_steps, current_step_key: current_step_key) %>
+  <footer class="py-6 text-sm text-slate-500 dark:text-slate-400">
+    <%= t("manuals.show.footer.help_text") %>
+  </footer>
+</article>
