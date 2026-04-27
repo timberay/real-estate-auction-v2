@@ -19,22 +19,17 @@ module Manual
         progress.current_step
       end
 
-      def cta_card_label
+      def cta_card_resolver
         return nil unless has_current?
-        borrowed_step_card.send(:cta_label)
+        @cta_card_resolver ||= Manual::CtaResolver.new(progress.current_step)
+      end
+
+      def cta_card_label
+        cta_card_resolver&.label
       end
 
       def cta_card_path
-        return nil unless has_current?
-        borrowed_step_card.send(:cta_path)
-      end
-
-      def borrowed_step_card
-        ctx = __vc_original_view_context || @view_context
-        Manual::StepCard::Component.new(step: cta_card_step, default_open: false).tap do |c|
-          c.set_original_view_context(ctx)
-          c.instance_variable_set(:@view_context, ctx)
-        end
+        cta_card_resolver&.path
       end
 
       def fallback_path

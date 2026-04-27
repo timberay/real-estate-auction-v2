@@ -33,25 +33,8 @@ module Manual
         t("manuals.status.#{step.status}")
       end
 
-      def cta_label
-        if step.in_progress? && step.key == :checklist && step.detail
-          t("manuals.cta.checklist.in_progress", done: step.detail[:done], total: step.detail[:total])
-        elsif step.in_progress?
-          t("manuals.cta.#{step.key}.in_progress", default: t("manuals.cta.#{step.key}.default"))
-        else
-          t("manuals.cta.#{step.key}.default")
-        end
-      end
-
-      def cta_path
-        case step.key
-        when :budget then helpers.start_onboarding_path
-        when :properties then helpers.properties_path
-        when :ai_analysis then helpers.new_analysis_path
-        when :checklist then helpers.properties_path
-        when :eviction_guide then helpers.eviction_guide_guide_path
-        when :simulator then helpers.eviction_guide_simulator_path
-        end
+      def cta
+        @cta ||= Manual::CtaResolver.new(step)
       end
 
       def screenshot_path
