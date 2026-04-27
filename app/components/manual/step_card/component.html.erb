@@ -1,0 +1,20 @@
+<details class="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4 mb-3" <%= "open" if open? %>>
+  <summary class="cursor-pointer flex items-center gap-3">
+    <span class="text-lg font-semibold text-slate-700 dark:text-slate-200">
+      <%= step.number %>. <%= label %>
+    </span>
+    <% if status_text %>
+      <span class="ml-auto text-sm text-slate-500 dark:text-slate-400"><%= status_text %></span>
+    <% end %>
+  </summary>
+  <p class="mt-3 text-slate-600 dark:text-slate-300"><%= summary %></p>
+  <ul class="mt-3 list-disc list-inside text-slate-600 dark:text-slate-300 space-y-1">
+    <% actions.each do |action| %>
+      <li><%= action %></li>
+    <% end %>
+  </ul>
+  <%= screenshot_tag %>
+  <a href="<%= cta_path %>" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+    <%= cta_label %>
+  </a>
+</details>
