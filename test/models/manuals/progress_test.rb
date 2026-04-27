@@ -224,22 +224,29 @@ module Manuals
     end
 
     test "continue_cta for in_progress checklist carries property_id from latest inspection_result" do
-      property_old = Property.create!(case_number: "2026타경100012a")
-      property_new = Property.create!(case_number: "2026타경100012b")
-      UserProperty.create!(user: @user, property: property_old)
-      UserProperty.create!(user: @user, property: property_new)
+      property_old_inspect = Property.create!(case_number: "2026타경100012a")
+      property_new_inspect = Property.create!(case_number: "2026타경100012b")
+      UserProperty.create!(user: @user, property: property_old_inspect)
+      UserProperty.create!(user: @user, property: property_new_inspect)
       BudgetSetting.create!(user: @user, available_cash: 1000, loan_ratio: 0.5, completed_at: Time.current)
       UserProperty.where(user: @user).update_all(analyzed_at: Time.current)
 
-      InspectionResult.create!(user: @user, property: property_old, inspection_item: InspectionItem.first, source_type: 0, updated_at: 2.days.ago)
-      InspectionResult.create!(user: @user, property: property_new, inspection_item: InspectionItem.second, source_type: 0, updated_at: 1.minute.ago)
+      # Flip user_property.updated_at so it points the OPPOSITE way to
+      # inspection_results.updated_at. If the implementation accidentally
+      # used user_property.updated_at, this test would assert property_old_inspect;
+      # the spec requires inspection_results.updated_at, so we expect property_new_inspect.
+      UserProperty.where(user: @user, property: property_old_inspect).update_all(updated_at: 1.minute.from_now)
+      UserProperty.where(user: @user, property: property_new_inspect).update_all(updated_at: 2.days.ago)
+
+      InspectionResult.create!(user: @user, property: property_old_inspect, inspection_item: InspectionItem.first, source_type: 0, updated_at: 2.days.ago)
+      InspectionResult.create!(user: @user, property: property_new_inspect, inspection_item: InspectionItem.second, source_type: 0, updated_at: 1.minute.ago)
 
       result = Manuals::Progress.for(@user)
       cta = result.continue_cta
 
       assert_equal :checklist, cta[:key]
       assert_equal :in_progress, cta[:variant]
-      assert_equal property_new.id, cta[:property_id], "Step 4 CTA must target the property with the latest inspection_result.updated_at"
+      assert_equal property_new_inspect.id, cta[:property_id], "Step 4 CTA must target the property with the latest inspection_result.updated_at — NOT user_property.updated_at"
     end
   end
 end
