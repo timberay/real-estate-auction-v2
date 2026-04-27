@@ -82,6 +82,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resource :manual, only: [ :show ]
+
   scope :eviction_guide, controller: :eviction_guide do
     get "/", action: :guide, as: :eviction_guide_guide
     get "simulator", action: :simulator, as: :eviction_guide_simulator

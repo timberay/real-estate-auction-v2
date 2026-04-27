@@ -5,6 +5,9 @@ module Sidebar
     MenuItem = Data.define(:label, :icon, :path, :enabled)
 
     MENU_GROUPS = {
+      "시작하기" => [
+        MenuItem.new(label: "사용자매뉴얼", icon: "book-open", path: :manual_path, enabled: true)
+      ],
       "물건검색" => [
         MenuItem.new(label: "예산 설정", icon: "calculator", path: :start_onboarding_path, enabled: true),
         MenuItem.new(label: "물건 목록", icon: "magnifying-glass", path: :properties_path, enabled: true),

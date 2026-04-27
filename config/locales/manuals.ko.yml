@@ -1,0 +1,85 @@
+ko:
+  manuals:
+    show:
+      hero:
+        headline: "경매 초보의 워크북"
+        subhead: "낙찰 전 89개 체크리스트, 낙찰 후 명도 시뮬레이터"
+        tagline: "정보를 보여드리는 게 아니라, 직접 분석하는 능력을 길러드립니다."
+      continue_card:
+        title: "이어서 하기"
+        empty_title: "처음부터 시작하기"
+        empty_body: "예산 설정부터 6단계로 안내해 드립니다."
+      flow_strip:
+        auction_marker: "낙찰"
+      phase_pre:
+        heading: "낙찰 전"
+        subheading: "89개 체크리스트로 직접 분석합니다"
+      phase_post:
+        heading: "낙찰 후"
+        subheading: "명도 시뮬레이터로 다음 한 수를 정합니다"
+      footer:
+        help_text: "각 화면에서 막히면 상단 도움말 아이콘을 눌러주세요."
+    steps:
+      budget:
+        label: "예산 정하기"
+        summary: "내가 살 수 있는 가격대를 먼저 못 박습니다."
+        actions:
+          - "보유 현금과 대출 한도 입력"
+          - "취득세·수리비·이사비 등 부대비용 자동 계산"
+          - "지역과 평형대 설정"
+      properties:
+        label: "물건 찾기"
+        summary: "법원 경매 물건을 검색해서 내 목록에 담습니다."
+        actions:
+          - "법원 경매 사이트 검색 결과 가져오기"
+          - "관심 물건 내 목록에 추가"
+          - "예산 안 맞는 물건 자동 필터"
+      ai_analysis:
+        label: "AI 분석"
+        summary: "권리관계와 위험요소를 AI가 1차로 정리합니다."
+        actions:
+          - "등기부·매각물건명세서 자동 분석"
+          - "인수금액·말소기준권리 추출"
+          - "이상 징후 하이라이트"
+      checklist:
+        label: "89개 체크리스트"
+        summary: "AI 결과를 받아 직접 검증·보완합니다. 워크북의 핵심."
+        actions:
+          - "권리·물건·임차인·시세 등 89개 항목 점검"
+          - "근거 문서 첨부와 메모"
+          - "안전등급(녹/황/적) 자동 판정"
+      eviction_guide:
+        label: "명도 가이드"
+        summary: "낙찰 후 점유자별 시나리오와 절차를 한 번에 봅니다."
+        actions:
+          - "점유자 유형별 흐름도"
+          - "단계별 소요 기간·비용 가이드"
+          - "필요 서류 체크"
+      simulator:
+        label: "명도 시뮬레이터"
+        summary: "내 물건의 명도 난이도를 질문 답변으로 시뮬레이션합니다."
+        actions:
+          - "점유자 유형 선택"
+          - "분기형 질문에 답하면 경로 제시"
+          - "예상 기간·난이도 산출"
+    cta:
+      budget:
+        default: "예산 설정 시작"
+        in_progress: "예산 설정 이어서 하기"
+      properties:
+        default: "물건 추가하기"
+      ai_analysis:
+        default: "AI 분석할 물건 고르기"
+        in_progress: "분석 이어서 하기"
+      checklist:
+        default: "체크리스트 시작"
+        in_progress: "이어서 채우기 (%{done}/%{total})"
+      eviction_guide:
+        default: "명도 가이드 펴보기"
+      simulator:
+        default: "시뮬레이터 돌려보기"
+        in_progress: "시뮬레이션 이어서 하기"
+    status:
+      done: "✓ 완료"
+      in_progress: "▶ 진행 중"
+      pending: "· 미시작"
