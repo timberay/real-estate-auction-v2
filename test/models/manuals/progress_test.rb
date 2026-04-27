@@ -182,5 +182,64 @@ module Manuals
 
       assert step.pending?
     end
+
+    # ---- current_step ----
+
+    test "current_step is step 1 for fresh user (all pending)" do
+      result = Manuals::Progress.for(@user)
+
+      assert_equal :budget, result.current_step.key
+    end
+
+    test "current_step skips done steps and lands on first non-done non-:none step" do
+      BudgetSetting.create!(user: @user, available_cash: 1000, loan_ratio: 0.5, completed_at: Time.current)
+      property = Property.create!(case_number: "2026타경100010")
+      UserProperty.create!(user: @user, property: property)
+
+      result = Manuals::Progress.for(@user)
+
+      assert_equal :ai_analysis, result.current_step.key
+    end
+
+    test "current_step lands on simulator when 1-4 done and step 5 skipped" do
+      BudgetSetting.create!(user: @user, available_cash: 1000, loan_ratio: 0.5, completed_at: Time.current)
+      property = Property.create!(case_number: "2026타경100011")
+      UserProperty.create!(user: @user, property: property, analyzed_at: Time.current)
+      InspectionItem.find_each do |item|
+        InspectionResult.create!(user: @user, property: property, inspection_item: item, source_type: 0)
+      end
+
+      result = Manuals::Progress.for(@user)
+
+      assert_equal :simulator, result.current_step.key
+    end
+
+    # ---- continue_cta ----
+
+    test "continue_cta for fresh user points to onboarding start" do
+      result = Manuals::Progress.for(@user)
+
+      assert_equal :budget, result.continue_cta[:key]
+      assert_equal :pending, result.continue_cta[:variant]
+    end
+
+    test "continue_cta for in_progress checklist carries property_id from latest inspection_result" do
+      property_old = Property.create!(case_number: "2026타경100012a")
+      property_new = Property.create!(case_number: "2026타경100012b")
+      UserProperty.create!(user: @user, property: property_old)
+      UserProperty.create!(user: @user, property: property_new)
+      BudgetSetting.create!(user: @user, available_cash: 1000, loan_ratio: 0.5, completed_at: Time.current)
+      UserProperty.where(user: @user).update_all(analyzed_at: Time.current)
+
+      InspectionResult.create!(user: @user, property: property_old, inspection_item: InspectionItem.first, source_type: 0, updated_at: 2.days.ago)
+      InspectionResult.create!(user: @user, property: property_new, inspection_item: InspectionItem.second, source_type: 0, updated_at: 1.minute.ago)
+
+      result = Manuals::Progress.for(@user)
+      cta = result.continue_cta
+
+      assert_equal :checklist, cta[:key]
+      assert_equal :in_progress, cta[:variant]
+      assert_equal property_new.id, cta[:property_id], "Step 4 CTA must target the property with the latest inspection_result.updated_at"
+    end
   end
 end

@@ -20,13 +20,40 @@ module Manuals
     end
 
     def result
-      ProgressResult.new(steps: build_steps, current_step: nil, continue_cta: nil)
+      built = build_steps
+      current = pick_current_step(built)
+      ProgressResult.new(steps: built, current_step: current, continue_cta: build_continue_cta(current))
     end
 
     private
 
     def build_steps
       STEP_DEFS.map { |defn| Step.new(number: defn[:number], key: defn[:key], status: status_for(defn[:key]), detail: detail_for(defn[:key])) }
+    end
+
+    def pick_current_step(built_steps)
+      built_steps.find { |s| s.status != :done && s.status != :none } || built_steps.last
+    end
+
+    def build_continue_cta(step)
+      base = { key: step.key, variant: cta_variant(step) }
+      case step.key
+      when :checklist then base.merge(property_id: latest_inspection_property_id || latest_user_property_id)
+      else base
+      end
+    end
+
+    def cta_variant(step)
+      step.in_progress? ? :in_progress : :pending
+    end
+
+    def latest_inspection_property_id
+      InspectionResult.where(user_id: @user.id, property_id: @user.user_properties.select(:property_id))
+        .order(updated_at: :desc).limit(1).pick(:property_id)
+    end
+
+    def latest_user_property_id
+      @user.user_properties.order(updated_at: :desc).limit(1).pick(:property_id)
     end
 
     def status_for(key)
