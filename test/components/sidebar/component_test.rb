@@ -144,5 +144,27 @@ module Sidebar
       html = page.native.inner_html
       assert_includes html, "border-t"
     end
+
+    # --- 시작하기 group ---
+
+    test "renders 사용자매뉴얼 menu item" do
+      render_inline(Sidebar::Component.new)
+
+      assert_text "사용자매뉴얼"
+      assert_selector "a[href='/manual']", text: "사용자매뉴얼"
+    end
+
+    test "사용자매뉴얼 is the first link in the sidebar (시작하기 group is at top)" do
+      render_inline(Sidebar::Component.new)
+
+      first_link = page.first("a[href]")
+      assert_equal "/manual", first_link[:href]
+    end
+
+    test "marks 사용자매뉴얼 as active when on /manual" do
+      render_inline(Sidebar::Component.new(current_path: "/manual"))
+
+      assert_selector "a[href='/manual'][class*='bg-blue-50']"
+    end
   end
 end
