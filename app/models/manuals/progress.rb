@@ -39,9 +39,9 @@ module Manuals
     def detail_for(_key) = nil
 
     def budget_status
-      budget = BudgetSetting.find_by(user_id: @user.id)
+      budget = @user.budget_setting
       return :pending unless budget
-      budget.completed_at.present? ? :done : :in_progress
+      budget.completed? ? :done : :in_progress
     end
   end
 end
