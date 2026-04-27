@@ -74,5 +74,77 @@ module Manuals
 
       assert step.pending?
     end
+
+    # ---- Step 4: checklist ----
+
+    test "step 4 done when single property has results for ALL inspection_items" do
+      property = Property.create!(case_number: "2026타경100004")
+      UserProperty.create!(user: @user, property: property)
+      InspectionItem.find_each do |item|
+        InspectionResult.create!(user: @user, property: property, inspection_item: item, source_type: 0)
+      end
+
+      step = Manuals::Progress.for(@user).fetch_step(:checklist)
+
+      assert step.done?
+    end
+
+    test "step 4 in_progress with single property max < total" do
+      property = Property.create!(case_number: "2026타경100005")
+      UserProperty.create!(user: @user, property: property)
+      first_item = InspectionItem.first
+      InspectionResult.create!(user: @user, property: property, inspection_item: first_item, source_type: 0)
+
+      step = Manuals::Progress.for(@user).fetch_step(:checklist)
+
+      assert step.in_progress?
+      assert_equal 1, step.detail[:done]
+      assert_equal InspectionItem.count, step.detail[:total]
+    end
+
+    test "step 4 pending when no inspection_results" do
+      step = Manuals::Progress.for(@user).fetch_step(:checklist)
+
+      assert step.pending?
+    end
+
+    test "step 4 NOT done when totals come from cross-property aggregation" do
+      # CRITICAL spec rule: A=N + B=M never combines into done.
+      half = InspectionItem.count / 2
+      remainder = InspectionItem.count - half
+      first_items = InspectionItem.limit(half)
+      remaining_items = InspectionItem.offset(half).limit(remainder)
+      property_a = Property.create!(case_number: "2026타경100006a")
+      property_b = Property.create!(case_number: "2026타경100006b")
+      UserProperty.create!(user: @user, property: property_a)
+      UserProperty.create!(user: @user, property: property_b)
+      first_items.each do |item|
+        InspectionResult.create!(user: @user, property: property_a, inspection_item: item, source_type: 0)
+      end
+      remaining_items.each do |item|
+        InspectionResult.create!(user: @user, property: property_b, inspection_item: item, source_type: 0)
+      end
+
+      step = Manuals::Progress.for(@user).fetch_step(:checklist)
+
+      refute step.done?, "Cross-property aggregation must not flip checklist to done"
+      assert step.in_progress?
+      assert_equal [ half, remainder ].max, step.detail[:done], "Progress count is the single-property max, not the sum"
+    end
+
+    test "step 4 done when one property full and another partial" do
+      property_full = Property.create!(case_number: "2026타경100007")
+      property_partial = Property.create!(case_number: "2026타경100007b")
+      UserProperty.create!(user: @user, property: property_full)
+      UserProperty.create!(user: @user, property: property_partial)
+      InspectionItem.find_each do |item|
+        InspectionResult.create!(user: @user, property: property_full, inspection_item: item, source_type: 0)
+      end
+      InspectionResult.create!(user: @user, property: property_partial, inspection_item: InspectionItem.first, source_type: 0)
+
+      step = Manuals::Progress.for(@user).fetch_step(:checklist)
+
+      assert step.done?
+    end
   end
 end

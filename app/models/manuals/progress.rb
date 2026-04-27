@@ -34,11 +34,16 @@ module Manuals
       when :budget then budget_status
       when :properties then properties_status
       when :ai_analysis then ai_analysis_status
+      when :checklist then checklist_status
       else :pending
       end
     end
 
-    def detail_for(_key) = nil
+    def detail_for(key)
+      case key
+      when :checklist then checklist_detail
+      end
+    end
 
     def budget_status
       budget = @user.budget_setting
@@ -53,6 +58,32 @@ module Manuals
     def ai_analysis_status
       return :pending unless @user.user_properties.exists?
       @user.user_properties.where.not(analyzed_at: nil).exists? ? :done : :in_progress
+    end
+
+    def checklist_status
+      max = checklist_max_per_property
+      total = checklist_total
+      return :pending if max.zero?
+      max >= total ? :done : :in_progress
+    end
+
+    def checklist_detail
+      { done: checklist_max_per_property, total: checklist_total }
+    end
+
+    def checklist_max_per_property
+      return @checklist_max_per_property if defined?(@checklist_max_per_property)
+
+      counts = InspectionResult
+        .where(user_id: @user.id, property_id: @user.user_properties.select(:property_id))
+        .group(:property_id)
+        .distinct
+        .count(:inspection_item_id)
+      @checklist_max_per_property = counts.values.max || 0
+    end
+
+    def checklist_total
+      @checklist_total ||= InspectionItem.count
     end
   end
 end
