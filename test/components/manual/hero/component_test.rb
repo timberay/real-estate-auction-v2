@@ -40,6 +40,16 @@ module Manual
 
         assert_text "처음부터 시작하기"
       end
+
+      test "step 4 in_progress carries property_id deep link in CTA" do
+        step = Manuals::Step.new(number: 4, key: :checklist, status: :in_progress, detail: { done: 12, total: 26 })
+        cta = { key: :checklist, variant: :in_progress, property_id: 7 }
+        progress = Manuals::ProgressResult.new(steps: [ step ], current_step: step, continue_cta: cta)
+
+        render_inline(Manual::Hero::Component.new(progress: progress))
+
+        assert_selector "a[href='/properties/7']", text: "이어서 채우기 (12/26)"
+      end
     end
   end
 end

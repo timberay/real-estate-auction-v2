@@ -21,7 +21,10 @@ module Manual
 
       def cta_card_resolver
         return nil unless has_current?
-        @cta_card_resolver ||= Manual::CtaResolver.new(progress.current_step)
+        @cta_card_resolver ||= Manual::CtaResolver.new(
+          progress.current_step,
+          property_id: progress.continue_cta&.dig(:property_id)
+        )
       end
 
       def cta_card_label

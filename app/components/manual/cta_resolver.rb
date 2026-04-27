@@ -11,12 +11,17 @@ module Manual
       simulator: :eviction_guide_simulator_path
     }.freeze
 
-    def initialize(step)
+    def initialize(step, property_id: nil)
       @step = step
+      @property_id = property_id
     end
 
     def path
-      Rails.application.routes.url_helpers.public_send(PATH_HELPERS.fetch(@step.key))
+      if @step.key == :checklist && @property_id
+        Rails.application.routes.url_helpers.property_path(@property_id)
+      else
+        Rails.application.routes.url_helpers.public_send(PATH_HELPERS.fetch(@step.key))
+      end
     end
 
     def label
@@ -24,12 +29,16 @@ module Manual
         I18n.t("manuals.cta.checklist.in_progress",
                done: @step.detail[:done],
                total: @step.detail[:total])
-      elsif @step.in_progress?
+      elsif @step.in_progress? && @step.key != :checklist
         I18n.t("manuals.cta.#{@step.key}.in_progress",
                default: I18n.t("manuals.cta.#{@step.key}.default"))
       else
         I18n.t("manuals.cta.#{@step.key}.default")
       end
+    end
+
+    def step_label
+      I18n.t("manuals.steps.#{@step.key}.label")
     end
 
     private
