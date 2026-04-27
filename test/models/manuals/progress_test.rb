@@ -31,5 +31,22 @@ module Manuals
 
       assert step.pending?
     end
+
+    # ---- Step 2: properties ----
+
+    test "step 2 done when user has at least one user_property" do
+      property = Property.create!(case_number: "2026타경100001")
+      UserProperty.create!(user: @user, property: property)
+
+      step = Manuals::Progress.for(@user).fetch_step(:properties)
+
+      assert step.done?
+    end
+
+    test "step 2 pending when user has no user_properties" do
+      step = Manuals::Progress.for(@user).fetch_step(:properties)
+
+      assert step.pending?
+    end
   end
 end

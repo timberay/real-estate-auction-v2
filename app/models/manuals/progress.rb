@@ -32,6 +32,7 @@ module Manuals
     def status_for(key)
       case key
       when :budget then budget_status
+      when :properties then properties_status
       else :pending
       end
     end
@@ -42,6 +43,10 @@ module Manuals
       budget = @user.budget_setting
       return :pending unless budget
       budget.completed? ? :done : :in_progress
+    end
+
+    def properties_status
+      @user.user_properties.exists? ? :done : :pending
     end
   end
 end
