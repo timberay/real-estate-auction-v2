@@ -33,6 +33,7 @@ module Manuals
       case key
       when :budget then budget_status
       when :properties then properties_status
+      when :ai_analysis then ai_analysis_status
       else :pending
       end
     end
@@ -47,6 +48,11 @@ module Manuals
 
     def properties_status
       @user.user_properties.exists? ? :done : :pending
+    end
+
+    def ai_analysis_status
+      return :pending unless @user.user_properties.exists?
+      @user.user_properties.where.not(analyzed_at: nil).exists? ? :done : :in_progress
     end
   end
 end

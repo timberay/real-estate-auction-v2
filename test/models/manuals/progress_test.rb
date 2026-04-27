@@ -48,5 +48,31 @@ module Manuals
 
       assert step.pending?
     end
+
+    # ---- Step 3: ai_analysis ----
+
+    test "step 3 done when any user_property has analyzed_at set" do
+      property = Property.create!(case_number: "2026타경100002")
+      UserProperty.create!(user: @user, property: property, analyzed_at: Time.current)
+
+      step = Manuals::Progress.for(@user).fetch_step(:ai_analysis)
+
+      assert step.done?
+    end
+
+    test "step 3 in_progress when user_property exists but no analyzed_at" do
+      property = Property.create!(case_number: "2026타경100003")
+      UserProperty.create!(user: @user, property: property, analyzed_at: nil)
+
+      step = Manuals::Progress.for(@user).fetch_step(:ai_analysis)
+
+      assert step.in_progress?
+    end
+
+    test "step 3 pending when no user_properties at all" do
+      step = Manuals::Progress.for(@user).fetch_step(:ai_analysis)
+
+      assert step.pending?
+    end
   end
 end
