@@ -160,7 +160,7 @@ module Manuals
     test "step 6 done when user has completed simulation" do
       property = Property.create!(case_number: "2026타경100008")
       UserProperty.create!(user: @user, property: property)
-      EvictionSimulation.create!(property: property, completed: true, occupant_type: "owner", answers: {})
+      EvictionSimulation.create!(property: property, completed: true, occupant_type: "debtor_owner", answers: {})
 
       step = Manuals::Progress.for(@user).fetch_step(:simulator)
 
@@ -170,7 +170,7 @@ module Manuals
     test "step 6 in_progress when simulation exists but not completed" do
       property = Property.create!(case_number: "2026타경100009")
       UserProperty.create!(user: @user, property: property)
-      EvictionSimulation.create!(property: property, completed: false, occupant_type: "owner", answers: {})
+      EvictionSimulation.create!(property: property, completed: false, occupant_type: "debtor_owner", answers: {})
 
       step = Manuals::Progress.for(@user).fetch_step(:simulator)
 

@@ -88,9 +88,9 @@ module Manuals
     end
 
     def simulator_status
-      simulations = EvictionSimulation.where(property_id: @user.user_properties.select(:property_id))
-      return :pending unless simulations.exists?
-      simulations.where(completed: true).exists? ? :done : :in_progress
+      scope = EvictionSimulation.where(property_id: @user.user_properties.select(:property_id))
+      return :done if scope.exists?(completed: true)
+      scope.exists? ? :in_progress : :pending
     end
   end
 end
