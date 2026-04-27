@@ -47,7 +47,7 @@ module Manual
         case step.key
         when :budget then helpers.start_onboarding_path
         when :properties then helpers.properties_path
-        when :ai_analysis then helpers.properties_path
+        when :ai_analysis then helpers.new_analysis_path
         when :checklist then helpers.properties_path
         when :eviction_guide then helpers.eviction_guide_guide_path
         when :simulator then helpers.eviction_guide_simulator_path
@@ -65,7 +65,9 @@ module Manual
           class: "mt-4 rounded border border-slate-200 dark:border-slate-700",
           onerror: "this.style.display='none'"
         )
-      rescue Propshaft::MissingAssetError
+      rescue Propshaft::MissingAssetError => e
+        raise unless Rails.env.local?
+        Rails.logger.warn("Manual screenshot missing: #{screenshot_path} (#{e.message})")
         nil
       end
     end
