@@ -44,11 +44,13 @@ Exact versions: see `Gemfile.lock` (Rails), `.ruby-version` (Ruby).
 ### Deployment
 
 - **Proxy**: Thruster (Go-based proxy wrapping Puma on port 80, automatic HTTP/2, compression, X-Sendfile, asset caching)
-- **Tool**: Kamal 2 (primary) or Docker Compose (local)
-- **Container**: Optimized Dockerfile, mount `/rails/storage` for SQLite/ActiveStorage/Solid services, run as non-root (UID/GID 1000)
+- **Tool**: Kamal 2 (the only deploy tool wired in — see `config/deploy.yml`). No `docker-compose.yml` exists; do not assume Compose works locally.
+- **Container**: `Dockerfile` (production); `/rails/storage` is the persistent volume for SQLite + ActiveStorage + Solid services; non-root runtime (UID/GID 1000).
 - **CI/CD**: GitHub Actions (automated testing, linting, security checks)
 
 ### Sub-directory Deployment
+
+> **This is the project's active deployment mode.** Production runs at `<host>/real-estate-auction-v2/` — see `RAILS_RELATIVE_URL_ROOT` in `config/deploy.yml`. Treat the rules below as enforced, not hypothetical.
 
 When deploying multiple projects on a single server under sub-paths (e.g., `example.com/my-app/`):
 
@@ -122,8 +124,9 @@ env:
 ### Background Jobs
 
 - **Backend**: Solid Queue (database-backed, no Redis)
-- **Worker**: `bin/rails solid_queue:start`
+- **Worker**: `bin/jobs` (Rails 8 default; wraps `SolidQueue::Cli`)
 - **Use Cases**: Heavy API calls, email delivery, data processing
+- **Recurring jobs**: Defined in `config/recurring.yml` (e.g., `GuestCleanupJob` daily 3am, `LoanPolicySyncJob` daily 6am)
 - **Kamal**: Deploy as separate `job` role for resource isolation
 
 ## Architecture Patterns
@@ -134,13 +137,28 @@ env:
 
 ### Adapter Pattern
 
-API communication abstraction with mock support:
+API communication abstraction with mock support. Adapters live under `app/adapters/`, namespaced per provider family (`Llm::`, `CourtAuction::`) when multiple implementations exist.
+
+Real example — `app/adapters/llm/base.rb`:
 
 ```ruby
-# app/adapters/base_adapter.rb
-class BaseAdapter
-  def self.for(provider)
-    ENV['USE_MOCK'] == 'true' ? MockAdapter.new : RealAdapter.new
+module Llm
+  class Base
+    def self.for
+      return Llm::Mock.new if ENV["USE_MOCK"] == "true"
+
+      provider = ENV.fetch("LLM_PROVIDER", "anthropic")
+      case provider
+      when "anthropic" then Llm::Anthropic.new
+      when "openai"    then Llm::OpenAi.new
+      when "gemini"    then Llm::Gemini.new
+      # ...
+      end
+    end
+
+    def analyze(system:, prompt:, documents: [])
+      raise NotImplementedError
+    end
   end
 end
 ```
@@ -149,16 +167,27 @@ end
 - **Tests**: Use constructor injection for test isolation instead of environment variables:
   ```ruby
   class SomeService
-    def initialize(adapter: BaseAdapter.for(:provider))
+    def initialize(adapter: Llm::Base.for)
       @adapter = adapter
     end
   end
-  # In tests: SomeService.new(adapter: MockAdapter.new)
+  # In tests: SomeService.new(adapter: Llm::Mock.new)
   ```
 
 ### Custom Errors
 
-Define in `app/errors/custom_error.rb` with `rescue_from` in controllers.
+Group related errors under a module in `app/errors/<domain>.rb` and `rescue_from` in controllers. Example pattern from `app/errors/data_provider.rb`:
+
+```ruby
+module DataProvider
+  class Error < StandardError; end
+
+  class MissingCredentialError < Error; end
+  class ConnectionError < Error; end
+  class RateLimitError < Error; end
+  # ...
+end
+```
 
 ### Authentication
 
@@ -187,41 +216,22 @@ Test helpers: `mock_omniauth` in `test_helper.rb`, `/testing/sign_in` and `/test
 - **API response caching**: External API call results (TTL setting required)
 - Use Solid Cache as the backend
 
-## Hotwire Best Practices
-
-### Turbo Frame Usage
-
-```erb
-<%= turbo_frame_tag "items" do %>
-  <%= render @items %>
-<% end %>
-```
-
-### Turbo Stream Response
-
-```ruby
-# controller
-respond_to do |format|
-  format.turbo_stream
-  format.html
-end
-```
-
-### Stimulus Controller Naming
-
-- `data-controller="search"`
-- `data-action="input->search#submit"`
-- `data-search-target="input"`
-
 ## UI/Frontend Rules
 
-UI components follow the project's design tokens and specs. When creating new components, follow patterns from existing components for consistency.
+- **ViewComponent first**: Reusable UI lives under `app/components/<feature>/component.rb` + matching `*.html.erb`. The `lookbook` gem is bundled for previews, but no engine mount is configured in `config/routes.rb` yet — add `mount Lookbook::Engine, at: "/lookbook"` (development/test only) when previews are needed.
+- **Stimulus controllers**: `app/javascript/controllers/`, registered via `index.js`. Use kebab-case identifiers (`data-controller="search"`, `data-action="input->search#submit"`, `data-search-target="input"`).
+- **Turbo**: Use `turbo_frame_tag` for sub-page updates (pagination, tabs); use `format.turbo_stream` responses for partial DOM mutations after a write. Prefer Turbo over a manual XHR + DOM patch.
+- **Korean copy**: Default to Korean text in views/components. Only route through `I18n.t` when a feature already uses a locale file (see [i18n](#internationalization-i18n)).
+- **Consistency**: When creating a new component, look for an existing analogous component first and match its structure (template/CSS/Stimulus split).
 
 ## Internationalization (i18n)
 
-- Use Rails `I18n` API (`config/locales/*.yml`) as primary translation engine
-- Use structured translation keys: `t('login.button.submit')`, convention: `[page_or_component].[element].[action]`
-- Recommended gems: `rails-i18n`, `i18n-tasks`, `mobility` (for DB record translations)
+The product is Korean-only; default copy is written in Korean directly in views and components. `I18n.t` is reserved for subsystems that benefit from key-based copy (currently the user manual under `app/components/manual/*` backed by `config/locales/manuals.ko.yml`). `config/locales/en.yml` covers Rails defaults only.
+
+If a future feature requires `I18n.t`:
+- Add keys to a feature-scoped YAML file under `config/locales/`
+- Use the convention `[page_or_component].[element].[action]` (e.g., `t('login.button.submit')`)
+- Do not pull in `mobility`, `rails-i18n`, or `i18n-tasks` until a clear need exists — they are not currently in the bundle
 
 ## Rails 8 — Do NOT Use (Removed/Deprecated)
 

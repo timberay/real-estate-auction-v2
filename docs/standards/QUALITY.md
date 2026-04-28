@@ -7,8 +7,9 @@ Testing strategy, security standards, code quality, accessibility, and performan
 ### Framework
 
 - **Unit/Integration**: Minitest (Rails 8 default)
-- **E2E**: Playwright (or System Tests with Capybara/Cuprite)
-- **Performance**: K6
+- **System tests**: Capybara + `selenium-webdriver` (headless Chrome via `ApplicationSystemTestCase`)
+- **External-app E2E**: `playwright-ruby-client` for scraper/black-box flows (see [TOOLS.md → E2E / Browser Automation](TOOLS.md#e2e--browser-automation))
+- **Performance**: No load-testing tool currently in the stack — add one (and document here) before publishing performance budgets
 
 ### Test Pyramid (maintain this ratio)
 
@@ -18,15 +19,14 @@ Testing strategy, security standards, code quality, accessibility, and performan
 
 ### Test Coverage
 
-- Target minimum **80%** coverage with SimpleCov
 - Every new feature must include corresponding tests
-- Bug fixes must include a regression test
+- Bug fixes must include a regression test that fails before the fix and passes after
 
 ## Code Style
 
-- **Ruby**: Standard (rubocop-rails-omakase)
-- **JavaScript**: Prettier / StandardJS
-- **CSS**: Tailwind utility classes or BEM if custom CSS
+- **Ruby**: `rubocop-rails-omakase` (run `bin/rubocop`, auto-fix with `bin/rubocop -a`)
+- **JavaScript**: No formatter is currently wired into `bin/ci`. Match existing Stimulus controller style.
+- **CSS**: TailwindCSS utility classes only — avoid introducing custom CSS
 
 ## Security Best Practices
 
@@ -36,14 +36,18 @@ Maintain Rails default settings. Never disable CSRF.
 
 ### Parameter Handling
 
-```ruby
-# Rails 8 recommended — raises if key is missing
-params.expect(article: [:title, :body, :published])
+Use `params.expect` for required structured params (Rails 8). It raises when the key is missing, so missing-key bugs surface during request parsing instead of inside actions.
 
-# For optional parameters, use permit or fetch with default
+```ruby
+# Required nested params
+params.expect(article: [ :title, :body, :published ])
+
+# Optional top-level params
 params.permit(:sort_by, :page)
 params.fetch(:page, 1)
 ```
+
+Do not introduce new `params.require(...).permit(...)` chains — see [STACK.md → Rails 8 — Do NOT Use](STACK.md#rails-8--do-not-use-removeddeprecated).
 
 ### ReDoS Prevention
 
@@ -57,7 +61,7 @@ params.fetch(:page, 1)
 
 ### Rate Limiting
 
-Limit API requests with `Rack::Attack` (`config/initializers/rack_attack.rb`). `/auth/*` POST endpoints throttled at 10/min/IP.
+Use `Rack::Attack` (`config/initializers/rack_attack.rb`) for any new rate-limited endpoint. The auth throttle is documented in [STACK.md → Authentication](STACK.md#authentication); do not redocument it here.
 
 ### Credentials
 
@@ -95,16 +99,16 @@ Mobile-first approach using TailwindCSS breakpoints. Ensure touch targets are at
 
 ### Fragment Caching
 
-Cache HTML fragments for frequently used UI components.
-
-### Eager Loading
-
-Use parallel requests or background loading for heavy external data.
+Cache a fragment when **all three** are true: it renders on a hot path (search results, property list, manual page), its underlying data changes less often than once per request, and re-rendering measurably costs >50ms in dev. Use Solid Cache as the backend (configured in `config/cache.yml`). Add a Rails fragment cache key tied to the model's `updated_at` so invalidation is automatic.
 
 ### Prevent N+1 Queries
 
 - Use `includes`, `preload`, `eager_load` appropriately
-- Monitor with Bullet gem
+- Inspect `log/development.log` for repeated `SELECT` patterns when in doubt; add the `bullet` gem to the development group if continuous monitoring becomes necessary
+
+### Off-request Work for Heavy External Calls
+
+Move slow third-party calls (LLM analysis, court-auction scraping, PDF processing) off the request path via Solid Queue jobs. The user should see a Turbo-Stream/poll update when the job finishes — never block the request.
 
 ### Database Indexing
 
@@ -154,8 +158,15 @@ For diagnosis workflow, follow the `systematic-debugging` skill.
 
 ## Pre-commit Failure Recovery
 
-When a pre-commit hook (rubocop, test, etc.) fails, fix it yourself and retry — do not stop and ask the user.
+This project enforces commit gates via Claude Code `PreToolUse` hooks (`.claude/settings.json`). Every `git commit*` invocation runs, in order:
 
-- **Rubocop violation**: Run `bin/rubocop -a` to auto-fix, then re-stage and re-commit
-- **Test failure**: Diagnose the failing test, fix the code, verify with `bin/rails test`, then re-commit
-- **Multiple issues**: Fix rubocop first, then tests, then re-commit
+1. `bin/rails test` — full Minitest suite (timeout 120s)
+2. `bin/rubocop --format quiet` — style check (timeout 60s)
+
+If either fails, the hook denies the commit and surfaces the output. **Fix it yourself and retry — do not stop and ask the user.**
+
+- **Rubocop violation**: `bin/rubocop -a` to auto-fix, manually resolve any remainder, re-stage, re-commit.
+- **Test failure**: Diagnose the failing test, fix the code, verify locally with `bin/rails test`, re-commit.
+- **Multiple issues**: Fix rubocop first (cheap), then tests, then re-commit.
+
+There is also a `PostToolUse` hook on `Write|Edit` that runs `bin/rubocop` on the touched `.rb` file — surface fixes immediately rather than batching them at commit time.

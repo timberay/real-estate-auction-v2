@@ -24,7 +24,9 @@ Separate **Structural Changes** (refactoring) from **Behavioral Changes** (new l
 - **`docs/superpowers/`**: Project documentation managed by superpowers plugin
   - `specs/` — Design specs from brainstorming sessions
   - `plans/` — Implementation plans for feature work
-- **`db/seeds/`**: Seed data files (e.g., `master_checklist.json`)
+- **`docs/references/`**: Persistent reference material (e.g., parsed external docs, regulation excerpts) — keep only what is actually consulted
+- **`docs/screenshots/`**: Manual and README screenshots — checked in, treated as content, not test artifacts
+- **`db/seeds/`**: Seed data JSON files. The seed loader (`db/seeds.rb`) is the source of truth for which files are loaded.
 
 ### Writing Principles
 
