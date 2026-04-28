@@ -44,6 +44,9 @@
 # Playwright MCP artifacts.
 /.playwright-mcp/
 
+# Graphify knowledge graph output (rebuilt locally).
+/graphify-out/
+
 # IDE and AI tool local state.
 .superpowers/
 .worktrees/
