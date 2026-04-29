@@ -36,4 +36,34 @@ class SubPathCompatibilityTest < ActionDispatch::IntegrationTest
     # Clear the cached env_config to restore the default state.
     Rails.application.instance_variable_set(:@app_env_config, nil)
   end
+
+  test "mailer URL helpers include sub-path prefix when env set" do
+    original = ENV["RAILS_RELATIVE_URL_ROOT"]
+    ENV["RAILS_RELATIVE_URL_ROOT"] = "/real-estate-auction"
+    url = Rails.application.routes.url_helpers.root_url(
+      host: "example.com",
+      script_name: SubPath.prefix
+    )
+    assert_equal "http://example.com/real-estate-auction/", url
+  ensure
+    ENV["RAILS_RELATIVE_URL_ROOT"] = original
+  end
+
+  test "production.rb mailer default_url_options includes script_name: SubPath.prefix" do
+    config_text = File.read(Rails.root.join("config/environments/production.rb"))
+    assert_match(
+      /config\.action_mailer\.default_url_options\s*=\s*\{[^}]*script_name:\s*SubPath\.prefix/,
+      config_text,
+      "production.rb mailer default_url_options must include script_name: SubPath.prefix"
+    )
+  end
+
+  test "development.rb mailer default_url_options includes script_name: SubPath.prefix" do
+    config_text = File.read(Rails.root.join("config/environments/development.rb"))
+    assert_match(
+      /config\.action_mailer\.default_url_options\s*=\s*\{[^}]*script_name:\s*SubPath\.prefix/,
+      config_text,
+      "development.rb mailer default_url_options must include script_name: SubPath.prefix"
+    )
+  end
 end
