@@ -1,4 +1,5 @@
 require "active_support/core_ext/integer/time"
+require_relative "../../app/lib/sub_path"
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
@@ -44,7 +45,7 @@ Rails.application.configure do
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 
   # Prevent health checks from clogging up the logs.
-  config.silence_healthcheck_path = "/up"
+  config.silence_healthcheck_path = SubPath.path_under("/up")
 
   # Don't log any deprecations.
   config.active_support.report_deprecations = false

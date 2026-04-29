@@ -38,4 +38,13 @@ class SubPathTest < ActiveSupport::TestCase
   test ".path_under handles env with trailing slash" do
     with_env("/foo/") { assert_equal "/foo/up", SubPath.path_under("/up") }
   end
+
+  test "production silence_healthcheck_path call site uses SubPath.path_under('/up')" do
+    config_text = File.read(Rails.root.join("config/environments/production.rb"))
+    assert_match(
+      /config\.silence_healthcheck_path\s*=\s*SubPath\.path_under\("\/up"\)/,
+      config_text,
+      "production.rb must use SubPath.path_under for silence_healthcheck_path"
+    )
+  end
 end
