@@ -1,5 +1,7 @@
 # Be sure to restart your server when you modify this file.
 
+require_relative "../../app/lib/sub_path"
+
 Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self
@@ -15,7 +17,7 @@ Rails.application.configure do
                        "https://accounts.google.com",
                        "https://nid.naver.com",
                        "https://kauth.kakao.com"
-    policy.report_uri  "/csp_reports"
+    policy.report_uri  SubPath.path_under("/csp_reports")
   end
 
   config.content_security_policy_nonce_generator = ->(request) { SecureRandom.base64(16) }
