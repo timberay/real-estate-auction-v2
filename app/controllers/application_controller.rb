@@ -38,7 +38,7 @@ class ApplicationController < ActionController::Base
 
   def capture_return_to_url
     return unless request.get? || request.head?
-    return if request.path.start_with?("/auth")
+    return if request.path_info.start_with?("/auth")
     return if request.xhr? || turbo_frame_request?
 
     session[:return_to_url] = request.fullpath

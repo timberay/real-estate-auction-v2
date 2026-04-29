@@ -66,4 +66,33 @@ class SubPathCompatibilityTest < ActionDispatch::IntegrationTest
       "development.rb mailer default_url_options must include script_name: SubPath.prefix"
     )
   end
+
+  test "capture_return_to_url skips /auth under any prefix" do
+    # Simulate sub-path by mocking request.script_name; we exercise the controller filter directly.
+    controller = ApplicationController.new
+    env = Rack::MockRequest.env_for("/", method: "GET")
+    env["SCRIPT_NAME"] = "/real-estate-auction"
+    env["PATH_INFO"] = "/auth/login"
+    controller.request = ActionDispatch::Request.new(env)
+    controller.send(:instance_variable_set, :@_session_for_test, {})
+    # Stub session helper
+    controller.define_singleton_method(:session) { @_session_for_test }
+    controller.send(:capture_return_to_url)
+    assert_nil controller.session[:return_to_url],
+      "should not capture /auth/* even when sub-path makes request.path /<prefix>/auth/login"
+  end
+
+  test "capture_return_to_url stores non-/auth path under sub-path" do
+    controller = ApplicationController.new
+    env = Rack::MockRequest.env_for("/", method: "GET")
+    env["SCRIPT_NAME"] = "/real-estate-auction"
+    env["PATH_INFO"] = "/properties"
+    env["QUERY_STRING"] = ""
+    controller.request = ActionDispatch::Request.new(env)
+    controller.send(:instance_variable_set, :@_session_for_test, {})
+    controller.define_singleton_method(:session) { @_session_for_test }
+    controller.define_singleton_method(:turbo_frame_request?) { false }
+    controller.send(:capture_return_to_url)
+    assert_equal "/real-estate-auction/properties", controller.session[:return_to_url]
+  end
 end
