@@ -31,13 +31,13 @@
           <span class="hidden md:inline text-sm text-white"><%= @current_user.name %></span>
         </button>
         <div data-dropdown-target="menu" class="hidden absolute right-0 mt-2 w-44 bg-white dark:bg-slate-800 rounded-md shadow-lg border border-slate-200 dark:border-slate-700 py-1">
-          <%= link_to "설정", "/settings/budget", class: "block px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700" %>
-          <%= button_to "로그아웃", "/auth/logout", method: :delete, form_class: "w-full",
+          <%= link_to "설정", settings_budget_path, class: "block px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700" %>
+          <%= button_to "로그아웃", auth_logout_path, method: :delete, form_class: "w-full",
               class: "block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700" %>
         </div>
       </div>
     <% else %>
-      <%= link_to "로그인", "/auth/login",
+      <%= link_to "로그인", auth_login_path,
           class: "text-sm text-white hover:text-slate-200 px-3 py-2 rounded-md hover:bg-slate-700",
           data: { turbo_frame: "auth_modal" } %>
     <% end %>
