@@ -360,7 +360,7 @@ If `bin/ci` passes with no code changes, nothing to commit. If a fix was needed,
 ### Task 6: Update memory and verify final state
 
 **Files:**
-- Modify: `~/.claude/projects/-home-tonny-projects-real-estate-auction-v2/memory/project_data_provider_progress.md`
+- Modify: `~/.claude/projects/-home-tonny-projects-real-estate-auction/memory/project_data_provider_progress.md`
 
 - [ ] **Step 1: Update project memory**
 

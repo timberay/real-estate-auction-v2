@@ -3,7 +3,7 @@ require "active_support/core_ext/integer/time"
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
-  # Sub-directory deployment support (e.g., example.com/real-estate-auction-v2/)
+  # Sub-directory deployment support (e.g., example.com/real-estate-auction/)
   config.relative_url_root = ENV.fetch("RAILS_RELATIVE_URL_ROOT", "/")
 
   # Code is not reloaded between requests.
