@@ -95,4 +95,17 @@ class SubPathCompatibilityTest < ActionDispatch::IntegrationTest
     controller.send(:capture_return_to_url)
     assert_equal "/real-estate-auction/properties", controller.session[:return_to_url]
   end
+
+  test "handle_auth_error redirect Location includes script_name" do
+    # Verify the source uses the named helper.
+    source = File.read(Rails.root.join("app/controllers/application_controller.rb"))
+    assert_match(/redirect_to auth_login_path/, source)
+    refute_match(%r{redirect_to "/auth/login"}, source)
+  end
+
+  test "omniauth failure redirect Location uses named helper" do
+    source = File.read(Rails.root.join("app/controllers/auth/omniauth_callbacks_controller.rb"))
+    assert_match(/redirect_to auth_login_path/, source)
+    refute_match(%r{redirect_to "/auth/login"}, source)
+  end
 end
