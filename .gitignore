@@ -59,4 +59,7 @@
 .DS_Store
 Thumbs.db
 db/development.sqlite3
-docs/screenshots/
+
+# Transient QA / debug screenshots — manual/ is checked in for README.
+docs/screenshots/*
+!docs/screenshots/manual/
