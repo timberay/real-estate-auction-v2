@@ -13,7 +13,7 @@ module AuthHelper
   end
 
   def provider_path(provider)
-    "/auth/#{provider}"
+    "#{request.script_name}/auth/#{provider}"
   end
 
   def provider_label(provider)

@@ -120,4 +120,16 @@ module Header
       assert_selector "span#analysis_indicator"
     end
   end
+
+  class RouteHelpersTest < ActiveSupport::TestCase
+    test "header component template uses named route helpers for auth and settings" do
+      template = File.read(Rails.root.join("app/components/header/component.html.erb"))
+      refute_match(%r{button_to[^,]+,\s*"/auth/logout"}, template, "use auth_logout_path helper")
+      refute_match(%r{link_to[^,]+,\s*"/auth/login"}, template, "use auth_login_path helper")
+      refute_match(%r{link_to[^,]+,\s*"/settings/budget"}, template, "use settings_budget_path helper")
+      assert_match(/auth_login_path/, template)
+      assert_match(/auth_logout_path/, template)
+      assert_match(/settings_budget_path/, template)
+    end
+  end
 end

@@ -38,7 +38,7 @@ class ApplicationController < ActionController::Base
 
   def capture_return_to_url
     return unless request.get? || request.head?
-    return if request.path.start_with?("/auth")
+    return if request.path_info.start_with?("/auth")
     return if request.xhr? || turbo_frame_request?
 
     session[:return_to_url] = request.fullpath
@@ -59,7 +59,7 @@ class ApplicationController < ActionController::Base
 
   def handle_auth_error(error)
     Rails.logger.warn("[Auth::Error] #{error.class}: #{error.message}")
-    redirect_to "/auth/login", alert: "로그인 중 문제가 발생했습니다. 다시 시도해주세요."
+    redirect_to auth_login_path, alert: "로그인 중 문제가 발생했습니다. 다시 시도해주세요."
   end
 
   def handle_missing_credential(_error)

@@ -12,7 +12,7 @@ if defined?(Dotenv)
   Dotenv.load if Rails.env.development?
 end
 
-module RealEstateAuctionV2
+module RealEstateAuction
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1

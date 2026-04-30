@@ -50,7 +50,7 @@ Exact versions: see `Gemfile.lock` (Rails), `.ruby-version` (Ruby).
 
 ### Sub-directory Deployment
 
-> **This is the project's active deployment mode.** Production runs at `<host>/real-estate-auction-v2/` — see `RAILS_RELATIVE_URL_ROOT` in `config/deploy.yml`. Treat the rules below as enforced, not hypothetical.
+> **This is the project's active deployment mode.** Production runs at `<host>/real-estate-auction/` — see `RAILS_RELATIVE_URL_ROOT` in `config/deploy.yml`. Treat the rules below as enforced, not hypothetical.
 
 When deploying multiple projects on a single server under sub-paths (e.g., `example.com/my-app/`):
 

@@ -31,7 +31,7 @@ class Auth::OmniauthCallbacksController < ApplicationController
   def failure
     code = params[:message].to_s
     flash[:alert] = failure_message(code)
-    redirect_to "/auth/login"
+    redirect_to auth_login_path
   end
 
   private
