@@ -29,7 +29,7 @@ When a pre-commit hook fails, fix it yourself and retry — do not stop and ask 
 
 For new feature work, six phases — do NOT skip:
 
-1. `/office-hours` (Product) → 2. `/plan-eng-review` (Architecture) → 3. `/superpowers:brainstorming` (Tech design) → 4. `/superpowers:writing-plans` (Task breakdown) → 5. `/superpowers:executing-plans` + `/superpowers:test-driven-development` → 6. `/review` → `/ship` → `/land-and-deploy` → `/document-release`
+1. `/office-hours` (Product) → 2. `/plan-eng-review` (Architecture) → 3. `/superpowers:brainstorming` (Tech design) → 4. `/superpowers:writing-plans` (Task breakdown) → 5. `/superpowers:executing-plans` + `/superpowers:test-driven-development` (Execute) → 6. Review/Ship/Deploy/Document (`/review` → `/ship` → `/land-and-deploy` → `/document-release`)
 
 Skip only for bug fixes, refactors, small tweaks. A `UserPromptSubmit` hook (`.claude/settings.json`) reminds you when a feature request is detected. **Full rules**: [WORKFLOW.md](docs/standards/WORKFLOW.md).
 
