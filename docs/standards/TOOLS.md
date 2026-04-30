@@ -94,7 +94,7 @@ There is no `docker-compose.yml`; for local Docker testing, build with `docker b
 # .env (development defaults — use credentials for secrets)
 RAILS_ENV=development
 USE_MOCK=true                # Forces all adapters to return mock responses (no network)
-LLM_PROVIDER=anthropic       # anthropic|openai|gemini|ollama|open_router (when USE_MOCK=false)
+LLM_PROVIDER=anthropic       # anthropic|openai|gemini|ollama|openrouter (when USE_MOCK=false)
 ```
 
 `dotenv` is loaded in development/test only. Production reads env from Kamal `env:` blocks or Rails credentials.
