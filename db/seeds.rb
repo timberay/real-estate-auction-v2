@@ -53,9 +53,7 @@ end
 puts "  -> #{LoanPolicy.count} loan policies"
 
 puts "Seeding guest user..."
-User.find_or_create_by!(email: "guest@auction.local") do |u|
-  u.password = "123456"
-end
+User.find_or_create_by!(email: "guest@auction.local")
 puts "  -> Guest user ready"
 
 puts "Seeding inspection items..."
