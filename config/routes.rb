@@ -84,6 +84,9 @@ Rails.application.routes.draw do
 
   resource :manual, only: [ :show ]
 
+  get "/terms",   to: "legal#terms",   as: :terms
+  get "/privacy", to: "legal#privacy", as: :privacy
+
   scope :eviction_guide, controller: :eviction_guide do
     get "/", action: :guide, as: :eviction_guide_guide
     get "simulator", action: :simulator, as: :eviction_guide_simulator
