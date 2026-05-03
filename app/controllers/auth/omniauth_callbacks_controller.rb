@@ -8,7 +8,7 @@ class Auth::OmniauthCallbacksController < ApplicationController
   }.freeze
 
   def create
-    adapter_class = ADAPTERS[request.env["omniauth.auth"]["provider"]]
+    adapter_class = ADAPTERS[request.env["omniauth.auth"]["provider"].to_s]
     raise Auth::ProviderError, "unknown provider" unless adapter_class
 
     profile = adapter_class.new(request.env["omniauth.auth"]).to_profile
@@ -29,8 +29,14 @@ class Auth::OmniauthCallbacksController < ApplicationController
   end
 
   def failure
-    code = params[:message].to_s
-    flash[:alert] = failure_message(code)
+    error_type = params[:message].presence || request.env["omniauth.error.type"]&.to_s.presence || ""
+    if (error = request.env["omniauth.error"])
+      Rails.logger.error("[OmniAuth Failure] strategy=#{request.env['omniauth.error.strategy']&.name} type=#{error_type} #{error.class}: #{error.message}")
+      Rails.logger.error(error.backtrace.first(10).join("\n")) if error.backtrace
+    else
+      Rails.logger.error("[OmniAuth Failure] type=#{error_type} (no exception in env)")
+    end
+    flash[:alert] = failure_message(error_type)
     redirect_to auth_login_path
   end
 
