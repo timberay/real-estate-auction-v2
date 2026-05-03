@@ -12,7 +12,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   provider :kakao,
     Rails.application.credentials.dig(:kakao, :client_id),
     Rails.application.credentials.dig(:kakao, :client_secret),
-    scope: "account_email profile_nickname profile_image"
+    scope: "profile_nickname,profile_image"
 end
 
 OmniAuth.config.on_failure = proc { |env| Auth::OmniauthCallbacksController.action(:failure).call(env) }
