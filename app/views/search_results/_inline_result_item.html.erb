@@ -15,6 +15,9 @@
         <div class="text-sm text-slate-500 dark:text-slate-400">감정가 <span class="text-slate-300 dark:text-slate-300 font-medium"><%= format_price_won(search_result.appraisal_price) %></span></div>
         <div class="text-sm text-slate-500 dark:text-slate-400">최저매각가 <span class="text-slate-300 dark:text-slate-300 font-medium"><%= format_price_won(search_result.min_bid_price) %></span></div>
       </div>
+      <% if search_result.court_name.present? %>
+        <div class="text-sm text-slate-500 dark:text-slate-400 mt-1 truncate">🏛️ <%= search_result.court_name %></div>
+      <% end %>
       <div class="text-sm text-slate-500 dark:text-slate-400 mt-1 truncate">📍 <%= search_result.address %></div>
     </button>
   <% end %>

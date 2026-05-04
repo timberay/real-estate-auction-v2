@@ -141,4 +141,20 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_no_match(/조건검색 결과/, response.body)
   end
+
+  test "search result card renders court_name and hides court_code" do
+    @user.search_results.create!(
+      case_number: "2026타경66666",
+      court_name: "서울동부지방법원",
+      court_code: "B000211",
+      address: "서울특별시 강남구",
+      appraisal_price: 200_000_000,
+      min_bid_price: 140_000_000
+    )
+
+    get properties_url
+    assert_response :success
+    assert_match "서울동부지방법원", response.body
+    assert_no_match "B000211", response.body
+  end
 end
