@@ -84,7 +84,9 @@
     <% end %>
   </div>
 
-  <% if @user_properties.any? || params[:safety_rating].present? || params[:search].present? || params[:within_budget].present? %>
+  <% filters_applied = params[:safety_rating].present? || params[:search].present? || params[:within_budget].present? %>
+
+  <% if @user_properties.any? || filters_applied %>
     <%# Filter + Search bar %>
     <div data-controller="property-filter" class="max-w-xl min-w-80">
       <%= form_with url: properties_path, method: :get, data: { property_filter_target: "form" }, class: "space-y-2" do %>
@@ -126,33 +128,35 @@
         </label>
       <% end %>
     </div>
+  <% end %>
 
-    <%# Property cards grid %>
-    <div id="property-cards-grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <% @user_properties.each do |user_property| %>
-        <div id="<%= dom_id(user_property.property, :card) %>">
-          <%= render PropertyCardComponent.new(
-            property: user_property.property,
-            safety_rating: user_property.safety_rating,
-            max_bid_amount: @max_bid_amount,
-            analyzed: user_property.property.analyzed?
-          ) %>
-        </div>
-      <% end %>
-    </div>
-
-    <% if @user_properties.empty? %>
-      <%= render EmptyStateComponent.new(
-        icon: "funnel",
-        title: "검색 결과가 없습니다",
-        description: "다른 검색어나 필터를 사용해보세요."
-      ) %>
+  <%# Property cards grid — always rendered so inline_import turbo_stream.append has a target %>
+  <div id="property-cards-grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <% @user_properties.each do |user_property| %>
+      <div id="<%= dom_id(user_property.property, :card) %>">
+        <%= render PropertyCardComponent.new(
+          property: user_property.property,
+          safety_rating: user_property.safety_rating,
+          max_bid_amount: @max_bid_amount,
+          analyzed: user_property.property.analyzed?
+        ) %>
+      </div>
     <% end %>
-  <% else %>
+  </div>
+
+  <% if @user_properties.empty? && filters_applied %>
     <%= render EmptyStateComponent.new(
-      icon: "magnifying-glass",
-      title: "아직 추가한 물건이 없습니다",
-      description: "사건번호를 입력하여 물건을 추가하세요."
+      icon: "funnel",
+      title: "검색 결과가 없습니다",
+      description: "다른 검색어나 필터를 사용해보세요."
     ) %>
+  <% elsif @user_properties.empty? %>
+    <div id="user-properties-empty-state">
+      <%= render EmptyStateComponent.new(
+        icon: "magnifying-glass",
+        title: "아직 추가한 물건이 없습니다",
+        description: "사건번호를 입력하여 물건을 추가하세요."
+      ) %>
+    </div>
   <% end %>
 </div>
