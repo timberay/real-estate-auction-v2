@@ -24,9 +24,9 @@ class SearchResultsController < ApplicationController
     )
 
     if result.error
-      redirect_to properties_path, alert: error_message_for(result.error)
+      redirect_to search_path, alert: error_message_for(result.error)
     else
-      redirect_to properties_path, notice: "#{result.count}건의 검색 결과를 가져왔습니다."
+      redirect_to search_path, notice: "#{result.count}건의 검색 결과를 가져왔습니다."
     end
   end
 

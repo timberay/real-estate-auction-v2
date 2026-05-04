@@ -1,4 +1,5 @@
 require "test_helper"
+require "ostruct"
 
 class SearchResultsControllerTest < ActionDispatch::IntegrationTest
   setup do
@@ -34,7 +35,7 @@ class SearchResultsControllerTest < ActionDispatch::IntegrationTest
     GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
 
     post search_results_url
-    assert_redirected_to properties_path
+    assert_redirected_to search_path
     follow_redirect!
     assert_match "0건", flash[:notice]
   ensure
@@ -49,11 +50,31 @@ class SearchResultsControllerTest < ActionDispatch::IntegrationTest
     GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
 
     post search_results_url
-    assert_redirected_to properties_path
+    assert_redirected_to search_path
     follow_redirect!
     assert_match "시간이 초과", flash[:alert]
   ensure
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
+  end
+
+  test "create redirects to /search with notice on success" do
+    original_call = CourtAuctionSearchService.method(:call)
+    CourtAuctionSearchService.define_singleton_method(:call) { |**_| OpenStruct.new(error: nil, count: 5) }
+
+    post search_results_url
+    assert_redirected_to search_path
+  ensure
+    CourtAuctionSearchService.define_singleton_method(:call, original_call)
+  end
+
+  test "create redirects to /search with alert on error" do
+    original_call = CourtAuctionSearchService.method(:call)
+    CourtAuctionSearchService.define_singleton_method(:call) { |**_| OpenStruct.new(error: :timeout, count: 0) }
+
+    post search_results_url
+    assert_redirected_to search_path
+  ensure
+    CourtAuctionSearchService.define_singleton_method(:call, original_call)
   end
 
   test "POST import adds property to user list" do
