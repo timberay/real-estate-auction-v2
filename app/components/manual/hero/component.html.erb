@@ -1,28 +1,11 @@
-<section class="grid grid-cols-1 lg:grid-cols-3 gap-6 py-8">
-  <div class="lg:col-span-2">
-    <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100">
-      <%= t("manuals.show.hero.headline") %>
-    </h1>
-    <p class="mt-2 text-lg text-slate-700 dark:text-slate-200">
-      <%= t("manuals.show.hero.subhead") %>
-    </p>
-    <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
-      <%= t("manuals.show.hero.tagline") %>
-    </p>
-  </div>
-  <aside class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 p-4">
-    <% if has_current? %>
-      <h2 class="text-sm font-semibold text-slate-600 dark:text-slate-300"><%= t("manuals.show.continue_card.title") %></h2>
-      <p class="mt-1 text-base text-slate-900 dark:text-slate-100"><%= cta_card_resolver.step_label %></p>
-      <a href="<%= cta_card_path %>" class="mt-3 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-        <%= cta_card_label %>
-      </a>
-    <% else %>
-      <h2 class="text-sm font-semibold text-slate-600 dark:text-slate-300"><%= t("manuals.show.continue_card.empty_title") %></h2>
-      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= t("manuals.show.continue_card.empty_body") %></p>
-      <a href="<%= fallback_path %>" class="mt-3 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-        <%= t("manuals.show.continue_card.empty_title") %>
-      </a>
-    <% end %>
-  </aside>
+<section class="py-8">
+  <h1 class="text-3xl font-bold text-slate-900 dark:text-slate-100">
+    <%= t("manuals.show.hero.headline") %>
+  </h1>
+  <p class="mt-2 text-lg text-slate-700 dark:text-slate-200">
+    <%= t("manuals.show.hero.subhead") %>
+  </p>
+  <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+    <%= t("manuals.show.hero.tagline") %>
+  </p>
 </section>

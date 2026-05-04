@@ -5,10 +5,6 @@ ko:
         headline: "경매 초보의 워크북"
         subhead: "낙찰 전 89개 체크리스트, 낙찰 후 명도 시뮬레이터"
         tagline: "정보를 보여드리는 게 아니라, 직접 분석하는 능력을 길러드립니다."
-      continue_card:
-        title: "이어서 하기"
-        empty_title: "처음부터 시작하기"
-        empty_body: "예산 설정부터 6단계로 안내해 드립니다."
       flow_strip:
         auction_marker: "낙찰"
       phase_pre:
@@ -17,8 +13,6 @@ ko:
       phase_post:
         heading: "낙찰 후"
         subheading: "명도 시뮬레이터로 다음 한 수를 정합니다"
-      footer:
-        help_text: "각 화면에서 막히면 상단 도움말 아이콘을 눌러주세요."
     steps:
       budget:
         label: "예산 정하기"

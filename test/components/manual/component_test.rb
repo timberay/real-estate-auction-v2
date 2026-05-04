@@ -23,14 +23,13 @@ module Manual
       Manuals::ProgressResult.new(steps: steps, current_step: steps[1], continue_cta: { key: :properties, variant: :pending })
     end
 
-    test "renders hero, flow strip, both phase sections, footer" do
+    test "renders hero, flow strip, both phase sections" do
       render_inline(Manual::Component.new(progress: progress_fixture))
 
       assert_text "경매 초보의 워크북"      # hero
       assert_text "낙찰"                    # flow strip auction marker
       assert_text "낙찰 전"                 # pre-auction heading
       assert_text "낙찰 후"                 # post-auction heading
-      assert_text "각 화면에서 막히면"      # footer
     end
 
     test "splits steps 1-4 into pre and 5-6 into post" do
