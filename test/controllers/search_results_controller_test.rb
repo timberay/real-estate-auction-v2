@@ -19,10 +19,10 @@ class SearchResultsControllerTest < ActionDispatch::IntegrationTest
     assert_match "제주특별자치도", response.body
   end
 
-  test "GET index shows empty state when no results" do
+  test "GET index shows region select when no results" do
     get search_results_url
     assert_response :success
-    assert_match "검색 결과가 없습니다", response.body
+    assert_match "관심 지역", response.body
   end
 
   test "POST create runs search and redirects" do
