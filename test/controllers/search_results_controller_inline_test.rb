@@ -131,7 +131,7 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     assert_includes response.content_type, "text/vnd.turbo-stream.html"
   end
 
-  test "properties index renders persisted search results on load" do
+  test "search index renders persisted search results on load" do
     @user.search_results.create!(
       case_number: "2026타경55555",
       address: "부산광역시",
@@ -139,17 +139,17 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
       min_bid_price: 105_000_000
     )
 
-    get properties_url
+    get search_path
     assert_response :success
     assert_match "2026타경55555", response.body
     assert_match "criteria-search-results", response.body
     assert_no_match "닫기", response.body
   end
 
-  test "properties index does not render results box when no search results" do
+  test "search index does not render results box when no search results" do
     @user.search_results.destroy_all
 
-    get properties_url
+    get search_path
     assert_response :success
     assert_no_match(/조건검색 결과/, response.body)
   end
@@ -164,7 +164,7 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
       min_bid_price: 140_000_000
     )
 
-    get properties_url
+    get search_path
     assert_response :success
     assert_match "서울동부지방법원", response.body
     # court_code must not appear as visible text (it may appear as an option value in the court select)
