@@ -12,7 +12,47 @@ module CourtAuction
       result
     end
 
+    def parse_case_search(api_data:)
+      cs_bas = api_data["dma_csBasInf"]
+      return nil if cs_bas.nil? || cs_bas["csNo"].blank?
+
+      goods     = (api_data["dlt_dspslGdsDspslObjctLst"] || []).first || {}
+      objects   = (api_data["dlt_rletCsDspslObjctLst"]   || []).first || {}
+      demand    = (api_data["dlt_dstrtDemnLstprdDts"]    || []).first || {}
+      schedules =  api_data["dlt_rletCsGdsDtsDxdyInf"]   || []
+
+      {
+        case_number:             cs_bas["userCsNo"],
+        case_type:               cs_bas["csNm"],
+        court_code:              cs_bas["cortOfcCd"],
+        court_name:              cs_bas["cortOfcNm"],
+        claim_amount:            parse_price(cs_bas["clmAmt"]),
+        status:                  parse_case_status(cs_bas["csProgStatCd"]),
+        property_type:           objects["auctnLstNm"],
+        address:                 goods["userSt"],
+        sido:                    goods["adongSdNm"],
+        sigungu:                 goods["adongSggNm"],
+        dong:                    goods["adongEmdNm"],
+        building_name:           goods["bldNm"].presence || demand["bldNm"],
+        building_detail:         goods["bldDtlDts"],
+        appraisal_price:         parse_price(goods["aeeEvlAmt"]),
+        min_bid_price:           parse_price(goods["fstPbancLwsDspslPrc"]),
+        failed_bid_count:        count_failed_bids(schedules),
+        remarks:                 goods["dspslGdsRmk"],
+        special_conditions_code: goods["bidDvsCd"],
+        property_count:          (api_data["dlt_dspslGdsDspslObjctLst"] || []).length.clamp(1, 99)
+      }
+    end
+
     private
+
+    def parse_case_status(code)
+      code&.start_with?("0002") ? "진행중" : "종결"
+    end
+
+    def count_failed_bids(schedules)
+      schedules.count { |s| s["auctnDxdyRsltCd"] == "002" }
+    end
 
     def extract_items(response)
       items = response.dig("data", "dlt_srchResult")

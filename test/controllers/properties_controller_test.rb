@@ -1,4 +1,5 @@
 require "test_helper"
+require "json"
 
 class PropertiesControllerTest < ActionDispatch::IntegrationTest
   setup do
@@ -21,43 +22,82 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
-  test "POST create with existing case number adds to user list" do
-    # guest already has safe_apartment via fixture; remove it first
-    UserProperty.where(
-      user: @user,
-      property: properties(:safe_apartment)
-    ).destroy_all
+  ENDPOINT = "https://www.courtauction.go.kr/pgj/pgj15A/selectAuctnCsSrchRslt.on"
 
-    assert_no_difference "Property.count" do
+  test "POST create with court_code + new case fetches from court site and adds to user list" do
+    fixture = File.read(Rails.root.join("test/fixtures/files/court_auction_case_search_valid.json"))
+    stub_request(:post, ENDPOINT).to_return(status: 200, body: fixture)
+
+    UserProperty.where(user: @user, property: properties(:safe_apartment)).destroy_all
+
+    assert_difference "Property.count", 1 do
       assert_difference "UserProperty.count", 1 do
-        post properties_url, params: { case_number: "2026타경10001" }
+        post properties_url, params: { court_code: "B000530", case_number: "2022타경564" }
       end
     end
-    assert_redirected_to property_path(properties(:safe_apartment))
+    property = Property.find_by(case_number: "2022타경564")
+    assert_redirected_to property_path(property)
     follow_redirect!
     assert_match "내 목록에 추가했습니다", flash[:notice]
   end
 
   test "POST create with already-added case number shows notice" do
-    # guest already has safe_apartment via fixture
-    post properties_url, params: { case_number: "2026타경10001" }
-    assert_redirected_to properties_path
+    fixture = File.read(Rails.root.join("test/fixtures/files/court_auction_case_search_valid.json"))
+    body = JSON.parse(fixture)
+    body["data"]["dma_csBasInf"]["userCsNo"] = "2026타경10001"
+    stub_request(:post, ENDPOINT).to_return(status: 200, body: body.to_json)
+
+    post properties_url, params: { court_code: "B000530", case_number: "2026타경10001" }
+    assert_redirected_to property_path(properties(:safe_apartment))
     follow_redirect!
-    assert_match "이미 내 목록에 있는 물건입니다", flash[:notice]
+    assert_match "내 목록에 추가했습니다", flash[:notice]
   end
 
-  test "POST create with blank case number shows alert" do
-    post properties_url, params: { case_number: "" }
+  test "POST create with blank case number shows format error" do
+    post properties_url, params: { court_code: "B000530", case_number: "" }
     assert_redirected_to properties_path
     follow_redirect!
-    assert_match "사건번호를 입력해주세요", flash[:alert]
+    assert_match "사건번호 형식이 올바르지 않습니다", flash[:alert]
   end
 
-  test "POST create with unknown case number shows not found alert" do
-    post properties_url, params: { case_number: "2026타경99999" }
+  test "POST create with case found-not-at-court shows not-found alert" do
+    body = { "data" => { "dma_csBasInf" => { "csNo" => "" } } }.to_json
+    stub_request(:post, ENDPOINT).to_return(status: 200, body: body)
+
+    post properties_url, params: { court_code: "B000530", case_number: "2099타경999" }
     assert_redirected_to properties_path
     follow_redirect!
     assert_match "물건을 찾을 수 없습니다", flash[:alert]
+  end
+
+  test "POST create with blank court_code shows format error" do
+    post properties_url, params: { court_code: "", case_number: "2024타경881" }
+    assert_redirected_to properties_path
+    follow_redirect!
+    assert_match "사건번호 형식이 올바르지 않습니다", flash[:alert]
+  end
+
+  test "POST create with tampered (non-allow-list) court_code shows format error" do
+    post properties_url, params: { court_code: "FAKE_CODE", case_number: "2024타경881" }
+    assert_redirected_to properties_path
+    follow_redirect!
+    assert_match "사건번호 형식이 올바르지 않습니다", flash[:alert]
+  end
+
+  test "POST create with bad case_number format shows format error and makes no HTTP call" do
+    post properties_url, params: { court_code: "B000530", case_number: "hello" }
+    assert_redirected_to properties_path
+    follow_redirect!
+    assert_match "사건번호 형식이 올바르지 않습니다", flash[:alert]
+  end
+
+  test "POST create when court site returns 503 shows site-unavailable alert" do
+    stub_request(:post, ENDPOINT).to_return(status: 503)
+
+    post properties_url, params: { court_code: "B000530", case_number: "2024타경881" }
+    assert_redirected_to properties_path
+    follow_redirect!
+    assert_match "법원경매 사이트에 접속할 수 없습니다", flash[:alert]
   end
 
   test "GET index renders successfully when user has no budget setting" do

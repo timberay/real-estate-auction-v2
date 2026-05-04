@@ -1,5 +1,6 @@
 class SearchResultsController < ApplicationController
   include ActionView::RecordIdentifier
+  include CourtAuctionErrorMessages
   def index
     @search_results = current_user.search_results.order(created_at: :desc)
   end
@@ -101,6 +102,8 @@ class SearchResultsController < ApplicationController
   def create_property_from_search_result(search_result)
     Property.create!(
       case_number: search_result.case_number,
+      court_code: search_result.court_code,
+      court_name: search_result.court_name,
       address: search_result.address,
       appraisal_price: search_result.appraisal_price,
       min_bid_price: search_result.min_bid_price,
@@ -109,20 +112,5 @@ class SearchResultsController < ApplicationController
       failed_bid_count: search_result.failed_bid_count,
       property_count: search_result.property_count
     )
-  end
-
-  def error_message_for(error)
-    case error
-    when DataProvider::TimeoutError
-      "데이터 수집 시간이 초과되었습니다. 다시 시도해주세요."
-    when DataProvider::ServiceUnavailableError, DataProvider::ConnectionError
-      "법원경매 사이트에 접속할 수 없습니다. 잠시 후 다시 시도해주세요."
-    when DataProvider::ConfigurationError
-      "브라우저 실행에 실패했습니다. 시스템 설정을 확인해주세요."
-    when DataProvider::DataNotFoundError, nil
-      "해당 물건을 찾을 수 없습니다."
-    else
-      "데이터 수집 중 오류가 발생했습니다. 다시 시도해주세요."
-    end
   end
 end

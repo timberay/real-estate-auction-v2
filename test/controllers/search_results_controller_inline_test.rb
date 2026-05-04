@@ -7,6 +7,28 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     @user = User.find(session[:user_id])
   end
 
+  test "POST inline_import persists court_code and court_name from search_result onto new Property" do
+    UserProperty.where(user: @user).destroy_all
+    Property.where(case_number: "2026타경55555").destroy_all
+
+    sr = @user.search_results.create!(
+      case_number: "2026타경55555",
+      court_code: "B000530",
+      court_name: "제주지방법원",
+      address: "제주특별자치도 제주시",
+      appraisal_price: 100_000_000,
+      min_bid_price: 70_000_000
+    )
+
+    assert_difference "Property.count", 1 do
+      post inline_import_search_result_url(sr), as: :turbo_stream
+    end
+
+    property = Property.find_by!(case_number: "2026타경55555")
+    assert_equal "B000530", property.court_code
+    assert_equal "제주지방법원", property.court_name
+  end
+
   test "POST inline_import returns turbo stream with fade-out and card append" do
     property = properties(:safe_apartment)
     UserProperty.where(user: @user, property: property).destroy_all
@@ -155,6 +177,7 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     get properties_url
     assert_response :success
     assert_match "서울동부지방법원", response.body
-    assert_no_match "B000211", response.body
+    # court_code must not appear as visible text (it may appear as an option value in the court select)
+    assert_no_match ">B000211<", response.body
   end
 end
