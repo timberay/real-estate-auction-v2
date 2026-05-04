@@ -1,7 +1,7 @@
 <%# app/views/properties/_case_number_form.html.erb
     Locals: setting — current_user.budget_setting (or nil)
 %>
-<div data-controller="criteria-search" class="max-w-2xl min-w-80">
+<div data-controller="criteria-search" class="max-w-xl min-w-80">
   <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">사건번호로 물건 추가</label>
   <%= form_with url: properties_path, method: :post, data: { action: "submit->criteria-search#submitCaseNumber" } do |f| %>
     <div class="flex items-center gap-2">
