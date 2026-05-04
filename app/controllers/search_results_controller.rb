@@ -2,7 +2,17 @@ class SearchResultsController < ApplicationController
   include ActionView::RecordIdentifier
   include CourtAuctionErrorMessages
   def index
-    @search_results = current_user.search_results.order(created_at: :desc)
+    @setting = current_user.budget_setting
+    @region  = @setting&.effective_region
+    @existing_case_numbers = current_user.properties.pluck(:case_number).to_set
+
+    search_scope = current_user.search_results.order(created_at: :desc)
+    total_displayable = search_scope.count
+    @total_pages = (total_displayable.to_f / 20).ceil
+    @search_page = params[:search_page].to_i.clamp(1, [ @total_pages, 1 ].max)
+    @search_results = search_scope.offset((@search_page - 1) * 20).limit(20)
+    @api_total_count = current_user.last_search_api_total_count
+    @over_api_limit  = @api_total_count.to_i > 100
   end
 
   def create
