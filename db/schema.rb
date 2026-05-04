@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_22_065658) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_04_103104) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -327,6 +327,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_065658) do
     t.integer "appraisal_price"
     t.string "auction_date"
     t.string "case_number", null: false
+    t.string "court_code"
     t.string "court_name"
     t.datetime "created_at", null: false
     t.integer "failed_bid_count"
