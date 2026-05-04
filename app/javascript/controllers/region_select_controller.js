@@ -2,7 +2,6 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static values = { url: String }
-  static targets = ["feedback"]
 
   connect() {
     this.previousValue = this.element.value
@@ -23,25 +22,11 @@ export default class extends Controller {
     }).then(response => {
       if (response.ok) {
         this.previousValue = region
-        this.showFeedback()
       } else {
         this.element.value = this.previousValue
       }
     }).catch(() => {
       this.element.value = this.previousValue
     })
-  }
-
-  showFeedback() {
-    if (!this.hasFeedbackTarget) return
-
-    this.feedbackTarget.textContent = "✓ 저장됨"
-    this.feedbackTarget.classList.remove("opacity-0")
-    this.feedbackTarget.classList.add("opacity-100")
-
-    setTimeout(() => {
-      this.feedbackTarget.classList.remove("opacity-100")
-      this.feedbackTarget.classList.add("opacity-0")
-    }, 1500)
   }
 }

@@ -52,7 +52,8 @@ class SearchResultsController < ApplicationController
           "property-cards-grid",
           partial: "search_results/inline_imported_card",
           locals: { property: property, user_property: user_property, max_bid_amount: current_user.budget_setting&.max_bid_amount }
-        )
+        ),
+        turbo_stream.remove("user-properties-empty-state")
       ]
 
       if remaining_count == 0
