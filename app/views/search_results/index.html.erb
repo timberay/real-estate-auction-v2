@@ -1,43 +1,46 @@
-<% content_for(:page_title, "물건검색") %>
+<% content_for(:page_title, "물건 목록") %>
 
+<%# app/views/search_results/index.html.erb %>
 <div class="space-y-6">
-  <div class="flex items-center justify-end">
-    <%= form_with url: search_results_path, method: :post do %>
-      <%= render ButtonComponent.new(type: "submit", icon: "magnifying-glass", size: :sm) { "검색 실행" } %>
-    <% end %>
+  <%# 관심 지역 + 조건검색 %>
+  <div data-controller="criteria-search" class="max-w-xl min-w-80">
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">관심 지역</label>
+      <div class="flex items-center gap-2">
+        <select name="budget_setting[region]"
+                class="flex-1 h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                data-controller="region-select"
+                data-region-select-url-value="<%= update_region_settings_budget_path %>"
+                data-action="change->region-select#save">
+          <% BudgetSetting::REGIONS.each do |region| %>
+            <option value="<%= region %>" <%= "selected" if region == @region %>><%= region %></option>
+          <% end %>
+        </select>
+        <%= form_with url: search_results_path, method: :post, class: "contents", data: { action: "submit->criteria-search#submit turbo:submit-end->criteria-search#enable" } do %>
+          <button type="submit"
+                  data-criteria-search-target="submitButton"
+                  class="inline-flex items-center justify-center gap-1.5 w-24 h-10 rounded-md bg-violet-600 hover:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-500 text-white text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900">
+            <span data-criteria-search-target="buttonText">조건검색</span>
+            <svg data-criteria-search-target="buttonSpinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </button>
+        <% end %>
+      </div>
+    </div>
   </div>
 
-  <% if @search_results.any? %>
-    <p class="text-sm text-slate-500 dark:text-slate-400"><%= @search_results.count %>건</p>
-    <div class="space-y-3">
-      <% @search_results.each do |sr| %>
-        <div class="rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
-          <div class="flex items-start justify-between gap-4">
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-slate-900 dark:text-slate-100 truncate"><%= sr.address %></p>
-              <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                <%= sr.case_number %> · <%= sr.court_name %> · <%= sr.property_type %>
-              </p>
-              <div class="flex gap-4 mt-2 text-sm">
-                <span class="text-slate-600 dark:text-slate-300">감정가 <strong class="tabular-nums"><%= number_to_currency(sr.appraisal_price, unit: "", precision: 0) %></strong></span>
-                <span class="text-blue-600 dark:text-blue-400">최저가 <strong class="tabular-nums"><%= number_to_currency(sr.min_bid_price, unit: "", precision: 0) %></strong></span>
-                <% if sr.failed_bid_count.to_i > 0 %>
-                  <span class="text-orange-600 dark:text-orange-400">유찰 <%= sr.failed_bid_count %>회</span>
-                <% end %>
-              </div>
-            </div>
-            <%= form_with url: import_search_result_path(sr), method: :post, class: "shrink-0" do %>
-              <%= render ButtonComponent.new(type: "submit", icon: "plus", size: :sm, variant: :secondary) { "추가" } %>
-            <% end %>
-          </div>
-        </div>
-      <% end %>
-    </div>
-  <% else %>
-    <%= render EmptyStateComponent.new(
-      icon: "magnifying-glass",
-      title: "검색 결과가 없습니다",
-      description: "검색 실행 버튼을 눌러 경매 물건을 검색하세요."
-    ) %>
-  <% end %>
+  <%# 조건검색 결과 %>
+  <div id="criteria-search-results">
+    <% if @search_results&.any? %>
+      <%= render "search_results/inline_results",
+                 search_results: @search_results,
+                 search_page: @search_page,
+                 total_pages: @total_pages,
+                 api_total_count: @api_total_count,
+                 over_api_limit: @over_api_limit,
+                 existing_case_numbers: @existing_case_numbers %>
+    <% end %>
+  </div>
 </div>

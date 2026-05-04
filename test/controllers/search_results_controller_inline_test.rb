@@ -29,7 +29,7 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     assert_equal "제주지방법원", property.court_name
   end
 
-  test "POST inline_import returns turbo stream with fade-out and card append" do
+  test "POST inline_import returns turbo stream that replaces card with already_added badge" do
     property = properties(:safe_apartment)
     UserProperty.where(user: @user, property: property).destroy_all
 
@@ -39,25 +39,18 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
       appraisal_price: 200_000_000,
       min_bid_price: 140_000_000
     )
-    # Create a second search result so remaining_count > 0 after import
-    @user.search_results.create!(
-      case_number: "2026타경11111",
-      address: "부산광역시",
-      appraisal_price: 150_000_000,
-      min_bid_price: 105_000_000
-    )
 
     assert_difference "UserProperty.count", 1 do
       post inline_import_search_result_url(sr), as: :turbo_stream
     end
     assert_response :success
     assert_includes response.content_type, "text/vnd.turbo-stream.html"
-    assert_match "fade-remove", response.body
-    assert_match "property-cards-grid", response.body
-    assert_match "criteria-search-count", response.body
+    assert_match(/turbo-stream action="replace"/, response.body)
+    assert_match "이미 추가됨", response.body
+    assert_no_match "property-cards-grid", response.body
   end
 
-  test "POST inline_import for already-added property returns turbo stream" do
+  test "POST inline_import for already-added property returns turbo stream with already_added badge" do
     property = properties(:safe_apartment)
     @user.user_properties.find_or_create_by!(property: property)
 
@@ -72,7 +65,8 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
       post inline_import_search_result_url(sr), as: :turbo_stream
     end
     assert_response :success
-    assert_match "fade-remove", response.body
+    assert_match(/turbo-stream action="replace"/, response.body)
+    assert_match "이미 추가됨", response.body
   end
 
   test "POST inline_import falls back to search result data when detail fetch fails" do
@@ -95,8 +89,8 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
       post inline_import_search_result_url(sr), as: :turbo_stream
     end
     assert_response :success
-    assert_match "fade-remove", response.body
-    assert_match "property-cards-grid", response.body
+    assert_match(/turbo-stream action="replace"/, response.body)
+    assert_match "이미 추가됨", response.body
 
     property = Property.find_by(case_number: "2026타경88888")
     assert_equal "서울특별시", property.address
@@ -105,23 +99,19 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end
 
-  test "POST inline_import clears results box when last item is imported" do
+  test "POST inline_import replaces card with already_added badge (no criteria-search-results clear)" do
     sr = @user.search_results.create!(
       case_number: "2026타경77777",
       address: "서울특별시",
       appraisal_price: 200_000_000,
       min_bid_price: 140_000_000
     )
-    Property.find_or_create_by!(case_number: "2026타경77777") do |p|
-      p.address = "서울특별시"
-      p.appraisal_price = 200_000_000
-      p.min_bid_price = 140_000_000
-    end
 
     post inline_import_search_result_url(sr), as: :turbo_stream
     assert_response :success
-    # When remaining count is 0, the entire results container should be cleared
-    assert_match(/update.*criteria-search-results/, response.body)
+    assert_match(/turbo-stream action="replace"/, response.body)
+    assert_match "이미 추가됨", response.body
+    assert_no_match "criteria-search-results", response.body
   end
 
   test "DELETE clear removes all search results and returns turbo stream" do
@@ -141,7 +131,7 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     assert_includes response.content_type, "text/vnd.turbo-stream.html"
   end
 
-  test "properties index renders persisted search results on load" do
+  test "search index renders persisted search results on load" do
     @user.search_results.create!(
       case_number: "2026타경55555",
       address: "부산광역시",
@@ -149,17 +139,17 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
       min_bid_price: 105_000_000
     )
 
-    get properties_url
+    get search_path
     assert_response :success
     assert_match "2026타경55555", response.body
     assert_match "criteria-search-results", response.body
     assert_no_match "닫기", response.body
   end
 
-  test "properties index does not render results box when no search results" do
+  test "search index does not render results box when no search results" do
     @user.search_results.destroy_all
 
-    get properties_url
+    get search_path
     assert_response :success
     assert_no_match(/조건검색 결과/, response.body)
   end
@@ -174,7 +164,7 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
       min_bid_price: 140_000_000
     )
 
-    get properties_url
+    get search_path
     assert_response :success
     assert_match "서울동부지방법원", response.body
     # court_code must not appear as visible text (it may appear as an option value in the court select)

@@ -1,8 +1,14 @@
-<%# app/views/search_results/_inline_result_item.html.erb %>
+<%# app/views/search_results/_inline_result_item.html.erb
+    Locals:
+      search_result — SearchResult instance
+      already_added — Boolean (default false). When true, render disabled card with badge
+%>
+<% already_added = local_assigns.fetch(:already_added, false) %>
 <div id="<%= dom_id(search_result, :inline) %>"
-     class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 cursor-pointer hover:border-violet-500 dark:hover:border-violet-500 transition-colors">
-  <%= form_with url: inline_import_search_result_path(search_result), method: :post, data: { turbo_stream: true } do %>
-    <button type="submit" class="w-full text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900 rounded-lg">
+     class="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 <%= already_added ? "opacity-60" : "cursor-pointer hover:border-violet-500 dark:hover:border-violet-500 transition-colors" %>"
+     <%= already_added ? 'aria-disabled="true"' : "" %>>
+  <% if already_added %>
+    <div class="w-full text-left">
       <div class="flex items-center justify-between">
         <span class="text-sm font-semibold text-violet-400">
           <%= search_result.case_number %>
@@ -10,6 +16,7 @@
             <span class="inline-flex items-center rounded bg-amber-900/30 px-1.5 py-0.5 text-sm font-medium text-amber-400">다물건 <%= search_result.property_count %>건</span>
           <% end %>
         </span>
+        <span class="inline-flex items-center rounded bg-emerald-900/30 px-1.5 py-0.5 text-xs font-medium text-emerald-400">이미 추가됨</span>
       </div>
       <div class="mt-1.5 space-y-0.5">
         <div class="text-sm text-slate-500 dark:text-slate-400">감정가 <span class="text-slate-300 dark:text-slate-300 font-medium"><%= format_price_won(search_result.appraisal_price) %></span></div>
@@ -19,6 +26,27 @@
         <div class="text-sm text-slate-500 dark:text-slate-400 mt-1 truncate">🏛️ <%= search_result.court_name %></div>
       <% end %>
       <div class="text-sm text-slate-500 dark:text-slate-400 mt-1 truncate">📍 <%= search_result.address %></div>
-    </button>
+    </div>
+  <% else %>
+    <%= form_with url: inline_import_search_result_path(search_result), method: :post, data: { turbo_stream: true } do %>
+      <button type="submit" class="w-full text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900 rounded-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-semibold text-violet-400">
+            <%= search_result.case_number %>
+            <% if search_result.property_count > 1 %>
+              <span class="inline-flex items-center rounded bg-amber-900/30 px-1.5 py-0.5 text-sm font-medium text-amber-400">다물건 <%= search_result.property_count %>건</span>
+            <% end %>
+          </span>
+        </div>
+        <div class="mt-1.5 space-y-0.5">
+          <div class="text-sm text-slate-500 dark:text-slate-400">감정가 <span class="text-slate-300 dark:text-slate-300 font-medium"><%= format_price_won(search_result.appraisal_price) %></span></div>
+          <div class="text-sm text-slate-500 dark:text-slate-400">최저매각가 <span class="text-slate-300 dark:text-slate-300 font-medium"><%= format_price_won(search_result.min_bid_price) %></span></div>
+        </div>
+        <% if search_result.court_name.present? %>
+          <div class="text-sm text-slate-500 dark:text-slate-400 mt-1 truncate">🏛️ <%= search_result.court_name %></div>
+        <% end %>
+        <div class="text-sm text-slate-500 dark:text-slate-400 mt-1 truncate">📍 <%= search_result.address %></div>
+      </button>
+    <% end %>
   <% end %>
 </div>

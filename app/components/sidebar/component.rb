@@ -10,8 +10,9 @@ module Sidebar
       ],
       "물건검색" => [
         MenuItem.new(label: "예산 설정", icon: "calculator", path: :start_onboarding_path, enabled: true),
-        MenuItem.new(label: "물건 목록", icon: "magnifying-glass", path: :properties_path, enabled: true),
-        MenuItem.new(label: "AI분석", icon: "document-plus", path: :new_analysis_path, enabled: true)
+        MenuItem.new(label: "물건 목록", icon: "magnifying-glass", path: :search_path, enabled: true),
+        MenuItem.new(label: "내 물건", icon: "folder", path: :properties_path, enabled: true),
+        MenuItem.new(label: "AI 분석", icon: "document-plus", path: :new_analysis_path, enabled: true)
       ],
       "가이드" => [
         MenuItem.new(label: "명도 가이드", icon: "book-open", path: :eviction_guide_guide_path, enabled: true),

@@ -173,70 +173,21 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_analysis_path(property_id: property.id)
   end
 
-  test "GET index paginates search_results 20 per page (page 1 default)" do
-    user = @user
-    user.update!(last_search_api_total_count: 30)
-    25.times do |i|
-      user.search_results.create!(case_number: "PAG#{format('%03d', i)}", address: "주소 #{i}", appraisal_price: 1, min_bid_price: 1)
-    end
-
+  test "index does NOT assign search-related instance vars (moved to SearchResultsController#index)" do
     get properties_url
+
     assert_response :success
-    assert_select "[id^='inline_search_result_']", 20
+    assert_nil assigns(:search_results)
+    assert_nil assigns(:search_page)
+    assert_nil assigns(:total_pages)
+    assert_nil assigns(:api_total_count)
+    assert_nil assigns(:over_api_limit)
   end
 
-  test "GET index shows page 2 with search_page=2" do
-    user = @user
-    user.update!(last_search_api_total_count: 30)
-    25.times do |i|
-      user.search_results.create!(case_number: "PAG#{format('%03d', i)}", address: "주소 #{i}", appraisal_price: 1, min_bid_price: 1)
-    end
-
-    get properties_url, params: { search_page: 2 }
-    assert_response :success
-    assert_select "[id^='inline_search_result_']", 5
-  end
-
-  test "GET index clamps search_page above total_pages" do
-    user = @user
-    user.update!(last_search_api_total_count: 30)
-    25.times do |i|
-      user.search_results.create!(case_number: "PAG#{format('%03d', i)}", address: "주소 #{i}", appraisal_price: 1, min_bid_price: 1)
-    end
-
-    get properties_url, params: { search_page: 99 }
-    assert_response :success
-    assert_select "[id^='inline_search_result_']", 5
-  end
-
-  test "GET index shows over-100 banner when API total exceeds 100" do
-    user = @user
-    user.update!(last_search_api_total_count: 150)
-    user.search_results.create!(case_number: "ONE001", address: "x", appraisal_price: 1, min_bid_price: 1)
-
+  test "index still assigns user_properties and budget vars" do
     get properties_url
-    assert_response :success
-    assert_match "전체 150건 중 상위 100건만", response.body
-  end
 
-  test "GET index hides banner when API total is 100 or below" do
-    user = @user
-    user.update!(last_search_api_total_count: 50)
-    user.search_results.create!(case_number: "ONE001", address: "x", appraisal_price: 1, min_bid_price: 1)
-
-    get properties_url
-    assert_response :success
-    assert_no_match "상위 100건만", response.body
-  end
-
-  test "GET index treats non-integer search_page as page 1" do
-    user = @user
-    25.times do |i|
-      user.search_results.create!(case_number: "PAG#{format('%03d', i)}", address: "주소 #{i}", appraisal_price: 1, min_bid_price: 1)
-    end
-
-    get properties_url, params: { search_page: "abc" }
-    assert_response :success
-    assert_select "[id^='inline_search_result_']", 20
+    assert_not_nil assigns(:user_properties)
+    # @max_bid_amount may be nil if user has no budget — that's OK
   end
 end
