@@ -21,9 +21,16 @@ class MyPropertiesTest < ApplicationSystemTestCase
   end
 
   test "내 물건 page does NOT show inline budget box (moved to header)" do
+    user = User.last
+    user.update!(guest: false, email: "test@example.com")
+    user.create_budget_setting!(max_bid_amount: 50_000) unless user.budget_setting
+    user.budget_setting.update!(max_bid_amount: 50_000)
+
     visit properties_path
 
-    # Header has the budget link with 최대입찰가, but inside main content area there should be none
+    # Budget exists in header (proves the assertion isn't trivially passing).
+    assert_selector "header a[href='/settings/budget']", text: /최대입찰가/
+    # But not duplicated inside the page content area.
     within "main" do
       assert_no_selector "a[href='/settings/budget']", text: /최대입찰가/
     end
