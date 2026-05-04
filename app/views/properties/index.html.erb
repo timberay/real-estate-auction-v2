@@ -48,9 +48,15 @@
       </div>
     </div>
     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">사건번호로 물건 추가</label>
-    <div class="flex items-center gap-2">
-      <%= form_with url: properties_path, method: :post, class: "contents", data: { action: "submit->criteria-search#submitCaseNumber" } do |f| %>
-        <%= f.text_field :case_number,
+    <%= form_with url: properties_path, method: :post, class: "space-y-2", data: { action: "submit->criteria-search#submitCaseNumber" } do |f| %>
+      <%= select_tag :court_code,
+          grouped_options_for_select(CourtAuction::CaseSearchClient.court_options_for(@setting&.effective_region)),
+          required: true,
+          include_blank: false,
+          class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" %>
+
+      <div class="flex items-center gap-2">
+        <%= text_field_tag :case_number, nil,
             placeholder: "예: 2026타경1234",
             required: true,
             data: { criteria_search_target: "caseInput", action: "input->criteria-search#clearCaseError" },
@@ -66,10 +72,10 @@
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
         </button>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
     <p class="hidden text-sm text-red-500 dark:text-red-400 mt-1" data-criteria-search-target="caseError">사건번호를 입력해주세요</p>
-    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">법원을 선택하면 빠르게 검색됩니다</p>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">법원과 사건번호를 입력해주세요</p>
   </div>
 
   <%# Criteria search results — full-width, outside max-w-md %>

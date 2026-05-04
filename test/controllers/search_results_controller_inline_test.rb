@@ -155,6 +155,7 @@ class SearchResultsControllerInlineTest < ActionDispatch::IntegrationTest
     get properties_url
     assert_response :success
     assert_match "서울동부지방법원", response.body
-    assert_no_match "B000211", response.body
+    # court_code must not appear as visible text (it may appear as an option value in the court select)
+    assert_no_match ">B000211<", response.body
   end
 end
