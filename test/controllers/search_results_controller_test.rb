@@ -114,4 +114,12 @@ class SearchResultsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 2, assigns(:search_page)
     assert_equal 5, assigns(:search_results).size
   end
+
+  test "clear (HTML) redirects to /search" do
+    @user.search_results.create!(case_number: "2024타경1", court_code: "B000210", court_name: "서울지법", address: "주소", appraisal_price: 1, min_bid_price: 1)
+
+    delete clear_search_results_url
+
+    assert_redirected_to search_path
+  end
 end

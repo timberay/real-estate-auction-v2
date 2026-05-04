@@ -89,7 +89,7 @@ class SearchResultsController < ApplicationController
       format.turbo_stream do
         render turbo_stream: turbo_stream.update("criteria-search-results", "")
       end
-      format.html { redirect_to properties_path }
+      format.html { redirect_to search_path }
     end
   end
 
