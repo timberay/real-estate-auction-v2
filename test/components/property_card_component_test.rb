@@ -21,6 +21,18 @@ class PropertyCardComponentTest < ViewComponent::TestCase
     assert_text property.address
   end
 
+  test "renders court_name when present" do
+    property = properties(:safe_apartment) # court_name: "서울중앙지방법원"
+    render_inline(PropertyCardComponent.new(property: property))
+    assert_text "서울중앙지방법원"
+  end
+
+  test "does not render court_name section when blank" do
+    property = properties(:risky_villa) # court_name: nil
+    render_inline(PropertyCardComponent.new(property: property))
+    assert_no_selector "[data-property-card='court']"
+  end
+
   test "renders appraisal price label and value on separate line" do
     property = properties(:safe_apartment)
     render_inline(PropertyCardComponent.new(property: property))
