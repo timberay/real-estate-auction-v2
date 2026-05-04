@@ -35,7 +35,7 @@
       <%= render CardComponent.new(title: "유용자금") do %>
         <div class="flex items-center gap-2" data-controller="number-format" data-number-format-initial-value="<%= @setting.available_cash %>">
           <input type="text"
-            class="flex-1 h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+            class="flex-1 min-w-0 h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
             placeholder="예: 1억 3천"
             data-number-format-target="display"
             data-action="input->number-format#format input->budget-calculator#calculate blur->number-format#formatDisplay">
@@ -71,8 +71,8 @@
       <% end %>
     </div>
 
-    <%# Right column — Reserve Funds (largest section) %>
-    <div class="lg:col-span-2">
+    <%# Right column — Reserve Funds + result + submit %>
+    <div class="lg:col-span-2 space-y-6">
       <%= render CardComponent.new(title: "예비비") do %>
         <div data-controller="reserve-fund"
              data-reserve-fund-defaults-value="<%= @reserve_defaults.to_json %>"
@@ -123,7 +123,7 @@
                 <div class="flex items-center gap-2">
                   <label class="w-24 text-sm font-medium text-slate-700 dark:text-slate-300 shrink-0"><%= label %></label>
                   <%= f.number_field field, inputmode: "numeric",
-                    class: "flex-1 h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
+                    class: "flex-1 min-w-0 h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
                     data: { reserve_fund_target: target,
                             action: "input->reserve-fund#updateTotal input->budget-calculator#calculate" } %>
                   <span class="text-slate-600 dark:text-slate-400 text-sm whitespace-nowrap">만원</span>
@@ -150,20 +150,21 @@
           </div>
         </div>
       <% end %>
-    </div>
-  </div>
 
-  <%# Result + Submit — full-width sticky-feel footer %>
-  <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-    <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 flex flex-col justify-center">
-      <p class="text-sm text-slate-500 dark:text-slate-400">현재 최대입찰가</p>
-      <p class="text-2xl font-bold text-slate-900 dark:text-slate-100 tabular-nums" data-budget-calculator-target="display"><%= @setting.max_bid_amount ? format_price_in_eok(@setting.max_bid_amount) : "—" %></p>
-    </div>
+      <%# Current Results — placed under 예비비, updates in real-time %>
+      <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
+        <p class="text-sm text-slate-500 dark:text-slate-400">현재 최대입찰가</p>
+        <p class="text-2xl font-bold text-slate-900 dark:text-slate-100 tabular-nums" data-budget-calculator-target="display"><%= @setting.max_bid_amount ? format_price_in_eok(@setting.max_bid_amount) : "—" %></p>
+      </div>
 
-    <button type="submit"
-            class="inline-flex items-center justify-center gap-2 h-12 px-6 text-base font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-400 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
-      예산 저장
-    </button>
+      <%# Submit — right-aligned under the result panel %>
+      <div class="flex justify-end">
+        <button type="submit"
+                class="inline-flex items-center justify-center gap-2 h-12 px-6 text-base font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-400 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+          예산 저장
+        </button>
+      </div>
+    </div>
   </div>
 <% end %>
