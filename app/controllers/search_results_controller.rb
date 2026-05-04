@@ -46,39 +46,17 @@ class SearchResultsController < ApplicationController
     import_result = perform_import(search_result)
 
     if import_result[:success]
-      property = import_result[:property]
-      user_property = import_result[:user_property]
-      existing_case_numbers = current_user.properties.pluck(:case_number)
-      remaining_count = current_user.search_results
-        .where.not(case_number: existing_case_numbers)
-        .count
-
-      streams = [
-        turbo_stream.replace(
-          dom_id(search_result, :inline),
-          partial: "search_results/inline_result_fade_out",
-          locals: { search_result: search_result }
-        ),
-        turbo_stream.append(
-          "property-cards-grid",
-          partial: "search_results/inline_imported_card",
-          locals: { property: property, user_property: user_property, max_bid_amount: current_user.budget_setting&.max_bid_amount }
-        ),
-        turbo_stream.remove("user-properties-empty-state")
-      ]
-
-      if remaining_count == 0
-        streams << turbo_stream.update("criteria-search-results", "")
-      else
-        streams << turbo_stream.update("criteria-search-count", html: "#{remaining_count}건")
-      end
-
-      render turbo_stream: streams
+      render turbo_stream: turbo_stream.replace(
+        dom_id(search_result, :inline),
+        partial: "search_results/inline_result_item",
+        locals: { search_result: search_result, already_added: true }
+      )
     else
       render turbo_stream: turbo_stream.replace(
         dom_id(search_result, :inline),
         partial: "search_results/inline_result_item_error",
-        locals: { search_result: search_result, message: error_message_for(import_result[:error]) })
+        locals: { search_result: search_result, message: error_message_for(import_result[:error]) }
+      )
     end
   end
 

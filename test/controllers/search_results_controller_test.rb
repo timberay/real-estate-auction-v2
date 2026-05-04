@@ -122,4 +122,28 @@ class SearchResultsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to search_path
   end
+
+  test "inline_import returns Turbo Stream that replaces card with already_added badge" do
+    sr = @user.search_results.create!(case_number: "2024타경7777", court_code: "B000210", court_name: "서울지법", address: "주소", appraisal_price: 100_000_000, min_bid_price: 80_000_000)
+
+    post inline_import_search_result_url(sr), as: :turbo_stream
+
+    assert_response :success
+    assert_match(/turbo-stream action="replace"/, response.body)
+    assert_match dom_id(sr, :inline), response.body
+    assert_match "이미 추가됨", response.body
+
+    # 분리 후 property-cards-grid는 search 페이지에 없음 → append 스트림 미포함
+    assert_no_match(/property-cards-grid/, response.body)
+  end
+
+  test "inline_import is idempotent — second call does not create duplicate user_property" do
+    sr = @user.search_results.create!(case_number: "2024타경8888", court_code: "B000210", court_name: "서울지법", address: "주소", appraisal_price: 100_000_000, min_bid_price: 80_000_000)
+
+    post inline_import_search_result_url(sr), as: :turbo_stream
+    count_after_first = @user.user_properties.count
+
+    post inline_import_search_result_url(sr), as: :turbo_stream
+    assert_equal count_after_first, @user.user_properties.count
+  end
 end
