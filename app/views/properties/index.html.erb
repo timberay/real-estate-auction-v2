@@ -1,94 +1,8 @@
-<% content_for(:page_title, "물건 목록") %>
+<% content_for(:page_title, "내 물건") %>
 
 <%# app/views/properties/index.html.erb %>
 <div class="space-y-6">
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4">
-    <% budget = current_user.budget_setting %>
-    <% if budget&.max_bid_amount.present? %>
-      <%= link_to settings_budget_path,
-          class: "inline-flex items-center gap-1.5 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 px-3 h-8 hover:bg-blue-100 dark:hover:bg-blue-800/30 transition-colors duration-150" do %>
-        <span class="text-sm text-slate-500 dark:text-slate-400">최대입찰가</span>
-        <span class="text-sm font-bold tabular-nums text-blue-700 dark:text-blue-300"><%= format_price_in_eok(budget.max_bid_amount) %></span>
-        <svg class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-      <% end %>
-    <% else %>
-      <%= link_to settings_budget_path,
-          class: "inline-flex items-center gap-1.5 rounded-md bg-slate-50 dark:bg-slate-800 border border-dashed border-slate-300 dark:border-slate-600 px-3 h-8 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors duration-150" do %>
-        <span class="text-sm text-slate-400 dark:text-slate-500">예산 미설정</span>
-        <svg class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-      <% end %>
-    <% end %>
-  </div>
-
-  <%# Case number input + criteria search %>
-  <div data-controller="criteria-search" class="max-w-xl min-w-80">
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">관심 지역</label>
-      <div class="flex items-center gap-2">
-        <select name="budget_setting[region]"
-                class="flex-1 h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-                data-controller="region-select"
-                data-region-select-url-value="<%= update_region_settings_budget_path %>"
-                data-action="change->region-select#save">
-          <% BudgetSetting::REGIONS.each do |region| %>
-            <option value="<%= region %>" <%= "selected" if region == @setting&.effective_region %>><%= region %></option>
-          <% end %>
-        </select>
-        <%= form_with url: search_results_path, method: :post, class: "contents", data: { action: "submit->criteria-search#submit turbo:submit-end->criteria-search#enable" } do %>
-          <button type="submit"
-                  data-criteria-search-target="submitButton"
-                  class="inline-flex items-center justify-center gap-1.5 w-24 h-10 rounded-md bg-violet-600 hover:bg-violet-700 dark:bg-violet-600 dark:hover:bg-violet-500 text-white text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-violet-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900">
-            <span data-criteria-search-target="buttonText">조건검색</span>
-            <svg data-criteria-search-target="buttonSpinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-          </button>
-        <% end %>
-      </div>
-    </div>
-    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">사건번호로 물건 추가</label>
-    <%= form_with url: properties_path, method: :post, class: "space-y-2", data: { action: "submit->criteria-search#submitCaseNumber" } do |f| %>
-      <%= select_tag :court_code,
-          grouped_options_for_select(CourtAuction::CaseSearchClient.court_options_for(@setting&.effective_region)),
-          required: true,
-          include_blank: false,
-          class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" %>
-
-      <div class="flex items-center gap-2">
-        <%= text_field_tag :case_number, nil,
-            placeholder: "예: 2026타경1234",
-            required: true,
-            data: { criteria_search_target: "caseInput", action: "input->criteria-search#clearCaseError" },
-            class: "flex-1 min-w-0 h-10 rounded-md border px-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:outline-none border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100" %>
-        <button type="submit" data-criteria-search-target="addButton"
-                class="inline-flex items-center justify-center gap-1.5 w-24 h-10 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-400 text-white transition-colors">
-          <span data-criteria-search-target="addButtonText" class="flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.5v15m7.5-7.5h-15"/></svg>
-            추가
-          </span>
-          <svg data-criteria-search-target="addButtonSpinner" class="hidden w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </button>
-      </div>
-    <% end %>
-    <p class="hidden text-sm text-red-500 dark:text-red-400 mt-1" data-criteria-search-target="caseError">사건번호를 입력해주세요</p>
-    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">법원과 사건번호를 입력해주세요</p>
-  </div>
-
-  <%# Criteria search results — full-width, outside max-w-md %>
-  <div id="criteria-search-results">
-    <% if @search_results&.any? %>
-      <%= render "search_results/inline_results",
-                 search_results: @search_results,
-                 search_page: @search_page,
-                 total_pages: @total_pages,
-                 api_total_count: @api_total_count,
-                 over_api_limit: @over_api_limit %>
-    <% end %>
-  </div>
+  <%= render "case_number_form", setting: @setting %>
 
   <% filters_applied = params[:safety_rating].present? || params[:search].present? || params[:within_budget].present? %>
 
@@ -136,7 +50,7 @@
     </div>
   <% end %>
 
-  <%# Property cards grid — always rendered so inline_import turbo_stream.append has a target %>
+  <%# Property cards grid %>
   <div id="property-cards-grid" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
     <% @user_properties.each do |user_property| %>
       <div id="<%= dom_id(user_property.property, :card) %>">
@@ -161,7 +75,7 @@
       <%= render EmptyStateComponent.new(
         icon: "magnifying-glass",
         title: "아직 추가한 물건이 없습니다",
-        description: "사건번호를 입력하여 물건을 추가하세요."
+        description: "사건번호를 입력하거나 물건 목록에서 검색하여 추가하세요."
       ) %>
     </div>
   <% end %>
