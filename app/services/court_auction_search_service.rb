@@ -53,6 +53,7 @@ class CourtAuctionSearchService
         @user.search_results.create!(
           case_number: item["srnSaNo"],
           court_name: item["jiwonNm"],
+          court_code: item["boCd"],
           address: item["printSt"],
           appraisal_price: item["gamevalAmt"].to_i,
           min_bid_price: item["minmaePrice"].to_i,

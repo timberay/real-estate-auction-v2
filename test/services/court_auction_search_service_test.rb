@@ -11,6 +11,7 @@ class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
         {
           "srnSaNo" => "2024타경4812",
           "jiwonNm" => "제주지방법원",
+          "boCd" => "B000260",
           "printSt" => "제주특별자치도 서귀포시 성산읍",
           "gamevalAmt" => "700374010",
           "minmaePrice" => "240228000",
@@ -42,6 +43,7 @@ class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
     sr = @user.search_results.first
     assert_equal "2024타경4812", sr.case_number
     assert_equal "제주지방법원", sr.court_name
+    assert_equal "B000260", sr.court_code
     assert_equal 700_374_010, sr.appraisal_price
     assert_equal 240_228_000, sr.min_bid_price
     assert_equal "진행중", sr.status
