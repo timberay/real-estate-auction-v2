@@ -2,8 +2,7 @@ class SearchResultsController < ApplicationController
   include ActionView::RecordIdentifier
   include CourtAuctionErrorMessages
   def index
-    @setting = current_user.budget_setting
-    @region  = @setting&.effective_region
+    @region = current_user.budget_setting&.effective_region
     @existing_case_numbers = current_user.properties.pluck(:case_number).to_set
 
     search_scope = current_user.search_results.order(created_at: :desc)
