@@ -22,6 +22,22 @@ Deferred work captured by `/plan-eng-review`. Each item includes context so a fu
 
 ---
 
+### CaseSearchService race-rescue test that exercises the rescue branch
+
+**What**: Add a test in `test/services/case_search_service_test.rb` that actually triggers `rescue ActiveRecord::RecordNotUnique` inside `CaseSearchService#persist`. Currently the "race condition" test pre-creates the Property, so `find_or_create_by!` takes the find path and the rescue block at `case_search_service.rb:39-40` is dead code from the test suite's perspective.
+
+**Why**: Coverage gap flagged by the post-implementation final review. The rescue path exists for genuine concurrent submits (two browser tabs, simultaneous POST). If a future refactor breaks the rescue, no test catches it.
+
+**Pros**: Closes the only untested branch in CaseSearchService. Inexpensive insurance against future regressions.
+
+**Cons**: Requires Mocha or stub-based fakery to make `find_or_create_by!` raise `RecordNotUnique` on first call and succeed on second. Slightly more invasive than a simple test.
+
+**Context**: Identified by the final code review on commit `bae42ff`. Original test at `test/services/case_search_service_test.rb` line 65 named "race condition: concurrent insert resolves to existing Property" — passes for the right reason (existing property returned) but never enters the rescue branch.
+
+**Depends on / blocked by**: nothing.
+
+---
+
 ### Property refresh from court auction site
 
 **What**: Add `Property#refresh_from_court_auction!` instance method. Uses stored `court_code` + `case_number` to re-call `pgj15A/selectAuctnCsSrchRslt.on`, re-runs `parse_case_search`, updates Property attributes (status, min_bid_price, failed_bid_count, auction_date, etc.) without losing user-entered data.
