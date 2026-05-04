@@ -2,6 +2,7 @@ safe_apartment:
   case_number: "2026타경10001"
   case_type: "부동산임의경매"
   property_type: "아파트"
+  court_name: "서울중앙지방법원"
   address: "서울특별시 강남구 역삼동 100-1"
   sido: "서울특별시"
   sigungu: "강남구"
