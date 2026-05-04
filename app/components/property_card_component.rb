@@ -15,9 +15,9 @@ class PropertyCardComponent < ViewComponent::Base
   end
 
   def budget_exceeded?
-    return false unless @max_bid_amount.present? && @property.appraisal_price.present?
+    return false unless @max_bid_amount.present? && @property.min_bid_price.present?
 
     # max_bid_amount is in 만원 (from budget settings), property prices are in 원 (won)
-    @property.appraisal_price > @max_bid_amount * 10000
+    @property.min_bid_price > @max_bid_amount * 10000
   end
 end

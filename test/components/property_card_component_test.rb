@@ -35,15 +35,22 @@ class PropertyCardComponentTest < ViewComponent::TestCase
     assert_text "최저매각가"
   end
 
-  test "renders budget exceeded badge when appraisal_price exceeds max_bid_amount" do
-    property = properties(:safe_apartment) # appraisal_price: 800000000 (8억원)
+  test "renders budget exceeded badge when min_bid_price exceeds max_bid_amount" do
+    property = properties(:safe_apartment) # min_bid_price: 560000000 (5.6억원)
     render_inline(PropertyCardComponent.new(property: property, max_bid_amount: 50000)) # 5억만원
     assert_selector ".inline-flex", text: "예산 초과"
   end
 
   test "does not render budget exceeded badge when within budget" do
-    property = properties(:safe_apartment) # appraisal_price: 800000000 (8억원)
+    property = properties(:safe_apartment) # min_bid_price: 560000000 (5.6억원)
     render_inline(PropertyCardComponent.new(property: property, max_bid_amount: 100000)) # 10억만원
+    assert_no_text "예산 초과"
+  end
+
+  test "does not render budget exceeded badge when min_bid_price within budget even if appraisal_price exceeds" do
+    # Key behavior: a property with high appraisal but discounted min_bid (after 유찰) should NOT be flagged.
+    property = properties(:safe_apartment) # appraisal_price: 8억, min_bid_price: 5.6억
+    render_inline(PropertyCardComponent.new(property: property, max_bid_amount: 70000)) # 7억만원
     assert_no_text "예산 초과"
   end
 
