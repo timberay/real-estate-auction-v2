@@ -34,7 +34,6 @@
             <option value="<%= region %>" <%= "selected" if region == @setting&.effective_region %>><%= region %></option>
           <% end %>
         </select>
-        <span class="text-sm text-slate-500 dark:text-slate-400 transition-opacity duration-300 opacity-0" data-region-select-target="feedback"></span>
         <%= form_with url: search_results_path, method: :post, class: "contents", data: { action: "submit->criteria-search#submit turbo:submit-end->criteria-search#enable" } do %>
           <button type="submit"
                   data-criteria-search-target="submitButton"
