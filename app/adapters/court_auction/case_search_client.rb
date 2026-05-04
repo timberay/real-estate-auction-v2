@@ -98,7 +98,7 @@ module CourtAuction
         f.options.open_timeout = OPEN_TIMEOUT
         f.options.timeout = READ_TIMEOUT
         f.request :json
-        f.response :json
+        f.response :json, content_type: /.*/
         f.headers["Accept"] = "application/json"
         f.headers["Referer"] = REFERER
         f.headers["User-Agent"] = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
