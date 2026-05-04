@@ -119,6 +119,29 @@ module Header
 
       assert_selector "span#analysis_indicator"
     end
+
+    # --- Budget indicator ---
+
+    test "renders budget indicator with max bid when budget set" do
+      user = users(:budget_user)
+      user.create_budget_setting!(max_bid_amount: 50_000) unless user.budget_setting
+      user.budget_setting.update!(max_bid_amount: 50_000)
+
+      render_inline(Header::Component.new(current_user: user))
+
+      assert_selector "a[href='/settings/budget']", text: /최대입찰가/
+      assert_text "5억"
+    end
+
+    test "renders budget unset link when no budget" do
+      user = users(:budget_user)
+      user.budget_setting&.destroy
+      user.reload
+
+      render_inline(Header::Component.new(current_user: user))
+
+      assert_selector "a[href='/settings/budget']", text: "예산 미설정"
+    end
   end
 
   class RouteHelpersTest < ActiveSupport::TestCase

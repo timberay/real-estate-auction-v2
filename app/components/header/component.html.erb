@@ -11,6 +11,9 @@
   </div>
 
   <div class="flex items-center gap-1">
+    <% if signed_in? %>
+      <%= render "shared/budget_indicator", budget: @current_user.budget_setting %>
+    <% end %>
     <div data-controller="dark-mode">
       <button type="button" class="<%= BUTTON_CLASSES %>" data-action="dark-mode#toggle" aria-label="다크 모드 전환">
         <span data-dark-mode-target="sunIcon"><%= sun_icon %></span>
