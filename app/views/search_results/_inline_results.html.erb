@@ -1,11 +1,13 @@
 <%# app/views/search_results/_inline_results.html.erb
     Locals:
-      search_results     — ActiveRecord::Relation of paginated SearchResult rows (up to 20)
-      search_page        — Integer (1-based current page)
-      total_pages        — Integer
-      api_total_count    — Integer or nil (users.last_search_api_total_count)
-      over_api_limit     — Boolean
+      search_results          — ActiveRecord::Relation of paginated SearchResult rows (up to 20)
+      search_page             — Integer (1-based current page)
+      total_pages             — Integer
+      api_total_count         — Integer or nil (users.last_search_api_total_count)
+      over_api_limit          — Boolean
+      existing_case_numbers   — Set of case_number strings already in user's properties
 %>
+<% existing_case_numbers = local_assigns.fetch(:existing_case_numbers, Set.new) %>
 <turbo-frame id="search-results-frame" data-turbo-action="advance">
   <div id="criteria-search-results-inner"
        class="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3.5 mt-3">
@@ -21,7 +23,9 @@
     <% if search_results.any? %>
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <% search_results.each do |sr| %>
-          <%= render "search_results/inline_result_item", search_result: sr %>
+          <%= render "search_results/inline_result_item",
+                     search_result: sr,
+                     already_added: existing_case_numbers.include?(sr.case_number) %>
         <% end %>
       </div>
 
