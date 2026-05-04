@@ -17,8 +17,6 @@ jobs:
         with:
           filters: |
             sensitive:
-              - 'db/migrate/**'
-              - 'db/schema.rb'
               - 'config/deploy*.yml'
               - 'config/credentials/**'
               - 'config/master.key'
