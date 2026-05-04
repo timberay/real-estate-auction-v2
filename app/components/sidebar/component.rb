@@ -2,21 +2,21 @@
 
 module Sidebar
   class Component < ViewComponent::Base
-    MenuItem = Data.define(:label, :icon, :path, :enabled)
+    MenuItem = Data.define(:label, :icon, :path, :enabled, :active_paths)
 
     MENU_GROUPS = {
       "시작하기" => [
-        MenuItem.new(label: "사용자매뉴얼", icon: "book-open", path: :manual_path, enabled: true)
+        MenuItem.new(label: "사용자매뉴얼", icon: "book-open", path: :manual_path, enabled: true, active_paths: [])
       ],
       "물건검색" => [
-        MenuItem.new(label: "예산 설정", icon: "calculator", path: :start_onboarding_path, enabled: true),
-        MenuItem.new(label: "물건 목록", icon: "magnifying-glass", path: :search_path, enabled: true),
-        MenuItem.new(label: "내 물건", icon: "folder", path: :properties_path, enabled: true),
-        MenuItem.new(label: "AI 분석", icon: "document-plus", path: :new_analysis_path, enabled: true)
+        MenuItem.new(label: "예산 설정", icon: "calculator", path: :start_onboarding_path, enabled: true, active_paths: [ :settings_budget_path ]),
+        MenuItem.new(label: "물건 목록", icon: "magnifying-glass", path: :search_path, enabled: true, active_paths: []),
+        MenuItem.new(label: "내 물건", icon: "folder", path: :properties_path, enabled: true, active_paths: []),
+        MenuItem.new(label: "AI 분석", icon: "document-plus", path: :new_analysis_path, enabled: true, active_paths: [])
       ],
       "가이드" => [
-        MenuItem.new(label: "명도 가이드", icon: "book-open", path: :eviction_guide_guide_path, enabled: true),
-        MenuItem.new(label: "명도 시뮬레이터", icon: "play", path: :eviction_guide_simulator_path, enabled: true)
+        MenuItem.new(label: "명도 가이드", icon: "book-open", path: :eviction_guide_guide_path, enabled: true, active_paths: []),
+        MenuItem.new(label: "명도 시뮬레이터", icon: "play", path: :eviction_guide_simulator_path, enabled: true, active_paths: [])
       ]
     }.freeze
 
@@ -37,16 +37,16 @@ module Sidebar
     end
 
     def active?(item)
-      resolved = resolve_path(item)
-      return false unless resolved.present? && @current_path.start_with?(resolved)
+      candidates = ([ item.path ] + item.active_paths).map { |sym| helpers.public_send(sym) }.select(&:present?)
+      matched = candidates.find { |p| @current_path.start_with?(p) }
+      return false unless matched
 
       # Prefer the longest matching path to avoid /eviction_guide matching /eviction_guide/simulator
-      all_items = MENU_GROUPS.values.flatten
-      all_items.none? do |other|
-        other_resolved = resolve_path(other)
-        other_resolved.present? && other_resolved != resolved &&
-          other_resolved.length > resolved.length &&
-          @current_path.start_with?(other_resolved)
+      all_paths = MENU_GROUPS.values.flatten.flat_map { |o| [ o.path ] + o.active_paths }
+      all_paths.map { |sym| helpers.public_send(sym) }.none? do |other|
+        other.present? && other != matched &&
+          other.length > matched.length &&
+          @current_path.start_with?(other)
       end
     end
 

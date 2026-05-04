@@ -97,6 +97,12 @@ module Sidebar
       assert_selector "a[href='/search'][class*='bg-blue-50']", text: "물건 목록"
     end
 
+    test "marks 예산 설정 active when on /settings/budget (post-onboarding redirect target)" do
+      render_inline(Sidebar::Component.new(current_path: "/settings/budget"))
+
+      assert_selector "a[href='/onboarding'][class*='bg-blue-50']", text: "예산 설정"
+    end
+
     test "active item has dark mode classes" do
       render_inline(Sidebar::Component.new(current_path: "/onboarding"))
 
