@@ -42,7 +42,8 @@ module Sidebar
 
       assert_text "예산 설정"
       assert_text "물건 목록"
-      assert_text "AI분석"
+      assert_text "내 물건"
+      assert_text "AI 분석"
     end
 
     test "does not render removed report menu items" do
@@ -63,8 +64,9 @@ module Sidebar
       render_inline(Sidebar::Component.new)
 
       assert_selector "a[href='/onboarding']", text: "예산 설정"
-      assert_selector "a[href='/properties']", text: "물건 목록"
-      assert_selector "a[href='/analyses/new']", text: "AI분석"
+      assert_selector "a[href='/search']", text: "물건 목록"
+      assert_selector "a[href='/properties']", text: "내 물건"
+      assert_selector "a[href='/analyses/new']", text: "AI 분석"
     end
 
     test "renders no disabled buttons" do
@@ -86,7 +88,13 @@ module Sidebar
     test "marks properties path as active" do
       render_inline(Sidebar::Component.new(current_path: "/properties"))
 
-      assert_selector "a[href='/properties'][class*='bg-blue-50']"
+      assert_selector "a[href='/properties'][class*='bg-blue-50']", text: "내 물건"
+    end
+
+    test "marks search path as active for /search" do
+      render_inline(Sidebar::Component.new(current_path: "/search"))
+
+      assert_selector "a[href='/search'][class*='bg-blue-50']", text: "물건 목록"
     end
 
     test "active item has dark mode classes" do

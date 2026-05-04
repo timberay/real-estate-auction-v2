@@ -82,6 +82,8 @@ Rails.application.routes.draw do
     end
   end
 
+  get "/search", to: "search_results#index", as: :search
+
   resource :manual, only: [ :show ]
 
   get "/terms",   to: "legal#terms",   as: :terms
