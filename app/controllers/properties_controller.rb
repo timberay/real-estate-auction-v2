@@ -1,4 +1,5 @@
 class PropertiesController < ApplicationController
+  include CourtAuctionErrorMessages
   def index
     @user_properties = current_user.user_properties
       .includes(property: :inspection_results)
@@ -48,26 +49,24 @@ class PropertiesController < ApplicationController
   end
 
   def create
-    case_number = params[:case_number]&.strip
+    case_number = params[:case_number].to_s.strip
+    court_code  = params[:court_code].to_s.strip
 
-    if case_number.blank?
-      redirect_to properties_path, alert: "사건번호를 입력해주세요."
+    unless valid_inputs?(case_number, court_code)
+      redirect_to properties_path, alert: "사건번호 형식이 올바르지 않습니다. (예: 2026타경1234)"
       return
     end
 
-    property = Property.find_by(case_number: case_number)
+    result = CaseSearchService.call(court_code: court_code, case_number: case_number)
 
-    if property.nil?
-      redirect_to properties_path, alert: "해당 사건번호의 물건을 찾을 수 없습니다."
+    if result.error
+      redirect_to properties_path, alert: error_message_for(result.error)
       return
     end
 
-    if current_user.user_properties.exists?(property: property)
-      redirect_to properties_path, notice: "이미 내 목록에 있는 물건입니다."
-    else
-      current_user.user_properties.create!(property: property)
-      redirect_to property_path(property), notice: "내 목록에 추가했습니다."
-    end
+    property = result.properties.first
+    current_user.user_properties.find_or_create_by!(property: property)
+    redirect_to property_path(property), notice: "내 목록에 추가했습니다."
   end
 
   def destroy
@@ -85,5 +84,17 @@ class PropertiesController < ApplicationController
       format.turbo_stream { render turbo_stream: turbo_stream.remove(helpers.dom_id(property, :card)) }
       format.html { redirect_to properties_path, notice: "물건을 내 목록에서 삭제했습니다." }
     end
+  end
+
+  private
+
+  def valid_inputs?(case_number, court_code)
+    return false if case_number.blank? || court_code.blank?
+    return false unless CourtAuction::CaseSearchClient::COURT_CODES.value?(court_code)
+
+    CourtAuction::CaseNumberParser.parse(case_number)
+    true
+  rescue DataProvider::ParseError
+    false
   end
 end
