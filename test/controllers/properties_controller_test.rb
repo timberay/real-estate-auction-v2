@@ -190,4 +190,14 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil assigns(:user_properties)
     # @max_bid_amount may be nil if user has no budget — that's OK
   end
+
+  test "index within_budget filter compares min_bid_price (not appraisal_price) against max_bid_amount" do
+    # safe_apartment: appraisal=8억, min_bid=5.6억
+    # max_bid=6억(60000만원) → appraisal exceeds, min_bid does NOT → property MUST remain visible
+    BudgetSetting.create!(user: @user, max_bid_amount: 60000, completed_at: Time.current)
+
+    get properties_url, params: { within_budget: "1" }
+    assert_response :success
+    assert_includes assigns(:user_properties).map(&:property), properties(:safe_apartment)
+  end
 end
