@@ -55,6 +55,9 @@ Rails.application.routes.draw do
   end
 
   resources :properties, only: [ :index, :show, :create, :destroy ] do
+    member do
+      patch :toggle_favorite
+    end
     resources :documents, only: [ :create, :destroy ], controller: "properties/documents"
     namespace :inspections do
       resource :start, only: [ :create ], controller: "start"
