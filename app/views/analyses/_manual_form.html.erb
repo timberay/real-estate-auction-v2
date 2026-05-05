@@ -27,26 +27,28 @@
         AI로부터 받은 JSON 결과를 파일로 업로드하거나 직접 붙여넣으세요.
       </p>
 
-      <%# Input method toggle %>
-      <div class="flex gap-2">
-        <button type="button"
-                data-analysis-tabs-target="fileMethodTab"
-                data-action="analysis-tabs#showFileInput"
-                class="inline-flex items-center gap-1.5 h-8 rounded-md px-3 text-sm font-medium transition-colors duration-150 bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-          </svg>
-          파일 선택
-        </button>
-        <button type="button"
-                data-analysis-tabs-target="pasteMethodTab"
-                data-action="analysis-tabs#showPasteInput"
-                class="inline-flex items-center gap-1.5 h-8 rounded-md px-3 text-sm font-medium transition-colors duration-150 bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-700 dark:text-slate-400 dark:hover:bg-slate-600">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-          </svg>
-          붙여넣기
-        </button>
+      <%# Input method tabs %>
+      <div class="border-b border-slate-200 dark:border-slate-700">
+        <nav class="-mb-px flex gap-x-4" aria-label="입력 방법">
+          <button type="button"
+                  data-analysis-tabs-target="fileMethodTab"
+                  data-action="analysis-tabs#showFileInput"
+                  class="inline-flex items-center gap-1.5 whitespace-nowrap border-b-2 py-3 px-1 text-sm font-medium border-blue-500 text-blue-600 dark:text-blue-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+            파일 선택
+          </button>
+          <button type="button"
+                  data-analysis-tabs-target="pasteMethodTab"
+                  data-action="analysis-tabs#showPasteInput"
+                  class="inline-flex items-center gap-1.5 whitespace-nowrap border-b-2 py-3 px-1 text-sm font-medium border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+            </svg>
+            붙여넣기
+          </button>
+        </nav>
       </div>
 
       <%# File input form %>
