@@ -77,6 +77,7 @@ class SearchResultsController < ApplicationController
 
     property = Property.find_by(case_number: case_number)
     if property
+      backfill_court_info(property, search_result)
       user_property = current_user.user_properties.find_or_create_by!(property: property)
       return { success: true, property: property, user_property: user_property }
     end
@@ -84,6 +85,17 @@ class SearchResultsController < ApplicationController
     property = create_property_from_search_result(search_result)
     user_property = current_user.user_properties.create!(property: property)
     { success: true, property: property, user_property: user_property }
+  end
+
+  # Properties created before the court_code/court_name columns existed have
+  # those fields as nil. When such a property is re-imported via search, the
+  # SearchResult carries authoritative court info — copy it over so the card
+  # renders the court name like all other entries.
+  def backfill_court_info(property, search_result)
+    return if property.court_code.present?
+    return if search_result.court_code.blank?
+
+    property.update!(court_code: search_result.court_code, court_name: search_result.court_name)
   end
 
   def create_property_from_search_result(search_result)
