@@ -53,6 +53,33 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
     assert_equal BudgetSetting::DEFAULT_REGION, @setting.reload.region
   end
 
+  test "GET show checks the radio for an equivalent policy when loan_policy_id is stale across property types" do
+    @setting.update!(
+      property_type: property_types(:officetel),
+      loan_policy: loan_policies(:auction_capital_apartment) # stale: belongs to apartment, not officetel
+    )
+
+    get settings_budget_url
+    assert_response :success
+
+    expected_policy = loan_policies(:auction_capital_officetel)
+    assert_select "input[type='radio'][name='budget_setting[loan_policy_id]'][value=?][checked='checked']",
+                  expected_policy.id.to_s
+  end
+
+  test "GET show does not persist the remap to the database" do
+    @setting.update!(
+      property_type: property_types(:officetel),
+      loan_policy: loan_policies(:auction_capital_apartment)
+    )
+    stale_id = loan_policies(:auction_capital_apartment).id
+
+    get settings_budget_url
+    assert_response :success
+
+    assert_equal stale_id, @setting.reload.loan_policy_id
+  end
+
   test "PATCH update saves new settings and creates snapshot" do
     patch settings_budget_url, params: {
       budget_setting: {
