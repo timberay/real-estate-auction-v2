@@ -23,6 +23,7 @@ class LoanPolicySyncService
           if policy_changed?(existing, policy_data)
             existing.update!(
               loan_ratio: policy_data[:loan_ratio],
+              regulated_loan_ratio: policy_data[:regulated_loan_ratio],
               description: policy_data[:description],
               source_url: policy_data[:source_url],
               effective_date: policy_data[:effective_date]
@@ -36,6 +37,7 @@ class LoanPolicySyncService
             property_type: pt,
             policy_name: policy_data[:policy_name],
             loan_ratio: policy_data[:loan_ratio],
+            regulated_loan_ratio: policy_data[:regulated_loan_ratio],
             description: policy_data[:description],
             source_url: policy_data[:source_url],
             effective_date: policy_data[:effective_date],
@@ -53,6 +55,7 @@ class LoanPolicySyncService
 
   def policy_changed?(existing, new_data)
     existing.loan_ratio.to_f != new_data[:loan_ratio].to_f ||
+      existing.regulated_loan_ratio.to_f != new_data[:regulated_loan_ratio].to_f ||
       existing.description != new_data[:description] ||
       existing.source_url != new_data[:source_url]
   end

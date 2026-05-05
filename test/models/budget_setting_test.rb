@@ -29,6 +29,16 @@ class BudgetSettingTest < ActiveSupport::TestCase
     assert_includes bs.errors[:available_cash], "must be greater than 0"
   end
 
+  test "regulated_region? is true for Seoul and false otherwise" do
+    bs = BudgetSetting.new(user: users(:guest), available_cash: 30000)
+    bs.region = "서울특별시"
+    assert bs.regulated_region?
+    bs.region = "경기도"
+    assert_not bs.regulated_region?
+    bs.region = nil
+    assert_not bs.regulated_region?
+  end
+
   test "loan_ratio must be between 0 and 1" do
     bs = BudgetSetting.new(user: users(:guest), available_cash: 30000, loan_ratio: 1.5)
     assert_not bs.valid?

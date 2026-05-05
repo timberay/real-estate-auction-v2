@@ -32,9 +32,9 @@ class LoanPolicySyncServiceTest < ActiveSupport::TestCase
 
     apt = PropertyType.find_by!(code: "apartment")
     policy = LoanPolicy.find_by!(property_type: apt, policy_name: "경락대출 (1금융)")
-    original_ratio = policy.loan_ratio
 
-    assert_equal 0.8, original_ratio.to_f
+    assert_equal 0.7, policy.loan_ratio.to_f
+    assert_equal 0.4, policy.regulated_loan_ratio.to_f
   end
 
   test "returns summary with synced and skipped counts" do

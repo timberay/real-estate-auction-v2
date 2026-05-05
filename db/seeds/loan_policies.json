@@ -2,22 +2,22 @@
   {
     "property_type_code": "apartment",
     "policies": [
-      { "policy_name": "경락대출 (1금융)", "loan_ratio": 0.8, "description": "시중은행 경락대출 — 감정가 기준 LTV 80% (비규제지역 기준)", "source_url": "https://www.fsc.go.kr", "effective_date": "2026-01-01" },
-      { "policy_name": "경락대출 (2금융)", "loan_ratio": 0.9, "description": "캐피탈·저축은행 경락대출 — 감정가 기준 LTV 90% (금리 높음)", "source_url": "https://www.fsc.go.kr", "effective_date": "2026-01-01" }
+      { "policy_name": "경락대출 (1금융)", "loan_ratio": 0.7, "regulated_loan_ratio": 0.4, "description": "시중은행 경락잔금대출 — 무주택 일반 비규제 70% / 규제 40% (2026.05 기준)", "source_url": "https://www.korea.kr/news/policyNewsView.do?newsId=148951581", "effective_date": "2026-05-01" },
+      { "policy_name": "경락대출 (2금융)", "loan_ratio": 0.8, "regulated_loan_ratio": 0.8, "description": "캐피탈·저축은행·P2P 경락잔금대출 — 비규제/규제 모두 LTV 80%", "source_url": "https://www.korea.kr/news/policyNewsView.do?newsId=148951581", "effective_date": "2026-05-01" }
     ]
   },
   {
     "property_type_code": "villa",
     "policies": [
-      { "policy_name": "경락대출 (1금융)", "loan_ratio": 0.7, "description": "시중은행 경락대출 — 감정가 기준 LTV 70% (비아파트 하향 적용)", "source_url": "https://www.fsc.go.kr", "effective_date": "2026-01-01" },
-      { "policy_name": "경락대출 (2금융)", "loan_ratio": 0.8, "description": "캐피탈·저축은행 경락대출 — 감정가 기준 LTV 80% (금리 높음)", "source_url": "https://www.fsc.go.kr", "effective_date": "2026-01-01" }
+      { "policy_name": "경락대출 (1금융)", "loan_ratio": 0.6, "regulated_loan_ratio": 0.4, "description": "시중은행 경락잔금대출 — 비아파트 실효치 비규제 60% / 규제 40% (방빼기·감정가 차감 반영)", "source_url": "https://www.korea.kr/news/policyNewsView.do?newsId=148951581", "effective_date": "2026-05-01" },
+      { "policy_name": "경락대출 (2금융)", "loan_ratio": 0.7, "regulated_loan_ratio": 0.7, "description": "캐피탈·저축은행·P2P 경락잔금대출 — 환금성 낮아 LTV 70%", "source_url": "https://www.korea.kr/news/policyNewsView.do?newsId=148951581", "effective_date": "2026-05-01" }
     ]
   },
   {
     "property_type_code": "officetel",
     "policies": [
-      { "policy_name": "경락대출 (1금융)", "loan_ratio": 0.7, "description": "시중은행 경락대출 — 감정가 기준 LTV 70% (주거용 인정 시)", "source_url": "https://www.fsc.go.kr", "effective_date": "2026-01-01" },
-      { "policy_name": "경락대출 (2금융)", "loan_ratio": 0.8, "description": "캐피탈·저축은행 경락대출 — 감정가 기준 LTV 80% (금리 높음)", "source_url": "https://www.fsc.go.kr", "effective_date": "2026-01-01" }
+      { "policy_name": "경락대출 (1금융)", "loan_ratio": 0.7, "regulated_loan_ratio": 0.4, "description": "시중은행 경락잔금대출 — 주거용 무주택 비규제 70% / 규제 40%", "source_url": "https://www.korea.kr/news/policyNewsView.do?newsId=148951581", "effective_date": "2026-05-01" },
+      { "policy_name": "경락대출 (2금융)", "loan_ratio": 0.8, "regulated_loan_ratio": 0.8, "description": "캐피탈·저축은행·P2P 경락잔금대출 — 비규제/규제 모두 LTV 80%", "source_url": "https://www.korea.kr/news/policyNewsView.do?newsId=148951581", "effective_date": "2026-05-01" }
     ]
   }
 ]

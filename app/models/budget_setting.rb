@@ -81,4 +81,8 @@ class BudgetSetting < ApplicationRecord
   def effective_region
     region.presence || DEFAULT_REGION
   end
+
+  def regulated_region?
+    LoanPolicy::REGULATED_REGIONS.include?(region)
+  end
 end
