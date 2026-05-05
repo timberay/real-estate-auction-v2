@@ -2,9 +2,10 @@ guest_safe_apartment:
   user: guest
   property: safe_apartment
 
-guest_risky_villa:
+guest_favorited_villa:
   user: guest
   property: risky_villa
+  favorite: true
 
 guest_unanalyzed_officetel:
   user: guest
