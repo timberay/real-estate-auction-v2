@@ -15,8 +15,7 @@ module Sidebar
         MenuItem.new(label: "AI 분석", icon: "document-plus", path: :new_analysis_path, enabled: true, active_paths: [])
       ],
       "가이드" => [
-        MenuItem.new(label: "명도 가이드", icon: "book-open", path: :eviction_guide_guide_path, enabled: true, active_paths: []),
-        MenuItem.new(label: "명도 시뮬레이터", icon: "play", path: :eviction_guide_simulator_path, enabled: true, active_paths: [])
+        MenuItem.new(label: "명도 가이드", icon: "book-open", path: :eviction_guide_guide_path, enabled: true, active_paths: [])
       ]
     }.freeze
 
