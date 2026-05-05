@@ -53,11 +53,17 @@ module Sidebar
       assert_no_text "리포트 내보내기"
     end
 
-    test "renders eviction guide as enabled links" do
+    test "renders eviction guide as enabled link" do
       render_inline(Sidebar::Component.new)
 
       assert_selector "a[href='/eviction_guide']", text: "명도 가이드"
-      assert_selector "a[href='/eviction_guide/simulator']", text: "명도 시뮬레이터"
+    end
+
+    test "does not render 명도 시뮬레이터 sidebar item" do
+      render_inline(Sidebar::Component.new)
+
+      assert_no_text "명도 시뮬레이터"
+      assert_no_selector "a[href='/eviction_guide/simulator']"
     end
 
     test "renders enabled items as links" do

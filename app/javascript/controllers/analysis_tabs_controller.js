@@ -127,13 +127,13 @@ export default class extends Controller {
   }
 
   #activateMethodTab(tab) {
-    tab.classList.add("bg-blue-100", "text-blue-700", "dark:bg-blue-900/50", "dark:text-blue-300")
-    tab.classList.remove("bg-slate-100", "text-slate-600", "hover:bg-slate-200", "dark:bg-slate-700", "dark:text-slate-400", "dark:hover:bg-slate-600")
+    tab.classList.add("border-blue-500", "text-blue-600", "dark:text-blue-400")
+    tab.classList.remove("border-transparent", "text-slate-500", "hover:border-slate-300", "hover:text-slate-700", "dark:text-slate-400", "dark:hover:text-slate-300")
   }
 
   #deactivateMethodTab(tab) {
-    tab.classList.remove("bg-blue-100", "text-blue-700", "dark:bg-blue-900/50", "dark:text-blue-300")
-    tab.classList.add("bg-slate-100", "text-slate-600", "hover:bg-slate-200", "dark:bg-slate-700", "dark:text-slate-400", "dark:hover:bg-slate-600")
+    tab.classList.remove("border-blue-500", "text-blue-600", "dark:text-blue-400")
+    tab.classList.add("border-transparent", "text-slate-500", "hover:border-slate-300", "hover:text-slate-700", "dark:text-slate-400", "dark:hover:text-slate-300")
   }
 
   #enableButton(button) {

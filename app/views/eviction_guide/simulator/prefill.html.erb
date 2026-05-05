@@ -2,6 +2,7 @@
 <%= render EvictionGuide::TabNavigationComponent.new(active_tab: "simulator") %>
 
 <div>
+  <%= render "eviction_guide/simulator/mode_badge", simulation: @simulation %>
   <%= render EvictionGuide::F02PrefillComponent.new(
     prefill_data: @prefill_data,
     simulation: @simulation
