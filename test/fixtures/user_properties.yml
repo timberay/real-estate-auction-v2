@@ -1,12 +1,15 @@
 guest_safe_apartment:
   user: guest
   property: safe_apartment
+  created_at: 2026-01-01 00:00:00
 
 guest_favorited_villa:
   user: guest
   property: risky_villa
   favorite: true
+  created_at: 2026-01-02 00:00:00
 
 guest_unanalyzed_officetel:
   user: guest
   property: unanalyzed_officetel
+  created_at: 2026-01-03 00:00:00
