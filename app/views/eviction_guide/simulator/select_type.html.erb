@@ -2,5 +2,6 @@
 <%= render EvictionGuide::TabNavigationComponent.new(active_tab: "simulator") %>
 
 <div>
+  <%= render "eviction_guide/simulator/mode_badge", simulation: @simulation %>
   <%= render EvictionGuide::OccupantTypeSelectorComponent.new(simulation: @simulation) %>
 </div>

@@ -1,6 +1,8 @@
 <% content_for(:page_title, "명도 시뮬레이터") %>
 <%= render EvictionGuide::TabNavigationComponent.new(active_tab: "simulator") %>
 
+<%= render "eviction_guide/simulator/mode_badge", simulation: @simulation %>
+
 <%= turbo_frame_tag "simulator_question" do %>
   <%= render EvictionGuide::SimulatorQuestionComponent.new(
     question: @question,
