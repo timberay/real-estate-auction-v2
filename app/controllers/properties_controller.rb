@@ -3,7 +3,7 @@ class PropertiesController < ApplicationController
   def index
     @user_properties = current_user.user_properties
       .includes(property: :inspection_results)
-      .order(created_at: :desc)
+      .ordered_for_list
     @user_properties = @user_properties.where(safety_rating: params[:safety_rating]) if params[:safety_rating].present?
     if params[:search].present?
       search_term = "%#{params[:search]}%"
@@ -70,6 +70,21 @@ class PropertiesController < ApplicationController
     respond_to do |format|
       format.turbo_stream { render turbo_stream: turbo_stream.remove(helpers.dom_id(property, :card)) }
       format.html { redirect_to properties_path, notice: "물건을 내 목록에서 삭제했습니다." }
+    end
+  end
+
+  def toggle_favorite
+    user_property = current_user.user_properties.find_by!(property_id: params[:id])
+    user_property.update!(favorite: !user_property.favorite)
+
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace(
+          helpers.dom_id(user_property, :favorite_toggle),
+          FavoriteToggleComponent.new(user_property: user_property)
+        )
+      end
+      format.html { redirect_to properties_path }
     end
   end
 

@@ -36,4 +36,22 @@ class UserPropertyTest < ActiveSupport::TestCase
     up = UserProperty.new(user: users(:budget_user), property: properties(:unanalyzed_officetel))
     assert_nil up.safety_rating
   end
+
+  test "favorite defaults to false" do
+    up = UserProperty.new(user: users(:budget_user), property: properties(:unanalyzed_officetel))
+    assert_equal false, up.favorite
+  end
+
+  test "ordered_for_list sorts favorites first, then by created_at desc" do
+    user = users(:guest)
+    results = user.user_properties.ordered_for_list.to_a
+
+    favorited = results.select(&:favorite)
+    non_favorited = results.reject(&:favorite)
+
+    assert_equal results[0...favorited.size], favorited,
+      "favorited items should appear first"
+    assert_equal non_favorited.sort_by { |up| -up.created_at.to_i }, non_favorited,
+      "non-favorited items should be ordered by created_at desc"
+  end
 end

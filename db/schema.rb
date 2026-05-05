@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_05_111107) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_05_111108) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -348,11 +348,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_05_111107) do
   create_table "user_properties", force: :cascade do |t|
     t.datetime "analyzed_at"
     t.datetime "created_at", null: false
+    t.boolean "favorite", default: false, null: false
     t.integer "property_id", null: false
     t.integer "safety_rating"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["property_id"], name: "index_user_properties_on_property_id"
+    t.index ["user_id", "favorite", "created_at"], name: "index_user_properties_on_user_favorite_created"
     t.index ["user_id", "property_id"], name: "index_user_properties_on_user_id_and_property_id", unique: true
     t.index ["user_id"], name: "index_user_properties_on_user_id"
   end

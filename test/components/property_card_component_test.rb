@@ -95,4 +95,16 @@ class PropertyCardComponentTest < ViewComponent::TestCase
     render_inline(PropertyCardComponent.new(property: property))
     assert_no_text "AI 분석완료"
   end
+
+  test "renders FavoriteToggleComponent when user_property is given" do
+    up = user_properties(:guest_safe_apartment)
+    render_inline(PropertyCardComponent.new(property: up.property, user_property: up))
+    assert_selector "##{ActionView::RecordIdentifier.dom_id(up, :favorite_toggle)}"
+  end
+
+  test "does not render FavoriteToggleComponent when user_property is nil" do
+    property = properties(:safe_apartment)
+    render_inline(PropertyCardComponent.new(property: property))
+    assert_no_selector "[id$='_favorite_toggle']"
+  end
 end

@@ -200,4 +200,55 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_includes assigns(:user_properties).map(&:property), properties(:safe_apartment)
   end
+
+  test "PATCH toggle_favorite flips favorite flag and returns turbo_stream" do
+    property = user_properties(:guest_safe_apartment).property
+    assert_equal false, user_properties(:guest_safe_apartment).favorite
+
+    patch toggle_favorite_property_url(property),
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :success
+    assert_equal "text/vnd.turbo-stream.html", response.media_type
+    assert_equal true, user_properties(:guest_safe_apartment).reload.favorite
+  end
+
+  test "PATCH toggle_favorite is idempotent on second call (toggles back)" do
+    property = user_properties(:guest_safe_apartment).property
+
+    patch toggle_favorite_property_url(property),
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    patch toggle_favorite_property_url(property),
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_equal false, user_properties(:guest_safe_apartment).reload.favorite
+  end
+
+  test "PATCH toggle_favorite redirects on HTML format (Turbo fallback)" do
+    property = user_properties(:guest_safe_apartment).property
+
+    patch toggle_favorite_property_url(property)
+
+    assert_redirected_to properties_path
+  end
+
+  test "PATCH toggle_favorite returns 404 for property not in user's list" do
+    other_property = Property.create!(
+      case_number: "9999타경99999", court_name: "테스트법원", address: "테스트"
+    )
+
+    patch toggle_favorite_property_url(other_property)
+    assert_response :not_found
+  end
+
+  test "GET index returns favorited user_properties before non-favorited" do
+    get properties_url
+
+    assert_response :success
+    body = response.body
+    favorited_pos = body.index(user_properties(:guest_favorited_villa).property.case_number)
+    non_favorited_pos = body.index(user_properties(:guest_safe_apartment).property.case_number)
+    assert favorited_pos < non_favorited_pos,
+      "favorited card should appear before non-favorited in HTML"
+  end
 end

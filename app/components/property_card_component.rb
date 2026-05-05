@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 class PropertyCardComponent < ViewComponent::Base
-  def initialize(property:, safety_rating: nil, max_bid_amount: nil, analyzed: false)
+  def initialize(property:, safety_rating: nil, max_bid_amount: nil, analyzed: false, user_property: nil)
     @property = property
     @safety_rating = safety_rating
     @max_bid_amount = max_bid_amount
     @analyzed = analyzed
+    @user_property = user_property
   end
 
   private

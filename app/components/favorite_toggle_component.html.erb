@@ -1,0 +1,16 @@
+<div id="<%= wrapper_id %>" class="inline-flex">
+  <%= button_to toggle_favorite_property_path(@user_property.property),
+        method: :patch,
+        aria: { label: aria_label, pressed: favorited? },
+        class: button_classes do %>
+    <% if favorited? %>
+      <svg data-favorite-state="on" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.5l7.1-.6L12 2z"/>
+      </svg>
+    <% else %>
+      <svg data-favorite-state="off" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.5l7.1-.6L12 2z"/>
+      </svg>
+    <% end %>
+  <% end %>
+</div>
