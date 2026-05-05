@@ -117,6 +117,44 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to settings_budget_url
   end
 
+  test "step3 renders regulated LTV when region is Seoul" do
+    get start_onboarding_url
+    post step1_onboarding_url, params: { budget_setting: { available_cash: 30000, region: "서울특별시" } }
+
+    apt = property_types(:apartment)
+    post step2_onboarding_url, params: {
+      budget_setting: {
+        property_type_id: apt.id, area_category: "mid",
+        repair_cost: 500, acquisition_tax: 360,
+        scrivener_fee: 80, moving_cost: 150, maintenance_fee: 50
+      }
+    }
+    assert_response :success
+    # The radio input itself carries the region-appropriate ratio
+    assert_select "input[type='radio'][name='budget_setting[loan_policy_id]'][data-loan-ratio='0.4']"
+    # And the visible LTV span next to the radio name shows the regulated rate
+    assert_select "span.font-medium", text: "경락대출 (1금융)"
+    assert_select "input[type='range'][value='40']"
+  end
+
+  test "step3 renders non-regulated LTV when region is not Seoul" do
+    get start_onboarding_url
+    post step1_onboarding_url, params: { budget_setting: { available_cash: 30000, region: "경기도" } }
+
+    apt = property_types(:apartment)
+    post step2_onboarding_url, params: {
+      budget_setting: {
+        property_type_id: apt.id, area_category: "mid",
+        repair_cost: 500, acquisition_tax: 360,
+        scrivener_fee: 80, moving_cost: 150, maintenance_fee: 50
+      }
+    }
+    assert_response :success
+    # The radio input carries the non-regulated ratio
+    assert_select "input[type='radio'][name='budget_setting[loan_policy_id]'][data-loan-ratio='0.7']"
+    assert_select "span.font-medium", text: "경락대출 (1금융)"
+  end
+
   test "GET complete shows results" do
     get start_onboarding_url
     guest = User.find(session[:user_id])

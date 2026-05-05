@@ -16,12 +16,17 @@
 
 <%
   loan_policies_payload = @loan_policies_by_type.transform_values do |policies|
-    policies.map { |p| { id: p.id, policy_name: p.policy_name, loan_ratio: p.loan_ratio.to_f } }
+    policies.map do |p|
+      { id: p.id, policy_name: p.policy_name,
+        loan_ratio: p.loan_ratio.to_f,
+        regulated_loan_ratio: p.regulated_loan_ratio.to_f }
+    end
   end
 %>
 <%= form_with model: @setting, url: settings_budget_path, method: :patch,
     data: { controller: "budget-calculator",
-            budget_calculator_loan_policies_by_type_value: loan_policies_payload.to_json } do |f| %>
+            budget_calculator_loan_policies_by_type_value: loan_policies_payload.to_json,
+            budget_calculator_regulated_regions_value: LoanPolicy::REGULATED_REGIONS.to_json } do |f| %>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <%# Left column — small settings %>
@@ -33,7 +38,7 @@
             options_for_select(BudgetSetting::REGIONS, @setting.effective_region),
             {},
             class: "flex-1 h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
-            data: { controller: "region-select", region_select_url_value: update_region_settings_budget_path, region_select_target: "select", action: "change->region-select#save" } %>
+            data: { controller: "region-select", region_select_url_value: update_region_settings_budget_path, region_select_target: "select", action: "change->region-select#save change->budget-calculator#regionChanged" } %>
         </div>
       <% end %>
 
@@ -55,13 +60,14 @@
         <div class="mb-4">
           <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">대출 정책</label>
           <div class="space-y-2" data-budget-calculator-target="loanPolicyList">
-            <% @loan_policies.each do |policy| %>
+            <% @loan_policies.each do |policy|
+              effective_ratio = policy.ratio_for(@setting.effective_region) %>
               <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors">
                 <%= f.radio_button :loan_policy_id, policy.id, class: "text-blue-600",
-                    data: { action: "change->budget-calculator#applyPolicy", loan_ratio: policy.loan_ratio } %>
+                    data: { action: "change->budget-calculator#applyPolicy", loan_ratio: effective_ratio } %>
                 <div>
                   <span class="font-medium text-slate-900 dark:text-slate-100"><%= policy.policy_name %></span>
-                  <span class="text-sm text-slate-500 dark:text-slate-400 ml-2">LTV <%= (policy.loan_ratio * 100).to_i %>%</span>
+                  <span class="text-sm text-slate-500 dark:text-slate-400 ml-2">LTV <%= (effective_ratio * 100).to_i %>%</span>
                 </div>
               </label>
             <% end %>
@@ -73,13 +79,13 @@
             <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">대출 비율 (LTV)</label>
             <span class="text-sm font-semibold text-slate-900 dark:text-slate-100 tabular-nums" data-budget-calculator-target="loanRatioDisplay"><%= (@setting.loan_ratio.to_f * 100).to_i %>%</span>
           </div>
-          <input type="range" min="50" max="100" step="1"
+          <input type="range" min="30" max="100" step="1"
                  value="<%= (@setting.loan_ratio.to_f * 100).to_i %>"
                  data-budget-calculator-target="loanRatioSlider"
                  data-action="input->budget-calculator#slideLoanRatio"
                  class="w-full accent-blue-600">
           <div class="flex justify-between text-sm text-slate-400 dark:text-slate-500 mt-1">
-            <span>50%</span>
+            <span>30%</span>
             <span>100%</span>
           </div>
           <%= f.hidden_field :loan_ratio, data: { budget_calculator_target: "loanRatioHidden" } %>

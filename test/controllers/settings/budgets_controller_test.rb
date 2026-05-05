@@ -65,7 +65,66 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
     PropertyType.enabled.ordered.each do |pt|
       policies = payload[pt.id.to_s]
       assert policies.present?, "expected payload to include policies for property type #{pt.code}"
-      policies.each { |p| assert_kind_of Numeric, p["loan_ratio"] }
+      policies.each do |p|
+        assert_kind_of Numeric, p["loan_ratio"]
+        assert_kind_of Numeric, p["regulated_loan_ratio"]
+      end
+    end
+  end
+
+  test "GET show exposes the regulated regions list for client-side switching" do
+    get settings_budget_url
+    assert_response :success
+
+    form = css_select("[data-budget-calculator-regulated-regions-value]").first
+    assert form, "expected form to expose regulated regions"
+    regions = JSON.parse(form["data-budget-calculator-regulated-regions-value"])
+    assert_includes regions, "서울특별시"
+  end
+
+  test "GET show wires the region select to the budget-calculator stimulus action" do
+    get settings_budget_url
+    assert_response :success
+
+    select = css_select("select[name='budget_setting[region]']").first
+    assert select, "expected region select to be rendered"
+    assert_includes select["data-action"].to_s, "change->budget-calculator#regionChanged"
+  end
+
+  test "GET show renders LTV using regulated rate when region is Seoul" do
+    @setting.update!(
+      region: "서울특별시",
+      property_type: property_types(:apartment),
+      loan_policy: loan_policies(:auction_bank_apartment),
+      loan_ratio: 0.4
+    )
+
+    get settings_budget_url
+    assert_response :success
+
+    # Apartment 1금융 비규제 70% / 규제 40% — Seoul should display 40%
+    assert_select "[data-budget-calculator-target='loanRatioDisplay']", text: "40%"
+    assert_select "input[type='range'][data-budget-calculator-target='loanRatioSlider'][value='40']"
+    # The radio label should reflect the regulated LTV
+    assert_select "[data-budget-calculator-target='loanPolicyList']" do
+      assert_select "label", text: /경락대출 \(1금융\).*LTV 40%/m
+    end
+  end
+
+  test "GET show renders LTV using non-regulated rate when region is not Seoul" do
+    @setting.update!(
+      region: "경기도",
+      property_type: property_types(:apartment),
+      loan_policy: loan_policies(:auction_bank_apartment),
+      loan_ratio: 0.7
+    )
+
+    get settings_budget_url
+    assert_response :success
+
+    assert_select "[data-budget-calculator-target='loanRatioDisplay']", text: "70%"
+    assert_select "[data-budget-calculator-target='loanPolicyList']" do
+      assert_select "label", text: /경락대출 \(1금융\).*LTV 70%/m
     end
   end
 
@@ -107,10 +166,10 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-budget-calculator-target='loanRatioDisplay']", text: "80%"
   end
 
-  test "GET show renders the LTV slider with min=50, max=100" do
+  test "GET show renders the LTV slider with min=30, max=100 (covers regulated 40% floor)" do
     get settings_budget_url
     assert_response :success
-    assert_select "input[type='range'][min='50'][max='100'][data-budget-calculator-target='loanRatioSlider']"
+    assert_select "input[type='range'][min='30'][max='100'][data-budget-calculator-target='loanRatioSlider']"
   end
 
   test "GET show does not persist the remap to the database" do

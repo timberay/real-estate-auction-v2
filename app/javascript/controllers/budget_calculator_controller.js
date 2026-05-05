@@ -4,14 +4,17 @@ import { Controller } from "@hotwired/stimulus"
 // Recalculates max bid amount in real-time as the user edits budget fields.
 // Formula: max_bid_amount = (available_cash - total_reserves) / (1 - loan_ratio)
 //
-// Also handles two coupled UI behaviors:
-//   - LTV slider (50–100%) syncs the hidden loan_ratio field and the % display.
-//   - When property type changes, the loan policy radios re-render with that
+// Also handles three coupled UI behaviors:
+//   - LTV slider syncs the hidden loan_ratio field and the % display.
+//   - Property type changes re-render the loan policy radios with that
 //     type's policies, preserving the user's 1금융 / 2금융 selection by name.
+//   - Region changes flip every policy's LTV between non-regulated and
+//     regulated rates (서울특별시 = regulated).
 export default class extends Controller {
   static targets = ["display", "loanPolicyList", "loanRatioSlider", "loanRatioDisplay", "loanRatioHidden"]
   static values = {
-    loanPoliciesByType: { type: Object, default: {} }
+    loanPoliciesByType: { type: Object, default: {} },
+    regulatedRegions: { type: Array, default: [] }
   }
 
   connect() {
@@ -39,16 +42,38 @@ export default class extends Controller {
     const policies = this.loanPoliciesByTypeValue[newTypeId] || []
     const previousName = this.currentSelectedPolicyName()
 
-    this.loanPolicyListTarget.innerHTML = policies.map(p => this.policyRadioHTML(p, previousName)).join("")
+    this.renderPolicies(policies, previousName)
 
     const selected = policies.find(p => p.policy_name === previousName) || policies[0]
-    if (selected) this.setLoanRatio(selected.loan_ratio)
+    if (selected) this.setLoanRatio(this.policyRatio(selected))
     this.calculate()
   }
 
-  policyRadioHTML(policy, previousName) {
-    const checked = policy.policy_name === previousName ? "checked" : ""
-    const ltv = Math.round(policy.loan_ratio * 100)
+  // Re-render the radio labels (LTV %) and reset slider to the current
+  // policy's region-appropriate ratio when the user picks a new region.
+  regionChanged() {
+    if (!this.hasLoanPolicyListTarget) return
+
+    const propertyTypeSelect = this.element.querySelector("select[name='budget_setting[property_type_id]']")
+    const typeId = String(propertyTypeSelect?.value || "")
+    const policies = this.loanPoliciesByTypeValue[typeId] || []
+    const previousName = this.currentSelectedPolicyName()
+
+    this.renderPolicies(policies, previousName)
+
+    const selected = policies.find(p => p.policy_name === previousName) || policies[0]
+    if (selected) this.setLoanRatio(this.policyRatio(selected))
+    this.calculate()
+  }
+
+  renderPolicies(policies, selectedName) {
+    this.loanPolicyListTarget.innerHTML = policies.map(p => this.policyRadioHTML(p, selectedName)).join("")
+  }
+
+  policyRadioHTML(policy, selectedName) {
+    const ratio = this.policyRatio(policy)
+    const checked = policy.policy_name === selectedName ? "checked" : ""
+    const ltv = Math.round(ratio * 100)
     return `
       <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors">
         <input type="radio"
@@ -57,7 +82,7 @@ export default class extends Controller {
                value="${policy.id}"
                class="text-blue-600"
                data-action="change->budget-calculator#applyPolicy"
-               data-loan-ratio="${policy.loan_ratio}"
+               data-loan-ratio="${ratio}"
                ${checked}>
         <div>
           <span class="font-medium text-slate-900 dark:text-slate-100">${policy.policy_name}</span>
@@ -65,6 +90,17 @@ export default class extends Controller {
         </div>
       </label>
     `
+  }
+
+  // Returns the region-appropriate ratio for a policy based on the currently
+  // selected region. Falls back to the non-regulated rate if the region select
+  // is missing or its value isn't in the regulated list.
+  policyRatio(policy) {
+    const regionSelect = this.element.querySelector("select[name='budget_setting[region]']")
+    const region = regionSelect?.value
+    const regulated = region && this.regulatedRegionsValue.includes(region)
+    const ratio = regulated ? policy.regulated_loan_ratio : policy.loan_ratio
+    return Number.isFinite(ratio) ? ratio : policy.loan_ratio
   }
 
   currentSelectedPolicyName() {
