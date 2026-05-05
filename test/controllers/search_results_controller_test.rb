@@ -87,6 +87,33 @@ class SearchResultsControllerTest < ActionDispatch::IntegrationTest
     assert_match "목록에 추가", flash[:notice]
   end
 
+  test "POST import backfills missing court info on existing property when search_result has it" do
+    # Existing property predates the court_code/court_name columns and has nils
+    property = Property.create!(case_number: "2025타경7777", address: "제주", appraisal_price: 100_000_000, min_bid_price: 80_000_000)
+    assert_nil property.court_code
+    assert_nil property.court_name
+
+    sr = @user.search_results.create!(case_number: "2025타경7777", court_code: "B000530", court_name: "제주지방법원", address: "제주", appraisal_price: 100_000_000, min_bid_price: 80_000_000)
+
+    post import_search_result_url(sr)
+    assert_redirected_to properties_path
+
+    property.reload
+    assert_equal "B000530", property.court_code
+    assert_equal "제주지방법원", property.court_name
+  end
+
+  test "POST import does not overwrite existing court info" do
+    property = Property.create!(case_number: "2025타경8888", court_code: "B000280", court_name: "대전지방법원", address: "대전", appraisal_price: 100_000_000, min_bid_price: 80_000_000)
+    sr = @user.search_results.create!(case_number: "2025타경8888", court_code: "B000530", court_name: "제주지방법원", address: "대전", appraisal_price: 100_000_000, min_bid_price: 80_000_000)
+
+    post import_search_result_url(sr)
+
+    property.reload
+    assert_equal "B000280", property.court_code
+    assert_equal "대전지방법원", property.court_name
+  end
+
   test "index assigns paginated search results and existing case numbers" do
     10.times do |i|
       @user.search_results.create!(case_number: "2024타경#{1000 + i}", court_code: "B000210", court_name: "서울지법", address: "주소 #{i}", appraisal_price: 100_000_000, min_bid_price: 80_000_000)
