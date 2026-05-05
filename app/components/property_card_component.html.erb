@@ -70,5 +70,9 @@
       </svg>
       삭제
     <% end %>
+
+    <% if @user_property %>
+      <%= render FavoriteToggleComponent.new(user_property: @user_property) %>
+    <% end %>
   </div>
 <% end %>
