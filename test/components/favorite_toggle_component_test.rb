@@ -10,6 +10,7 @@ class FavoriteToggleComponentTest < ViewComponent::TestCase
     assert_selector "button[aria-label='즐겨찾기 추가']"
     assert_selector "button[aria-pressed='false']"
     assert_selector "svg[data-favorite-state='off']"
+    assert_no_selector "svg[data-favorite-state='on']"
   end
 
   test "renders solid star + 즐겨찾기 해제 label when favorited" do
@@ -19,6 +20,7 @@ class FavoriteToggleComponentTest < ViewComponent::TestCase
     assert_selector "button[aria-label='즐겨찾기 해제']"
     assert_selector "button[aria-pressed='true']"
     assert_selector "svg[data-favorite-state='on']"
+    assert_no_selector "svg[data-favorite-state='off']"
   end
 
   test "wraps in dom_id for turbo replacement" do
