@@ -35,8 +35,8 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
         post properties_url, params: { court_code: "B000530", case_number: "2022타경564" }
       end
     end
-    property = Property.find_by(case_number: "2022타경564")
-    assert_redirected_to property_path(property)
+    assert Property.find_by(case_number: "2022타경564")
+    assert_redirected_to properties_path
     follow_redirect!
     assert_match "내 목록에 추가했습니다", flash[:notice]
   end
@@ -48,7 +48,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     stub_request(:post, ENDPOINT).to_return(status: 200, body: body.to_json)
 
     post properties_url, params: { court_code: "B000530", case_number: "2026타경10001" }
-    assert_redirected_to property_path(properties(:safe_apartment))
+    assert_redirected_to properties_path
     follow_redirect!
     assert_match "내 목록에 추가했습니다", flash[:notice]
   end

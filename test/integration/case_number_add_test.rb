@@ -21,11 +21,11 @@ class CaseNumberAddTest < ActionDispatch::IntegrationTest
 
     # Submit form
     post properties_path, params: { court_code: "B000530", case_number: "2022타경564" }
-    follow_redirect!  # -> property_path (show redirects to analyses/new)
-    follow_redirect!  # -> analyses/new
+    follow_redirect!  # -> properties_path (my-list)
 
-    # Analysis page shows the new property's case number
+    # The list page now shows the newly registered case number
     assert_response :success
+    assert_match "내 목록에 추가했습니다", response.body
     assert_match "2022타경564", response.body
   end
 
