@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_04_121928) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_05_102644) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -233,6 +233,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_04_121928) do
     t.decimal "loan_ratio", precision: 3, scale: 2, null: false
     t.string "policy_name", null: false
     t.integer "property_type_id", null: false
+    t.decimal "regulated_loan_ratio", precision: 3, scale: 2, null: false
     t.string "source_url"
     t.datetime "updated_at", null: false
     t.index ["property_type_id", "enabled"], name: "index_loan_policies_on_property_type_id_and_enabled"

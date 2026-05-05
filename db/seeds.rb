@@ -43,6 +43,7 @@ loan_data.each do |group|
       policy_name: attrs["policy_name"]
     ) do |lp|
       lp.loan_ratio = attrs["loan_ratio"]
+      lp.regulated_loan_ratio = attrs["regulated_loan_ratio"]
       lp.description = attrs["description"]
       lp.source_url = attrs["source_url"]
       lp.effective_date = Date.parse(attrs["effective_date"])

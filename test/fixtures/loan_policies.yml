@@ -1,17 +1,59 @@
 auction_bank_apartment:
   property_type: apartment
   policy_name: "경락대출 (1금융)"
-  loan_ratio: 0.8
-  description: "시중은행 경락대출 — 감정가 기준 LTV 80%"
-  effective_date: "2026-01-01"
+  loan_ratio: 0.7
+  regulated_loan_ratio: 0.4
+  description: "시중은행 경락대출 — 비규제 LTV 70% / 규제 LTV 40%"
+  effective_date: "2026-05-01"
   expiry_date:
   enabled: true
 
 auction_capital_apartment:
   property_type: apartment
   policy_name: "경락대출 (2금융)"
-  loan_ratio: 0.9
-  description: "캐피탈·저축은행 경락대출 — 감정가 기준 LTV 90%"
-  effective_date: "2026-01-01"
+  loan_ratio: 0.8
+  regulated_loan_ratio: 0.8
+  description: "캐피탈·저축은행·P2P 경락잔금대출 — 비규제/규제 모두 LTV 80%"
+  effective_date: "2026-05-01"
+  expiry_date:
+  enabled: true
+
+auction_bank_officetel:
+  property_type: officetel
+  policy_name: "경락대출 (1금융)"
+  loan_ratio: 0.7
+  regulated_loan_ratio: 0.4
+  description: "시중은행 경락대출 — 주거용 무주택 기준 비규제 70% / 규제 40%"
+  effective_date: "2026-05-01"
+  expiry_date:
+  enabled: true
+
+auction_capital_officetel:
+  property_type: officetel
+  policy_name: "경락대출 (2금융)"
+  loan_ratio: 0.8
+  regulated_loan_ratio: 0.8
+  description: "캐피탈·저축은행·P2P 경락잔금대출 — 비규제/규제 모두 LTV 80%"
+  effective_date: "2026-05-01"
+  expiry_date:
+  enabled: true
+
+auction_bank_villa:
+  property_type: villa
+  policy_name: "경락대출 (1금융)"
+  loan_ratio: 0.6
+  regulated_loan_ratio: 0.4
+  description: "시중은행 경락대출 — 비아파트 실효치 비규제 60% / 규제 40%"
+  effective_date: "2026-05-01"
+  expiry_date:
+  enabled: true
+
+auction_capital_villa:
+  property_type: villa
+  policy_name: "경락대출 (2금융)"
+  loan_ratio: 0.7
+  regulated_loan_ratio: 0.7
+  description: "캐피탈·저축은행·P2P 경락잔금대출 — 환금성 낮음 비규제/규제 70%"
+  effective_date: "2026-05-01"
   expiry_date:
   enabled: true

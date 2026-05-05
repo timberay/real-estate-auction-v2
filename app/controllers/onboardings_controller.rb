@@ -121,5 +121,9 @@ class OnboardingsController < ApplicationController
 
   def load_step3_data
     @loan_policies = LoanPolicy.active.for_property_type(@setting.property_type_id)
+    return if @setting.loan_ratio.present?
+
+    default_policy = @loan_policies.first
+    @setting.loan_ratio = default_policy.ratio_for(@setting.effective_region) if default_policy
   end
 end

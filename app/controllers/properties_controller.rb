@@ -53,7 +53,7 @@ class PropertiesController < ApplicationController
 
     property = result.properties.first
     current_user.user_properties.find_or_create_by!(property: property)
-    redirect_to property_path(property), notice: "내 목록에 추가했습니다."
+    redirect_to properties_path, notice: "내 목록에 추가했습니다."
   end
 
   def destroy
