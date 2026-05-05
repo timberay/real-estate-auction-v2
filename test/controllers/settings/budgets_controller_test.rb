@@ -53,6 +53,31 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
     assert_equal BudgetSetting::DEFAULT_REGION, @setting.reload.region
   end
 
+  test "GET show exposes loan policies for every enabled property type as JSON for client-side switching" do
+    get settings_budget_url
+    assert_response :success
+
+    payload_attr = css_select("[data-budget-calculator-loan-policies-by-type-value]").first
+    assert payload_attr, "expected the form to expose loan policies grouped by property type"
+
+    payload = JSON.parse(payload_attr["data-budget-calculator-loan-policies-by-type-value"])
+
+    PropertyType.enabled.ordered.each do |pt|
+      policies = payload[pt.id.to_s]
+      assert policies.present?, "expected payload to include policies for property type #{pt.code}"
+      policies.each { |p| assert_kind_of Numeric, p["loan_ratio"] }
+    end
+  end
+
+  test "GET show wires the property type select to the budget-calculator stimulus action" do
+    get settings_budget_url
+    assert_response :success
+
+    select = css_select("select[name='budget_setting[property_type_id]']").first
+    assert select, "expected property type select to be rendered"
+    assert_includes select["data-action"].to_s, "change->budget-calculator#propertyTypeChanged"
+  end
+
   test "GET show checks the radio for an equivalent policy when loan_policy_id is stale across property types" do
     @setting.update!(
       property_type: property_types(:officetel),
@@ -65,6 +90,27 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
     expected_policy = loan_policies(:auction_capital_officetel)
     assert_select "input[type='radio'][name='budget_setting[loan_policy_id]'][value=?][checked='checked']",
                   expected_policy.id.to_s
+  end
+
+  test "GET show remaps loan_ratio along with loan_policy_id when stale" do
+    @setting.update!(
+      property_type: property_types(:officetel),
+      loan_policy: loan_policies(:auction_capital_apartment), # apartment 2금융 (0.9)
+      loan_ratio: 0.9
+    )
+
+    get settings_budget_url
+    assert_response :success
+
+    # officetel 2금융 = 0.8, slider should reflect 80%
+    assert_select "input[type='range'][data-budget-calculator-target='loanRatioSlider'][value='80']"
+    assert_select "[data-budget-calculator-target='loanRatioDisplay']", text: "80%"
+  end
+
+  test "GET show renders the LTV slider with min=50, max=100" do
+    get settings_budget_url
+    assert_response :success
+    assert_select "input[type='range'][min='50'][max='100'][data-budget-calculator-target='loanRatioSlider']"
   end
 
   test "GET show does not persist the remap to the database" do

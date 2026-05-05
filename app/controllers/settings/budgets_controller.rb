@@ -61,7 +61,10 @@ module Settings
 
     def load_show_data
       @property_types = PropertyType.enabled.ordered
-      @loan_policies = LoanPolicy.active.for_property_type(@setting.property_type_id)
+      @loan_policies_by_type = LoanPolicy.active
+        .where(property_type_id: @property_types.pluck(:id))
+        .group_by(&:property_type_id)
+      @loan_policies = @loan_policies_by_type[@setting.property_type_id] || []
       remap_stale_loan_policy
       @reserve_defaults = ReserveFundDefault.where(
         property_type_id: @property_types.pluck(:id)
@@ -74,13 +77,16 @@ module Settings
     # DB stays as-is until the user submits the form.
     def remap_stale_loan_policy
       return if @setting.loan_policy_id.blank?
-      return if @loan_policies.exists?(id: @setting.loan_policy_id)
+      return if @loan_policies.any? { |p| p.id == @setting.loan_policy_id }
 
       stale_policy = LoanPolicy.find_by(id: @setting.loan_policy_id)
       return unless stale_policy
 
-      equivalent = @loan_policies.find_by(policy_name: stale_policy.policy_name)
-      @setting.loan_policy_id = equivalent.id if equivalent
+      equivalent = @loan_policies.find { |p| p.policy_name == stale_policy.policy_name }
+      return unless equivalent
+
+      @setting.loan_policy_id = equivalent.id
+      @setting.loan_ratio = equivalent.loan_ratio
     end
 
     def budget_params

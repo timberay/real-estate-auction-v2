@@ -14,8 +14,14 @@
   </div>
 <% end %>
 
+<%
+  loan_policies_payload = @loan_policies_by_type.transform_values do |policies|
+    policies.map { |p| { id: p.id, policy_name: p.policy_name, loan_ratio: p.loan_ratio.to_f } }
+  end
+%>
 <%= form_with model: @setting, url: settings_budget_path, method: :patch,
-    data: { controller: "budget-calculator" } do |f| %>
+    data: { controller: "budget-calculator",
+            budget_calculator_loan_policies_by_type_value: loan_policies_payload.to_json } do |f| %>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <%# Left column — small settings %>
@@ -48,7 +54,7 @@
       <%= render CardComponent.new(title: "대출 정책") do %>
         <div class="mb-4">
           <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">대출 정책</label>
-          <div class="space-y-2">
+          <div class="space-y-2" data-budget-calculator-target="loanPolicyList">
             <% @loan_policies.each do |policy| %>
               <label class="flex items-center gap-3 p-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors">
                 <%= f.radio_button :loan_policy_id, policy.id, class: "text-blue-600",
@@ -63,10 +69,20 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">대출 비율 (LTV)</label>
-          <%= f.number_field :loan_ratio, step: 0.01, min: 0, max: 1,
-            data: { action: "input->budget-calculator#calculate" },
-            class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" %>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">대출 비율 (LTV)</label>
+            <span class="text-sm font-semibold text-slate-900 dark:text-slate-100 tabular-nums" data-budget-calculator-target="loanRatioDisplay"><%= (@setting.loan_ratio.to_f * 100).to_i %>%</span>
+          </div>
+          <input type="range" min="50" max="100" step="1"
+                 value="<%= (@setting.loan_ratio.to_f * 100).to_i %>"
+                 data-budget-calculator-target="loanRatioSlider"
+                 data-action="input->budget-calculator#slideLoanRatio"
+                 class="w-full accent-blue-600">
+          <div class="flex justify-between text-sm text-slate-400 dark:text-slate-500 mt-1">
+            <span>50%</span>
+            <span>100%</span>
+          </div>
+          <%= f.hidden_field :loan_ratio, data: { budget_calculator_target: "loanRatioHidden" } %>
         </div>
       <% end %>
     </div>
@@ -85,7 +101,7 @@
                 { prompt: "선택하세요" },
                 { class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
                   data: { reserve_fund_target: "propertyType",
-                          action: "change->reserve-fund#propertyTypeChanged" } } %>
+                          action: "change->reserve-fund#propertyTypeChanged change->budget-calculator#propertyTypeChanged" } } %>
             </div>
 
             <div>
