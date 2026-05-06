@@ -18,7 +18,14 @@ class AnalysesController < ApplicationController
     render json: { prompt: prompts[:system] + "\n\n" + prompts[:user] }
   end
 
+  MAX_MANUAL_JSON_SIZE = 1.megabyte
+
   def manual
+    if params[:json_file].present? && params[:json_file].size > MAX_MANUAL_JSON_SIZE
+      redirect_to new_analysis_path(tab: "manual"), alert: "JSON 파일은 1MB를 초과할 수 없습니다."
+      return
+    end
+
     json_string = if params[:json_file].present?
       extract_json(params[:json_file].read.force_encoding("UTF-8"))
     elsif params[:json_text].present?

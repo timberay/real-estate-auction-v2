@@ -1,10 +1,15 @@
 module Inspections
   class StartController < ApplicationController
     include PropertyScopable
+    include PdfUploadValidatable
     before_action :set_user_property
 
     def create
       if params[:documents].present?
+        if (err = validate_pdf_uploads(params[:documents]))
+          redirect_to property_path(@property), alert: err
+          return
+        end
         @property.documents.attach(params[:documents])
       end
 

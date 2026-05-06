@@ -132,6 +132,49 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     assert_not_equal "유효한 JSON 파일이 아닙니다. JSON만 포함된 파일인지 확인해주세요.", flash[:alert]
   end
 
+  test "POST manual rejects json_file larger than 1MB" do
+    big_json = Rack::Test::UploadedFile.new(
+      StringIO.new("a" * (1.megabyte + 1)),
+      "application/json",
+      original_filename: "huge.json"
+    )
+
+    post manual_analyses_path, params: { json_file: big_json }
+
+    assert_redirected_to new_analysis_path(tab: "manual")
+    assert_match(/1MB/, flash[:alert])
+  end
+
+  test "POST create rejects oversized PDF (over 5MB)" do
+    big_pdf = Rack::Test::UploadedFile.new(
+      StringIO.new("%PDF-" + ("a" * 5.megabytes)),
+      "application/pdf",
+      original_filename: "huge.pdf"
+    )
+
+    assert_no_enqueued_jobs only: PdfAnalysisJob do
+      post analyses_path, params: { documents: [ big_pdf ] }
+    end
+
+    assert_redirected_to new_analysis_path
+    assert_match(/5MB/, flash[:alert])
+  end
+
+  test "POST create rejects PDF with wrong magic bytes" do
+    fake_pdf = Rack::Test::UploadedFile.new(
+      StringIO.new("<html>nope</html>"),
+      "application/pdf",
+      original_filename: "evil.pdf"
+    )
+
+    assert_no_enqueued_jobs only: PdfAnalysisJob do
+      post analyses_path, params: { documents: [ fake_pdf ] }
+    end
+
+    assert_redirected_to new_analysis_path
+    assert_match(/PDF 형식/, flash[:alert])
+  end
+
   test "POST manual with JSON missing case_number shows alert and stays on manual tab" do
     json_content = { "metadata" => { "address" => "test" }, "results" => {} }.to_json
     file = Rack::Test::UploadedFile.new(
