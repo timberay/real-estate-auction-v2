@@ -66,11 +66,6 @@ class IdorProtectionTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "PATCH /properties/:id/inspections/dividend returns 404 for other user's property" do
-    patch property_inspections_dividend_url(@other_property), params: { expected_bid: "10000" }
-    assert_response :not_found
-  end
-
   test "PATCH /properties/:id/inspections/source_doc_review returns 404 for other user's property" do
     patch property_inspections_source_doc_review_url(@other_property)
     assert_response :not_found

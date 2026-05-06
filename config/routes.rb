@@ -63,7 +63,6 @@ Rails.application.routes.draw do
       resource :start, only: [ :create ], controller: "start"
       resources :tabs, only: [ :edit, :update ], param: :tab_key
       resource :grade, only: [ :show ], controller: "grades"
-      resource :dividend, only: [ :update ], controller: "dividends"
       resource :source_doc_review, only: [ :update ], controller: "source_doc_reviews"
     end
   end
