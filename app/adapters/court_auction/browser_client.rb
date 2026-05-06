@@ -2,7 +2,14 @@ module CourtAuction
   class BrowserClient
     API_ENDPOINT = "pgjsearch/searchControllerMain.on"
     DEFAULT_TIMEOUT = ENV.fetch("BROWSER_TIMEOUT", 90).to_i
-    PAGE_LOAD_WAIT = 3
+    PAGE_LOAD_WAIT = ENV.fetch("BROWSER_PAGE_LOAD_WAIT_SECONDS", 3).to_i
+
+    # Wait durations after WebSquare DOM mutations that cascade to dependent
+    # selects. Tuned to the live court auction site — adjust only after
+    # observing the cascade fail in practice.
+    DOM_CASCADE_WAIT_MS = 500
+    USAGE_CASCADE_WAIT_MS = 1500
+    POST_SELECT_WAIT_MS = 300
 
     def self.search_url
       Endpoints.criteria_search_referer
@@ -84,29 +91,29 @@ module CourtAuction
     def fill_criteria(page, region:, year:, min_price:, max_price:)
       # 1. Click "소재지(새주소)" radio (label intercepts pointer events, so use force)
       page.click("##{REGION_RADIO}", force: true)
-      page.wait_for_timeout(500)
+      page.wait_for_timeout(DOM_CASCADE_WAIT_MS)
 
       # 2. Set region via DOM dispatchEvent (for cascade)
       set_select_via_dom(page, REGION_SELECT, normalize_region(region))
-      page.wait_for_timeout(500)
+      page.wait_for_timeout(DOM_CASCADE_WAIT_MS)
 
       # 3. Set year
       set_select_via_js(page, YEAR_SELECT, year.to_s)
 
       # 4. Set bid category to 전체
       page.click("##{BID_CATEGORY_ALL_RADIO}", force: true)
-      page.wait_for_timeout(300)
+      page.wait_for_timeout(POST_SELECT_WAIT_MS)
 
       # 5. Set usage: 건물 → 주거용건물 (cascade)
       set_select_via_dom(page, USAGE_LARGE_SELECT, "건물")
-      page.wait_for_timeout(1500) # wait for mid-category options to load
+      page.wait_for_timeout(USAGE_CASCADE_WAIT_MS) # wait for mid-category options to load
       set_select_via_dom(page, USAGE_MID_SELECT, "주거용건물")
-      page.wait_for_timeout(300)
+      page.wait_for_timeout(POST_SELECT_WAIT_MS)
 
       # 6. Set price range: min=5천만원, max=next tier above user's max bid
       set_select_via_dom(page, MIN_PRICE_SELECT, price_label(Pricing::MIN_BID_PRICE_WON))
       set_select_via_dom(page, MAX_PRICE_SELECT, price_label(next_price_tier(max_price)))
-      page.wait_for_timeout(300)
+      page.wait_for_timeout(POST_SELECT_WAIT_MS)
     end
 
     def click_search_and_capture(page)

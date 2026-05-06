@@ -1,7 +1,7 @@
 module CourtAuction
   class RateLimiter
-    DEFAULT_MIN_INTERVAL = 0.5
-    DEFAULT_MAX_PER_MINUTE = 60
+    DEFAULT_MIN_INTERVAL = ENV.fetch("COURT_AUCTION_MIN_REQUEST_INTERVAL", 0.5).to_f
+    DEFAULT_MAX_PER_MINUTE = ENV.fetch("COURT_AUCTION_MAX_REQUESTS_PER_MINUTE", 60).to_i
 
     attr_reader :request_count
 

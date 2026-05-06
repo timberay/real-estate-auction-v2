@@ -2,8 +2,8 @@ module CourtAuction
   class CaseSearchClient
     ENDPOINT = "pgj15A/selectAuctnCsSrchRslt.on"
 
-    OPEN_TIMEOUT = 5
-    READ_TIMEOUT = 10
+    OPEN_TIMEOUT = ENV.fetch("COURT_AUCTION_CASE_SEARCH_OPEN_TIMEOUT", 5).to_i
+    READ_TIMEOUT = ENV.fetch("COURT_AUCTION_CASE_SEARCH_READ_TIMEOUT", 10).to_i
 
     COURT_CODES = {
       "서울중앙지방법원" => "B000210", "서울동부지방법원" => "B000211",

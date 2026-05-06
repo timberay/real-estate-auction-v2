@@ -3,7 +3,8 @@ module CourtAuction
     ENDPOINT = "pgjsearch/searchControllerMain.on"
 
     PAGE_SIZE = 10
-    TIMEOUT = 30
+    TIMEOUT = ENV.fetch("COURT_AUCTION_CRITERIA_SEARCH_TIMEOUT", 30).to_i
+    OPEN_TIMEOUT = ENV.fetch("COURT_AUCTION_CRITERIA_SEARCH_OPEN_TIMEOUT", 10).to_i
     MAX_ITEMS_DEFAULT = 100
 
     REGION_CODES = {
@@ -57,7 +58,7 @@ module CourtAuction
     def build_connection
       Faraday.new(url: Endpoints.base_url) do |f|
         f.options.timeout = TIMEOUT
-        f.options.open_timeout = 10
+        f.options.open_timeout = OPEN_TIMEOUT
         f.request :json
         f.response :json
         f.headers["Accept"] = "application/json"

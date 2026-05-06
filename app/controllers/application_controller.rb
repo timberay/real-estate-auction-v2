@@ -78,12 +78,14 @@ class ApplicationController < ActionController::Base
     session[:return_to_url] = request.fullpath
   end
 
+  LAST_SEEN_TTL_SECONDS = ENV.fetch("LAST_SEEN_TTL_SECONDS", 60).to_i
+
   def touch_last_seen
     user = current_user
     return unless user
     return if Rails.cache.exist?("last_seen:#{user.id}")
 
-    Rails.cache.write("last_seen:#{user.id}", true, expires_in: 1.minute)
+    Rails.cache.write("last_seen:#{user.id}", true, expires_in: LAST_SEEN_TTL_SECONDS.seconds)
     user.update_column(:last_seen_at, Time.current)
   end
 

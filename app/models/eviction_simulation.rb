@@ -19,9 +19,11 @@ class EvictionSimulation < ApplicationRecord
 
   validates :property_id, uniqueness: true, allow_nil: true
 
+  STALE_AFTER_HOURS = ENV.fetch("EVICTION_SIMULATION_STALE_AFTER_HOURS", 24).to_i
+
   scope :stale, -> {
     where(property_id: nil)
-      .where(created_at: ...24.hours.ago)
+      .where(created_at: ...STALE_AFTER_HOURS.hours.ago)
   }
 
   def record_answer(question_code, value)

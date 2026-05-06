@@ -1,5 +1,8 @@
 class Rack::Attack
-  throttle("auth:ip", limit: 10, period: 1.minute) do |req|
+  AUTH_RATE_LIMIT = ENV.fetch("AUTH_RATE_LIMIT_ATTEMPTS", 10).to_i
+  AUTH_RATE_PERIOD = ENV.fetch("AUTH_RATE_LIMIT_PERIOD_SECONDS", 60).to_i.seconds
+
+  throttle("auth:ip", limit: AUTH_RATE_LIMIT, period: AUTH_RATE_PERIOD) do |req|
     req.ip if req.path_info.start_with?("/auth/") && req.post?
   end
 
