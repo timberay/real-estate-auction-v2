@@ -1,6 +1,10 @@
 require "test_helper"
 
 class EvictionGuide::SimulatorControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    get start_onboarding_url # bootstrap a guest session (lazy guest creation)
+  end
+
   test "question renders turbo frame" do
     get eviction_guide_simulator_question_url(code: "Q1")
     assert_response :success

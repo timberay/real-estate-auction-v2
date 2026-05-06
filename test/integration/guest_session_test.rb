@@ -39,8 +39,8 @@ class GuestSessionTest < ActionDispatch::IntegrationTest
 
   test "Auth::Error rescue_from redirects to login with flash" do
     ApplicationController.class_eval do
-      alias_method :_orig_require_authenticated_user, :require_authenticated_user
-      define_method(:require_authenticated_user) { raise Auth::ProviderError, "boom" }
+      alias_method :_orig_ensure_guest_user, :ensure_guest_user
+      define_method(:ensure_guest_user) { raise Auth::ProviderError, "boom" }
     end
 
     get start_onboarding_path
@@ -48,9 +48,9 @@ class GuestSessionTest < ActionDispatch::IntegrationTest
     assert_equal "로그인 중 문제가 발생했습니다. 다시 시도해주세요.", flash[:alert]
   ensure
     ApplicationController.class_eval do
-      if private_method_defined?(:_orig_require_authenticated_user)
-        alias_method :require_authenticated_user, :_orig_require_authenticated_user
-        remove_method(:_orig_require_authenticated_user)
+      if private_method_defined?(:_orig_ensure_guest_user)
+        alias_method :ensure_guest_user, :_orig_ensure_guest_user
+        remove_method(:_orig_ensure_guest_user)
       end
     end
   end

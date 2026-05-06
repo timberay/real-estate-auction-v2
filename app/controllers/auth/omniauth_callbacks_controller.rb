@@ -1,5 +1,7 @@
 class Auth::OmniauthCallbacksController < ApplicationController
+  skip_before_action :require_authenticated_user
   skip_before_action :verify_authenticity_token, only: [ :create ]
+  prepend_before_action :ensure_guest_user, only: [ :create ]
 
   ADAPTERS = {
     "google_oauth2" => Auth::GoogleAdapter,

@@ -25,11 +25,28 @@ class ApplicationController < ActionController::Base
 
   private
 
-  # Eagerly resolves @current_user, creating a guest user if none exists.
-  # Public/landing controllers should `skip_before_action :require_authenticated_user`
-  # to avoid User.create! on every anonymous request (bot/crawler DoS surface).
+  # Default before_action: redirects to login if no User row identifies this
+  # session. Read-only — never creates a new User, so anonymous bot traffic on
+  # protected URLs cannot inflate the users table.
+  #
+  # Public/landing/login/onboarding entry controllers should
+  # `skip_before_action :require_authenticated_user`. Onboarding/OAuth callback
+  # additionally use `before_action :ensure_guest_user` to lazily allocate a
+  # User row on first meaningful engagement.
   def require_authenticated_user
-    @current_user = load_existing_user || create_guest_user!
+    return if current_user
+
+    # Persist the original destination so the post-login flow can resume it.
+    if request.get? || request.head?
+      session[:return_to_url] = request.fullpath unless request.path_info.start_with?("/auth")
+    end
+    redirect_to auth_login_path, alert: "로그인이 필요합니다"
+  end
+
+  # Lazily resolves @current_user, creating a guest if none exists. Use this
+  # before any action that writes user-scoped data through `current_user`.
+  def ensure_guest_user
+    @current_user ||= load_existing_user || create_guest_user!
   end
 
   # Read-only lookup. Returns nil if no session/cookie identifies a user.

@@ -2,6 +2,8 @@ require "test_helper"
 
 class EvictionGuideControllerTest < ActionDispatch::IntegrationTest
   setup do
+    get start_onboarding_url # bootstrap a guest session (lazy guest creation)
+
     eviction_data = JSON.parse(File.read(Rails.root.join("db/seeds/eviction_steps.json")))
     (eviction_data["steps"] + eviction_data["branches"]).each do |attrs|
       EvictionStep.find_or_create_by!(code: attrs["code"]) do |step|
