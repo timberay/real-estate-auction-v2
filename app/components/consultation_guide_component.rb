@@ -6,8 +6,9 @@ class ConsultationGuideComponent < ViewComponent::Base
     "bidding" => { title: "법무사", scope: "입찰 절차 및 보증금 관련 확인" }
   }.freeze
 
-  def initialize(risk_results:)
+  def initialize(risk_results:, show_title: true)
     @risk_results = risk_results
+    @show_title = show_title
   end
 
   def render?

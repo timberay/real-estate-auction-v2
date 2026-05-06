@@ -50,4 +50,11 @@ class PropertyInfoComponentTest < ViewComponent::TestCase
     render_inline(PropertyInfoComponent.new(property: property))
     assert_text "—"
   end
+
+  test "hides title when show_title: false" do
+    property = properties(:safe_apartment)
+    render_inline(PropertyInfoComponent.new(property: property, show_title: false))
+    assert_no_text "물건 기본 정보"
+    assert_text "2026타경10001"
+  end
 end

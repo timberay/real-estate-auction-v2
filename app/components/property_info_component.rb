@@ -3,8 +3,9 @@
 class PropertyInfoComponent < ViewComponent::Base
   include ApplicationHelper
 
-  def initialize(property:)
+  def initialize(property:, show_title: true)
     @property = property
+    @show_title = show_title
   end
 
   private
