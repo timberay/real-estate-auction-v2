@@ -16,7 +16,7 @@
         조건검색 결과 <span id="criteria-search-count" class="text-violet-500"><%= search_results.size %>건</span>
       </span>
       <% if over_api_limit && search_results.any? %>
-        <span class="text-sm text-amber-500">전체 <%= api_total_count %>건 중 상위 100건만 조회됩니다</span>
+        <span class="text-sm text-amber-500">전체 <%= api_total_count %>건 중 상위 <%= CourtAuctionSearchService::MAX_ITEMS %>건만 조회됩니다</span>
       <% end %>
     </div>
 

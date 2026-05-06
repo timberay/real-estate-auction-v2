@@ -116,7 +116,9 @@ class SearchResultsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "index assigns paginated search results and existing case numbers" do
-    10.times do |i|
+    page_size = CourtAuctionSearchService::PAGE_SIZE
+    total = page_size + 2
+    total.times do |i|
       @user.search_results.create!(case_number: "2024타경#{1000 + i}", court_code: "B000210", court_name: "서울지법", address: "주소 #{i}", appraisal_price: 100_000_000, min_bid_price: 80_000_000)
     end
     @user.update!(last_search_api_total_count: 150)
@@ -124,23 +126,24 @@ class SearchResultsControllerTest < ActionDispatch::IntegrationTest
     get search_results_url
 
     assert_response :success
-    assert_equal 10, assigns(:search_results).size
+    assert_equal page_size, assigns(:search_results).size
     assert_equal 1, assigns(:search_page)
-    assert_equal 1, assigns(:total_pages)
+    assert_equal 2, assigns(:total_pages)
     assert_equal 150, assigns(:api_total_count)
     assert assigns(:over_api_limit)
     assert_kind_of Set, assigns(:existing_case_numbers)
   end
 
   test "index supports pagination via search_page param" do
-    25.times do |i|
+    page_size = CourtAuctionSearchService::PAGE_SIZE
+    (page_size * 2 + 1).times do |i|
       @user.search_results.create!(case_number: "2024타경#{2000 + i}", court_code: "B000210", court_name: "서울지법", address: "주소", appraisal_price: 100_000_000, min_bid_price: 80_000_000)
     end
 
     get search_results_url, params: { search_page: 2 }
 
     assert_equal 2, assigns(:search_page)
-    assert_equal 5, assigns(:search_results).size
+    assert_equal page_size, assigns(:search_results).size
   end
 
   test "clear (HTML) redirects to /search" do
