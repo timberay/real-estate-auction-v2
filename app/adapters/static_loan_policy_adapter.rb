@@ -1,20 +1,36 @@
 class StaticLoanPolicyAdapter < LoanPolicyAdapter
-  POLICIES = {
-    "apartment" => [
-      { policy_name: "경락대출 (1금융)", loan_ratio: 0.7, regulated_loan_ratio: 0.4, description: "시중은행 경락잔금대출 — 무주택 일반 비규제 70% / 규제 40% (2026.05 기준)", source_url: "https://www.korea.kr/news/policyNewsView.do?newsId=148951581", effective_date: Date.new(2026, 5, 1) },
-      { policy_name: "경락대출 (2금융)", loan_ratio: 0.8, regulated_loan_ratio: 0.8, description: "캐피탈·저축은행·P2P 경락잔금대출 — 비규제/규제 모두 LTV 80%", source_url: "https://www.korea.kr/news/policyNewsView.do?newsId=148951581", effective_date: Date.new(2026, 5, 1) }
-    ],
-    "villa" => [
-      { policy_name: "경락대출 (1금융)", loan_ratio: 0.6, regulated_loan_ratio: 0.4, description: "시중은행 경락잔금대출 — 비아파트 실효치 비규제 60% / 규제 40% (방빼기·감정가 차감 반영)", source_url: "https://www.korea.kr/news/policyNewsView.do?newsId=148951581", effective_date: Date.new(2026, 5, 1) },
-      { policy_name: "경락대출 (2금융)", loan_ratio: 0.7, regulated_loan_ratio: 0.7, description: "캐피탈·저축은행·P2P 경락잔금대출 — 환금성 낮아 LTV 70%", source_url: "https://www.korea.kr/news/policyNewsView.do?newsId=148951581", effective_date: Date.new(2026, 5, 1) }
-    ],
-    "officetel" => [
-      { policy_name: "경락대출 (1금융)", loan_ratio: 0.7, regulated_loan_ratio: 0.4, description: "시중은행 경락잔금대출 — 주거용 무주택 비규제 70% / 규제 40%", source_url: "https://www.korea.kr/news/policyNewsView.do?newsId=148951581", effective_date: Date.new(2026, 5, 1) },
-      { policy_name: "경락대출 (2금융)", loan_ratio: 0.8, regulated_loan_ratio: 0.8, description: "캐피탈·저축은행·P2P 경락잔금대출 — 비규제/규제 모두 LTV 80%", source_url: "https://www.korea.kr/news/policyNewsView.do?newsId=148951581", effective_date: Date.new(2026, 5, 1) }
-    ]
-  }.freeze
+  # Read policies from the same JSON file db/seeds.rb uses so the seed and
+  # the sync-service source can never drift. The file is the canonical
+  # store; this adapter just deserializes it.
+  SEED_PATH = Rails.root.join("db/seeds/loan_policies.json").freeze
 
   def fetch_policies(property_type_code:)
-    POLICIES.fetch(property_type_code, [])
+    self.class.policies_by_code.fetch(property_type_code, [])
   end
+
+  def self.policies_by_code
+    @policies_by_code ||= load_policies
+  end
+
+  # Useful for tests or after editing the JSON in a `rails console` session.
+  def self.reload!
+    @policies_by_code = load_policies
+  end
+
+  def self.load_policies
+    raw = JSON.parse(File.read(SEED_PATH))
+    raw.each_with_object({}) do |group, acc|
+      acc[group["property_type_code"]] = group["policies"].map do |p|
+        {
+          policy_name: p["policy_name"],
+          loan_ratio: p["loan_ratio"],
+          regulated_loan_ratio: p["regulated_loan_ratio"],
+          description: p["description"],
+          source_url: p["source_url"],
+          effective_date: Date.parse(p["effective_date"])
+        }
+      end.freeze
+    end.freeze
+  end
+  private_class_method :load_policies
 end
