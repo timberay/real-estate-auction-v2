@@ -30,11 +30,12 @@ class CourtAuctionSearchJob < ApplicationJob
 
   def broadcast_ready(user)
     user.reload
-    search_results = user.search_results.order(created_at: :desc).limit(20)
+    page_size = CourtAuctionSearchService::PAGE_SIZE
+    search_results = user.search_results.order(created_at: :desc).limit(page_size)
     api_total_count = user.last_search_api_total_count
-    over_api_limit  = api_total_count.to_i > 100
+    over_api_limit  = api_total_count.to_i > CourtAuctionSearchService::MAX_ITEMS
     existing_case_numbers = user.properties.pluck(:case_number).to_set
-    total_pages = [ (user.search_results.count.to_f / 20).ceil, 1 ].max
+    total_pages = [ (user.search_results.count.to_f / page_size).ceil, 1 ].max
 
     Turbo::StreamsChannel.broadcast_replace_to(
       stream_name(user),

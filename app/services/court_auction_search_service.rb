@@ -1,5 +1,6 @@
 class CourtAuctionSearchService
-  MAX_ITEMS = 100
+  MAX_ITEMS = 20
+  PAGE_SIZE = 8
 
   Result = Data.define(:count, :error)
 

@@ -198,7 +198,7 @@ class CourtAuctionSearchServiceTest < ActiveSupport::TestCase
       max_bid_price: 100_000_000
     )
 
-    assert_equal 100, captured_args[:max_items]
+    assert_equal CourtAuctionSearchService::MAX_ITEMS, captured_args[:max_items]
   ensure
     GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
   end
