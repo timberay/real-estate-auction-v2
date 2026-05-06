@@ -2,7 +2,7 @@ require "test_helper"
 
 class Api::ReserveFundDefaultsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    get root_url  # create guest session
+    get start_onboarding_url  # create guest session via non-public action
   end
 
   test "GET index returns defaults for given property_type_id" do

@@ -4,7 +4,7 @@ class Inspections::DividendsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @property = properties(:risky_villa)
     @report = rights_analysis_reports(:risky_villa_report)
-    get root_path
+    get start_onboarding_url
     @user = inherit_fixture_guest_ownership
 
     # Fixtures store json columns as strings in SQLite; normalise to Hash before each test

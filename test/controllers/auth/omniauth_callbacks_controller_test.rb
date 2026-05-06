@@ -26,8 +26,9 @@ class Auth::OmniauthCallbacksControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "Case C: completely new user - promotes current guest in place" do
-    get root_path
-    guest_id = session[:user_id]
+    guest = User.create!
+    post "/testing/sign_in", params: { user_id: guest.id }
+    guest_id = guest.id
 
     mock_omniauth(:google_oauth2, uid: "g-new", email: "new@example.com", name: "New")
     get "/auth/google_oauth2/callback"
@@ -42,8 +43,9 @@ class Auth::OmniauthCallbacksControllerTest < ActionDispatch::IntegrationTest
   test "Case C nil-email: Kakao user without email still promotes guest (no spurious Case B match)" do
     User.create!(guest: false, email: nil, name: "OldAnon")
 
-    get root_path
-    guest_id = session[:user_id]
+    guest = User.create!
+    post "/testing/sign_in", params: { user_id: guest.id }
+    guest_id = guest.id
 
     mock_omniauth(:kakao, uid: "no-email", email: nil, name: "NewAnon")
     get "/auth/kakao/callback"

@@ -21,14 +21,14 @@ class LegalControllerTest < ActionDispatch::IntegrationTest
     assert_select "h1", /개인정보\s*처리방침/
   end
 
-  test "GET /terms auto-creates a guest user (no auth gate)" do
-    assert_difference "User.count", 1 do
+  test "GET /terms does NOT auto-create a user (public page, lazy guest creation)" do
+    assert_no_difference "User.count" do
       get terms_url
     end
   end
 
-  test "GET /privacy auto-creates a guest user (no auth gate)" do
-    assert_difference "User.count", 1 do
+  test "GET /privacy does NOT auto-create a user (public page, lazy guest creation)" do
+    assert_no_difference "User.count" do
       get privacy_url
     end
   end

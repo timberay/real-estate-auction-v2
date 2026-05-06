@@ -1,9 +1,8 @@
 require "test_helper"
 
 class GuestSessionTest < ActionDispatch::IntegrationTest
-  test "first visit creates a new guest with its own user_id" do
-    get root_path
-    assert_response :redirect
+  test "first visit to a non-public action creates a new guest with its own user_id" do
+    get start_onboarding_path
     assert User.exists?(session[:user_id])
     user = User.find(session[:user_id])
     assert user.guest?
@@ -11,11 +10,11 @@ class GuestSessionTest < ActionDispatch::IntegrationTest
 
   test "two separate sessions get different guest user_ids" do
     session1 = open_session
-    session1.get root_path
+    session1.get start_onboarding_path
     uid1 = session1.session[:user_id]
 
     session2 = open_session
-    session2.get root_path
+    session2.get start_onboarding_path
     uid2 = session2.session[:user_id]
 
     refute_equal uid1, uid2, "two browsers must get distinct guest users"
@@ -44,7 +43,7 @@ class GuestSessionTest < ActionDispatch::IntegrationTest
       define_method(:ensure_user) { raise Auth::ProviderError, "boom" }
     end
 
-    get root_path
+    get start_onboarding_path
     assert_redirected_to "/auth/login"
     assert_equal "로그인 중 문제가 발생했습니다. 다시 시도해주세요.", flash[:alert]
   ensure
@@ -102,18 +101,18 @@ class GuestSessionTest < ActionDispatch::IntegrationTest
     original_cache = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
 
-    get root_path
+    get start_onboarding_path
     user = User.find(session[:user_id])
     first = user.reload.last_seen_at
     assert_not_nil first
 
     travel 30.seconds do
-      get root_path
+      get start_onboarding_path
     end
     assert_equal first, user.reload.last_seen_at, "throttle must skip writes within 1 minute"
 
     travel 70.seconds do
-      get root_path
+      get start_onboarding_path
     end
     second = user.reload.last_seen_at
     assert second > first

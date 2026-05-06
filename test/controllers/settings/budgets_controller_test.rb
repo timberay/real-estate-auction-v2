@@ -2,7 +2,7 @@ require "test_helper"
 
 class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    get root_url  # create guest session
+    get start_onboarding_url  # create guest session via non-public action
     @user = User.find(session[:user_id])
     @setting = BudgetSetting.create!(
       user: @user,
