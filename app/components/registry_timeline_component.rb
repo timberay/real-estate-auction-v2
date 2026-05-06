@@ -9,6 +9,12 @@ class RegistryTimelineComponent < ViewComponent::Base
 
   private
 
+  def sorted_entries
+    rights = @timeline.map { |e| { kind: :right, date: e["date"], payload: e } }
+    tenants = @tenants.map { |t| { kind: :tenant, date: t["move_in_date"], payload: t } }
+    (rights + tenants).sort_by { |e| e[:date].to_s }
+  end
+
   def base_right_date
     @report.base_right_date
   end
