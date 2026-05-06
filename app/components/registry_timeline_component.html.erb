@@ -3,42 +3,44 @@
 
   <% if @timeline.any? || @tenants.any? %>
     <div class="relative pl-6 border-l-2 border-slate-200 dark:border-slate-700 ml-2 space-y-4">
-      <% @timeline.each do |entry| %>
-        <% is_base = entry["date"] == @report.base_right_date&.to_s %>
-        <div class="relative">
-          <div class="absolute -left-[25px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 <%= is_base ? 'bg-red-500' : 'bg-slate-400' %>"></div>
-          <div class="rounded-lg border p-3 <%= is_base ? 'border-red-400 bg-red-50 dark:border-red-600 dark:bg-red-900/20' : 'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50' %>">
-            <div class="flex items-center justify-between">
-              <div class="text-sm">
-                <% if is_base %><span class="text-sm font-bold text-red-600 dark:text-red-400">★ 말소기준권리</span> <% end %>
-                <span class="font-semibold text-slate-900 dark:text-slate-100"><%= entry["type"] %> — <%= entry["holder"] %></span>
+      <% sorted_entries.each do |entry| %>
+        <% if entry[:kind] == :right %>
+          <% right = entry[:payload] %>
+          <% is_base = right["date"] == @report.base_right_date&.to_s %>
+          <div class="relative">
+            <div class="absolute -left-[25px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 <%= is_base ? 'bg-red-500' : 'bg-slate-400' %>"></div>
+            <div class="rounded-lg border p-3 <%= is_base ? 'border-red-400 bg-red-50 dark:border-red-600 dark:bg-red-900/20' : 'border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50' %>">
+              <div class="flex items-center justify-between">
+                <div class="text-sm">
+                  <% if is_base %><span class="text-sm font-bold text-red-600 dark:text-red-400">★ 말소기준권리</span> <% end %>
+                  <span class="font-semibold text-slate-900 dark:text-slate-100"><%= right["type"] %> — <%= right["holder"] %></span>
+                </div>
+                <span class="text-sm text-slate-500 dark:text-slate-400"><%= right["date"] %></span>
               </div>
-              <span class="text-sm text-slate-500 dark:text-slate-400"><%= entry["date"] %></span>
-            </div>
-            <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">채권액: <%= format_amount(entry["amount"]) %></div>
-          </div>
-        </div>
-      <% end %>
-
-      <% @tenants.each do |tenant| %>
-        <% has_power = tenant["opposing_power"] %>
-        <div class="relative">
-          <div class="absolute -left-[25px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 <%= has_power ? 'bg-red-500' : 'bg-green-500' %>"></div>
-          <div class="rounded-lg border p-3 <%= has_power ? 'border-red-400 bg-red-50 dark:border-red-600 dark:bg-red-900/20' : 'border-green-400 bg-green-50 dark:border-green-600 dark:bg-green-900/20' %>">
-            <div class="flex items-center justify-between">
-              <div class="text-sm">
-                <span class="font-semibold text-slate-900 dark:text-slate-100"><%= tenant["name"] %> — 전입신고</span>
-                <span class="ml-2 text-sm px-1.5 py-0.5 rounded <%= has_power ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' %>">
-                  대항력 <%= has_power ? '있음' : '없음' %>
-                </span>
-              </div>
-              <span class="text-sm text-slate-500 dark:text-slate-400"><%= tenant["move_in_date"] %></span>
-            </div>
-            <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              보증금: <%= format_amount(tenant["deposit"]) %> · 확정일자: <%= tenant["confirmed_date"] || "없음" %> · 배당요구: <%= tenant["dividend_requested"] ? "✓" : "✗" %>
+              <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">채권액: <%= format_amount(right["amount"]) %></div>
             </div>
           </div>
-        </div>
+        <% else %>
+          <% tenant = entry[:payload] %>
+          <% has_power = tenant["opposing_power"] %>
+          <div class="relative">
+            <div class="absolute -left-[25px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 <%= has_power ? 'bg-red-500' : 'bg-green-500' %>"></div>
+            <div class="rounded-lg border p-3 <%= has_power ? 'border-red-400 bg-red-50 dark:border-red-600 dark:bg-red-900/20' : 'border-green-400 bg-green-50 dark:border-green-600 dark:bg-green-900/20' %>">
+              <div class="flex items-center justify-between">
+                <div class="text-sm">
+                  <span class="font-semibold text-slate-900 dark:text-slate-100"><%= tenant["name"] %> — 전입신고</span>
+                  <span class="ml-2 text-sm px-1.5 py-0.5 rounded <%= has_power ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' %>">
+                    대항력 <%= has_power ? '있음' : '없음' %>
+                  </span>
+                </div>
+                <span class="text-sm text-slate-500 dark:text-slate-400"><%= tenant["move_in_date"] %></span>
+              </div>
+              <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                보증금: <%= format_amount(tenant["deposit"]) %> · 확정일자: <%= tenant["confirmed_date"] || "없음" %> · 배당요구: <%= tenant["dividend_requested"] ? "✓" : "✗" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
       <% end %>
     </div>
   <% else %>

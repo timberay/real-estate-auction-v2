@@ -40,4 +40,32 @@ class RegistryTimelineComponentTest < ViewComponent::TestCase
     render_inline(RegistryTimelineComponent.new(report: report))
     assert_text "등기부"
   end
+
+  test "merges timeline and tenants in chronological order" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => {
+        "rights_timeline" => [
+          { "date" => "2023-03-17", "type" => "주택임차권등기", "holder" => "장동영", "amount" => 367_000_000 },
+          { "date" => "2024-09-04", "type" => "강제경매개시결정", "holder" => "주택도시보증공사", "amount" => 385_377_865 }
+        ]
+      },
+      "calculated" => {
+        "tenants" => [
+          { "name" => "장동영", "deposit" => 367_000_000, "move_in_date" => "2021-02-25",
+            "confirmed_date" => "2021-01-26", "opposing_power" => true }
+        ]
+      },
+      "discrepancies" => []
+    }
+    render_inline(RegistryTimelineComponent.new(report: report))
+
+    rendered = page.text
+    tenant_pos = rendered.index("장동영 — 전입신고")
+    rights_2023_pos = rendered.index("주택임차권등기")
+    rights_2024_pos = rendered.index("강제경매개시결정")
+
+    assert tenant_pos < rights_2023_pos, "tenant (2021) should render before right (2023)"
+    assert rights_2023_pos < rights_2024_pos, "earlier right should render before later right"
+  end
 end
