@@ -47,11 +47,11 @@ module CourtAuction
     private
 
     def parse_case_status(code)
-      code&.start_with?("0002") ? "진행중" : "종결"
+      Status.from_progress_code(code)
     end
 
     def count_failed_bids(schedules)
-      schedules.count { |s| s["auctnDxdyRsltCd"] == "002" }
+      schedules.count { |s| Status.failed_bid?(s["auctnDxdyRsltCd"]) }
     end
 
     def extract_items(response)
@@ -67,7 +67,7 @@ module CourtAuction
         case_number: item["srnSaNo"],
         property_type: item["dspslUsgNm"],
         property_usage_code: item["maemulUtilCd"],
-        status: item["mulJinYn"] == "Y" ? "진행중" : "종결",
+        status: Status.from_property_flag(item["mulJinYn"]),
         address: item["printSt"],
         sido: item["hjguSido"],
         sigungu: item["hjguSigu"],

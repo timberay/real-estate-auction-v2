@@ -59,7 +59,7 @@ class CourtAuctionSearchService
           appraisal_price: item["gamevalAmt"].to_i,
           min_bid_price: item["minmaePrice"].to_i,
           property_type: item["dspslUsgNm"],
-          status: item["mulJinYn"] == "Y" ? "진행중" : "종결",
+          status: CourtAuction::Status.from_property_flag(item["mulJinYn"]),
           failed_bid_count: item["yuchalCnt"].to_i,
           auction_date: item["maeGiil"],
           remarks: item["mulBigo"],

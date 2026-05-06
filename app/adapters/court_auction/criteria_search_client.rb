@@ -4,7 +4,6 @@ module CourtAuction
 
     PAGE_SIZE = 10
     TIMEOUT = 30
-    MIN_BID_PRICE = "50000000"
     MAX_ITEMS_DEFAULT = 100
 
     REGION_CODES = {
@@ -17,20 +16,13 @@ module CourtAuction
       "강원특별자치도" => "51", "전북특별자치도" => "52"
     }.freeze
 
-    PRICE_TIERS = [
-      50_000_000, 100_000_000, 150_000_000, 200_000_000, 250_000_000,
-      300_000_000, 350_000_000, 400_000_000, 450_000_000, 500_000_000,
-      550_000_000, 600_000_000, 650_000_000, 700_000_000, 750_000_000,
-      800_000_000, 850_000_000, 900_000_000, 950_000_000, 1_000_000_000
-    ].freeze
-
     def self.region_code_for(address)
       return nil if address.blank?
       REGION_CODES.find { |name, _| address.start_with?(name) }&.last
     end
 
     def self.next_price_tier(amount)
-      PRICE_TIERS.find { |tier| tier > amount } || PRICE_TIERS.last
+      Pricing.next_tier(amount, tiers: Pricing::CRITERIA_MAX_FILTER_TIERS_WON)
     end
 
     def initialize
@@ -100,7 +92,7 @@ module CourtAuction
           "lclDspslGdsLstUsgCd" => "20000",
           "mclDspslGdsLstUsgCd" => "20100",
           "sclDspslGdsLstUsgCd" => "",
-          "lwsDspslPrcMin" => MIN_BID_PRICE,
+          "lwsDspslPrcMin" => Pricing::MIN_BID_PRICE_WON.to_s,
           "lwsDspslPrcMax" => max_price.to_s,
           "notifyLoc" => "on",
           "bidBgngYmd" => today.strftime("%Y%m%d"),

@@ -19,18 +19,6 @@ module CourtAuction
     MAX_PRICE_SELECT = "mf_wfm_mainFrame_sbx_rletLwsDspslMax"
     SEARCH_BUTTON = "mf_wfm_mainFrame_btn_gdsDtlSrch"
 
-    # Search form defaults
-    MIN_BID_PRICE = 50_000_000
-    DEFAULT_MAX_PRICE = 500_000_000
-
-    PRICE_TIERS = [
-      10_000_000, 50_000_000,
-      100_000_000, 150_000_000, 200_000_000, 250_000_000, 300_000_000,
-      350_000_000, 400_000_000, 450_000_000, 500_000_000, 550_000_000,
-      600_000_000, 650_000_000, 700_000_000, 750_000_000, 800_000_000,
-      850_000_000, 900_000_000, 950_000_000, 1_000_000_000
-    ].freeze
-
     VALID_REGIONS = %w[
       서울특별시 부산광역시 대구광역시 인천광역시 광주광역시
       대전광역시 울산광역시 세종특별자치시 경기도 강원도
@@ -116,7 +104,7 @@ module CourtAuction
       page.wait_for_timeout(300)
 
       # 6. Set price range: min=5천만원, max=next tier above user's max bid
-      set_select_via_dom(page, MIN_PRICE_SELECT, price_label(MIN_BID_PRICE))
+      set_select_via_dom(page, MIN_PRICE_SELECT, price_label(Pricing::MIN_BID_PRICE_WON))
       set_select_via_dom(page, MAX_PRICE_SELECT, price_label(next_price_tier(max_price)))
       page.wait_for_timeout(300)
     end
@@ -171,8 +159,8 @@ module CourtAuction
     end
 
     def next_price_tier(amount)
-      return DEFAULT_MAX_PRICE unless amount
-      PRICE_TIERS.find { |tier| tier > amount } || PRICE_TIERS.last
+      return Pricing::DEFAULT_MAX_PRICE_WON unless amount
+      Pricing.next_tier(amount)
     end
 
     def escape_js(str)
