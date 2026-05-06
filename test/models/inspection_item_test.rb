@@ -24,9 +24,6 @@ class InspectionItemTest < ActiveSupport::TestCase
     item = InspectionItem.new(code: "enum-test", tab: "rights_analysis", tab_position: 1, category: "C", question: "Q?", priority: "상")
     assert item.rights_analysis?
 
-    item.tab = "property_analysis"
-    assert item.property_analysis?
-
     item.tab = "profit_analysis"
     assert item.profit_analysis?
 
@@ -102,9 +99,9 @@ class InspectionItemTest < ActiveSupport::TestCase
   test "applicable_for? returns true when property_type is in applicable_types" do
     item = InspectionItem.create!(
       code: "applicable-specific",
-      tab: "property_analysis",
+      tab: "profit_analysis",
       tab_position: 1,
-      category: "물건분석",
+      category: "수익분석",
       question: "특정 타입에만 적용?",
       priority: "중",
       applicable_types: [ "아파트", "오피스텔" ]

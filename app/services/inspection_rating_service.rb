@@ -1,5 +1,5 @@
 class InspectionRatingService
-  ANALYSIS_TABS = %w[rights_analysis property_analysis profit_analysis field_check bidding].freeze
+  ANALYSIS_TABS = %w[rights_analysis profit_analysis field_check bidding].freeze
 
   def self.call(property:, user:)
     new(property:, user:).call
