@@ -26,15 +26,6 @@ module CourtAuction
     MAX_PRICE_SELECT = "mf_wfm_mainFrame_sbx_rletLwsDspslMax"
     SEARCH_BUTTON = "mf_wfm_mainFrame_btn_gdsDtlSrch"
 
-    VALID_REGIONS = %w[
-      서울특별시 부산광역시 대구광역시 인천광역시 광주광역시
-      대전광역시 울산광역시 세종특별자치시 경기도 강원도
-      충청북도 충청남도 전라북도 전라남도 경상북도 경상남도
-      제주특별자치도 강원특별자치도 전북특별자치도
-    ].freeze
-
-    DEFAULT_REGION = "제주특별자치도"
-
     def initialize(timeout: DEFAULT_TIMEOUT)
       @timeout = timeout
     end
@@ -162,7 +153,7 @@ module CourtAuction
     end
 
     def normalize_region(region)
-      VALID_REGIONS.include?(region) ? region : DEFAULT_REGION
+      Regions::ALL.include?(region) ? region : Regions::DEFAULT
     end
 
     def next_price_tier(amount)
