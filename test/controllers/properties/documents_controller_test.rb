@@ -3,6 +3,9 @@ require "test_helper"
 class Properties::DocumentsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @property = properties(:safe_apartment)
+    get start_onboarding_url
+    @user = inherit_fixture_guest_ownership
+    UserProperty.find_or_create_by!(user: @user, property: @property)
   end
 
   test "upload PDF document" do
