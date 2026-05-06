@@ -1,8 +1,17 @@
 module Llm
   class Base
-    TIMEOUT_SECONDS = 300
+    DEFAULT_TIMEOUT_SECONDS = 300
+    DEFAULT_OPEN_TIMEOUT_SECONDS = 10
 
     PDF_UNSUPPORTED_ERROR = "이 모델은 PDF 분석을 지원하지 않습니다. Anthropic Claude 또는 Gemini를 사용해주세요."
+
+    def self.timeout_seconds
+      ENV.fetch("LLM_TIMEOUT_SECONDS", DEFAULT_TIMEOUT_SECONDS).to_i
+    end
+
+    def self.open_timeout_seconds
+      ENV.fetch("LLM_OPEN_TIMEOUT_SECONDS", DEFAULT_OPEN_TIMEOUT_SECONDS).to_i
+    end
 
     def self.for
       return Llm::Mock.new if ENV["USE_MOCK"] == "true"
@@ -43,14 +52,19 @@ module Llm
       Rails.application.credentials.dig(provider_name.to_sym, :api_key) || ENV[env_key]
     end
 
-    def model_name(default)
+    # Resolves model name with the precedence:
+    #   per-provider ENV (env_key) > LLM_MODEL > default
+    def model_name(default, env_key: nil)
+      if env_key && (val = ENV[env_key]) && !val.empty?
+        return val
+      end
       ENV.fetch("LLM_MODEL", default)
     end
 
     def connection(base_url)
       Faraday.new(url: base_url) do |f|
-        f.options.timeout = TIMEOUT_SECONDS
-        f.options.open_timeout = 10
+        f.options.timeout = self.class.timeout_seconds
+        f.options.open_timeout = self.class.open_timeout_seconds
         f.request :json
         f.response :json
       end

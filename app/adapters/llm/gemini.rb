@@ -1,6 +1,6 @@
 module Llm
   class Gemini < Base
-    BASE_URL = "https://generativelanguage.googleapis.com"
+    DEFAULT_BASE_URL = "https://generativelanguage.googleapis.com"
     DEFAULT_MODEL = "gemini-2.5-flash"
 
     def provider_name
@@ -8,7 +8,7 @@ module Llm
     end
 
     def model_id
-      model_name(DEFAULT_MODEL)
+      model_name(DEFAULT_MODEL, env_key: "GEMINI_MODEL")
     end
 
     def supports_documents?
@@ -22,8 +22,8 @@ module Llm
       encoded_docs = documents.map { |doc| encode_pdf_base64(doc) }
       content_parts = build_content_parts(prompt, encoded_docs)
 
-      model = model_name(DEFAULT_MODEL)
-      conn = connection(BASE_URL)
+      model = model_id
+      conn = connection(base_url)
       response = conn.post("/v1beta/models/#{model}:generateContent") do |req|
         req.params["key"] = key
         req.body = {
@@ -40,6 +40,10 @@ module Llm
     end
 
     private
+
+    def base_url
+      ENV.fetch("GEMINI_BASE_URL", DEFAULT_BASE_URL)
+    end
 
     def build_content_parts(prompt, encoded_pdfs)
       parts = []
