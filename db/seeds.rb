@@ -61,7 +61,6 @@ puts "Seeding inspection items..."
 
 TAB_MAP = {
   "권리분석" => "rights_analysis",
-  "물건분석" => "property_analysis",
   "수익분석" => "profit_analysis",
   "현장확인" => "field_check",
   "입찰&낙찰" => "bidding"

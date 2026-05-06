@@ -1,7 +1,6 @@
 class TabSummaryTableComponent < ViewComponent::Base
   TAB_LABELS = {
     "rights_analysis" => "권리분석",
-    "property_analysis" => "물건분석",
     "profit_analysis" => "수익분석",
     "field_check" => "현장확인",
     "bidding" => "입찰&낙찰"

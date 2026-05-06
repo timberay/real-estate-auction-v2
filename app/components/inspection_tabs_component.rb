@@ -1,11 +1,10 @@
 class InspectionTabsComponent < ViewComponent::Base
   TAB_CONFIG = [
-    { key: "rights_analysis",   label: "권리분석" },
-    { key: "property_analysis", label: "물건분석" },
-    { key: "profit_analysis",   label: "수익분석" },
-    { key: "field_check",       label: "현장확인" },
-    { key: "bidding",           label: "입찰&낙찰" },
-    { key: "grade",             label: "종합 판정" }
+    { key: "rights_analysis", label: "권리분석" },
+    { key: "profit_analysis", label: "수익분석" },
+    { key: "field_check",     label: "현장확인" },
+    { key: "bidding",         label: "입찰&낙찰" },
+    { key: "grade",           label: "종합 판정" }
   ].freeze
 
   def initialize(property:, user:, active_tab:)

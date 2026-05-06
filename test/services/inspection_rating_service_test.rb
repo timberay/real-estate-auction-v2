@@ -67,7 +67,7 @@ class InspectionRatingServiceTest < ActiveSupport::TestCase
     InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: true, resolvable: false)
     service = InspectionRatingService.new(property: @property, user: @user)
     assert_equal :danger, service.tab_rating("rights_analysis")
-    assert_nil service.tab_rating("property_analysis")
+    assert_nil service.tab_rating("profit_analysis")
   end
 
   # Partial evaluation: call method (Tasks 1)
@@ -122,16 +122,16 @@ class InspectionRatingServiceTest < ActiveSupport::TestCase
     service = InspectionRatingService.new(property: @property, user: @user)
     evaluated, total = service.tabs_evaluated_count
     assert_equal 1, evaluated
-    assert_equal 5, total
+    assert_equal 4, total
   end
 
   test "tabs_evaluated_count counts tab as evaluated when at least one item answered" do
-    item_prop = inspection_items(:property_001)
+    item_other_tab = inspection_items(:tax_006)
     InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: false)
-    InspectionResult.create!(property: @property, inspection_item: item_prop, user: @user, source_type: "auto", has_risk: true, resolvable: true)
+    InspectionResult.create!(property: @property, inspection_item: item_other_tab, user: @user, source_type: "auto", has_risk: true, resolvable: true)
     service = InspectionRatingService.new(property: @property, user: @user)
     evaluated, total = service.tabs_evaluated_count
     assert_equal 2, evaluated
-    assert_equal 5, total
+    assert_equal 4, total
   end
 end

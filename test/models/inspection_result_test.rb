@@ -4,7 +4,7 @@ class InspectionResultTest < ActiveSupport::TestCase
   test "valid with property, inspection_item, and user" do
     result = InspectionResult.new(
       property: properties(:safe_apartment),
-      inspection_item: inspection_items(:property_004),
+      inspection_item: inspection_items(:rights_005),
       user: users(:guest),
       source_type: "auto",
       has_risk: false

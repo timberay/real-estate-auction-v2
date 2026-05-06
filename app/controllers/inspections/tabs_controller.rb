@@ -3,7 +3,7 @@ module Inspections
     include PropertyScopable
     before_action :set_user_property
 
-    VALID_TABS = %w[ rights_analysis property_analysis profit_analysis field_check bidding ].freeze
+    VALID_TABS = %w[ rights_analysis profit_analysis field_check bidding ].freeze
 
     def edit
       @tab_key = params[:tab_key]
