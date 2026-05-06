@@ -26,6 +26,7 @@ export default class extends Controller {
     this.autoTabTarget.classList.remove("border-transparent", "text-slate-500")
     this.manualTabTarget.classList.remove("border-blue-500", "text-blue-600", "dark:text-blue-400")
     this.manualTabTarget.classList.add("border-transparent", "text-slate-500")
+    this.#updatePageTitle(this.autoTabTarget.textContent.trim())
   }
 
   showManual() {
@@ -35,6 +36,12 @@ export default class extends Controller {
     this.manualTabTarget.classList.remove("border-transparent", "text-slate-500")
     this.autoTabTarget.classList.remove("border-blue-500", "text-blue-600", "dark:text-blue-400")
     this.autoTabTarget.classList.add("border-transparent", "text-slate-500")
+    this.#updatePageTitle(this.manualTabTarget.textContent.trim())
+  }
+
+  #updatePageTitle(title) {
+    const el = document.getElementById("page-title")
+    if (el) el.textContent = title
   }
 
   // --- Input method toggle ---

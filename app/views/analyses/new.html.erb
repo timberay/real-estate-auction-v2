@@ -26,12 +26,28 @@
         data-analysis-tabs-target="manualTab"
         data-action="click->analysis-tabs#showManual"
         class="whitespace-nowrap border-b-2 py-3 px-1 text-sm font-medium border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300">
-        수동분석
+        AI 수동분석
       </button>
     </nav>
   </div>
 
   <div data-analysis-tabs-target="autoPanel">
+    <div class="p-4 bg-blue-100 dark:bg-blue-900/20 border border-blue-400 dark:border-blue-800 rounded-lg mb-4">
+      <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2">AI 자동분석이란?</h2>
+      <p class="text-sm text-slate-700 dark:text-slate-300">
+        법원경매 PDF 문서를 업로드하면 시스템이 자동으로 외부 LLM API(ChatGPT, Claude, Gemini 등)에 분석을 요청하고
+        결과를 저장합니다. <br>별도의 복사·붙여넣기 없이 한 번에 분석이 완료됩니다.
+      </p>
+    </div>
+
+    <div class="p-4 bg-amber-100 dark:bg-amber-900/20 border border-amber-400 dark:border-amber-800 rounded-lg mb-4">
+      <p class="text-sm text-slate-700 dark:text-slate-300">
+        AI 자동분석은 외부 LLM API 호출에 따른 별도 과금이 발생하여 개인적으로 비용을 지불해야 하는 상태라서 현재 임시로 사용이 중단되어 있습니다.
+        <br>서비스 제공시에 구독 모델 도입후 서비스가 재개될 수 있으나 이럴경우 서비스를 유료로 전환하여야만 제공이 가능할 것으로 보입니다.
+        <br>분석이 필요하신 경우 옆 탭의 <strong>AI 수동분석</strong>을 이용해 주세요.
+      </p>
+    </div>
+
     <%= render CardComponent.new(title: "PDF 문서 업로드") do %>
       <div class="space-y-3">
         <p class="text-sm text-slate-600 dark:text-slate-400">
