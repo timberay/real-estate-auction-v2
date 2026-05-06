@@ -11,22 +11,27 @@ class InspectionRatingService
   end
 
   def call
+    rating = overall_rating
+    return rating if rating == :incomplete
+
+    user_property = UserProperty.find_by!(user: @user, property: @property)
+    user_property.update!(safety_rating: rating, analyzed_at: Time.current)
+    rating
+  end
+
+  def overall_rating
     answered = visible_results.select { |r| !r.has_risk.nil? }
     return :incomplete if answered.empty?
 
     risk_results = answered.select { |r| r.has_risk }
 
-    rating = if risk_results.any? { |r| r.resolvable == false }
+    if risk_results.any? { |r| r.resolvable == false }
       :danger
     elsif risk_results.any?
       :caution
     else
       :safe
     end
-
-    user_property = UserProperty.find_by!(user: @user, property: @property)
-    user_property.update!(safety_rating: rating, analyzed_at: Time.current)
-    rating
   end
 
   def tab_rating(tab_key)

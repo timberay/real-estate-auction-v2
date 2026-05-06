@@ -1,7 +1,17 @@
-<div class="rounded-xl border-2 p-8 text-center <%= @config[:bg] %>">
-  <div class="text-4xl font-bold <%= @config[:color] %> <%= 'opacity-75' if partial? %>"><%= display_label %></div>
-  <p class="mt-2 text-sm text-slate-600 dark:text-slate-400"><%= @config[:description] %></p>
-  <% if (progress = progress_text) %>
-    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= progress %></p>
-  <% end %>
-</div>
+<% if @compact %>
+  <p class="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-x-2 gap-y-1 flex-wrap">
+    <span class="font-semibold <%= @config[:color] %>"><%= display_label %></span>
+    <span><%= @config[:description] %></span>
+    <% if (progress = progress_text) %>
+      <span class="text-slate-500 dark:text-slate-500">· <%= progress %></span>
+    <% end %>
+  </p>
+<% else %>
+  <div class="rounded-xl border-2 p-8 text-center <%= @config[:bg] %>">
+    <div class="text-4xl font-bold <%= @config[:color] %> <%= 'opacity-75' if partial? %>"><%= display_label %></div>
+    <p class="mt-2 text-sm text-slate-600 dark:text-slate-400"><%= @config[:description] %></p>
+    <% if (progress = progress_text) %>
+      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400"><%= progress %></p>
+    <% end %>
+  </div>
+<% end %>

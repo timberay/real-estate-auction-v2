@@ -134,4 +134,24 @@ class InspectionRatingServiceTest < ActiveSupport::TestCase
     assert_equal 2, evaluated
     assert_equal 4, total
   end
+
+  # overall_rating: non-mutating read of overall rating (Task: tabs component reuse)
+  test "overall_rating returns rating without mutating user_property" do
+    InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: true, resolvable: true)
+    user_property = UserProperty.find_by!(user: @user, property: @property)
+    user_property.update!(safety_rating: nil, analyzed_at: nil)
+
+    service = InspectionRatingService.new(property: @property, user: @user)
+    rating = service.overall_rating
+
+    assert_equal :caution, rating
+    user_property.reload
+    assert_nil user_property.safety_rating
+    assert_nil user_property.analyzed_at
+  end
+
+  test "overall_rating returns incomplete when no items answered" do
+    service = InspectionRatingService.new(property: @property, user: @user)
+    assert_equal :incomplete, service.overall_rating
+  end
 end
