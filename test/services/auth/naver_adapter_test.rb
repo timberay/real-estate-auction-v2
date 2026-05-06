@@ -51,4 +51,31 @@ class Auth::NaverAdapterTest < ActiveSupport::TestCase
     )
     assert_nil Auth::NaverAdapter.new(auth_hash).to_profile.email_verified
   end
+
+  test "coerces string \"true\" to boolean true" do
+    auth_hash = OmniAuth::AuthHash.new(
+      "provider" => "naver", "uid" => "4",
+      "info"  => { "email" => "a@b.com", "name" => "X", "image" => nil },
+      "extra" => { "raw_info" => { "response" => { "email_verified" => "true" } } }
+    )
+    assert_equal true, Auth::NaverAdapter.new(auth_hash).to_profile.email_verified
+  end
+
+  test "coerces string \"false\" to boolean false" do
+    auth_hash = OmniAuth::AuthHash.new(
+      "provider" => "naver", "uid" => "5",
+      "info"  => { "email" => "a@b.com", "name" => "X", "image" => nil },
+      "extra" => { "raw_info" => { "response" => { "email_verified" => "false" } } }
+    )
+    assert_equal false, Auth::NaverAdapter.new(auth_hash).to_profile.email_verified
+  end
+
+  test "unknown string value (e.g. \"yes\") becomes nil" do
+    auth_hash = OmniAuth::AuthHash.new(
+      "provider" => "naver", "uid" => "6",
+      "info"  => { "email" => "a@b.com", "name" => "X", "image" => nil },
+      "extra" => { "raw_info" => { "response" => { "email_verified" => "yes" } } }
+    )
+    assert_nil Auth::NaverAdapter.new(auth_hash).to_profile.email_verified
+  end
 end

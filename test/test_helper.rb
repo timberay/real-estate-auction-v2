@@ -20,12 +20,22 @@ module ActiveSupport
       Rails.cache.clear if Rails.cache.respond_to?(:clear)
     end
 
-    def mock_omniauth(provider, uid:, email: nil, name: "Test User", avatar: nil)
+    def mock_omniauth(provider, uid:, email: nil, name: "Test User", avatar: nil, email_verified: nil)
+      info = { "email" => email, "name" => name, "image" => avatar }
+      info["email_verified"] = email_verified if provider.to_sym == :google_oauth2
+
+      raw_info =
+        case provider.to_sym
+        when :kakao then { "kakao_account" => { "is_email_verified" => email_verified } }
+        when :naver then { "response" => { "email_verified" => email_verified } }
+        else {}
+        end
+
       OmniAuth.config.mock_auth[provider.to_sym] = OmniAuth::AuthHash.new(
         "provider" => provider.to_s,
         "uid"      => uid.to_s,
-        "info"     => { "email" => email, "name" => name, "image" => avatar },
-        "extra"    => { "raw_info" => {} }
+        "info"     => info,
+        "extra"    => { "raw_info" => raw_info }
       )
     end
 

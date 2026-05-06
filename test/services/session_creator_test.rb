@@ -17,19 +17,59 @@ class SessionCreatorTest < ActiveSupport::TestCase
     assert_raises(ActiveRecord::RecordNotFound) { @guest.reload }
   end
 
-  test "Case B: email matches an existing account - attaches new identity and merges" do
+  test "Case B: email matches and email_verified=true - attaches new identity and merges" do
     existing = User.create!(guest: false, email: "alice@example.com", name: "Alice")
     existing.identities.create!(provider: "kakao", uid: "kakao-1")
 
     profile = Auth::ProviderProfile.new(
       provider: "google", uid: "google-1", email: "alice@example.com",
-      email_verified: nil, name: "Alice", avatar_url: nil
+      email_verified: true, name: "Alice", avatar_url: nil
     )
     result = SessionCreator.new(current_guest: @guest, profile: profile).call
 
     assert_equal existing, result
     assert_equal 2, existing.reload.identities.count
     assert_includes existing.identities.pluck(:provider, :uid), [ "google", "google-1" ]
+  end
+
+  test "Case B blocked: email_verified=false does NOT auto-link to existing user" do
+    existing = User.create!(guest: false, email: "alice@example.com", name: "Alice")
+    existing.identities.create!(provider: "kakao", uid: "kakao-1")
+
+    profile = Auth::ProviderProfile.new(
+      provider: "google", uid: "google-attacker", email: "alice@example.com",
+      email_verified: false, name: "Attacker", avatar_url: nil
+    )
+
+    # Promotion fails due to email uniqueness against the existing account; the
+    # existing user must remain untouched. Fixing the user-facing UX is tracked
+    # as post-launch hotfix in the hardening plan.
+    assert_raises(ActiveRecord::RecordNotUnique) do
+      SessionCreator.new(current_guest: @guest, profile: profile).call
+    end
+
+    existing.reload
+    assert_equal 1, existing.identities.count
+    assert_equal "kakao", existing.identities.first.provider
+  end
+
+  test "Case B blocked: email_verified=nil (provider didn't assert) does NOT auto-link" do
+    existing = User.create!(guest: false, email: "alice@example.com", name: "Alice")
+    existing.identities.create!(provider: "kakao", uid: "kakao-1")
+
+    profile = Auth::ProviderProfile.new(
+      provider: "google", uid: "google-2", email: "alice@example.com",
+      email_verified: nil, name: "Alice", avatar_url: nil
+    )
+
+    # Promotion fails due to email uniqueness against the existing account; the
+    # existing user must remain untouched. Fixing the user-facing UX is tracked
+    # as post-launch hotfix in the hardening plan.
+    assert_raises(ActiveRecord::RecordNotUnique) do
+      SessionCreator.new(current_guest: @guest, profile: profile).call
+    end
+
+    assert_equal 1, existing.reload.identities.count
   end
 
   test "Case B: email nil does NOT match — falls to Case C" do
