@@ -1,50 +1,95 @@
 <%= render layout: "inspections/layout", locals: { property: @property, user_property: @user_property, active_tab: "grade" } do %>
-  <div class="space-y-6">
-    <%= render GradeSummaryComponent.new(rating: @rating, fully_evaluated: @fully_evaluated, tabs_evaluated: @tabs_evaluated, tabs_total: @tabs_total, compact: true) %>
-    <%= render BidOpinionComponent.new(
-      rating: @rating,
-      report: @report,
-      risk_results: @risk_results,
-      budget_setting: @budget_setting,
-      property: @property
-    ) %>
-    <%= render PropertyInfoComponent.new(property: @property) %>
-    <%= render ProfitCalculatorComponent.new(
-      property: @property,
-      budget_setting: @budget_setting,
-      report: @report
-    ) %>
-    <%= render TabSummaryTableComponent.new(results_by_tab: @results_by_tab, property: @property) %>
+  <% has_risks = @risk_results.any? %>
 
-    <% if @risk_results.any? %>
-      <h3 class="text-lg font-semibold text-slate-900 dark:text-slate-100">위험 항목 상세</h3>
-      <%= render RiskItemsListComponent.new(risk_results: @risk_results) %>
+  <%# ===== Status banner (above section 1) ===== %>
+  <%= render GradeSummaryComponent.new(rating: @rating, fully_evaluated: @fully_evaluated, tabs_evaluated: @tabs_evaluated, tabs_total: @tabs_total, compact: true) %>
+
+  <%# ===== Table of contents ===== %>
+  <nav aria-label="목차" class="mt-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40 p-4">
+    <p class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">목차</p>
+    <ol class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1 text-sm">
+      <li><a href="#section-verdict" class="text-blue-600 dark:text-blue-400 hover:underline">1. 종합 판정</a></li>
+      <li><a href="#section-property" class="text-blue-600 dark:text-blue-400 hover:underline">2. 물건 기본 정보</a></li>
+      <li><a href="#section-profit" class="text-blue-600 dark:text-blue-400 hover:underline">3. 순수익 계산기</a></li>
+      <li><a href="#section-tabs" class="text-blue-600 dark:text-blue-400 hover:underline">4. 탭별 평가 요약</a></li>
+      <% if has_risks %>
+        <li><a href="#section-risks" class="text-blue-600 dark:text-blue-400 hover:underline">5. 위험 항목 상세</a></li>
+      <% end %>
+      <li><a href="#section-rights" class="text-blue-600 dark:text-blue-400 hover:underline"><%= has_risks ? 6 : 5 %>. 권리 분석 리포트</a></li>
+      <% if has_risks %>
+        <li><a href="#section-consultation" class="text-blue-600 dark:text-blue-400 hover:underline">7. 전문가 상담 가이드</a></li>
+      <% end %>
+      <li><a href="#section-eviction" class="text-blue-600 dark:text-blue-400 hover:underline"><%= has_risks ? 8 : 6 %>. 명도 시나리오</a></li>
+    </ol>
+  </nav>
+
+  <%# ===== Numbered report sections ===== %>
+  <div class="mt-10 space-y-10">
+    <%= render ReportSectionComponent.new(number: 1, title: "종합 판정", anchor: "verdict") do %>
+      <%= render BidOpinionComponent.new(
+        rating: @rating,
+        report: @report,
+        risk_results: @risk_results,
+        budget_setting: @budget_setting,
+        property: @property
+      ) %>
     <% end %>
 
-    <%= render RightsReportSectionComponent.new(report: @report, property: @property) %>
-    <%= render ConsultationGuideComponent.new(risk_results: @risk_results) %>
+    <%= render ReportSectionComponent.new(number: 2, title: "물건 기본 정보", anchor: "property") do %>
+      <%= render PropertyInfoComponent.new(property: @property, show_title: false) %>
+    <% end %>
 
-    <%# Eviction scenario link %>
-    <div class="p-4 border border-slate-200 dark:border-slate-700 rounded-lg">
-      <div class="flex items-center justify-between">
-        <div>
-          <strong class="text-sm text-slate-900 dark:text-slate-100">명도 시나리오 확인</strong>
-          <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">이 물건의 명도 난이도와 절차를 미리 확인할 수 있습니다.</p>
-        </div>
-        <a href="<%= eviction_guide_simulator_path(property_id: @property.id) %>"
-           class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 whitespace-nowrap">
-          명도 시나리오 보기 →
-        </a>
-      </div>
-    </div>
+    <%= render ReportSectionComponent.new(number: 3, title: "순수익 계산기", anchor: "profit") do %>
+      <%= render ProfitCalculatorComponent.new(
+        property: @property,
+        budget_setting: @budget_setting,
+        report: @report,
+        show_title: false
+      ) %>
+    <% end %>
 
-    <div class="flex gap-3">
-      <%= link_to property_inspections_grade_path(@property, format: :pdf),
-          class: "flex-1 rounded-lg bg-blue-600 dark:bg-blue-500 px-4 py-3 text-sm font-semibold text-center text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors",
-          data: { turbo: false } do %>
-        PDF 다운로드
+    <%= render ReportSectionComponent.new(number: 4, title: "탭별 평가 요약", anchor: "tabs") do %>
+      <%= render TabSummaryTableComponent.new(results_by_tab: @results_by_tab, property: @property) %>
+    <% end %>
+
+    <% if has_risks %>
+      <%= render ReportSectionComponent.new(number: 5, title: "위험 항목 상세", anchor: "risks") do %>
+        <%= render RiskItemsListComponent.new(risk_results: @risk_results) %>
       <% end %>
-      <%= link_to "목록으로 돌아가기", properties_path, class: "flex-1 rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm font-semibold text-center text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" %>
-    </div>
+    <% end %>
+
+    <%= render ReportSectionComponent.new(number: (has_risks ? 6 : 5), title: "권리 분석 리포트", anchor: "rights") do %>
+      <%= render RightsReportSectionComponent.new(report: @report, property: @property, show_title: false) %>
+    <% end %>
+
+    <% if has_risks %>
+      <%= render ReportSectionComponent.new(number: 7, title: "전문가 상담 가이드", anchor: "consultation") do %>
+        <%= render ConsultationGuideComponent.new(risk_results: @risk_results, show_title: false) %>
+      <% end %>
+    <% end %>
+
+    <%= render ReportSectionComponent.new(number: (has_risks ? 8 : 6), title: "명도 시나리오", anchor: "eviction") do %>
+      <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="text-sm text-slate-600 dark:text-slate-400">이 물건의 명도 난이도와 절차를 미리 확인할 수 있습니다.</p>
+          </div>
+          <a href="<%= eviction_guide_simulator_path(property_id: @property.id) %>"
+             class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 whitespace-nowrap">
+            명도 시나리오 보기 →
+          </a>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%# ===== Footer actions ===== %>
+  <div class="mt-10 flex gap-3">
+    <%= link_to property_inspections_grade_path(@property, format: :pdf),
+        class: "flex-1 rounded-lg bg-blue-600 dark:bg-blue-500 px-4 py-3 text-sm font-semibold text-center text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors",
+        data: { turbo: false } do %>
+      PDF 다운로드
+    <% end %>
+    <%= link_to "목록으로 돌아가기", properties_path, class: "flex-1 rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm font-semibold text-center text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" %>
   </div>
 <% end %>
