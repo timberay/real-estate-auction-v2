@@ -8,8 +8,15 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
           </svg>
           <%= link_to tab[:url],
-              class: "px-3 py-2 rounded-md transition-colors whitespace-nowrap font-semibold #{tab[:active] ? 'bg-blue-600 text-white dark:bg-blue-500' : 'bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100'}" do %>
+              class: "px-3 py-2 rounded-md transition-colors whitespace-nowrap font-semibold inline-flex items-center gap-1.5 #{grade_button_classes(tab)}" do %>
+            <% if (badge = rating_badge(tab[:rating])) %>
+              <span><%= badge[:label] %></span>
+              <span class="opacity-70">·</span>
+            <% end %>
             <span><%= tab[:label] %></span>
+            <% if tab[:partial] %>
+              <span class="text-sm font-normal opacity-80">(진행 중)</span>
+            <% end %>
           <% end %>
         </div>
       <% else %>

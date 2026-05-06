@@ -6,11 +6,12 @@ class GradeSummaryComponent < ViewComponent::Base
     incomplete: { color: "text-slate-500 dark:text-slate-400", bg: "bg-slate-100 dark:bg-slate-800/50 border-slate-400 dark:border-slate-600", label: "미평가", description: "아직 평가된 항목이 없습니다" }
   }.freeze
 
-  def initialize(rating:, fully_evaluated: true, tabs_evaluated: nil, tabs_total: nil)
+  def initialize(rating:, fully_evaluated: true, tabs_evaluated: nil, tabs_total: nil, compact: false)
     @config = RATING_CONFIG[rating] || RATING_CONFIG[:incomplete]
     @fully_evaluated = fully_evaluated
     @tabs_evaluated = tabs_evaluated
     @tabs_total = tabs_total
+    @compact = compact
   end
 
   private
