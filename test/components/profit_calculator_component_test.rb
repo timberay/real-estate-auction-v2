@@ -19,7 +19,7 @@ class ProfitCalculatorComponentTest < ViewComponent::TestCase
     # Property values converted from 원 to 만원
     assert_selector "[data-profit-calculator-min-bid-value='56000']"
     assert_selector "[data-profit-calculator-appraisal-value='80000']"
-    # Report assumed_amount already in 만원
+    # Report assumed_amount converted from 원 to 만원
     assert_selector "[data-profit-calculator-assumed-amount-value='0']"
     # Budget reserves already in 만원
     assert_selector "[data-profit-calculator-scrivener-fee-value='80']"
@@ -60,5 +60,16 @@ class ProfitCalculatorComponentTest < ViewComponent::TestCase
     ))
 
     assert_selector "[data-profit-calculator-assumed-amount-value='0']"
+  end
+
+  test "converts assumed_amount from 원 to 만원" do
+    # risky_villa_report.assumed_amount is 30_000_000 (원) → 3,000 (만원)
+    render_inline(ProfitCalculatorComponent.new(
+      property: properties(:risky_villa),
+      budget_setting: @budget,
+      report: rights_analysis_reports(:risky_villa_report)
+    ))
+
+    assert_selector "[data-profit-calculator-assumed-amount-value='3000']"
   end
 end
