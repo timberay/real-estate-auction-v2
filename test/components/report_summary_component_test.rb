@@ -57,4 +57,13 @@ class ReportSummaryComponentTest < ViewComponent::TestCase
     assert_text "8억"
     assert_text "5억 6,000만원"
   end
+
+  test "formats assumed and total risk amounts in 만원, not raw 원" do
+    # risky_villa_report.assumed_amount = 30_000_000 → 3,000만원
+    report = rights_analysis_reports(:risky_villa_report)
+    property = properties(:risky_villa)
+    render_inline(ReportSummaryComponent.new(report: report, property: property))
+    assert_text "3,000만원"
+    assert_no_text "30,000,000원"
+  end
 end
