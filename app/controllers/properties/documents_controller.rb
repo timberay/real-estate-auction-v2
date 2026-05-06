@@ -1,6 +1,7 @@
 module Properties
   class DocumentsController < ApplicationController
     include PropertyScopable
+    include PdfUploadValidatable
     before_action :set_user_property
 
     def create
@@ -9,11 +10,9 @@ module Properties
         return
       end
 
-      params[:documents].each do |file|
-        unless file.content_type == "application/pdf"
-          redirect_to property_path(@property), alert: "PDF 파일만 업로드할 수 있습니다."
-          return
-        end
+      if (err = validate_pdf_uploads(params[:documents]))
+        redirect_to property_path(@property), alert: err
+        return
       end
 
       @property.documents.attach(params[:documents])

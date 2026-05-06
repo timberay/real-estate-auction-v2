@@ -1,4 +1,6 @@
 class AnalysesController < ApplicationController
+  include PdfUploadValidatable
+
   def new
     if params[:property_id].present?
       @property = Property.find_by(id: params[:property_id])
@@ -70,11 +72,12 @@ class AnalysesController < ApplicationController
       return
     end
 
+    if (err = validate_pdf_uploads(uploaded_files))
+      redirect_to new_analysis_path, alert: err
+      return
+    end
+
     blob_ids = uploaded_files.map do |file|
-      unless file.content_type == "application/pdf"
-        redirect_to new_analysis_path, alert: "PDF 파일만 업로드할 수 있습니다."
-        return
-      end
       ActiveStorage::Blob.create_and_upload!(
         io: file,
         filename: file.original_filename,
