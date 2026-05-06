@@ -1,11 +1,9 @@
 module CourtAuction
   class CaseSearchClient
-    BASE_URL = "https://www.courtauction.go.kr/pgj/"
     ENDPOINT = "pgj15A/selectAuctnCsSrchRslt.on"
-    REFERER = "https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ159M00.xml"
 
-    OPEN_TIMEOUT = 5
-    READ_TIMEOUT = 10
+    OPEN_TIMEOUT = ENV.fetch("COURT_AUCTION_CASE_SEARCH_OPEN_TIMEOUT", 5).to_i
+    READ_TIMEOUT = ENV.fetch("COURT_AUCTION_CASE_SEARCH_READ_TIMEOUT", 10).to_i
 
     COURT_CODES = {
       "서울중앙지방법원" => "B000210", "서울동부지방법원" => "B000211",
@@ -94,13 +92,13 @@ module CourtAuction
     private
 
     def build_connection
-      Faraday.new(url: BASE_URL) do |f|
+      Faraday.new(url: Endpoints.base_url) do |f|
         f.options.open_timeout = OPEN_TIMEOUT
         f.options.timeout = READ_TIMEOUT
         f.request :json
         f.response :json, content_type: /.*/
         f.headers["Accept"] = "application/json"
-        f.headers["Referer"] = REFERER
+        f.headers["Referer"] = Endpoints.case_search_referer
         f.headers["User-Agent"] = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
         f.headers["submissionid"] = "mf_wfm_mainFrame_sbm_selectCsDtlInf"
         f.headers["sc-userid"] = "NONUSER"

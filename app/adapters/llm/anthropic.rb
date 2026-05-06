@@ -1,14 +1,16 @@
 module Llm
   class Anthropic < Base
-    BASE_URL = "https://api.anthropic.com"
+    DEFAULT_BASE_URL = "https://api.anthropic.com"
     DEFAULT_MODEL = "claude-sonnet-4-20250514"
+    DEFAULT_MAX_TOKENS = 8192
+    DEFAULT_API_VERSION = "2023-06-01"
 
     def provider_name
       "anthropic"
     end
 
     def model_id
-      model_name(DEFAULT_MODEL)
+      model_name(DEFAULT_MODEL, env_key: "ANTHROPIC_MODEL")
     end
 
     def supports_documents?
@@ -22,13 +24,13 @@ module Llm
       encoded_docs = documents.map { |doc| encode_pdf_base64(doc) }
       user_content = build_user_content(prompt, encoded_docs)
 
-      conn = connection(BASE_URL)
+      conn = connection(base_url)
       response = conn.post("/v1/messages") do |req|
         req.headers["x-api-key"] = key
-        req.headers["anthropic-version"] = "2023-06-01"
+        req.headers["anthropic-version"] = api_version
         req.body = {
-          model: model_name(DEFAULT_MODEL),
-          max_tokens: 8192,
+          model: model_id,
+          max_tokens: max_tokens,
           system: system,
           messages: [ { role: "user", content: user_content } ]
         }
@@ -38,6 +40,18 @@ module Llm
     end
 
     private
+
+    def base_url
+      ENV.fetch("ANTHROPIC_BASE_URL", DEFAULT_BASE_URL)
+    end
+
+    def max_tokens
+      ENV.fetch("ANTHROPIC_MAX_TOKENS", DEFAULT_MAX_TOKENS).to_i
+    end
+
+    def api_version
+      ENV.fetch("ANTHROPIC_API_VERSION", DEFAULT_API_VERSION)
+    end
 
     def build_user_content(prompt, encoded_pdfs)
       content = []

@@ -1,9 +1,19 @@
 module CourtAuction
   class BrowserClient
-    SEARCH_URL = "https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml"
     API_ENDPOINT = "pgjsearch/searchControllerMain.on"
     DEFAULT_TIMEOUT = ENV.fetch("BROWSER_TIMEOUT", 90).to_i
-    PAGE_LOAD_WAIT = 3
+    PAGE_LOAD_WAIT = ENV.fetch("BROWSER_PAGE_LOAD_WAIT_SECONDS", 3).to_i
+
+    # Wait durations after WebSquare DOM mutations that cascade to dependent
+    # selects. Tuned to the live court auction site — adjust only after
+    # observing the cascade fail in practice.
+    DOM_CASCADE_WAIT_MS = 500
+    USAGE_CASCADE_WAIT_MS = 1500
+    POST_SELECT_WAIT_MS = 300
+
+    def self.search_url
+      Endpoints.criteria_search_referer
+    end
 
     # WebSquare element IDs
     YEAR_SELECT = "mf_wfm_mainFrame_sbx_rletCsYear"
@@ -15,27 +25,6 @@ module CourtAuction
     MIN_PRICE_SELECT = "mf_wfm_mainFrame_sbx_rletLwsDspslMin"
     MAX_PRICE_SELECT = "mf_wfm_mainFrame_sbx_rletLwsDspslMax"
     SEARCH_BUTTON = "mf_wfm_mainFrame_btn_gdsDtlSrch"
-
-    # Search form defaults
-    MIN_BID_PRICE = 50_000_000
-    DEFAULT_MAX_PRICE = 500_000_000
-
-    PRICE_TIERS = [
-      10_000_000, 50_000_000,
-      100_000_000, 150_000_000, 200_000_000, 250_000_000, 300_000_000,
-      350_000_000, 400_000_000, 450_000_000, 500_000_000, 550_000_000,
-      600_000_000, 650_000_000, 700_000_000, 750_000_000, 800_000_000,
-      850_000_000, 900_000_000, 950_000_000, 1_000_000_000
-    ].freeze
-
-    VALID_REGIONS = %w[
-      서울특별시 부산광역시 대구광역시 인천광역시 광주광역시
-      대전광역시 울산광역시 세종특별자치시 경기도 강원도
-      충청북도 충청남도 전라북도 전라남도 경상북도 경상남도
-      제주특별자치도 강원특별자치도 전북특별자치도
-    ].freeze
-
-    DEFAULT_REGION = "제주특별자치도"
 
     def initialize(timeout: DEFAULT_TIMEOUT)
       @timeout = timeout
@@ -84,7 +73,7 @@ module CourtAuction
     end
 
     def navigate_to_search(page)
-      page.goto(SEARCH_URL, waitUntil: "networkidle", timeout: @timeout * 1000)
+      page.goto(self.class.search_url, waitUntil: "networkidle", timeout: @timeout * 1000)
       page.wait_for_timeout(PAGE_LOAD_WAIT * 1000)
     rescue Playwright::Error => e
       raise DataProvider::ServiceUnavailableError, "Court auction site unreachable: #{e.message}"
@@ -93,29 +82,29 @@ module CourtAuction
     def fill_criteria(page, region:, year:, min_price:, max_price:)
       # 1. Click "소재지(새주소)" radio (label intercepts pointer events, so use force)
       page.click("##{REGION_RADIO}", force: true)
-      page.wait_for_timeout(500)
+      page.wait_for_timeout(DOM_CASCADE_WAIT_MS)
 
       # 2. Set region via DOM dispatchEvent (for cascade)
       set_select_via_dom(page, REGION_SELECT, normalize_region(region))
-      page.wait_for_timeout(500)
+      page.wait_for_timeout(DOM_CASCADE_WAIT_MS)
 
       # 3. Set year
       set_select_via_js(page, YEAR_SELECT, year.to_s)
 
       # 4. Set bid category to 전체
       page.click("##{BID_CATEGORY_ALL_RADIO}", force: true)
-      page.wait_for_timeout(300)
+      page.wait_for_timeout(POST_SELECT_WAIT_MS)
 
       # 5. Set usage: 건물 → 주거용건물 (cascade)
       set_select_via_dom(page, USAGE_LARGE_SELECT, "건물")
-      page.wait_for_timeout(1500) # wait for mid-category options to load
+      page.wait_for_timeout(USAGE_CASCADE_WAIT_MS) # wait for mid-category options to load
       set_select_via_dom(page, USAGE_MID_SELECT, "주거용건물")
-      page.wait_for_timeout(300)
+      page.wait_for_timeout(POST_SELECT_WAIT_MS)
 
       # 6. Set price range: min=5천만원, max=next tier above user's max bid
-      set_select_via_dom(page, MIN_PRICE_SELECT, price_label(MIN_BID_PRICE))
+      set_select_via_dom(page, MIN_PRICE_SELECT, price_label(Pricing::MIN_BID_PRICE_WON))
       set_select_via_dom(page, MAX_PRICE_SELECT, price_label(next_price_tier(max_price)))
-      page.wait_for_timeout(300)
+      page.wait_for_timeout(POST_SELECT_WAIT_MS)
     end
 
     def click_search_and_capture(page)
@@ -164,12 +153,12 @@ module CourtAuction
     end
 
     def normalize_region(region)
-      VALID_REGIONS.include?(region) ? region : DEFAULT_REGION
+      Regions::ALL.include?(region) ? region : Regions::DEFAULT
     end
 
     def next_price_tier(amount)
-      return DEFAULT_MAX_PRICE unless amount
-      PRICE_TIERS.find { |tier| tier > amount } || PRICE_TIERS.last
+      return Pricing::DEFAULT_MAX_PRICE_WON unless amount
+      Pricing.next_tier(amount)
     end
 
     def escape_js(str)

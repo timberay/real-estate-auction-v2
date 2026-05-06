@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { KOR_EOK_TO_MAN, KOR_CHEON_TO_MAN } from "controllers/constants"
 
 // Real-time net profit calculator for pre-bid estimation.
 // All amounts in 만원 (10,000 KRW). Tax rates are simplified
@@ -233,13 +234,13 @@ export default class extends Controller {
 
     const eokMatch = str.match(/(\d+)억(.*)/)
     if (eokMatch) {
-      const eok = parseInt(eokMatch[1], 10) * 10000
+      const eok = parseInt(eokMatch[1], 10) * KOR_EOK_TO_MAN
       let remainder = 0
       const rest = eokMatch[2]
       if (rest) {
         const cheonMatch = rest.match(/(\d+)천/)
         if (cheonMatch) {
-          remainder = parseInt(cheonMatch[1], 10) * 1000
+          remainder = parseInt(cheonMatch[1], 10) * KOR_CHEON_TO_MAN
         } else {
           const digits = rest.replace(/[^0-9]/g, "")
           if (digits) remainder = parseInt(digits, 10)
@@ -249,7 +250,7 @@ export default class extends Controller {
     }
 
     const cheonOnly = str.match(/(\d+)천/)
-    if (cheonOnly) return parseInt(cheonOnly[1], 10) * 1000
+    if (cheonOnly) return parseInt(cheonOnly[1], 10) * KOR_CHEON_TO_MAN
 
     const digits = str.replace(/[^0-9]/g, "")
     return digits ? parseInt(digits, 10) : 0
@@ -258,8 +259,8 @@ export default class extends Controller {
   // Format 만원 integer to Korean 억 display
   formatEok(manwon) {
     if (!manwon || manwon <= 0) return "0만원"
-    const eok = Math.floor(manwon / 10000)
-    const remainder = manwon % 10000
+    const eok = Math.floor(manwon / KOR_EOK_TO_MAN)
+    const remainder = manwon % KOR_EOK_TO_MAN
     if (eok >= 1 && remainder > 0) {
       return `${eok}억 ${remainder.toLocaleString("ko-KR")}만원`
     } else if (eok >= 1) {

@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { KOR_EOK_TO_MAN, KOR_CHEON_TO_MAN } from "controllers/constants"
 
 // Formats 만원 amounts with Korean 억 notation for readability.
 // Accepts various Korean input formats and normalizes to 만원 integer.
@@ -61,7 +62,7 @@ export default class extends Controller {
     // Handle 억 notation
     const eokMatch = str.match(/(\d+)억(.*)/)
     if (eokMatch) {
-      const eok = parseInt(eokMatch[1], 10) * 10000
+      const eok = parseInt(eokMatch[1], 10) * KOR_EOK_TO_MAN
       let remainder = 0
       const rest = eokMatch[2]
 
@@ -69,7 +70,7 @@ export default class extends Controller {
         // Handle 천 (thousands): "2천" → 2000
         const cheonMatch = rest.match(/(\d+)천/)
         if (cheonMatch) {
-          remainder = parseInt(cheonMatch[1], 10) * 1000
+          remainder = parseInt(cheonMatch[1], 10) * KOR_CHEON_TO_MAN
         } else {
           // Plain number after 억
           const digits = rest.replace(/[^0-9]/g, "")
@@ -82,7 +83,7 @@ export default class extends Controller {
     // Handle 천 without 억: "5천" → 5000
     const cheonOnly = str.match(/(\d+)천/)
     if (cheonOnly) {
-      return parseInt(cheonOnly[1], 10) * 1000
+      return parseInt(cheonOnly[1], 10) * KOR_CHEON_TO_MAN
     }
 
     // Plain number
@@ -94,8 +95,8 @@ export default class extends Controller {
   formatEok(manwon) {
     if (!manwon || manwon <= 0) return ""
 
-    const eok = Math.floor(manwon / 10000)
-    const remainder = manwon % 10000
+    const eok = Math.floor(manwon / KOR_EOK_TO_MAN)
+    const remainder = manwon % KOR_EOK_TO_MAN
 
     if (eok >= 1 && remainder > 0) {
       return `${eok}억 ${remainder.toLocaleString("ko-KR")}`

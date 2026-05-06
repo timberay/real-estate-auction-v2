@@ -1,5 +1,6 @@
 // app/javascript/controllers/budget_calculator_controller.js
 import { Controller } from "@hotwired/stimulus"
+import { KOR_EOK_TO_MAN } from "controllers/constants"
 
 // Recalculates max bid amount in real-time as the user edits budget fields.
 // Formula: max_bid_amount = (available_cash - total_reserves) / (1 - loan_ratio)
@@ -166,8 +167,8 @@ export default class extends Controller {
       return
     }
 
-    const eok = Math.floor(manwon / 10000)
-    const remainder = manwon % 10000
+    const eok = Math.floor(manwon / KOR_EOK_TO_MAN)
+    const remainder = manwon % KOR_EOK_TO_MAN
 
     if (eok >= 1 && remainder > 0) {
       this.displayTarget.textContent = `${eok}억 ${remainder.toLocaleString("ko-KR")}만원`

@@ -1,7 +1,10 @@
 class PdfAnalysisJob < ApplicationJob
   queue_as :default
 
-  retry_on Faraday::TimeoutError, wait: 5.seconds, attempts: 2
+  RETRY_WAIT = ENV.fetch("PDF_ANALYSIS_RETRY_WAIT_SECONDS", 5).to_i.seconds
+  RETRY_ATTEMPTS = ENV.fetch("PDF_ANALYSIS_RETRY_ATTEMPTS", 2).to_i
+
+  retry_on Faraday::TimeoutError, wait: RETRY_WAIT, attempts: RETRY_ATTEMPTS
   discard_on ActiveJob::DeserializationError
 
   def perform(property_id: nil, user_id:, document_blob_ids: nil)

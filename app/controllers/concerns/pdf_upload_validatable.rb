@@ -8,7 +8,7 @@
 module PdfUploadValidatable
   extend ActiveSupport::Concern
 
-  MAX_PDF_SIZE = 5.megabytes
+  MAX_PDF_SIZE = ENV.fetch("MAX_PDF_UPLOAD_MEGABYTES", 5).to_i.megabytes
   PDF_MAGIC = "%PDF-".b.freeze
 
   private
@@ -19,7 +19,7 @@ module PdfUploadValidatable
     Array(files).each do |file|
       next unless file.respond_to?(:content_type)
       return "PDF 파일만 업로드할 수 있습니다." unless file.content_type == "application/pdf"
-      return "PDF 파일은 5MB를 초과할 수 없습니다." if file.size > MAX_PDF_SIZE
+      return "PDF 파일은 #{MAX_PDF_SIZE / 1.megabyte}MB를 초과할 수 없습니다." if file.size > MAX_PDF_SIZE
 
       head = file.read(5).to_s.b
       file.rewind if file.respond_to?(:rewind)

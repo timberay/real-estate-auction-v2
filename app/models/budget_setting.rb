@@ -11,25 +11,11 @@ class BudgetSetting < ApplicationRecord
   RESERVE_FIELDS.each do |field|
     validates field, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   end
-  REGIONS = [
-    "서울특별시", "부산광역시", "대구광역시", "인천광역시", "광주광역시",
-    "대전광역시", "울산광역시", "세종특별자치시", "경기도", "강원도",
-    "충청북도", "충청남도", "전라북도", "전라남도", "경상북도",
-    "경상남도", "제주특별자치도", "강원특별자치도", "전북특별자치도"
-  ].freeze
+  REGIONS = Regions::ALL
+  DEFAULT_REGION = Regions::DEFAULT
 
-  DEFAULT_REGION = "제주특별자치도"
-
-  PRICE_OPTIONS = [
-    10_000_000, 50_000_000, 100_000_000, 150_000_000,
-    200_000_000, 250_000_000, 300_000_000, 350_000_000,
-    400_000_000, 450_000_000, 500_000_000, 550_000_000,
-    600_000_000, 650_000_000, 700_000_000, 750_000_000,
-    800_000_000, 850_000_000, 900_000_000, 950_000_000,
-    1_000_000_000
-  ].freeze
-
-  DEFAULT_MAX_PRICE = 500_000_000
+  PRICE_OPTIONS = Pricing::PRICE_TIERS_WON
+  DEFAULT_MAX_PRICE = Pricing::DEFAULT_MAX_PRICE_WON
 
   validates :region, inclusion: { in: REGIONS }, allow_nil: true
   AREA_CATEGORIES = [
@@ -83,6 +69,6 @@ class BudgetSetting < ApplicationRecord
   end
 
   def regulated_region?
-    LoanPolicy::REGULATED_REGIONS.include?(region)
+    Regions.regulated?(region)
   end
 end

@@ -1,26 +1,27 @@
 module Llm
   class OpenRouter < Base
-    BASE_URL = "https://openrouter.ai"
+    DEFAULT_BASE_URL = "https://openrouter.ai"
     DEFAULT_MODEL = "anthropic/claude-sonnet-4-20250514"
+    DEFAULT_MAX_TOKENS = 4096
 
     def provider_name
       "openrouter"
     end
 
     def model_id
-      model_name(DEFAULT_MODEL)
+      model_name(DEFAULT_MODEL, env_key: "OPENROUTER_MODEL")
     end
 
     def analyze(system:, prompt:)
       key = api_key("openrouter", "OPENROUTER_API_KEY")
       raise "OPENROUTER_API_KEY not configured. Set USE_MOCK=true for development." unless key
 
-      conn = connection(BASE_URL)
+      conn = connection(base_url)
       response = conn.post("/v1/chat/completions") do |req|
         req.headers["Authorization"] = "Bearer #{key}"
         req.body = {
-          model: model_name(DEFAULT_MODEL),
-          max_tokens: 4096,
+          model: model_id,
+          max_tokens: max_tokens,
           messages: [
             { role: "system", content: system },
             { role: "user", content: prompt }
@@ -29,6 +30,16 @@ module Llm
       end
       handle_response(response)
       sanitize_and_parse_json(response.body["choices"][0]["message"]["content"])
+    end
+
+    private
+
+    def base_url
+      ENV.fetch("OPENROUTER_BASE_URL", DEFAULT_BASE_URL)
+    end
+
+    def max_tokens
+      ENV.fetch("OPENROUTER_MAX_TOKENS", DEFAULT_MAX_TOKENS).to_i
     end
   end
 end

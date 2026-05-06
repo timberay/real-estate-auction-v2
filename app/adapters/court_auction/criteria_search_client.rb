@@ -1,38 +1,18 @@
 module CourtAuction
   class CriteriaSearchClient
-    BASE_URL = "https://www.courtauction.go.kr/pgj/"
     ENDPOINT = "pgjsearch/searchControllerMain.on"
-    REFERER = "https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml"
 
     PAGE_SIZE = 10
-    TIMEOUT = 30
-    MIN_BID_PRICE = "50000000"
+    TIMEOUT = ENV.fetch("COURT_AUCTION_CRITERIA_SEARCH_TIMEOUT", 30).to_i
+    OPEN_TIMEOUT = ENV.fetch("COURT_AUCTION_CRITERIA_SEARCH_OPEN_TIMEOUT", 10).to_i
     MAX_ITEMS_DEFAULT = 100
 
-    REGION_CODES = {
-      "서울특별시" => "11", "부산광역시" => "26", "대구광역시" => "27",
-      "인천광역시" => "28", "광주광역시" => "29", "대전광역시" => "30",
-      "울산광역시" => "31", "세종특별자치시" => "36", "경기도" => "41",
-      "강원도" => "42", "충청북도" => "43", "충청남도" => "44",
-      "전라북도" => "45", "전라남도" => "46", "경상북도" => "47",
-      "경상남도" => "48", "제주특별자치도" => "50",
-      "강원특별자치도" => "51", "전북특별자치도" => "52"
-    }.freeze
-
-    PRICE_TIERS = [
-      50_000_000, 100_000_000, 150_000_000, 200_000_000, 250_000_000,
-      300_000_000, 350_000_000, 400_000_000, 450_000_000, 500_000_000,
-      550_000_000, 600_000_000, 650_000_000, 700_000_000, 750_000_000,
-      800_000_000, 850_000_000, 900_000_000, 950_000_000, 1_000_000_000
-    ].freeze
-
     def self.region_code_for(address)
-      return nil if address.blank?
-      REGION_CODES.find { |name, _| address.start_with?(name) }&.last
+      Regions.code_for(address)
     end
 
     def self.next_price_tier(amount)
-      PRICE_TIERS.find { |tier| tier > amount } || PRICE_TIERS.last
+      Pricing.next_tier(amount, tiers: Pricing::CRITERIA_MAX_FILTER_TIERS_WON)
     end
 
     def initialize
@@ -65,13 +45,13 @@ module CourtAuction
     private
 
     def build_connection
-      Faraday.new(url: BASE_URL) do |f|
+      Faraday.new(url: Endpoints.base_url) do |f|
         f.options.timeout = TIMEOUT
-        f.options.open_timeout = 10
+        f.options.open_timeout = OPEN_TIMEOUT
         f.request :json
         f.response :json
         f.headers["Accept"] = "application/json"
-        f.headers["Referer"] = REFERER
+        f.headers["Referer"] = Endpoints.criteria_search_referer
         f.headers["submissionid"] = "mf_wfm_mainFrame_sbm_selectGdsDtlSrch"
         f.headers["SC-Userid"] = "SYSTEM"
       end
@@ -102,7 +82,7 @@ module CourtAuction
           "lclDspslGdsLstUsgCd" => "20000",
           "mclDspslGdsLstUsgCd" => "20100",
           "sclDspslGdsLstUsgCd" => "",
-          "lwsDspslPrcMin" => MIN_BID_PRICE,
+          "lwsDspslPrcMin" => Pricing::MIN_BID_PRICE_WON.to_s,
           "lwsDspslPrcMax" => max_price.to_s,
           "notifyLoc" => "on",
           "bidBgngYmd" => today.strftime("%Y%m%d"),

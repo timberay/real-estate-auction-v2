@@ -1,5 +1,5 @@
 class LoanPolicy < ApplicationRecord
-  REGULATED_REGIONS = [ "서울특별시" ].freeze
+  REGULATED_REGIONS = Regions::REGULATED
 
   has_many :budget_settings, dependent: :nullify
   belongs_to :property_type
@@ -17,6 +17,6 @@ class LoanPolicy < ApplicationRecord
   }
 
   def ratio_for(region)
-    REGULATED_REGIONS.include?(region) ? regulated_loan_ratio : loan_ratio
+    Regions.regulated?(region) ? regulated_loan_ratio : loan_ratio
   end
 end

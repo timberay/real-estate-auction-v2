@@ -1,4 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
+import {
+  COPY_FEEDBACK_DURATION_MS,
+  BYTES_PER_KB,
+  BYTES_PER_MB,
+} from "controllers/constants"
 
 export default class extends Controller {
   static targets = [
@@ -119,7 +124,7 @@ export default class extends Controller {
         this.checkIconTarget.classList.add("hidden")
         button.querySelector("span").textContent = "프롬프트 복사"
         button.disabled = false
-      }, 2000)
+      }, COPY_FEEDBACK_DURATION_MS)
     } catch {
       button.disabled = false
     }
@@ -128,9 +133,9 @@ export default class extends Controller {
   // --- Helpers ---
 
   formatSize(bytes) {
-    if (bytes < 1024) return `${bytes}B`
-    if (bytes < 1048576) return `${(bytes / 1024).toFixed(0)}KB`
-    return `${(bytes / 1048576).toFixed(1)}MB`
+    if (bytes < BYTES_PER_KB) return `${bytes}B`
+    if (bytes < BYTES_PER_MB) return `${(bytes / BYTES_PER_KB).toFixed(0)}KB`
+    return `${(bytes / BYTES_PER_MB).toFixed(1)}MB`
   }
 
   #activateMethodTab(tab) {
