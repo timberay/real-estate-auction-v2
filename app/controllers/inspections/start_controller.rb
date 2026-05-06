@@ -1,8 +1,9 @@
 module Inspections
   class StartController < ApplicationController
-    def create
-      @property = Property.find(params[:property_id])
+    include PropertyScopable
+    before_action :set_user_property
 
+    def create
       if params[:documents].present?
         @property.documents.attach(params[:documents])
       end

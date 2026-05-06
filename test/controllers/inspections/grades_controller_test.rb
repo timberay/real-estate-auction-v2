@@ -3,7 +3,9 @@ require "test_helper"
 class Inspections::GradesControllerTest < ActionDispatch::IntegrationTest
   setup do
     @property = properties(:safe_apartment)
-    UserProperty.find_or_create_by!(user: users(:guest), property: @property)
+    get start_onboarding_url
+    @user = inherit_fixture_guest_ownership
+    UserProperty.find_or_create_by!(user: @user, property: @property)
   end
 
   test "show renders grade page" do

@@ -1,7 +1,9 @@
 module Inspections
   class DividendsController < ApplicationController
+    include PropertyScopable
+    before_action :set_user_property
+
     def update
-      @property = Property.find(params[:property_id])
       @report = RightsAnalysisReport.find_by!(property: @property, user: current_user)
 
       expected_bid = params[:expected_bid].to_i

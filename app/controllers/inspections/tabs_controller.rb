@@ -1,10 +1,11 @@
 module Inspections
   class TabsController < ApplicationController
+    include PropertyScopable
+    before_action :set_user_property
+
     VALID_TABS = %w[ rights_analysis property_analysis profit_analysis field_check bidding ].freeze
 
     def edit
-      @property = Property.find(params[:property_id])
-      @user_property = current_user.user_properties.find_by(property: @property)
       @tab_key = params[:tab_key]
       return head(:not_found) unless VALID_TABS.include?(@tab_key)
 
@@ -29,7 +30,6 @@ module Inspections
     end
 
     def update
-      @property = Property.find(params[:property_id])
       @tab_key = params[:tab_key]
       return head(:not_found) unless VALID_TABS.include?(@tab_key)
 

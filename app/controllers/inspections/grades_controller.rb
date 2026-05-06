@@ -1,8 +1,9 @@
 module Inspections
   class GradesController < ApplicationController
+    include PropertyScopable
+    before_action :set_user_property
+
     def show
-      @property = Property.find(params[:property_id])
-      @user_property = current_user.user_properties.find_by(property: @property)
       rating_service = InspectionRatingService.new(property: @property, user: current_user)
       @rating = rating_service.call
       @fully_evaluated = rating_service.fully_evaluated?

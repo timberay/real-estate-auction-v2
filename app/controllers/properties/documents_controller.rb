@@ -1,6 +1,7 @@
 module Properties
   class DocumentsController < ApplicationController
-    before_action :set_property
+    include PropertyScopable
+    before_action :set_user_property
 
     def create
       if params[:documents].blank?
@@ -23,12 +24,6 @@ module Properties
       attachment = @property.documents.find(params[:id])
       attachment.purge
       redirect_to property_path(@property), notice: "문서가 삭제되었습니다."
-    end
-
-    private
-
-    def set_property
-      @property = Property.find(params[:property_id])
     end
   end
 end

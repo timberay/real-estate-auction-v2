@@ -1,5 +1,9 @@
 class PropertiesController < ApplicationController
   include CourtAuctionErrorMessages
+  include PropertyScopable
+
+  before_action :set_user_property, only: %i[show destroy toggle_favorite]
+
   def index
     @user_properties = current_user.user_properties
       .includes(property: :inspection_results)
@@ -20,17 +24,14 @@ class PropertiesController < ApplicationController
   end
 
   def show
-    @property = Property.find(params[:id])
-    @user_property = current_user.user_properties.find_by(property: @property)
-
     unless @property.analyzed?
       redirect_to new_analysis_path(property_id: @property.id)
       return
     end
 
-    if @user_property&.safety_rating.present?
+    if @user_property.safety_rating.present?
       redirect_to property_inspections_grade_path(@property)
-    elsif @user_property&.analyzed_at.present?
+    elsif @user_property.analyzed_at.present?
       redirect_to edit_property_inspections_tab_path(@property, tab_key: "rights_analysis")
     end
   end
@@ -57,31 +58,27 @@ class PropertiesController < ApplicationController
   end
 
   def destroy
-    property = Property.find(params[:id])
-    user_property = current_user.user_properties.find_by!(property: property)
-
     ActiveRecord::Base.transaction do
-      InspectionResult.where(user: current_user, property: property).delete_all
-      RightsAnalysisReport.where(user: current_user, property: property).delete_all
-      LlmAnalysisLog.where(user: current_user, property: property).delete_all
-      user_property.destroy!
+      InspectionResult.where(user: current_user, property: @property).delete_all
+      RightsAnalysisReport.where(user: current_user, property: @property).delete_all
+      LlmAnalysisLog.where(user: current_user, property: @property).delete_all
+      @user_property.destroy!
     end
 
     respond_to do |format|
-      format.turbo_stream { render turbo_stream: turbo_stream.remove(helpers.dom_id(property, :card)) }
+      format.turbo_stream { render turbo_stream: turbo_stream.remove(helpers.dom_id(@property, :card)) }
       format.html { redirect_to properties_path, notice: "물건을 내 목록에서 삭제했습니다." }
     end
   end
 
   def toggle_favorite
-    user_property = current_user.user_properties.find_by!(property_id: params[:id])
-    user_property.update!(favorite: !user_property.favorite)
+    @user_property.update!(favorite: !@user_property.favorite)
 
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace(
-          helpers.dom_id(user_property, :favorite_toggle),
-          FavoriteToggleComponent.new(user_property: user_property)
+          helpers.dom_id(@user_property, :favorite_toggle),
+          FavoriteToggleComponent.new(user_property: @user_property)
         )
       end
       format.html { redirect_to properties_path }
