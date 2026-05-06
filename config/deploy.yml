@@ -60,6 +60,15 @@ env:
     # Log everything from Rails
     # RAILS_LOG_LEVEL: debug
 
+# Bound Docker container logs to protect the host disk on small servers
+# (Cafe24 4GB single-server). Without this, json-file logs grow unbounded
+# and can fill the disk, taking the app down.
+logging:
+  driver: json-file
+  options:
+    max-size: "100m"
+    max-file: "5"
+
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal logs -r job" will tail logs from the first server in the job section.
 aliases:
