@@ -71,19 +71,11 @@ class BidOpinionComponent < ViewComponent::Base
       figures << { label: "최대 입찰가 (예산)", value: format_price_in_eok(@budget.max_bid_amount) }
     end
 
-    if bidder_burden.present?
-      figures << { label: "낙찰자 부담액", value: format_price_won(bidder_burden) }
-    end
-
     figures
   end
 
   def opposing_tenant_count
     return 0 unless @report
     @report.effective_tenants.count { |t| t["opposing_power"] }
-  end
-
-  def bidder_burden
-    @report&.parsed_data&.dig("user_simulation", "bidder_burden")
   end
 end
