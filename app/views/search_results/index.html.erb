@@ -1,6 +1,8 @@
 <% content_for(:page_title, "물건 목록") %>
 
 <%# app/views/search_results/index.html.erb %>
+<%= turbo_stream_from "criteria_search_#{current_user.id}" %>
+
 <div class="space-y-6">
   <%# 관심 지역 + 조건검색 %>
   <div data-controller="criteria-search" class="max-w-xl min-w-80">

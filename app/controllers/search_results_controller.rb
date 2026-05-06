@@ -16,16 +16,20 @@ class SearchResultsController < ApplicationController
 
   def create
     bs = current_user.budget_setting
-    result = CourtAuctionSearchService.call(
-      user: current_user,
+    CourtAuctionSearchJob.perform_later(
+      user_id: current_user.id,
       address: bs&.effective_region || BudgetSetting::DEFAULT_REGION,
       max_bid_price: bs&.max_bid_amount.to_i * 10_000
     )
 
-    if result.error
-      redirect_to search_path, alert: error_message_for(result.error)
-    else
-      redirect_to search_path, notice: "#{result.count}건의 검색 결과를 가져왔습니다."
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace(
+          "criteria-search-results",
+          partial: "search_results/loading_panel"
+        )
+      end
+      format.html { redirect_to search_path, notice: "조건검색을 시작했습니다. 결과를 잠시 기다려주세요." }
     end
   end
 

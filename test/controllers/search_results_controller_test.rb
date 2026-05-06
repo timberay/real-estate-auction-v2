@@ -26,55 +26,56 @@ class SearchResultsControllerTest < ActionDispatch::IntegrationTest
     assert_match "관심 지역", response.body
   end
 
-  test "POST create runs search and redirects" do
-    mock_response = { items: [], total: 0 }
-    adapter = Object.new
-    adapter.define_singleton_method(:search_by_criteria) { |**_| mock_response }
-
-    original_new = GovernmentCourtAuctionAdapter.method(:new)
-    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
-
-    post search_results_url
-    assert_redirected_to search_path
-    follow_redirect!
-    assert_match "0건", flash[:notice]
-  ensure
-    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
-  end
-
-  test "POST create shows error on timeout" do
-    adapter = Object.new
-    adapter.define_singleton_method(:search_by_criteria) { |**_| raise DataProvider::TimeoutError, "timeout" }
-
-    original_new = GovernmentCourtAuctionAdapter.method(:new)
-    GovernmentCourtAuctionAdapter.define_singleton_method(:new) { |*_| adapter }
-
-    post search_results_url
-    assert_redirected_to search_path
-    follow_redirect!
-    assert_match "시간이 초과", flash[:alert]
-  ensure
-    GovernmentCourtAuctionAdapter.define_singleton_method(:new, original_new)
-  end
-
-  test "create redirects to /search with notice on success" do
+  test "POST create enqueues CourtAuctionSearchJob and does not call service synchronously" do
+    called = false
     original_call = CourtAuctionSearchService.method(:call)
-    CourtAuctionSearchService.define_singleton_method(:call) { |**_| OpenStruct.new(error: nil, count: 5) }
+    CourtAuctionSearchService.define_singleton_method(:call) { |**_| called = true; OpenStruct.new(error: nil, count: 0) }
 
-    post search_results_url
-    assert_redirected_to search_path
+    assert_enqueued_with(job: CourtAuctionSearchJob) do
+      post search_results_url, as: :turbo_stream
+    end
+    refute called, "CourtAuctionSearchService should not be called inline from controller"
   ensure
     CourtAuctionSearchService.define_singleton_method(:call, original_call)
   end
 
-  test "create redirects to /search with alert on error" do
-    original_call = CourtAuctionSearchService.method(:call)
-    CourtAuctionSearchService.define_singleton_method(:call) { |**_| OpenStruct.new(error: :timeout, count: 0) }
+  test "POST create with turbo_stream renders loading panel" do
+    post search_results_url, as: :turbo_stream
 
+    assert_response :success
+    assert_match(/turbo-stream action="replace"/, response.body)
+    assert_match "criteria-search-results", response.body
+    assert_match "조건검색 중", response.body
+  end
+
+  test "POST create enqueues job with effective_region and max_bid_price from budget setting" do
+    @user.create_budget_setting!(region: "서울특별시", max_bid_amount: 12_345)
+
+    assert_enqueued_with(
+      job: CourtAuctionSearchJob,
+      args: [ { user_id: @user.id, address: "서울특별시", max_bid_price: 123_450_000 } ]
+    ) do
+      post search_results_url, as: :turbo_stream
+    end
+  end
+
+  test "POST create falls back to default region when no budget setting" do
+    assert_nil @user.budget_setting
+
+    assert_enqueued_with(
+      job: CourtAuctionSearchJob,
+      args: [ { user_id: @user.id, address: BudgetSetting::DEFAULT_REGION, max_bid_price: 0 } ]
+    ) do
+      post search_results_url, as: :turbo_stream
+    end
+  end
+
+  test "POST create with HTML format redirects to /search with notice (non-Turbo fallback)" do
     post search_results_url
+
     assert_redirected_to search_path
-  ensure
-    CourtAuctionSearchService.define_singleton_method(:call, original_call)
+    follow_redirect!
+    assert_match(/검색|시작|기다려/, flash[:notice].to_s)
   end
 
   test "POST import adds property to user list" do
