@@ -185,6 +185,24 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
     assert_equal stale_id, @setting.reload.loan_policy_id
   end
 
+  test "GET show redirects to onboarding without raising when budget_setting is missing" do
+    @setting.destroy!
+
+    assert_nothing_raised do
+      get settings_budget_url
+    end
+    assert_redirected_to start_onboarding_url
+  end
+
+  test "GET show redirects to onboarding without raising when budget_setting is incomplete" do
+    @setting.update!(completed_at: nil)
+
+    assert_nothing_raised do
+      get settings_budget_url
+    end
+    assert_redirected_to start_onboarding_url
+  end
+
   test "PATCH update saves new settings and creates snapshot" do
     patch settings_budget_url, params: {
       budget_setting: {

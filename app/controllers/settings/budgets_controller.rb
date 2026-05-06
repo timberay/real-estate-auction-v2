@@ -2,7 +2,7 @@ module Settings
   class BudgetsController < ApplicationController
     def show
       @setting = current_user.budget_setting
-      redirect_to start_onboarding_url unless @setting&.completed?
+      return redirect_to(start_onboarding_url) unless @setting&.completed?
       load_show_data
     end
 
