@@ -46,6 +46,10 @@ export default class extends Controller {
     this.bidDisplayTarget.value = this.formatEok(this.minBidValue)
     this.bidSliderTarget.value = this.minBidValue
     this.updateBidPercent(this.minBidValue)
+    if (this.appraisalValue > 0) {
+      this.saleDisplayTarget.value = this.formatEok(this.appraisalValue)
+      this.saleHiddenTarget.value = this.appraisalValue
+    }
     this.calculate()
   }
 
