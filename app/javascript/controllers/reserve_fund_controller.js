@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { KOR_EOK_TO_MAN } from "controllers/constants"
 
 // Manages Step 2 reserve fund form:
 // - Area dropdown change triggers auto-recalculation of reserve defaults
@@ -86,7 +87,7 @@ export default class extends Controller {
   }
 
   updateHints(match) {
-    const priceLabel = `평균 ${(match.average_price / 10000).toFixed(1)}억`
+    const priceLabel = `평균 ${(match.average_price / KOR_EOK_TO_MAN).toFixed(1)}억`
     const taxPercent = (match.acquisition_tax_rate * 100).toFixed(1)
 
     if (this.hasRepairCostHintTarget)

@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { BYTES_PER_KB, BYTES_PER_MB } from "controllers/constants"
 
 export default class extends Controller {
   static targets = ["input", "submit", "fileList"]
@@ -55,8 +56,8 @@ export default class extends Controller {
   }
 
   formatSize(bytes) {
-    if (bytes < 1024) return `${bytes}B`
-    if (bytes < 1048576) return `${(bytes / 1024).toFixed(0)}KB`
-    return `${(bytes / 1048576).toFixed(1)}MB`
+    if (bytes < BYTES_PER_KB) return `${bytes}B`
+    if (bytes < BYTES_PER_MB) return `${(bytes / BYTES_PER_KB).toFixed(0)}KB`
+    return `${(bytes / BYTES_PER_MB).toFixed(1)}MB`
   }
 }
