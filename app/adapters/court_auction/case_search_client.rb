@@ -1,8 +1,6 @@
 module CourtAuction
   class CaseSearchClient
-    BASE_URL = "https://www.courtauction.go.kr/pgj/"
     ENDPOINT = "pgj15A/selectAuctnCsSrchRslt.on"
-    REFERER = "https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ159M00.xml"
 
     OPEN_TIMEOUT = 5
     READ_TIMEOUT = 10
@@ -94,13 +92,13 @@ module CourtAuction
     private
 
     def build_connection
-      Faraday.new(url: BASE_URL) do |f|
+      Faraday.new(url: Endpoints.base_url) do |f|
         f.options.open_timeout = OPEN_TIMEOUT
         f.options.timeout = READ_TIMEOUT
         f.request :json
         f.response :json, content_type: /.*/
         f.headers["Accept"] = "application/json"
-        f.headers["Referer"] = REFERER
+        f.headers["Referer"] = Endpoints.case_search_referer
         f.headers["User-Agent"] = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36"
         f.headers["submissionid"] = "mf_wfm_mainFrame_sbm_selectCsDtlInf"
         f.headers["sc-userid"] = "NONUSER"

@@ -1,9 +1,12 @@
 module CourtAuction
   class BrowserClient
-    SEARCH_URL = "https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml"
     API_ENDPOINT = "pgjsearch/searchControllerMain.on"
     DEFAULT_TIMEOUT = ENV.fetch("BROWSER_TIMEOUT", 90).to_i
     PAGE_LOAD_WAIT = 3
+
+    def self.search_url
+      Endpoints.criteria_search_referer
+    end
 
     # WebSquare element IDs
     YEAR_SELECT = "mf_wfm_mainFrame_sbx_rletCsYear"
@@ -84,7 +87,7 @@ module CourtAuction
     end
 
     def navigate_to_search(page)
-      page.goto(SEARCH_URL, waitUntil: "networkidle", timeout: @timeout * 1000)
+      page.goto(self.class.search_url, waitUntil: "networkidle", timeout: @timeout * 1000)
       page.wait_for_timeout(PAGE_LOAD_WAIT * 1000)
     rescue Playwright::Error => e
       raise DataProvider::ServiceUnavailableError, "Court auction site unreachable: #{e.message}"
