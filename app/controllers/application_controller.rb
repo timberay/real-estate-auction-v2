@@ -5,9 +5,11 @@ class ApplicationController < ActionController::Base
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
-  before_action :ensure_current_user
+  before_action :ensure_user
   before_action :capture_return_to_url
   before_action :touch_last_seen
+
+  helper_method :current_user
 
   rescue_from Auth::Error, with: :handle_auth_error
   rescue_from DataProvider::MissingCredentialError, with: :handle_missing_credential
@@ -23,17 +25,32 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def ensure_current_user
+  # Eagerly resolves @current_user, creating a guest user if none exists.
+  # Public/landing controllers should `skip_before_action :ensure_user` to
+  # avoid User.create! on every anonymous request (bot/crawler DoS surface).
+  def ensure_user
+    @current_user = load_existing_user || create_guest_user!
+  end
+
+  # Read-only lookup. Returns nil if no session/cookie identifies a user.
+  def load_existing_user
     if session[:user_id] && (user = User.find_by(id: session[:user_id]))
-      @current_user = user
+      user
     elsif (uid = cookies.signed[:remember_token]) &&
           (user = User.find_by(id: uid, guest: false))
       session[:user_id] = user.id
-      @current_user = user
-    else
-      @current_user = User.create!
-      session[:user_id] = @current_user.id
+      user
     end
+  end
+
+  def create_guest_user!
+    user = User.create!
+    session[:user_id] = user.id
+    user
+  end
+
+  def current_user
+    @current_user ||= load_existing_user
   end
 
   def capture_return_to_url
@@ -45,17 +62,13 @@ class ApplicationController < ActionController::Base
   end
 
   def touch_last_seen
-    return unless @current_user
-    return if Rails.cache.exist?("last_seen:#{@current_user.id}")
+    user = current_user
+    return unless user
+    return if Rails.cache.exist?("last_seen:#{user.id}")
 
-    Rails.cache.write("last_seen:#{@current_user.id}", true, expires_in: 1.minute)
-    @current_user.update_column(:last_seen_at, Time.current)
+    Rails.cache.write("last_seen:#{user.id}", true, expires_in: 1.minute)
+    user.update_column(:last_seen_at, Time.current)
   end
-
-  def current_user
-    @current_user ||= User.find_by(id: session[:user_id])
-  end
-  helper_method :current_user
 
   def handle_auth_error(error)
     Rails.logger.warn("[Auth::Error] #{error.class}: #{error.message}")
