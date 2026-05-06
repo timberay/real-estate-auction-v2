@@ -17,8 +17,8 @@ module Manual
 
         render_inline(Manual::StepCard::Component.new(step: step, default_open: false))
 
-        assert_text "예산 정하기"
-        assert_text "내가 살 수 있는 가격대를 먼저 못 박습니다."
+        assert_text I18n.t("manuals.steps.budget.label")
+        assert_text I18n.t("manuals.steps.budget.summary")
       end
 
       test "is collapsed when default_open is false" do
@@ -69,9 +69,9 @@ module Manual
 
         render_inline(Manual::StepCard::Component.new(step: step, default_open: true))
 
-        assert_text "보유 현금과 대출 한도 입력"
-        assert_text "취득세·수리비·이사비 등 부대비용 자동 계산"
-        assert_text "지역과 평형대 설정"
+        I18n.t("manuals.steps.budget.actions").each do |action|
+          assert_text action
+        end
       end
 
       test "CTA links to the right path per step key" do
