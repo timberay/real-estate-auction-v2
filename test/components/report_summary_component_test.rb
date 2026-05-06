@@ -1,21 +1,23 @@
 require "test_helper"
 
 class ReportSummaryComponentTest < ViewComponent::TestCase
-  test "renders safe verdict with checklist label" do
+  test "renders verdict summary text" do
     report = rights_analysis_reports(:safe_apartment_report)
     property = properties(:safe_apartment)
     render_inline(ReportSummaryComponent.new(report: report, property: property))
-    assert_text "체크리스트 분석 결과"
-    assert_no_text "권리 분석 판정"
-    assert_text "안전"
     assert_text "말소기준권리"
   end
 
-  test "renders danger verdict" do
+  test "does not duplicate the overall verdict (no emoji, label, or 체크리스트 분석 결과 text)" do
+    # The overall verdict already lives on the inspection tab bar / bid opinion box.
+    # Repeating it here as 🔴 위험 conflicted with the overall 주의 verdict and confused users.
     report = rights_analysis_reports(:risky_villa_report)
     property = properties(:risky_villa)
     render_inline(ReportSummaryComponent.new(report: report, property: property))
-    assert_text "위험"
+    assert_no_text "체크리스트 분석 결과"
+    assert_no_text "🔴"
+    assert_no_text "🟡"
+    assert_no_text "🟢"
   end
 
   test "renders appraisal price and min bid price" do

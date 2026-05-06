@@ -1,10 +1,4 @@
 class ReportSummaryComponent < ViewComponent::Base
-  VERDICT_CONFIG = {
-    "safe" => { color: "text-green-700 dark:text-green-400", bg: "bg-green-100 dark:bg-green-900/20", border: "border-green-400", emoji: "🟢", label: "안전" },
-    "caution" => { color: "text-yellow-700 dark:text-yellow-400", bg: "bg-yellow-100 dark:bg-yellow-900/20", border: "border-yellow-400", emoji: "🟡", label: "주의" },
-    "danger" => { color: "text-red-700 dark:text-red-400", bg: "bg-red-100 dark:bg-red-900/20", border: "border-red-400", emoji: "🔴", label: "위험" }
-  }.freeze
-
   CHECKLIST_CODE_LABELS = {
     "rights-003" => "선순위 전세권 위험",
     "rights-006" => "대항력 있는 임차인 위험",
@@ -15,7 +9,6 @@ class ReportSummaryComponent < ViewComponent::Base
   def initialize(report:, property:)
     @report = report
     @property = property
-    @config = VERDICT_CONFIG[report.verdict] || VERDICT_CONFIG["safe"]
   end
 
   private
