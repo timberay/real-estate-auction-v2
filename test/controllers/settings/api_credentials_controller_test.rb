@@ -2,7 +2,7 @@ require "test_helper"
 
 class Settings::ApiCredentialsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    get root_path  # ensure guest session
+    get start_onboarding_url  # ensure guest session via non-public action
     @user = User.find(session[:user_id])
   end
 

@@ -7,8 +7,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "redirects to properties when budget settings completed" do
-    # Create guest user with completed budget settings
-    get root_url  # creates guest session
+    # Bootstrap a guest via a non-public action that runs ensure_user.
+    get start_onboarding_url
     user = User.find(session[:user_id])
     BudgetSetting.create!(
       user: user,
@@ -21,16 +21,15 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to properties_path
   end
 
-  test "auto-creates guest session on first visit" do
-    assert_difference "User.count", 1 do
+  test "does NOT auto-create a user on landing visit (lazy guest creation)" do
+    assert_no_difference "User.count" do
       get root_url
     end
   end
 
-  test "does not create duplicate guest user on second visit" do
-    get root_url
+  test "repeat anonymous visits never create users" do
     assert_no_difference "User.count" do
-      get root_url
+      3.times { get root_url }
     end
   end
 end

@@ -1,4 +1,6 @@
 class LegalController < ApplicationController
+  skip_before_action :ensure_user
+
   around_action :use_ko_locale
 
   def terms; end

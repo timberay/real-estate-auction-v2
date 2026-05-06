@@ -3,7 +3,7 @@ require "test_helper"
 class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @property = properties(:safe_apartment)
-    get root_path
+    get start_onboarding_url
     @user = inherit_fixture_guest_ownership
     UserProperty.find_or_create_by!(user: @user, property: @property)
   end

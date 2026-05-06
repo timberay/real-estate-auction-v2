@@ -17,14 +17,21 @@ class Auth::SessionsControllerTest < ActionDispatch::IntegrationTest
     assert google_pos < kakao_pos, "Google button should appear before Kakao when last_provider=google"
   end
 
-  test "DELETE destroy signs out and resets to new guest" do
+  test "DELETE destroy signs out and clears the session" do
     user = User.create!(guest: false, email: "x@y.com")
     post "/testing/sign_in", params: { user_id: user.id }
 
     delete "/auth/logout"
     assert_redirected_to root_path
+    assert_nil session[:user_id], "session must be cleared on logout"
+  end
 
-    get root_path
+  test "after logout, next non-public action creates a fresh guest" do
+    user = User.create!(guest: false, email: "x@y.com")
+    post "/testing/sign_in", params: { user_id: user.id }
+    delete "/auth/logout"
+
+    get start_onboarding_url
     refute_equal user.id, session[:user_id]
     assert User.find(session[:user_id]).guest?
   end
