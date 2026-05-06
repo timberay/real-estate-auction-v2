@@ -21,7 +21,10 @@ class SessionCreator
     if (identity = Identity.find_by(provider: @profile.provider, uid: @profile.uid))
       return attach_and_merge(identity.user)
     end
-    if @profile.email.present? &&
+    # Auto-link to an existing non-guest account ONLY when the provider asserts
+    # the email is verified. Otherwise an attacker who registers another user's
+    # email at a third-party IdP could hijack their account on first login.
+    if @profile.email.present? && @profile.email_verified == true &&
        (existing = User.find_by(email: @profile.email, guest: false))
       Identity.find_or_create_by!(provider: @profile.provider, uid: @profile.uid) do |i|
         i.user = existing

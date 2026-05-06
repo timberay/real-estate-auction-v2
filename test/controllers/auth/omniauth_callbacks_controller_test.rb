@@ -17,7 +17,8 @@ class Auth::OmniauthCallbacksControllerTest < ActionDispatch::IntegrationTest
     existing = User.create!(guest: false, email: "alice@example.com", name: "Alice")
     existing.identities.create!(provider: "kakao", uid: "kakao-1")
 
-    mock_omniauth(:google_oauth2, uid: "google-1", email: "alice@example.com", name: "Alice")
+    mock_omniauth(:google_oauth2, uid: "google-1", email: "alice@example.com",
+                  name: "Alice", email_verified: true)
     get "/auth/google_oauth2/callback"
 
     assert_redirected_to root_path
