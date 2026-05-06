@@ -6,10 +6,6 @@
     <p class="subtitle"><%= @property.case_number %> | 생성일: <%= Date.current.strftime("%Y년 %m월 %d일") %></p>
   </div>
 
-  <%# ===== Core Info Sections ===== %>
-  <%= render PropertyInfoComponent.new(property: @property) %>
-  <%= render ReportBudgetComponent.new(budget_setting: @budget_setting) %>
-
   <%# ===== Verdict Section ===== %>
   <%= render GradeSummaryComponent.new(rating: @rating, fully_evaluated: @fully_evaluated, tabs_evaluated: @tabs_evaluated, tabs_total: @tabs_total) %>
   <%= render BidOpinionComponent.new(
@@ -19,6 +15,9 @@
     budget_setting: @budget_setting,
     property: @property
   ) %>
+
+  <%# ===== Core Info Sections ===== %>
+  <%= render PropertyInfoComponent.new(property: @property) %>
 
   <%# ===== Analysis Details ===== %>
   <%= render TabSummaryTableComponent.new(results_by_tab: @results_by_tab, property: @property) %>
