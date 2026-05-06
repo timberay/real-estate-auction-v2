@@ -1,5 +1,5 @@
 class HomeController < ApplicationController
-  skip_before_action :ensure_user
+  skip_before_action :require_authenticated_user
 
   def index
     if current_user&.budget_setting&.completed?

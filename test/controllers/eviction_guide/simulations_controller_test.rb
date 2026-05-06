@@ -1,6 +1,10 @@
 require "test_helper"
 
 class EvictionGuide::SimulationsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    get start_onboarding_url # bootstrap a guest session (lazy guest creation)
+  end
+
   test "create with property_id creates simulation and redirects to prefill" do
     property = properties(:safe_apartment)
     assert_difference "EvictionSimulation.count", 1 do

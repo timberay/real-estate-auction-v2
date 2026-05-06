@@ -1,4 +1,6 @@
 class OnboardingsController < ApplicationController
+  skip_before_action :require_authenticated_user
+  prepend_before_action :ensure_guest_user
   before_action :find_or_initialize_budget_setting, except: [ :complete ]
   before_action :redirect_if_completed, only: [ :step1 ]
 
