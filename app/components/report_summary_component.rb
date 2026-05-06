@@ -33,11 +33,6 @@ class ReportSummaryComponent < ViewComponent::Base
     refs.map { |code| CHECKLIST_CODE_LABELS[code] || code }.join(", ")
   end
 
-  def format_amount(amount)
-    return "0원" if amount.nil? || amount == 0
-    amount.to_fs(:delimited) + "원"
-  end
-
   def format_price(price_in_won)
     helpers.format_price_won(price_in_won)
   end
