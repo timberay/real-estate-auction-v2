@@ -17,7 +17,7 @@ class ProfitCalculatorComponent < ViewComponent::Base
   end
 
   def assumed_amount
-    @report&.assumed_amount.to_i
+    @report&.assumed_amount.to_i / 10000
   end
 
   def scrivener_fee
