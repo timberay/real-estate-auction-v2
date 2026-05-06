@@ -21,4 +21,13 @@ class ConsultationGuideComponentTest < ViewComponent::TestCase
     render_inline(ConsultationGuideComponent.new(risk_results: risk_results))
     assert_text "전문가 상담 가이드"
   end
+
+  test "hides title when show_title: false" do
+    risk_results = InspectionResult
+      .where(has_risk: true, property: properties(:risky_villa), user: users(:guest))
+      .includes(:inspection_item)
+    render_inline(ConsultationGuideComponent.new(risk_results: risk_results, show_title: false))
+    assert_no_text "전문가 상담 가이드"
+    assert_text "법무사/변호사"
+  end
 end

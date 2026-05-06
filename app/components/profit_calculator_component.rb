@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 class ProfitCalculatorComponent < ViewComponent::Base
-  def initialize(property:, budget_setting:, report:)
+  def initialize(property:, budget_setting:, report:, show_title: true)
     @property = property
     @budget = budget_setting
     @report = report
+    @show_title = show_title
   end
 
   # All values normalized to 만원 for the Stimulus controller

@@ -62,6 +62,18 @@ class ProfitCalculatorComponentTest < ViewComponent::TestCase
     assert_selector "[data-profit-calculator-assumed-amount-value='0']"
   end
 
+  test "hides title when show_title: false" do
+    render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget,
+      report: @report,
+      show_title: false
+    ))
+
+    assert_no_text "순수익 계산기"
+    assert_text "추정치"
+  end
+
   test "converts assumed_amount from 원 to 만원" do
     # risky_villa_report.assumed_amount is 30_000_000 (원) → 3,000 (만원)
     render_inline(ProfitCalculatorComponent.new(

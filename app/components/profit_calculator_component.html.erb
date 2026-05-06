@@ -10,7 +10,9 @@
 
   <%# ===== Title + Disclaimer Badge ===== %>
   <div class="flex items-center gap-3">
-    <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">순수익 계산기</h3>
+    <% if @show_title %>
+      <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">순수익 계산기</h3>
+    <% end %>
     <span class="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded">추정치 — 세무사 상담을 권장합니다</span>
   </div>
 

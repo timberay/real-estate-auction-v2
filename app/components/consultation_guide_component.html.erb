@@ -1,5 +1,7 @@
 <div class="space-y-3">
-  <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">전문가 상담 가이드</h3>
+  <% if @show_title %>
+    <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">전문가 상담 가이드</h3>
+  <% end %>
   <% grouped_recommendations.each do |rec| %>
     <div class="rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20 p-4">
       <div class="font-semibold text-blue-800 dark:text-blue-200"><%= rec[:professional][:title] %> 상담 권장</div>
