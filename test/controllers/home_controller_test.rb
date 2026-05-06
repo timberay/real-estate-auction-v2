@@ -7,7 +7,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "redirects to properties when budget settings completed" do
-    # Bootstrap a guest via a non-public action that runs ensure_user.
+    # Bootstrap a guest via a non-public action that runs require_authenticated_user.
     get start_onboarding_url
     user = User.find(session[:user_id])
     BudgetSetting.create!(

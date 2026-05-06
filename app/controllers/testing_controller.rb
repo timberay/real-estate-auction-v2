@@ -4,7 +4,7 @@
 # where the route guard might be bypassed (e.g. RAILS_ENV unexpectedly set).
 class TestingController < ApplicationController
   skip_before_action :verify_authenticity_token
-  skip_before_action :ensure_user
+  skip_before_action :require_authenticated_user
   before_action :ensure_test_env
 
   def set_remember_cookie

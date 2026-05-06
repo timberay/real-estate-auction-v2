@@ -1,5 +1,5 @@
 class Auth::SessionsController < ApplicationController
-  skip_before_action :ensure_user
+  skip_before_action :require_authenticated_user
 
   def new
     session[:pending_post_action] = params[:pending] if params[:pending].present?

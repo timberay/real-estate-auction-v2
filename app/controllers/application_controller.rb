@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
 
-  before_action :ensure_user
+  before_action :require_authenticated_user
   before_action :capture_return_to_url
   before_action :touch_last_seen
 
@@ -26,9 +26,9 @@ class ApplicationController < ActionController::Base
   private
 
   # Eagerly resolves @current_user, creating a guest user if none exists.
-  # Public/landing controllers should `skip_before_action :ensure_user` to
-  # avoid User.create! on every anonymous request (bot/crawler DoS surface).
-  def ensure_user
+  # Public/landing controllers should `skip_before_action :require_authenticated_user`
+  # to avoid User.create! on every anonymous request (bot/crawler DoS surface).
+  def require_authenticated_user
     @current_user = load_existing_user || create_guest_user!
   end
 
