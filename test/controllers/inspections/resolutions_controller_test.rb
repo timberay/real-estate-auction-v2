@@ -69,11 +69,66 @@ class Inspections::ResolutionsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
-  test "rejects when source is manual (use unified form instead)" do
-    result = inspection_results(:manual_risk)
+  test "manual source persists has_risk=true via answer flow" do
+    result = inspection_results(:manual_unanswered)
+    assert_nil result.has_risk
 
     patch property_inspections_result_resolution_url(result.property, result),
-      params: { resolvable: "true" },
+      params: { has_risk: "true" },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    result.reload
+    assert_equal true, result.has_risk
+    assert_equal "manual", result.source_type
+  end
+
+  test "manual source has_risk=false clears resolvable and note" do
+    result = inspection_results(:manual_risk)
+    assert_equal true, result.has_risk
+    assert_equal true, result.resolvable
+
+    patch property_inspections_result_resolution_url(result.property, result),
+      params: { has_risk: "false" },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    result.reload
+    assert_equal false, result.has_risk
+    assert_nil result.resolvable
+    assert_nil result.resolution_note
+  end
+
+  test "manual source with has_risk=true accepts resolvable+note in same request" do
+    result = inspection_results(:manual_unanswered)
+
+    patch property_inspections_result_resolution_url(result.property, result),
+      params: { has_risk: "true", resolvable: "false", resolution_note: "협의 거부" },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    result.reload
+    assert_equal true, result.has_risk
+    assert_equal false, result.resolvable
+    assert_equal "협의 거부", result.resolution_note
+  end
+
+  test "ai_reference (source=ai, has_risk=nil) accepts manual answer flipping source to manual" do
+    result = inspection_results(:risky_villa_rights_003)
+    result.update!(source_type: :ai, has_risk: nil, resolvable: nil)
+
+    patch property_inspections_result_resolution_url(@property, result),
+      params: { has_risk: "true" },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    result.reload
+    assert_equal true, result.has_risk
+    assert_equal "manual", result.source_type
+  end
+
+  test "rejects has_risk update when result is auto with risk already set" do
+    result = inspection_results(:risky_villa_rights_003)
+    result.update!(source_type: :auto, has_risk: true)
+
+    patch property_inspections_result_resolution_url(@property, result),
+      params: { has_risk: "false" },
       headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
     assert_response :unprocessable_entity

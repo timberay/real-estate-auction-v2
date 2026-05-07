@@ -64,15 +64,24 @@ export default class extends Controller {
     this.#syncRadiosToOriginal()
   }
 
-  autosaveResolution() {
+  autosave() {
     if (!this.resolutionUrlValue) return
-    const radio = this.resolvableRadioTargets.find(r => r.checked)
-    if (!radio) return
 
-    const noteEl = this.hasResolutionNoteTarget ? this.resolutionNoteTarget : null
     const body = new FormData()
-    body.set("resolvable", radio.value)
-    body.set("resolution_note", noteEl?.value || "")
+
+    const hasRiskRadio = this.element.querySelector(
+      `input[name='resolutions[${this.resultIdValue}][has_risk]']:checked`
+    )
+    if (hasRiskRadio) body.set("has_risk", hasRiskRadio.value)
+
+    const resolvableRadio = this.resolvableRadioTargets.find(r => r.checked)
+    if (resolvableRadio) body.set("resolvable", resolvableRadio.value)
+
+    if (this.hasResolutionNoteTarget) {
+      body.set("resolution_note", this.resolutionNoteTarget.value)
+    }
+
+    if (!body.has("has_risk") && !body.has("resolvable")) return
 
     fetch(this.resolutionUrlValue, {
       method: "PATCH",
