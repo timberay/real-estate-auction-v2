@@ -2,7 +2,7 @@
      data-controller="inspection-item"
      data-inspection-item-result-id-value="<%= @result.id %>"
      data-inspection-item-auto-value="<%= auto_or_ai_source? && !ai_reference? %>"
-     data-inspection-item-resolution-url-value="<%= property_inspections_result_resolution_path(@result.property, @result) if auto_or_ai_source? && @result.has_risk %>"
+     data-inspection-item-resolution-url-value="<%= property_inspections_result_resolution_path(@result.property, @result) %>"
      data-inspection-item-original-has-risk-value="<%= @result.has_risk.nil? ? '' : @result.has_risk %>"
      data-inspection-item-original-badge-text-value="<%= source_badge_text %>"
      data-inspection-item-original-badge-classes-value="<%= source_badge_classes %>"
@@ -129,18 +129,18 @@
       <div class="flex items-center gap-4">
         <label class="inline-flex items-center text-sm text-slate-700 dark:text-slate-200">
           <%= radio_button_tag "resolutions[#{@result.id}][resolvable]", "true", @result.resolvable == true,
-              data: { inspection_item_target: "resolvableRadio", action: "change->inspection-item#autosaveResolution" },
+              data: { inspection_item_target: "resolvableRadio", action: "change->inspection-item#autosave" },
               class: "mr-1.5" %> 해결 가능
         </label>
         <label class="inline-flex items-center text-sm text-slate-700 dark:text-slate-200">
           <%= radio_button_tag "resolutions[#{@result.id}][resolvable]", "false", @result.resolvable == false,
-              data: { inspection_item_target: "resolvableRadio", action: "change->inspection-item#autosaveResolution" },
+              data: { inspection_item_target: "resolvableRadio", action: "change->inspection-item#autosave" },
               class: "mr-1.5" %> 해결 불가
         </label>
       </div>
       <%= text_field_tag "resolutions[#{@result.id}][resolution_note]", @result.resolution_note,
           placeholder: "해결 방안 메모",
-          data: { inspection_item_target: "resolutionNote", action: "blur->inspection-item#autosaveResolution" },
+          data: { inspection_item_target: "resolutionNote", action: "blur->inspection-item#autosave" },
           class: "mt-2 w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-200 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors" %>
     </div>
   <% end %>
@@ -150,21 +150,30 @@
       <div class="flex items-center gap-4 rounded-md bg-slate-50 dark:bg-slate-700/50 px-3 py-2">
         <label class="inline-flex items-center text-sm font-medium text-slate-800 dark:text-slate-100">
           <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", yes_radio_value, @result.has_risk == (yes_radio_value == "true"),
-              data: { action: "change->inspection-item#toggleManualRisk change->checklist-dependency#toggle" }, class: "mr-1.5" %> 예
+              data: { action: "change->inspection-item#toggleManualRisk change->checklist-dependency#toggle change->inspection-item#autosave" }, class: "mr-1.5" %> 예
         </label>
         <label class="inline-flex items-center text-sm font-medium text-slate-800 dark:text-slate-100">
           <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", no_radio_value, @result.has_risk == (no_radio_value == "true"),
-              data: { action: "change->inspection-item#toggleManualRisk change->checklist-dependency#toggle" }, class: "mr-1.5" %> 아니오
+              data: { action: "change->inspection-item#toggleManualRisk change->checklist-dependency#toggle change->inspection-item#autosave" }, class: "mr-1.5" %> 아니오
         </label>
       </div>
       <div data-inspection-item-target="resolutionSection" class="<%= 'hidden' unless @result.has_risk %> mt-3 rounded-md border border-dashed border-yellow-400 bg-yellow-50 dark:border-yellow-600 dark:bg-yellow-900/20 p-3">
         <p class="mb-2 text-sm font-medium text-yellow-800 dark:text-yellow-300">해결 가능 여부를 선택해주세요:</p>
         <div class="flex items-center gap-4">
-          <label class="inline-flex items-center text-sm text-yellow-900 dark:text-yellow-200"><%= radio_button_tag "resolutions[#{@result.id}][resolvable]", "true", @result.resolvable == true, class: "mr-1.5" %> 해결 가능</label>
-          <label class="inline-flex items-center text-sm text-yellow-900 dark:text-yellow-200"><%= radio_button_tag "resolutions[#{@result.id}][resolvable]", "false", @result.resolvable == false, class: "mr-1.5" %> 해결 불가</label>
+          <label class="inline-flex items-center text-sm text-yellow-900 dark:text-yellow-200">
+            <%= radio_button_tag "resolutions[#{@result.id}][resolvable]", "true", @result.resolvable == true,
+                data: { inspection_item_target: "resolvableRadio", action: "change->inspection-item#autosave" },
+                class: "mr-1.5" %> 해결 가능
+          </label>
+          <label class="inline-flex items-center text-sm text-yellow-900 dark:text-yellow-200">
+            <%= radio_button_tag "resolutions[#{@result.id}][resolvable]", "false", @result.resolvable == false,
+                data: { inspection_item_target: "resolvableRadio", action: "change->inspection-item#autosave" },
+                class: "mr-1.5" %> 해결 불가
+          </label>
         </div>
         <%= text_field_tag "resolutions[#{@result.id}][resolution_note]", @result.resolution_note,
             placeholder: "해결 방안 메모",
+            data: { inspection_item_target: "resolutionNote", action: "blur->inspection-item#autosave" },
             class: "mt-2 w-full h-10 rounded-md border border-yellow-400 dark:border-yellow-600 bg-white dark:bg-slate-700 px-3 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-colors" %>
       </div>
     </div>
