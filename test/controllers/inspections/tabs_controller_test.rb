@@ -152,6 +152,29 @@ class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
     assert_nil auto_result.resolvable, "resolvable should remain nil when user did not select any radio"
   end
 
+  test "AI source with risk persists resolvable and resolution_note from form" do
+    ai_result = inspection_results(:risky_villa_rights_003)
+    ai_result.update!(source_type: :ai, has_risk: true, resolvable: nil, resolution_note: nil)
+
+    risky = properties(:risky_villa)
+    UserProperty.find_or_create_by!(user: @user, property: risky)
+    tab_key = ai_result.inspection_item.tab
+
+    patch property_inspections_tab_url(risky, tab_key: tab_key), params: {
+      resolutions: {
+        ai_result.id => {
+          resolvable: "true",
+          resolution_note: "보증금 인수 가능"
+        }
+      }
+    }
+
+    ai_result.reload
+    assert_equal true, ai_result.resolvable, "resolvable should persist for AI source"
+    assert_equal "보증금 인수 가능", ai_result.resolution_note
+    assert_equal "ai", ai_result.source_type, "source_type should remain ai"
+  end
+
   test "update with no resolutions still sets flash" do
     patch property_inspections_tab_url(@property, tab_key: "rights_analysis"), params: {}
 
