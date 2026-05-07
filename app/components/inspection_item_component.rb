@@ -19,7 +19,12 @@ class InspectionItemComponent < ViewComponent::Base
     if @result.has_risk.nil?
       "border-slate-400 bg-slate-100 dark:border-slate-600 dark:bg-slate-800/50"
     elsif @result.has_risk
-      auto_or_ai_source? ? "border-red-400 bg-red-100 dark:border-red-600 dark:bg-red-900/20" : "border-yellow-400 bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900/20"
+      case @result.resolvable
+      when true then "border-yellow-400 bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900/20"
+      when false then "border-red-400 bg-red-100 dark:border-red-600 dark:bg-red-900/20"
+      else
+        auto_or_ai_source? ? "border-red-400 bg-red-100 dark:border-red-600 dark:bg-red-900/20" : "border-yellow-400 bg-yellow-100 dark:border-yellow-600 dark:bg-yellow-900/20"
+      end
     else
       "border-green-400 bg-green-100 dark:border-green-600 dark:bg-green-900/20"
     end
@@ -50,9 +55,16 @@ class InspectionItemComponent < ViewComponent::Base
   end
 
   def status_text
-    if @result.has_risk.nil? then "미입력"
-    elsif @result.has_risk then auto_or_ai_source? ? "위험" : "위험 확인"
-    else "안전"
+    if @result.has_risk.nil?
+      "미입력"
+    elsif @result.has_risk
+      case @result.resolvable
+      when true then "주의"
+      when false then "경고"
+      else auto_or_ai_source? ? "위험" : "위험 확인"
+      end
+    else
+      "안전"
     end
   end
 
@@ -60,7 +72,7 @@ class InspectionItemComponent < ViewComponent::Base
     if @result.has_risk.nil?
       "text-slate-400 dark:text-slate-500"
     elsif @result.has_risk
-      "text-red-600 dark:text-red-400"
+      @result.resolvable == true ? "text-yellow-600 dark:text-yellow-400" : "text-red-600 dark:text-red-400"
     else
       "text-green-600 dark:text-green-400"
     end
