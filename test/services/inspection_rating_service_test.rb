@@ -28,6 +28,26 @@ class InspectionRatingServiceTest < ActiveSupport::TestCase
     assert_equal :danger, rating
   end
 
+  test "rates danger when risk present but resolvable not yet decided" do
+    InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: true, resolvable: nil)
+    rating = InspectionRatingService.call(property: @property, user: @user)
+    assert_equal :danger, rating
+  end
+
+  test "tab_rating returns danger when risk present but resolvable not yet decided" do
+    InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: true, resolvable: nil)
+    service = InspectionRatingService.new(property: @property, user: @user)
+    assert_equal :danger, service.tab_rating("rights_analysis")
+  end
+
+  test "rates caution only when all risks are explicitly marked resolvable" do
+    item2 = inspection_items(:rights_002)
+    InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: true, resolvable: true)
+    InspectionResult.create!(property: @property, inspection_item: item2, user: @user, source_type: "auto", has_risk: true, resolvable: nil)
+    rating = InspectionRatingService.call(property: @property, user: @user)
+    assert_equal :danger, rating
+  end
+
   test "returns incomplete when unanswered items exist" do
     InspectionResult.create!(property: @property, inspection_item: @item, user: @user)
     rating = InspectionRatingService.call(property: @property, user: @user)
