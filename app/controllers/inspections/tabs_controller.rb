@@ -45,7 +45,7 @@ module Inspections
 
           if values[:override] == "true" && result.auto?
             apply_override(result, values)
-          elsif result.auto?
+          elsif result.auto? || result.ai?
             next unless values.key?(:resolvable)
 
             result.update!(
