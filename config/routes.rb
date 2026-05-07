@@ -64,6 +64,9 @@ Rails.application.routes.draw do
       resources :tabs, only: [ :edit, :update ], param: :tab_key
       resource :grade, only: [ :show ], controller: "grades"
       resource :source_doc_review, only: [ :update ], controller: "source_doc_reviews"
+      resources :results, only: [] do
+        resource :resolution, only: [ :update ], controller: "resolutions"
+      end
     end
   end
 

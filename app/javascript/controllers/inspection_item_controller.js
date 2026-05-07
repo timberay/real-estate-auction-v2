@@ -16,9 +16,15 @@ export default class extends Controller {
     "editButton", "cancelButton", "editSection",
     "overrideRadio", "overrideFlag", "overrideInput",
     "overrideResolutionSection",
-    "logicYes", "logicNo", "logicYesIcon", "logicNoIcon"
+    "logicYes", "logicNo", "logicYesIcon", "logicNoIcon",
+    "resolvableRadio", "resolutionNote"
   ]
-  static values = { resultId: Number, auto: Boolean, originalHasRisk: String, originalBadgeText: String, originalBadgeClasses: String, yesMeansSafe: Boolean }
+  static values = {
+    resultId: Number, auto: Boolean,
+    originalHasRisk: String, originalBadgeText: String, originalBadgeClasses: String,
+    yesMeansSafe: Boolean,
+    resolutionUrl: String
+  }
 
   enterEditMode() {
     this.editButtonTarget.classList.add("hidden")
@@ -56,6 +62,28 @@ export default class extends Controller {
       this.#updateLogicHighlight(this.originalHasRiskValue === "true")
     }
     this.#syncRadiosToOriginal()
+  }
+
+  autosaveResolution() {
+    if (!this.resolutionUrlValue) return
+    const radio = this.resolvableRadioTargets.find(r => r.checked)
+    if (!radio) return
+
+    const noteEl = this.hasResolutionNoteTarget ? this.resolutionNoteTarget : null
+    const body = new FormData()
+    body.set("resolvable", radio.value)
+    body.set("resolution_note", noteEl?.value || "")
+
+    fetch(this.resolutionUrlValue, {
+      method: "PATCH",
+      headers: {
+        "X-CSRF-Token": document.querySelector("meta[name='csrf-token']")?.content || "",
+        "Accept": "text/vnd.turbo-stream.html"
+      },
+      body
+    }).then(r => r.ok ? r.text() : Promise.reject(r))
+      .then(html => window.Turbo?.renderStreamMessage(html))
+      .catch(err => console.error("autosave failed", err))
   }
 
   toggleManualRisk(event) {

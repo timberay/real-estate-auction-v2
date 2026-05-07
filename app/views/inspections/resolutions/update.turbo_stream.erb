@@ -1,0 +1,7 @@
+<%= turbo_stream.replace dom_id(@result, "inspection_item") do %>
+  <%= render InspectionItemComponent.new(result: @result, show_resolution: true) %>
+<% end %>
+
+<%= turbo_stream.replace "inspection-tabs-nav" do %>
+  <%= render InspectionTabsComponent.new(property: @property, user: current_user, active_tab: @active_tab) %>
+<% end %>
