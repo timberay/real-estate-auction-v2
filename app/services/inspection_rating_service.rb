@@ -25,7 +25,7 @@ class InspectionRatingService
 
     risk_results = answered.select { |r| r.has_risk }
 
-    if risk_results.any? { |r| r.resolvable == false }
+    if risk_results.any? { |r| r.resolvable != true }
       :danger
     elsif risk_results.any?
       :caution
@@ -43,7 +43,7 @@ class InspectionRatingService
 
     risk_results = answered.select { |r| r.has_risk }
 
-    if risk_results.any? { |r| r.resolvable == false }
+    if risk_results.any? { |r| r.resolvable != true }
       :danger
     elsif risk_results.any?
       :caution
