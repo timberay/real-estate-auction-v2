@@ -201,6 +201,52 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     assert_selector "[data-evidence] span.whitespace-pre-line", text: /첫째 줄입니다/
   end
 
+  # --- Resolvable-aware status (matches tab-level rating) ---
+
+  test "has_risk=true + resolvable=true renders 주의 label with yellow box" do
+    result = inspection_results(:risky_villa_rights_003)
+    result.update!(source_type: :ai, has_risk: true, resolvable: true)
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-inspection-item-target='statusLabel']", text: "주의"
+    box = page.find("[data-controller='inspection-item']")
+    assert_includes box[:class], "bg-yellow-100"
+    assert_includes box[:class], "border-yellow-400"
+  end
+
+  test "has_risk=true + resolvable=false renders 경고 label with red box" do
+    result = inspection_results(:risky_villa_rights_003)
+    result.update!(source_type: :ai, has_risk: true, resolvable: false)
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-inspection-item-target='statusLabel']", text: "경고"
+    box = page.find("[data-controller='inspection-item']")
+    assert_includes box[:class], "bg-red-100"
+    assert_includes box[:class], "border-red-400"
+  end
+
+  test "has_risk=true + resolvable=nil (AI source) keeps 위험 label with red box" do
+    result = inspection_results(:risky_villa_rights_003)
+    result.update!(source_type: :ai, has_risk: true, resolvable: nil)
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-inspection-item-target='statusLabel']", text: "위험"
+    box = page.find("[data-controller='inspection-item']")
+    assert_includes box[:class], "bg-red-100"
+    assert_includes box[:class], "border-red-400"
+  end
+
+  test "has_risk=true + resolvable=true (manual source) renders 주의 label with yellow box" do
+    result = inspection_results(:manual_risk)
+    assert_equal true, result.has_risk
+    assert_equal true, result.resolvable
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-inspection-item-target='statusLabel']", text: "주의"
+    box = page.find("[data-controller='inspection-item']")
+    assert_includes box[:class], "bg-yellow-100"
+  end
+
   test "renders evidence block for ai result with none confidence (참고)" do
     result = inspection_results(:risky_villa_rights_003)
     result.update!(
