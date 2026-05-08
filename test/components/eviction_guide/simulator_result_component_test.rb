@@ -43,5 +43,21 @@ module EvictionGuide
       refute_text "예상 총 단계"
       refute_text "분기 진입"
     end
+
+    test "renders difficulty breakdown card after the difficulty badge" do
+      simulation = EvictionSimulation.new(
+        occupant_type: "debtor_owner",
+        difficulty_level: "medium",
+        answers: { "Q1" => true },
+        result_path: []
+      )
+
+      render_inline(SimulatorResultComponent.new(simulation: simulation))
+
+      assert_text "기본 난이도"
+      assert_text "채무자"
+      assert_text "추가 위험 요인"
+      assert_text "기본 난이도와 추가 위험 중 더 높은 쪽이 최종 난이도"
+    end
   end
 end

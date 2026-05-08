@@ -3,9 +3,15 @@ module EvictionGuide
     def initialize(simulation:)
       @simulation = simulation
       @path = simulation.result_path || []
+      @breakdown = EvictionGuide::DifficultyAssessor.call(
+        simulation.answers,
+        occupant_type: simulation.occupant_type
+      )
     end
 
     private
+
+    attr_reader :breakdown
 
     def total_steps
       @path.size
