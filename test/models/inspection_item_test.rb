@@ -271,3 +271,72 @@ class InspectionItemTest < ActiveSupport::TestCase
     assert item_a.skip_for?({}, all_items_by_code: all_items)
   end
 end
+
+# 2026-05 reorganization assertions: verify the seed JSON, when loaded, yields
+# the expected post-reorganization state. Uses a private DB scope so existing
+# fixtures (which mirror a curated subset for other tests) are not disturbed.
+class InspectionItemReorganization202605Test < ActiveSupport::TestCase
+  TAB_MAP = {
+    "권리분석" => "rights_analysis",
+    "수익분석" => "profit_analysis",
+    "현장확인" => "field_check",
+    "입찰&낙찰" => "bidding"
+  }.freeze
+
+  setup do
+    InspectionResult.delete_all
+    InspectionItem.delete_all
+    json_path = Rails.root.join("db/seeds/checklist_items_summary.json")
+    JSON.parse(File.read(json_path)).each do |attrs|
+      tab_key = TAB_MAP[attrs["tab"]]
+      next unless tab_key
+      InspectionItem.create!(
+        code: attrs["id"],
+        tab: tab_key,
+        tab_position: attrs["tab_position"],
+        category: attrs["category"],
+        question: attrs["question"],
+        description: attrs["description"],
+        logic: attrs["logic"],
+        priority: attrs["priority"],
+        merged_from: attrs["merged_from"],
+        answer_type: attrs["answer_type"],
+        yes_means_safe: attrs.fetch("yes_means_safe", true),
+        applicable_types: attrs["applicable_types"],
+        depends_on: attrs["depends_on"]
+      )
+    end
+  end
+
+  test "checklist count after reorganization is 44" do
+    assert_equal 44, InspectionItem.count
+  end
+
+  test "inspect-005 lives in field_check tab" do
+    item = InspectionItem.find_by!(code: "inspect-005")
+    assert_equal "field_check", item.tab
+    assert_equal "현장조사&서류검증", item.category
+  end
+
+  test "manual-001 lives in rights_analysis tab" do
+    item = InspectionItem.find_by!(code: "manual-001")
+    assert_equal "rights_analysis", item.tab
+    assert_equal "권리분석", item.category
+  end
+
+  test "eviction-001 category moved to 현장조사&서류검증" do
+    item = InspectionItem.find_by!(code: "eviction-001")
+    assert_equal "field_check", item.tab
+    assert_equal "현장조사&서류검증", item.category
+  end
+
+  test "inspect-009 question text updated" do
+    item = InspectionItem.find_by!(code: "inspect-009")
+    assert_equal "현장 방문(임장)을 통해 부동산으로부터 매도 가능 정보를 얻었습니까?", item.question
+  end
+
+  test "tax-007 and exit-002 are deleted" do
+    assert_nil InspectionItem.find_by(code: "tax-007")
+    assert_nil InspectionItem.find_by(code: "exit-002")
+  end
+end
