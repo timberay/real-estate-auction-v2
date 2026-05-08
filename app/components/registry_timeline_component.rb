@@ -1,10 +1,13 @@
 class RegistryTimelineComponent < ViewComponent::Base
+  include ChecklistCodeMapping
+
   def initialize(report:)
     @report = report
     @timeline = report.effective_rights_timeline
     @tenants = report.effective_tenants
-    @checklist_refs = report.report_data&.dig("llm_raw", "checklist_references") ||
-                      report.report_data&.dig("checklist_references") || []
+    raw_refs = report.report_data&.dig("llm_raw", "checklist_references") ||
+               report.report_data&.dig("checklist_references") || []
+    @checklist_refs = build_checklist_refs(raw_refs)
   end
 
   private
