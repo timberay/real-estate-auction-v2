@@ -22,7 +22,7 @@ module Manual
         render_inline(Manual::PhaseSection::Component.new(phase: :pre, steps: steps, current_step_key: :budget))
 
         assert_text "낙찰 전"
-        assert_text "89개 체크리스트로 직접 분석합니다"
+        assert_text "#{InspectionItem.count}개 체크리스트로 직접 분석합니다"
       end
 
       test "renders post-auction heading and step cards" do

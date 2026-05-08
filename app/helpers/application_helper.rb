@@ -37,4 +37,10 @@ module ApplicationHelper
 
     format_price_in_eok(amount / 10000)
   end
+
+  # Returns the current total number of inspection checklist items.
+  # Memoized per request so locale interpolation doesn't trigger N COUNT queries.
+  def inspection_item_total
+    @_inspection_item_total ||= InspectionItem.count
+  end
 end

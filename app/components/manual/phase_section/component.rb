@@ -18,7 +18,7 @@ module Manual
       end
 
       def subheading
-        t("manuals.show.phase_#{phase}.subheading")
+        t("manuals.show.phase_#{phase}.subheading", count: helpers.inspection_item_total)
       end
     end
   end

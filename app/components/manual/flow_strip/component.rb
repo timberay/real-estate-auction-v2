@@ -15,7 +15,7 @@ module Manual
       attr_reader :steps, :current_step_key
 
       def label_for(step)
-        t("manuals.steps.#{step.key}.label")
+        t("manuals.steps.#{step.key}.label", count: helpers.inspection_item_total)
       end
 
       def status_icon(step)

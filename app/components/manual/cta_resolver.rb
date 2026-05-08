@@ -38,7 +38,7 @@ module Manual
     end
 
     def step_label
-      I18n.t("manuals.steps.#{@step.key}.label")
+      I18n.t("manuals.steps.#{@step.key}.label", count: InspectionItem.count)
     end
 
     private

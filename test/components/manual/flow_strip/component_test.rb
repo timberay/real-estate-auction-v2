@@ -29,7 +29,7 @@ module Manual
         assert_text "예산 정하기"
         assert_text "물건 찾기"
         assert_text "AI 분석"
-        assert_text "89개 체크리스트"
+        assert_text "#{InspectionItem.count}개 체크리스트"
         assert_text "명도 가이드"
         assert_text "명도 시뮬레이터"
       end

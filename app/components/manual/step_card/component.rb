@@ -17,15 +17,15 @@ module Manual
       end
 
       def label
-        t("manuals.steps.#{step.key}.label")
+        t("manuals.steps.#{step.key}.label", count: helpers.inspection_item_total)
       end
 
       def summary
-        t("manuals.steps.#{step.key}.summary")
+        t("manuals.steps.#{step.key}.summary", count: helpers.inspection_item_total)
       end
 
       def actions
-        t("manuals.steps.#{step.key}.actions")
+        t("manuals.steps.#{step.key}.actions", count: helpers.inspection_item_total)
       end
 
       def status_text

@@ -54,4 +54,19 @@ class ApplicationHelperTest < ActionView::TestCase
   test "format_price_won returns dash for nil" do
     assert_equal "—", format_price_won(nil)
   end
+
+  # --- inspection_item_total ---
+
+  test "inspection_item_total returns InspectionItem.count" do
+    assert_equal InspectionItem.count, inspection_item_total
+  end
+
+  test "inspection_item_total memoizes per request" do
+    first = inspection_item_total
+    InspectionItem.create!(code: "test-memo-task2", tab: "rights_analysis", category: "권리분석", question: "test", priority: "상")
+    second = inspection_item_total
+    assert_equal first, second
+  ensure
+    InspectionItem.find_by(code: "test-memo-task2")&.destroy
+  end
 end
