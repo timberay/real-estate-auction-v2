@@ -78,8 +78,7 @@ class RegistryTimelineComponentTest < ViewComponent::TestCase
     }
     render_inline(RegistryTimelineComponent.new(report: report))
     expected_question = InspectionItem.find_by!(code: "rights-002").question
-    assert_text "[rights-002]"
-    assert_text expected_question
+    assert_selector "li", text: "[rights-002] #{expected_question}", normalize_ws: true
   end
 
   test "renders fallback for deleted checklist codes" do
@@ -90,7 +89,6 @@ class RegistryTimelineComponentTest < ViewComponent::TestCase
       "discrepancies" => []
     }
     render_inline(RegistryTimelineComponent.new(report: report))
-    assert_text "[tax-007]"
-    assert_text "(삭제된 항목)"
+    assert_selector "li", text: "[tax-007] (삭제된 항목)", normalize_ws: true
   end
 end
