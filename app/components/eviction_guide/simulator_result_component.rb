@@ -1,9 +1,9 @@
 module EvictionGuide
   class SimulatorResultComponent < ViewComponent::Base
-    def initialize(simulation:)
+    def initialize(simulation:, breakdown: nil)
       @simulation = simulation
       @path = simulation.result_path || []
-      @breakdown = EvictionGuide::DifficultyAssessor.call(
+      @breakdown = breakdown || EvictionGuide::DifficultyAssessor.call(
         simulation.answers,
         occupant_type: simulation.occupant_type
       )

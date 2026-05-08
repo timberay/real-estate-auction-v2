@@ -59,5 +59,31 @@ module EvictionGuide
       assert_text "추가 위험 요인"
       assert_text "기본 난이도와 추가 위험 중 더 높은 쪽이 최종 난이도"
     end
+
+    test "uses caller-provided breakdown without re-running the assessor" do
+      breakdown = EvictionGuide::DifficultyAssessor::Result.new(
+        level: "high",
+        base: { level: "high", occupant_type: "senior_tenant" },
+        triggers: []
+      )
+      simulation = EvictionSimulation.new(
+        occupant_type: "senior_tenant",
+        difficulty_level: "high",
+        answers: { "Q1" => true },
+        result_path: []
+      )
+
+      called = 0
+      assessor = EvictionGuide::DifficultyAssessor.singleton_class
+      original = assessor.instance_method(:call)
+      assessor.define_method(:call) { |*args, **kwargs| called += 1; breakdown }
+      begin
+        render_inline(SimulatorResultComponent.new(simulation: simulation, breakdown: breakdown))
+      ensure
+        assessor.define_method(:call, original)
+      end
+
+      assert_equal 0, called, "Component must not call DifficultyAssessor when breakdown is provided"
+    end
   end
 end
