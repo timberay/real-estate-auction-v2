@@ -4,7 +4,7 @@ class EvictionGuide::DifficultyAssessorTest < ActiveSupport::TestCase
   test "returns low when no branches entered" do
     answers = { "Q1" => true, "Q2" => true, "Q3" => true, "Q4" => true }
     result = EvictionGuide::DifficultyAssessor.call(answers)
-    assert_equal "low", result
+    assert_equal "low", result.level
   end
 
   test "returns high when B1 branch entered" do
@@ -15,7 +15,7 @@ class EvictionGuide::DifficultyAssessorTest < ActiveSupport::TestCase
     ) }
 
     result = EvictionGuide::DifficultyAssessor.call(answers, questions: questions)
-    assert_equal "high", result
+    assert_equal "high", result.level
   end
 
   test "returns medium for medium-impact branches" do
@@ -26,7 +26,7 @@ class EvictionGuide::DifficultyAssessorTest < ActiveSupport::TestCase
     ) }
 
     result = EvictionGuide::DifficultyAssessor.call(answers, questions: questions)
-    assert_equal "medium", result
+    assert_equal "medium", result.level
   end
 
   test "highest difficulty wins" do
@@ -41,19 +41,19 @@ class EvictionGuide::DifficultyAssessorTest < ActiveSupport::TestCase
     }
 
     result = EvictionGuide::DifficultyAssessor.call(answers, questions: questions)
-    assert_equal "high", result
+    assert_equal "high", result.level
   end
 
   test "returns base difficulty for junior_tenant with all-yes answers" do
     answers = { "JT-Q1" => true }
     result = EvictionGuide::DifficultyAssessor.call(answers, occupant_type: "junior_tenant")
-    assert_equal "low", result
+    assert_equal "low", result.level
   end
 
   test "returns base difficulty for senior_tenant with all-yes answers" do
     answers = { "ST-Q1" => true }
     result = EvictionGuide::DifficultyAssessor.call(answers, occupant_type: "senior_tenant")
-    assert_equal "high", result
+    assert_equal "high", result.level
   end
 
   test "base difficulty overridden by higher answer-based difficulty" do
@@ -67,7 +67,7 @@ class EvictionGuide::DifficultyAssessorTest < ActiveSupport::TestCase
     result = EvictionGuide::DifficultyAssessor.call(
       answers, occupant_type: "junior_tenant", questions: questions
     )
-    assert_equal "high", result
+    assert_equal "high", result.level
   end
 
   test "base difficulty wins when answer-based is lower" do
@@ -81,12 +81,19 @@ class EvictionGuide::DifficultyAssessorTest < ActiveSupport::TestCase
     result = EvictionGuide::DifficultyAssessor.call(
       answers, occupant_type: "debtor_owner", questions: questions
     )
-    assert_equal "medium", result
+    assert_equal "medium", result.level
   end
 
   test "legacy behavior unchanged when occupant_type is nil" do
     answers = { "Q1" => true }
     result = EvictionGuide::DifficultyAssessor.call(answers, occupant_type: nil)
-    assert_equal "low", result
+    assert_equal "low", result.level
+  end
+
+  test "Result#to_s returns level for back-compat" do
+    answers = { "Q1" => true }
+    result = EvictionGuide::DifficultyAssessor.call(answers)
+    assert_equal result.level, result.to_s
+    assert_equal "low", "#{result}"
   end
 end
