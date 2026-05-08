@@ -32,12 +32,14 @@
   <%# Stats %>
   <div class="flex gap-4 mb-6">
     <div class="flex-1 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
-      <div class="text-sm text-slate-500 dark:text-slate-400">예상 총 단계</div>
+      <div class="text-sm text-slate-500 dark:text-slate-400">전체 명도 단계</div>
       <div class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= total_steps %></div>
+      <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">진행해야 할 절차 단계 수</div>
     </div>
     <div class="flex-1 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg text-center">
-      <div class="text-sm text-slate-500 dark:text-slate-400">분기 진입</div>
+      <div class="text-sm text-slate-500 dark:text-slate-400">추가 분기 단계</div>
       <div class="text-2xl font-bold text-slate-900 dark:text-slate-100"><%= branch_count %>건</div>
+      <div class="text-xs text-slate-500 dark:text-slate-400 mt-1">"아니오" 답변으로 발생한 추가 법적 절차</div>
     </div>
   </div>
 
