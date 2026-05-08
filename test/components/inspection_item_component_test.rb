@@ -259,4 +259,11 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     assert_text "AI 분석 (참고)"
     assert_text "해당 물건은 단독주택이므로 직접 확인이 필요합니다."
   end
+
+  test "renders item code as a monospace badge" do
+    result = inspection_results(:safe_apartment_rights_002)
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "span.font-mono", text: result.inspection_item.code
+  end
 end
