@@ -3,6 +3,9 @@ require_relative "../config/environment"
 require "rails/test_help"
 require "webmock/minitest"
 
+# Auto-load shared test support modules
+Dir[Rails.root.join("test/support/**/*.rb")].each { |f| require f }
+
 # Allow localhost connections for Ollama tests, block all others
 WebMock.disable_net_connect!(allow_localhost: true)
 

@@ -2,36 +2,10 @@ require "test_helper"
 require Rails.root.join("db/migrate/20260508013259_reorganize_checklist_items_2026_05.rb")
 
 class ReorganizeChecklistItems202605Test < ActiveSupport::TestCase
-  TAB_MAP = {
-    "권리분석" => "rights_analysis",
-    "수익분석" => "profit_analysis",
-    "현장확인" => "field_check",
-    "입찰&낙찰" => "bidding"
-  }.freeze
+  include ChecklistSeedHelper
 
   setup do
-    InspectionResult.delete_all
-    InspectionItem.delete_all
-    json_path = Rails.root.join("db/seeds/checklist_items_summary.json")
-    JSON.parse(File.read(json_path)).each do |attrs|
-      tab_key = TAB_MAP[attrs["tab"]]
-      next unless tab_key
-      InspectionItem.create!(
-        code: attrs["id"],
-        tab: tab_key,
-        tab_position: attrs["tab_position"],
-        category: attrs["category"],
-        question: attrs["question"],
-        description: attrs["description"],
-        logic: attrs["logic"],
-        priority: attrs["priority"],
-        merged_from: attrs["merged_from"],
-        answer_type: attrs["answer_type"],
-        yes_means_safe: attrs.fetch("yes_means_safe", true),
-        applicable_types: attrs["applicable_types"],
-        depends_on: attrs["depends_on"]
-      )
-    end
+    load_checklist_seed!
   end
 
   test "up is idempotent — re-running produces same state" do
@@ -42,32 +16,83 @@ class ReorganizeChecklistItems202605Test < ActiveSupport::TestCase
     assert_nil InspectionItem.find_by(code: "tax-007")
   end
 
-  test "transaction rolls back if any step fails" do
-    original = InspectionItem.find_by!(code: "inspect-005").tab
+  test "transaction rolls back if migration step fails mid-up" do
+    # The seed JSON already reflects the post-reorganization state, so the
+    # migration's CHANGES would be no-ops as-is. Diverge a few rows so the
+    # earlier CHANGES have real work to do, then force a LATER change to
+    # raise — this proves the earlier update!s rolled back when the
+    # migration's transaction aborted, not just that nothing happened.
+    InspectionItem.find_by!(code: "inspect-005").update!(tab: "profit_analysis")
+    InspectionItem.find_by!(code: "inspect-009").update!(question: "OLD QUESTION")
+    # Re-create tax-007 so DELETIONS would have something to destroy if reached.
+    InspectionItem.create!(
+      code: "tax-007",
+      tab: "profit_analysis",
+      tab_position: 99,
+      category: "세무&절세 분석",
+      question: "should remain after rollback",
+      priority: "중"
+    )
 
-    assert_raises(ActiveRecord::RecordNotFound) do
-      ActiveRecord::Base.transaction do
-        InspectionItem.find_by!(code: "inspect-005").update!(tab: "rights_analysis")
-        InspectionItem.find_by!(code: "nonexistent-code-xyz")
+    pre_inspect_005_tab = "profit_analysis"
+    pre_inspect_009_question = "OLD QUESTION"
+    pre_count = InspectionItem.count
+
+    # Force the THIRD CHANGE (eviction-001) to raise. The first two updates
+    # (inspect-005, inspect-009) have already happened inside the migration's
+    # transaction by then — if rollback works, those two updates are reverted
+    # AND tax-007 is NOT deleted (DELETIONS runs after CHANGES).
+    failure_module = Module.new do
+      def update!(*args, **kwargs)
+        if code == "eviction-001"
+          raise StandardError, "forced failure inside migration transaction"
+        end
+        super
       end
     end
+    InspectionItem.prepend(failure_module)
 
-    assert_equal original, InspectionItem.find_by!(code: "inspect-005").tab
+    begin
+      assert_raises(StandardError) do
+        ReorganizeChecklistItems202605.new.up
+      end
+    ensure
+      failure_module.remove_method(:update!)
+    end
+
+    # Earlier CHANGES rolled back to their pre-migration (diverged) values.
+    assert_equal pre_inspect_005_tab, InspectionItem.find_by!(code: "inspect-005").tab,
+      "inspect-005 update should have rolled back when later CHANGE raised"
+    assert_equal pre_inspect_009_question, InspectionItem.find_by!(code: "inspect-009").question,
+      "inspect-009 update should have rolled back when later CHANGE raised"
+    # DELETIONS never ran.
+    assert_equal pre_count, InspectionItem.count
+    assert_not_nil InspectionItem.find_by(code: "tax-007"),
+      "tax-007 should still exist; DELETIONS should not have run after rollback"
   end
 
-  test "deleting an item cascades to inspection_results" do
+  test "deleting tax-007 cascades to inspection_results via the migration" do
     user = users(:guest)
     property = properties(:safe_apartment)
-    tax_item = InspectionItem.find_or_create_by!(code: "tax-007-temp") do |i|
-      i.tab = "profit_analysis"
-      i.category = "세무&절세 분석"
-      i.question = "test"
-      i.priority = "중"
-    end
-    InspectionResult.create!(user: user, property: property, inspection_item: tax_item)
 
-    assert_difference "InspectionResult.count", -1 do
-      tax_item.destroy
-    end
+    # The seed JSON no longer contains tax-007 (it's a post-reorganization
+    # state). Re-create a fresh tax-007 so the migration's DELETIONS path has
+    # something to destroy.
+    tax_item = InspectionItem.create!(
+      code: "tax-007",
+      tab: "profit_analysis",
+      tab_position: 99,
+      category: "세무&절세 분석",
+      question: "test question",
+      priority: "중"
+    )
+    result = InspectionResult.create!(user: user, property: property, inspection_item: tax_item)
+
+    ReorganizeChecklistItems202605.new.up
+
+    assert_nil InspectionItem.find_by(code: "tax-007"),
+      "migration's DELETIONS path should destroy tax-007"
+    assert_nil InspectionResult.find_by(id: result.id),
+      "destroying tax-007 should cascade via dependent: :destroy"
   end
 end
