@@ -82,6 +82,15 @@ module Manual
         assert_selector "a[href='/properties']"
       end
 
+      test "summary and actions use text-sm to match other screens" do
+        step = Manuals::Step.new(number: 1, key: :budget, status: :pending, detail: nil)
+
+        render_inline(Manual::StepCard::Component.new(step: step, default_open: true))
+
+        assert_selector "details p.text-sm"
+        assert_selector "details ul.text-sm"
+      end
+
       test "missing screenshot does not raise — silently swallowed in dev/test" do
         step = Manuals::Step.new(number: 1, key: :budget, status: :pending, detail: nil)
 
