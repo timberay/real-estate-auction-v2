@@ -48,8 +48,16 @@
   <% end %>
 
   <% if @checklist_refs.any? %>
-    <div class="mt-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm text-slate-500 dark:text-slate-400">
-      📋 연관 체크리스트: <%= @checklist_refs.join(", ") %> — ②체크리스트 탭에서 확인됨
+    <div class="mt-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 px-3 py-2 text-sm text-slate-500 dark:text-slate-400 break-words">
+      <p class="mb-1">📋 연관 체크리스트 — ②체크리스트 탭에서 확인됨:</p>
+      <ul class="list-disc pl-6 space-y-0.5">
+        <% @checklist_refs.each do |ref| %>
+          <li>
+            <span class="font-mono text-xs text-slate-500 dark:text-slate-400">[<%= ref[:code] %>]</span>
+            <%= ref[:question] || "(삭제된 항목)" %>
+          </li>
+        <% end %>
+      </ul>
     </div>
   <% end %>
 </div>

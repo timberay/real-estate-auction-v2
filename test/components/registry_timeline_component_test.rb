@@ -68,4 +68,27 @@ class RegistryTimelineComponentTest < ViewComponent::TestCase
     assert tenant_pos < rights_2023_pos, "tenant (2021) should render before right (2023)"
     assert rights_2023_pos < rights_2024_pos, "earlier right should render before later right"
   end
+
+  test "renders code+question pairs for checklist references" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => { "rights_timeline" => [], "checklist_references" => [ "rights-002" ] },
+      "calculated" => { "tenants" => [] },
+      "discrepancies" => []
+    }
+    render_inline(RegistryTimelineComponent.new(report: report))
+    expected_question = InspectionItem.find_by!(code: "rights-002").question
+    assert_selector "li", text: "[rights-002] #{expected_question}", normalize_ws: true
+  end
+
+  test "renders fallback for deleted checklist codes" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => { "rights_timeline" => [], "checklist_references" => [ "tax-007" ] },
+      "calculated" => { "tenants" => [] },
+      "discrepancies" => []
+    }
+    render_inline(RegistryTimelineComponent.new(report: report))
+    assert_selector "li", text: "[tax-007] (삭제된 항목)", normalize_ws: true
+  end
 end

@@ -6,7 +6,7 @@ class ManualsTest < ApplicationSystemTestCase
     visit "/manual"
 
     assert_text "경매 초보의 워크북"
-    assert_text "낙찰 전 89개 체크리스트, 낙찰 후 명도 시뮬레이터"
+    assert_text "낙찰 전 #{InspectionItem.count}개 체크리스트, 낙찰 후 명도 시뮬레이터"
 
     # current_step = budget (1번) for fresh user
     pre_section = find(:xpath, "//section[.//h2[normalize-space()='낙찰 전']]")

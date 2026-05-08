@@ -19,6 +19,12 @@ class RightsAnalysisReport < ApplicationRecord
     parsed_data&.dig("discrepancies") || []
   end
 
+  def checklist_reference_codes
+    data = parsed_data
+    return [] if data.blank?
+    data.dig("llm_raw", "checklist_references") || data.dig("checklist_references") || []
+  end
+
   def parsed_data
     return nil if report_data.nil?
     return report_data if report_data.is_a?(Hash)

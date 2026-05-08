@@ -3,8 +3,7 @@ class RegistryTimelineComponent < ViewComponent::Base
     @report = report
     @timeline = report.effective_rights_timeline
     @tenants = report.effective_tenants
-    @checklist_refs = report.report_data&.dig("llm_raw", "checklist_references") ||
-                      report.report_data&.dig("checklist_references") || []
+    @checklist_refs = ChecklistCodeMapping.build_checklist_refs(report.checklist_reference_codes)
   end
 
   private

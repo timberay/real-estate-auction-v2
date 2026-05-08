@@ -37,8 +37,9 @@ module Manual
       end
     end
 
-    def step_label
-      I18n.t("manuals.steps.#{@step.key}.label")
+    # Pass count: explicitly to share request-scoped memoization.
+    def step_label(count: nil)
+      I18n.t("manuals.steps.#{@step.key}.label", count: count || InspectionItem.count)
     end
 
     private
