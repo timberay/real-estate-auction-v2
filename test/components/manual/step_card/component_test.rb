@@ -91,6 +91,14 @@ module Manual
         assert_selector "details ul.text-sm"
       end
 
+      test "CTA button uses text-sm to match other screens" do
+        step = Manuals::Step.new(number: 2, key: :properties, status: :pending, detail: nil)
+
+        render_inline(Manual::StepCard::Component.new(step: step, default_open: true))
+
+        assert_selector "a.text-sm[href='/properties']"
+      end
+
       test "missing screenshot does not raise — silently swallowed in dev/test" do
         step = Manuals::Step.new(number: 1, key: :budget, status: :pending, detail: nil)
 
