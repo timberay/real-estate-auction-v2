@@ -68,4 +68,31 @@ class ReportSummaryComponentTest < ViewComponent::TestCase
     assert_text "3,000만원"
     assert_no_text "30,000,000원"
   end
+
+  test "renders [code] question for each checklist reference" do
+    report = rights_analysis_reports(:risky_villa_report)
+    report.report_data = JSON.generate({ "checklist_references" => [ "rights-002" ] })
+    property = properties(:risky_villa)
+    render_inline(ReportSummaryComponent.new(report: report, property: property))
+    expected_question = InspectionItem.find_by!(code: "rights-002").question
+    assert_text "[rights-002]"
+    assert_text expected_question
+  end
+
+  test "renders (삭제된 항목) fallback for missing codes" do
+    report = rights_analysis_reports(:risky_villa_report)
+    report.report_data = JSON.generate({ "checklist_references" => [ "tax-007" ] })
+    property = properties(:risky_villa)
+    render_inline(ReportSummaryComponent.new(report: report, property: property))
+    assert_text "[tax-007]"
+    assert_text "(삭제된 항목)"
+  end
+
+  test "renders 위험 항목 없음 when refs are empty" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = JSON.generate({ "checklist_references" => [] })
+    property = properties(:safe_apartment)
+    render_inline(ReportSummaryComponent.new(report: report, property: property))
+    assert_text "위험 항목 없음"
+  end
 end
