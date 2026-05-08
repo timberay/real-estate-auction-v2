@@ -376,6 +376,299 @@
       "position": 206,
       "next_step_code": null,
       "branch_codes": []
+    },
+    {
+      "code": "ST-S1",
+      "occupant_type": "senior_tenant",
+      "step_type": "main",
+      "name": "대항력 확인",
+      "description": "선순위 임차인의 대항요건(주택 인도 + 전입신고)이 말소기준권리 이전에 충족되었는지 확정한다. 대항력이 인정되면 매수인은 보증금을 인수하지 않고는 점유 이전을 받을 수 없다.",
+      "completion_condition": "대항력 인정 확정 (전입일이 말소기준권리보다 앞섬)",
+      "failure_condition": "무상거주확인서 정황 / 대항요건 불충분",
+      "required_documents": ["전입세대열람원", "임대차계약서", "매각물건명세서"],
+      "estimated_duration": "1~2주",
+      "estimated_cost": null,
+      "legal_basis": [
+        {
+          "title": "주택임대차보호법 제3조 (대항력)",
+          "summary": "주택 인도 + 전입신고를 마친 임차인은 다음날부터 제3자에 대하여 효력 발생",
+          "url": "https://law.go.kr"
+        },
+        {
+          "title": "민사집행법 제136조 제1항 단서",
+          "summary": "대항력 있는 임차인은 인도명령 대상에서 제외",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "position": 301,
+      "next_step_code": "ST-S2",
+      "branch_codes": []
+    },
+    {
+      "code": "ST-S2",
+      "occupant_type": "senior_tenant",
+      "step_type": "main",
+      "name": "보증금 잔액 협상",
+      "description": "배당표에서 임차인 배당액을 차감해 미회수 보증금 잔액을 산정하고, 임차인과 인수 금액·지급 시기를 협의한다. 매수인이 잔액을 인수해야 점유 이전이 가능하다.",
+      "completion_condition": "잔액 산정 + 협상 진행",
+      "failure_condition": "협상 거부 / 과도한 보증금 주장",
+      "required_documents": ["배당표", "임대차계약서"],
+      "estimated_duration": "2~6주",
+      "estimated_cost": null,
+      "legal_basis": [
+        {
+          "title": "주택임대차보호법 제3조의5",
+          "summary": "보증금이 전부 변제되지 않은 경우 임차권이 매수인에게 인수됨",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "position": 302,
+      "next_step_code": "ST-S3",
+      "branch_codes": ["ST-B1"]
+    },
+    {
+      "code": "ST-S3",
+      "occupant_type": "senior_tenant",
+      "step_type": "main",
+      "name": "인수 합의서 체결",
+      "description": "지급 금액·지급 시기·이사일·이사비·시설 상태 등을 명시한 서면 합의서를 작성한다. 동시이행 조항이 핵심이다.",
+      "completion_condition": "서면 합의서 체결",
+      "failure_condition": "구두 합의 / 일방 조건 강요",
+      "required_documents": ["보증금 인수 합의서", "이사 일정 합의서"],
+      "estimated_duration": "1~2주",
+      "estimated_cost": null,
+      "legal_basis": [],
+      "position": 303,
+      "next_step_code": "ST-S4",
+      "branch_codes": []
+    },
+    {
+      "code": "ST-S4",
+      "occupant_type": "senior_tenant",
+      "step_type": "main",
+      "name": "보증금 지급 + 점유 이전 (동시이행)",
+      "description": "합의된 잔액을 지급함과 동시에 임차인으로부터 점유(열쇠)를 이전받는다. 동시이행 원칙을 지키지 않으면 보증금 회수가 어려워진다.",
+      "completion_condition": "보증금 지급 + 점유 이전 동시 완료",
+      "failure_condition": "지급 후 점유 이전 거부",
+      "required_documents": ["지급 영수증", "점유 이전 확인서"],
+      "estimated_duration": "1~3일",
+      "estimated_cost": "인수 보증금 잔액",
+      "legal_basis": [],
+      "position": 304,
+      "next_step_code": "ST-S5",
+      "branch_codes": []
+    },
+    {
+      "code": "ST-S5",
+      "occupant_type": "senior_tenant",
+      "step_type": "main",
+      "name": "인수 완료",
+      "description": "시설물 인수 확인, 잠금장치 교체, 관리비 정산. 파손·훼손은 사진·영상으로 채증한다.",
+      "completion_condition": "시설 정상 확인 / 잠금장치 교체",
+      "failure_condition": "고의적 파손 발견",
+      "required_documents": [],
+      "estimated_duration": "1~3일",
+      "estimated_cost": "잠금장치 교체비",
+      "legal_basis": [],
+      "position": 305,
+      "next_step_code": null,
+      "branch_codes": []
+    },
+    {
+      "code": "DO-S1",
+      "occupant_type": "debtor_owner",
+      "step_type": "main",
+      "name": "잔금 납부 + 인도명령 신청",
+      "description": "매각대금 완납과 동시에 인도명령 + 점유이전금지가처분을 세트로 신청한다. 채무자(소유자)는 인도명령 대상자가 가장 명확한 유형이다.",
+      "completion_condition": "잔금 납부 + 인도명령·가처분 접수 완료",
+      "failure_condition": "6개월 기한 도과",
+      "required_documents": ["잔금완납증명서", "인도명령 신청서", "점유이전금지가처분 신청서"],
+      "estimated_duration": "잔금 납부일 당일",
+      "estimated_cost": "인지대·송달료",
+      "legal_basis": [
+        {
+          "title": "민사집행법 제136조 (인도명령)",
+          "summary": "매수인은 매각대금 납부 후 6개월 이내에 채무자·점유자에 대해 인도명령 신청 가능",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "position": 401,
+      "next_step_code": "DO-S2",
+      "branch_codes": []
+    },
+    {
+      "code": "DO-S2",
+      "occupant_type": "debtor_owner",
+      "step_type": "main",
+      "name": "1차 통보 (등기 + 내용증명)",
+      "description": "소유권이전등기 후 채무자에게 내용증명 또는 직접 방문으로 새 소유자임을 통보한다. 협상의 문을 여는 단계.",
+      "completion_condition": "내용증명 발송 + 채무자 응답 또는 수령 확인",
+      "failure_condition": "연락 두절 / 폐문부동",
+      "required_documents": ["소유권이전등기 완료 확인서", "내용증명"],
+      "estimated_duration": "1~2주",
+      "estimated_cost": "등기비용·취득세",
+      "legal_basis": [],
+      "position": 402,
+      "next_step_code": "DO-S3",
+      "branch_codes": []
+    },
+    {
+      "code": "DO-S3",
+      "occupant_type": "debtor_owner",
+      "step_type": "main",
+      "name": "이사비·이사일정 협상",
+      "description": "강제집행 예상 실비의 50~70%를 이사비로 제시한다. 채무자는 이미 자력이 부족한 경우가 많아 합의 도달 비율이 비교적 높다.",
+      "completion_condition": "이사일·이사비 합의서 작성",
+      "failure_condition": "합의 결렬 / 과도한 요구",
+      "required_documents": ["이사비 합의서"],
+      "estimated_duration": "2~4주",
+      "estimated_cost": "이사비 100~300만원",
+      "legal_basis": [],
+      "position": 403,
+      "next_step_code": "DO-S4",
+      "branch_codes": ["DO-B1"]
+    },
+    {
+      "code": "DO-S4",
+      "occupant_type": "debtor_owner",
+      "step_type": "main",
+      "name": "자진 퇴거 또는 강제집행",
+      "description": "인도명령 결정문 송달 후 자진 퇴거하지 않으면 강제집행을 신청한다. 집행관 계고 단계에서 합의 회귀 사례가 많다.",
+      "completion_condition": "점유 확보",
+      "failure_condition": "예상 외 저항",
+      "required_documents": ["인도명령 결정문 정본", "송달증명원", "강제집행 신청서"],
+      "estimated_duration": "1~2개월",
+      "estimated_cost": "강제집행 시 예납금 100~300만원",
+      "legal_basis": [
+        {
+          "title": "민사집행법 제24조·제30조 (집행권원)",
+          "summary": "확정된 인도명령은 집행권원으로서 강제집행 신청의 기초가 된다",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "position": 404,
+      "next_step_code": "DO-S5",
+      "branch_codes": []
+    },
+    {
+      "code": "DO-S5",
+      "occupant_type": "debtor_owner",
+      "step_type": "main",
+      "name": "인수 완료",
+      "description": "시설물 인수 확인, 잠금장치 교체, 관리비 정산. 파손·훼손은 사진·영상으로 채증한다.",
+      "completion_condition": "시설 정상 확인 / 잠금장치 교체",
+      "failure_condition": "고의적 파손 발견",
+      "required_documents": [],
+      "estimated_duration": "1~3일",
+      "estimated_cost": "잠금장치 교체비",
+      "legal_basis": [],
+      "position": 405,
+      "next_step_code": null,
+      "branch_codes": []
+    },
+    {
+      "code": "IO-S1",
+      "occupant_type": "illegal_occupant",
+      "step_type": "main",
+      "name": "점유자 신원 및 점유개시 시점 확인",
+      "description": "전입세대열람·임장·매각물건명세서 대조로 점유자를 특정하고, 매각결정 이후 점유를 개시했음을 입증할 자료를 확보한다. 매각결정 이후 점유 개시한 제3자는 인도명령 대상에서 제외되므로 명도소송이 필수.",
+      "completion_condition": "점유자 신원 + 점유개시 시점 확정",
+      "failure_condition": "신원 불명 / 위장 전입 / 점유자 세탁",
+      "required_documents": ["전입세대열람원", "임장 보고서", "매각물건명세서"],
+      "estimated_duration": "2~4주",
+      "estimated_cost": null,
+      "legal_basis": [
+        {
+          "title": "민사집행법 제136조 제1항 단서",
+          "summary": "매각결정 이후 점유를 개시한 제3자는 인도명령 대상에서 제외",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "position": 501,
+      "next_step_code": "IO-S2",
+      "branch_codes": []
+    },
+    {
+      "code": "IO-S2",
+      "occupant_type": "illegal_occupant",
+      "step_type": "main",
+      "name": "점유 권원 검토 및 명도소송 준비",
+      "description": "점유자가 주장할 가능성이 있는 권원(임대차·유치권·사용대차 등)을 검토하고 부존재 입증 자료를 정리한다. 점유이전금지가처분을 병행 신청해 점유자 바꿔치기를 방지한다.",
+      "completion_condition": "권원 부존재 입증 자료 + 가처분 접수",
+      "failure_condition": "유치권 주장 / 권원 입증 곤란",
+      "required_documents": ["등기부등본", "점유이전금지가처분 신청서"],
+      "estimated_duration": "2~4주",
+      "estimated_cost": "인지대·송달료",
+      "legal_basis": [
+        {
+          "title": "민법 제213조 (소유물반환청구권)",
+          "summary": "소유자는 점유할 권리가 없는 점유자에 대해 그 반환을 청구할 수 있다",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "position": 502,
+      "next_step_code": "IO-S3",
+      "branch_codes": ["IO-B1"]
+    },
+    {
+      "code": "IO-S3",
+      "occupant_type": "illegal_occupant",
+      "step_type": "main",
+      "name": "명도소송 제기",
+      "description": "변호사 선임 후 부동산인도청구 소장을 관할 법원에 제기한다. 인도명령이 불가하므로 일반 민사소송 절차를 따른다.",
+      "completion_condition": "소장 접수 + 사건번호 부여",
+      "failure_condition": "비용·시간 부담 곤란",
+      "required_documents": ["소장", "위임장", "인지대·송달료 영수증"],
+      "estimated_duration": "6~12개월 (1심)",
+      "estimated_cost": "변호사 비용 + 인지대 수백만원",
+      "legal_basis": [
+        {
+          "title": "민사소송법 제248조",
+          "summary": "소는 법원에 소장을 제출함으로써 제기한다",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "position": 503,
+      "next_step_code": "IO-S4",
+      "branch_codes": []
+    },
+    {
+      "code": "IO-S4",
+      "occupant_type": "illegal_occupant",
+      "step_type": "main",
+      "name": "판결 후 강제집행",
+      "description": "승소 판결과 송달증명원을 확보하면 집행관에 강제집행을 신청한다. 점유 확보까지 추가 1~2개월 소요.",
+      "completion_condition": "점유 확보",
+      "failure_condition": "송달 불능 / 항소로 인한 지연",
+      "required_documents": ["판결정본", "송달증명원", "강제집행 신청서"],
+      "estimated_duration": "1~3개월",
+      "estimated_cost": "예납금 100~300만원",
+      "legal_basis": [
+        {
+          "title": "민사집행법 제24조 (집행권원)",
+          "summary": "확정된 종국판결은 집행권원이 된다",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "position": 504,
+      "next_step_code": "IO-S5",
+      "branch_codes": []
+    },
+    {
+      "code": "IO-S5",
+      "occupant_type": "illegal_occupant",
+      "step_type": "main",
+      "name": "인수 완료",
+      "description": "시설물 인수 확인, 잠금장치 교체, 관리비 정산. 파손·훼손은 사진·영상으로 채증한다.",
+      "completion_condition": "시설 정상 확인 / 잠금장치 교체",
+      "failure_condition": "고의적 파손 발견",
+      "required_documents": [],
+      "estimated_duration": "1~3일",
+      "estimated_cost": "잠금장치 교체비",
+      "legal_basis": [],
+      "position": 505,
+      "next_step_code": null,
+      "branch_codes": []
     }
   ],
   "branches": [
@@ -668,6 +961,89 @@
       "return_step_code": "JT-S4",
       "estimated_duration": "1~2개월",
       "position": 212
+    },
+    {
+      "code": "ST-B1",
+      "occupant_type": "senior_tenant",
+      "step_type": "branch",
+      "name": "보증금 협상 결렬 → 명도소송",
+      "description": "임차인이 협상 자체를 거부하거나 과도한 보증금을 주장하는 경우. 대항력 임차인은 인도명령 대상이 아니므로 명도소송으로만 점유를 회복할 수 있다.",
+      "trigger_step_code": "ST-S2",
+      "problem_summary": "보증금 협상 교착으로 절차 정체",
+      "root_cause": "임차인의 과도한 보증금 주장 또는 협상 거부",
+      "action_steps": [
+        "최종 인수 금액·지급 시기를 서면으로 통보",
+        "응답 없으면 부동산인도청구 소장 제기",
+        "점유이전금지가처분 병행 신청",
+        "판결 확정 후 강제집행"
+      ],
+      "legal_basis": [
+        {
+          "title": "민법 제213조 (소유물반환청구권)",
+          "summary": "소유자는 점유할 권리가 없는 자에 대해 반환을 청구할 수 있다",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "return_step_code": "ST-S3",
+      "estimated_duration": "6~12개월",
+      "position": 311
+    },
+    {
+      "code": "DO-B1",
+      "occupant_type": "debtor_owner",
+      "step_type": "branch",
+      "name": "협상 결렬 → 강제집행",
+      "description": "채무자가 이사비 합의에 도달하지 못하거나 자진 퇴거를 거부한 경우. 인도명령 결정문을 근거로 강제집행 절차로 전환한다.",
+      "trigger_step_code": "DO-S3",
+      "problem_summary": "이사비 협상 결렬",
+      "root_cause": "채무자의 자력 부족 또는 과도한 이사비 요구",
+      "action_steps": [
+        "인도명령 결정문 송달 재확인",
+        "강제집행 신청 + 예납금 납부",
+        "집행관 계고 (1차 방문) 후 2주 대기",
+        "계고 불응 시 본집행 실시"
+      ],
+      "legal_basis": [
+        {
+          "title": "민사집행법 제24조·제30조",
+          "summary": "확정된 인도명령은 집행권원으로서 강제집행의 기초가 된다",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "return_step_code": "DO-S4",
+      "estimated_duration": "1~2개월",
+      "position": 411
+    },
+    {
+      "code": "IO-B1",
+      "occupant_type": "illegal_occupant",
+      "step_type": "branch",
+      "name": "유치권 주장 → 부존재 확인의 소",
+      "description": "점유자가 공사대금 등을 근거로 유치권을 주장하는 경우. 본안 명도소송에 앞서 또는 병행하여 유치권 부존재 확인의 소를 제기해야 한다. 집행정지 위험이 동반된다.",
+      "trigger_step_code": "IO-S2",
+      "problem_summary": "유치권 주장으로 인한 집행 지연",
+      "root_cause": "공사대금·필요비 등 채권자의 점유 주장",
+      "action_steps": [
+        "점유의 연속성·간접점유 요건 검증",
+        "채권 소멸시효(3년) 경과 여부 확인",
+        "유치권 부존재 확인의 소 제기",
+        "경매방해죄 형사 고소 압박 병행"
+      ],
+      "legal_basis": [
+        {
+          "title": "민법 제320조 (유치권)",
+          "summary": "타인의 물건을 점유한 자가 그 물건에 관해 생긴 채권의 변제를 받을 때까지 점유할 권리",
+          "url": "https://law.go.kr"
+        },
+        {
+          "title": "민사집행법 제91조 제5항",
+          "summary": "유치권은 등기 순위에 관계없이 매수인에게 인수",
+          "url": "https://law.go.kr"
+        }
+      ],
+      "return_step_code": "IO-S3",
+      "estimated_duration": "2~6개월",
+      "position": 511
     }
   ]
 }
