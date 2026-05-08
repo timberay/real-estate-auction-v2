@@ -63,4 +63,13 @@ class EvictionGuide::PathBuilderTest < ActiveSupport::TestCase
       assert_nil step.occupant_type
     end
   end
+
+  test "falls back to generic (nil) data when occupant_type has no seeded questions" do
+    answers = { "Q1" => true, "Q2" => true, "Q3" => true }
+    path = EvictionGuide::PathBuilder.call(answers, occupant_type: "debtor_owner")
+    assert_kind_of Array, path
+    refute_empty path, "expected fallback to generic questions/steps when debtor_owner has no data"
+    step_codes = path.map { |e| e[:code] }
+    assert_includes step_codes, "S1"
+  end
 end

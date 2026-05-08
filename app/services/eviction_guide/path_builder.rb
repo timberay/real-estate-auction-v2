@@ -6,8 +6,8 @@ module EvictionGuide
 
     def initialize(answers, occupant_type = nil)
       @answers = answers || {}
-      @questions = EvictionSimulatorQuestion.for_occupant_type(occupant_type).index_by(&:code)
-      @steps = EvictionStep.for_occupant_type(occupant_type).index_by(&:code)
+      @questions = questions_for(occupant_type).index_by(&:code)
+      @steps = steps_for(occupant_type).index_by(&:code)
     end
 
     def call
@@ -38,6 +38,18 @@ module EvictionGuide
     end
 
     private
+
+    # Falls back to generic (nil occupant_type) records when no records exist
+    # for the requested occupant_type — covers types with no seeded data yet.
+    def questions_for(occupant_type)
+      scoped = EvictionSimulatorQuestion.for_occupant_type(occupant_type)
+      scoped.exists? ? scoped : EvictionSimulatorQuestion.for_occupant_type(nil)
+    end
+
+    def steps_for(occupant_type)
+      scoped = EvictionStep.for_occupant_type(occupant_type)
+      scoped.exists? ? scoped : EvictionStep.for_occupant_type(nil)
+    end
 
     def add_branch_to_path(path, question, visited_steps)
       next_code = question.no_next_code
