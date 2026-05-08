@@ -61,12 +61,35 @@ class ApplicationHelperTest < ActionView::TestCase
     assert_equal InspectionItem.count, inspection_item_total
   end
 
-  test "inspection_item_total memoizes per request" do
-    first = inspection_item_total
-    InspectionItem.create!(code: "test-memo-task2", tab: "rights_analysis", category: "권리분석", question: "test", priority: "상")
-    second = inspection_item_total
-    assert_equal first, second
+  test "inspection_item_total memoizes within a single helper context" do
+    call_count = 0
+    with_stubbed_count(-> { call_count += 1; 99 }) do
+      inspection_item_total
+      inspection_item_total
+    end
+    assert_equal 1, call_count, "expected InspectionItem.count to be invoked exactly once across two calls"
+  end
+
+  test "inspection_item_total returns fresh values across separate helper contexts" do
+    klass = Class.new { include ApplicationHelper }
+    with_stubbed_count(5) { assert_equal 5, klass.new.send(:inspection_item_total) }
+    with_stubbed_count(7) { assert_equal 7, klass.new.send(:inspection_item_total) }
+  end
+
+  private
+
+  # Lightweight singleton-method stub for InspectionItem.count.
+  # Minitest 6 dropped minitest/mock, so we roll our own. The base
+  # .count is inherited from ActiveRecord::Querying, so defining a
+  # singleton method shadows it; removing the singleton method
+  # restores the original lookup.
+  def with_stubbed_count(value_or_proc)
+    sc = InspectionItem.singleton_class
+    sc.send(:define_method, :count) do
+      value_or_proc.respond_to?(:call) ? value_or_proc.call : value_or_proc
+    end
+    yield
   ensure
-    InspectionItem.find_by(code: "test-memo-task2")&.destroy
+    sc.send(:remove_method, :count) if sc.instance_methods(false).include?(:count)
   end
 end
