@@ -17,7 +17,12 @@ class ReorganizeChecklistItems202605 < ActiveRecord::Migration[8.0]
       end
 
       DELETIONS.each do |code|
-        InspectionItem.find_by(code: code)&.destroy
+        item = InspectionItem.find_by(code: code)
+        next unless item
+        result_count = item.inspection_results.count
+        say_with_time "destroying #{code} (#{result_count} answered InspectionResult rows)" do
+          item.destroy
+        end
       end
     end
   end
