@@ -71,7 +71,8 @@ module EvictionGuide
       return redirect_to eviction_guide_simulator_path unless @simulation
 
       @simulation.result_path = EvictionGuide::PathBuilder.call(@simulation.answers, occupant_type: @simulation.occupant_type)
-      @simulation.difficulty_level = EvictionGuide::DifficultyAssessor.call(@simulation.answers, occupant_type: @simulation.occupant_type)
+      @difficulty_assessment = EvictionGuide::DifficultyAssessor.call(@simulation.answers, occupant_type: @simulation.occupant_type)
+      @simulation.difficulty_level = @difficulty_assessment.level
       @simulation.completed = true
       @simulation.save!
 
