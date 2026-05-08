@@ -96,4 +96,73 @@ class EvictionGuide::DifficultyAssessorTest < ActiveSupport::TestCase
     assert_equal result.level, result.to_s
     assert_equal "low", "#{result}"
   end
+
+  test "base reports level and occupant_type" do
+    result = EvictionGuide::DifficultyAssessor.call({}, occupant_type: "debtor_owner")
+    assert_equal "medium", result.base[:level]
+    assert_equal "debtor_owner", result.base[:occupant_type]
+  end
+
+  test "base level is nil when occupant_type is nil" do
+    result = EvictionGuide::DifficultyAssessor.call({})
+    assert_nil result.base[:level]
+    assert_nil result.base[:occupant_type]
+  end
+
+  test "triggers is empty when no no-answer escalates difficulty" do
+    answers = { "Q1" => true, "Q2" => true }
+    result = EvictionGuide::DifficultyAssessor.call(answers, occupant_type: "debtor_owner")
+    assert_empty result.triggers
+  end
+
+  test "triggers includes code, step_code, step_name, impact, help_text" do
+    answers = { "Q5" => false }
+    questions = { "Q5" => EvictionSimulatorQuestion.new(
+      code: "Q5", step_code: "S5", no_next_code: "Q5B",
+      difficulty_impact: "high",
+      help_text: "잔금 납부일 당일 세트로 신청하는 것이 실무 정석입니다."
+    ) }
+
+    result = EvictionGuide::DifficultyAssessor.call(answers, questions: questions)
+
+    assert_equal 1, result.triggers.size
+    trigger = result.triggers.first
+    assert_equal "Q5", trigger[:code]
+    assert_equal "S5", trigger[:step_code]
+    assert_equal "인도명령 + 점유이전금지가처분 동시 신청", trigger[:step_name]
+    assert_equal "high", trigger[:impact]
+    assert_equal "잔금 납부일 당일 세트로 신청하는 것이 실무 정석입니다.", trigger[:help_text]
+  end
+
+  test "triggers preserves answer order" do
+    answers = { "Q5" => false, "Q14G" => false }
+    questions = {
+      "Q5" => EvictionSimulatorQuestion.new(
+        code: "Q5", step_code: "S5", no_next_code: "Q5B",
+        difficulty_impact: "high", help_text: "high impact help"
+      ),
+      "Q14G" => EvictionSimulatorQuestion.new(
+        code: "Q14G", step_code: "S14", no_next_code: "Q14R",
+        difficulty_impact: "medium", help_text: "medium impact help"
+      )
+    }
+
+    result = EvictionGuide::DifficultyAssessor.call(answers, questions: questions)
+
+    assert_equal %w[Q5 Q14G], result.triggers.map { |t| t[:code] }
+  end
+
+  test "triggers uses step_code as step_name fallback when step row is missing" do
+    answers = { "QX" => false }
+    questions = { "QX" => EvictionSimulatorQuestion.new(
+      code: "QX", step_code: "S-NONEXISTENT", no_next_code: "QXB",
+      difficulty_impact: "medium", help_text: "no step row"
+    ) }
+
+    result = EvictionGuide::DifficultyAssessor.call(answers, questions: questions)
+
+    trigger = result.triggers.first
+    assert_equal "S-NONEXISTENT", trigger[:step_code]
+    assert_equal "S-NONEXISTENT", trigger[:step_name]
+  end
 end
