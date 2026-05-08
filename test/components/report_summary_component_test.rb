@@ -95,4 +95,22 @@ class ReportSummaryComponentTest < ViewComponent::TestCase
     render_inline(ReportSummaryComponent.new(report: report, property: property))
     assert_text "위험 항목 없음"
   end
+
+  test "checklist_refs memoizes — single query per render even with multiple calls" do
+    report = rights_analysis_reports(:risky_villa_report)
+    report.report_data = JSON.generate({ "checklist_references" => [ "rights-002", "rights-003" ] })
+    property = properties(:risky_villa)
+
+    queries = []
+    callback = ->(_, _, _, _, payload) {
+      sql = payload[:sql]
+      queries << sql if sql =~ /\bFROM\s+"?inspection_items"?\b/i && sql !~ /sqlite_master|PRAGMA/i
+    }
+
+    ActiveSupport::Notifications.subscribed(callback, "sql.active_record") do
+      render_inline(ReportSummaryComponent.new(report: report, property: property))
+    end
+
+    assert_equal 1, queries.size, "expected exactly one inspection_items SELECT per render, got: #{queries.size}"
+  end
 end

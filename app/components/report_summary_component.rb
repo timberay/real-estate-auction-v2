@@ -11,10 +11,7 @@ class ReportSummaryComponent < ViewComponent::Base
   end
 
   def checklist_refs
-    data = @report.report_data
-    data = JSON.parse(data) if data.is_a?(String)
-    codes = data&.dig("checklist_references") || []
-    ChecklistCodeMapping.build_checklist_refs(codes)
+    @checklist_refs ||= ChecklistCodeMapping.build_checklist_refs(@report.checklist_reference_codes)
   end
 
   def format_price(price_in_won)
