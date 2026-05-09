@@ -50,11 +50,7 @@ class RightsTimelineComponent < ViewComponent::Base
     amount.to_fs(:delimited) + "원"
   end
 
-  AMOUNT_TYPE_HINTS = {
-    "채권최고액" => "※ 실제 채권액과 다를 수 있음 (보통 110~120%)"
-  }.freeze
-
   def amount_type_hint(amount_type)
-    AMOUNT_TYPE_HINTS[amount_type]
+    AmountTypeHints.for(amount_type)
   end
 end

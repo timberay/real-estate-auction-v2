@@ -142,6 +142,55 @@ class RegistryTimelineComponentTest < ViewComponent::TestCase
     assert_text "동일자 전입 — 추가 확인 필요"
   end
 
+  test "renders amount_type label next to amount when present" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => {
+        "rights_timeline" => [
+          { "date" => "2024-01-15", "type" => "근저당", "holder" => "국민은행",
+            "amount" => 200_000_000, "amount_type" => "채권최고액", "extinguished_on_sale" => true }
+        ]
+      },
+      "calculated" => { "tenants" => [] },
+      "discrepancies" => []
+    }
+    render_inline(RegistryTimelineComponent.new(report: report))
+    assert_text "채권최고액"
+  end
+
+  test "renders 채권최고액 hint as title tooltip" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => {
+        "rights_timeline" => [
+          { "date" => "2024-01-15", "type" => "근저당", "holder" => "국민은행",
+            "amount" => 200_000_000, "amount_type" => "채권최고액", "extinguished_on_sale" => true }
+        ]
+      },
+      "calculated" => { "tenants" => [] },
+      "discrepancies" => []
+    }
+    render_inline(RegistryTimelineComponent.new(report: report))
+    assert_selector "[title*='실제 채권액과 다를 수 있']"
+  end
+
+  test "does not render amount_type marker when absent" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => {
+        "rights_timeline" => [
+          { "date" => "2024-01-15", "type" => "근저당", "holder" => "국민은행",
+            "amount" => 200_000_000, "extinguished_on_sale" => true }
+        ]
+      },
+      "calculated" => { "tenants" => [] },
+      "discrepancies" => []
+    }
+    render_inline(RegistryTimelineComponent.new(report: report))
+    assert_no_text "amount_type"
+    refute_match(/nil/i, page.text)
+  end
+
   test "renders '배당요구 ✗' when dividend_requested is false" do
     report = rights_analysis_reports(:safe_apartment_report)
     report.report_data = {
