@@ -30,7 +30,10 @@ module Inspection
             {
               source_label: "AI 분석 (참고)",
               confidence: "none",
-              reasoning: ai_result["reasoning"]
+              reasoning: ai_result["reasoning"],
+              source_doc: ai_result["source_doc"],
+              page_number: ai_result["page_number"],
+              quote: ai_result["quote"]
             }
           end
           result.assign_attributes(source_type: "ai", has_risk: nil, evidence: evidence_attrs)
@@ -52,7 +55,10 @@ module Inspection
             evidence: {
               source_label: source_label,
               confidence: ai_result["confidence"],
-              reasoning: ai_result["reasoning"]
+              reasoning: ai_result["reasoning"],
+              source_doc: ai_result["source_doc"],
+              page_number: ai_result["page_number"],
+              quote: ai_result["quote"]
             }
           )
         end
