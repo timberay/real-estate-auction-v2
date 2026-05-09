@@ -11,16 +11,20 @@
           <span class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-800/40 px-3 py-1 text-sm font-semibold text-green-800 dark:text-green-300">
             안전 기회물건
           </span>
-          <span class="text-sm font-medium text-green-700 dark:text-green-400">
-            <% case @report.opportunity_type %>
-            <% when "hug_waiver" %>
-              HUG 권리신고 포기
-            <% when "gap_investment" %>
-              갭투자 기회
-            <% when "occupancy" %>
-              점유 기회
-            <% end %>
-          </span>
+          <%# TODO(A6 follow-up): preferred_purchase_risk is rendered as an "opportunity" but is actually a risk signal.
+              Consider promoting it to a separate "위험 신호" section for visual coherence. %>
+          <% case @report.opportunity_type %>
+          <% when "hug_waiver" %>
+            <span class="text-sm font-medium text-green-700 dark:text-green-400">HUG 권리신고 포기</span>
+          <% when "gap_investment" %>
+            <span class="text-sm font-medium text-green-700 dark:text-green-400">갭투자 기회</span>
+          <% when "occupancy" %>
+            <span class="text-sm font-medium text-green-700 dark:text-green-400">점유 기회</span>
+          <% when "preferred_purchase_risk" %>
+            <span class="inline-flex items-center rounded-md bg-amber-50 dark:bg-amber-900/30 px-2 py-1 text-xs font-medium text-amber-800 dark:text-amber-200 ring-1 ring-inset ring-amber-200 dark:ring-amber-800">
+              ⚠️ 우선매수권 행사 위험
+            </span>
+          <% end %>
         </div>
         <% if @report.opportunity_reason.present? %>
           <details class="mt-2">

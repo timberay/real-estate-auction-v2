@@ -17,4 +17,10 @@ class RightsReportSectionComponentTest < ViewComponent::TestCase
     component = RightsReportSectionComponent.new(report: @report, property: @property)
     assert_equal true, component.instance_variable_get(:@show_title)
   end
+
+  test "renders preferred_purchase_risk warning badge" do
+    @report.opportunity_type = "preferred_purchase_risk"
+    render_inline(RightsReportSectionComponent.new(report: @report, property: @property))
+    assert_text "우선매수권 행사 위험"
+  end
 end
