@@ -13,6 +13,13 @@
         <% end %>
       </div>
       <div class="flex items-center gap-2 flex-wrap">
+        <% if current_user %>
+          <%= button_to current_user.beginner_mode? ? "초심자 모드 ✓" : "초심자 모드",
+                        toggle_beginner_mode_path,
+                        method: :patch,
+                        data: { turbo: false },
+                        class: "rounded px-2 py-0.5 text-xs font-medium transition-colors #{current_user.beginner_mode? ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-100'}" %>
+        <% end %>
         <% if property.appraisal_price.present? %>
           <div class="inline-flex items-center gap-1.5 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 h-8">
             <span class="text-sm text-amber-600 dark:text-amber-400">감정가</span>

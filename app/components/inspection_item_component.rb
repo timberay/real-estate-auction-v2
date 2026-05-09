@@ -1,9 +1,10 @@
 class InspectionItemComponent < ViewComponent::Base
-  def initialize(result:, show_resolution: false, dependency_hidden: false)
+  def initialize(result:, show_resolution: false, dependency_hidden: false, beginner_mode: false)
     @result = result
     @item = result.inspection_item
     @show_resolution = show_resolution
     @dependency_hidden = dependency_hidden
+    @beginner_mode = beginner_mode
   end
 
   private

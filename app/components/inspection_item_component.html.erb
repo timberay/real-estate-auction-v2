@@ -22,7 +22,13 @@
       <% if ai_reference? %>
         <span class="inline-flex items-center rounded px-1.5 py-0.5 text-sm font-semibold bg-amber-100 text-amber-700 ring-1 ring-inset ring-amber-600/20 dark:bg-amber-900/30 dark:text-amber-300 dark:ring-amber-400/20">직접 확인</span>
       <% end %>
-      <p class="text-sm font-medium text-slate-900 dark:text-slate-100"><%= @item.question %></p>
+      <p class="text-sm font-medium text-slate-900 dark:text-slate-100">
+        <% if @beginner_mode %>
+          <%= render Inspection::TermGlossaryComponent.new(text: @item.question) %>
+        <% else %>
+          <%= @item.question %>
+        <% end %>
+      </p>
     </div>
     <div class="ml-2 flex shrink-0 items-center gap-2">
       <span class="text-sm font-semibold <%= status_classes %>" data-inspection-item-target="statusLabel"><%= status_text %></span>

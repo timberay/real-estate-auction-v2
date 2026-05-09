@@ -7,7 +7,7 @@
   </div>
   <div class="space-y-2">
     <% @results.each do |result| %>
-      <%= render InspectionItemComponent.new(result: result, show_resolution: true, dependency_hidden: @dependency_hidden_ids.include?(result.id)) %>
+      <%= render InspectionItemComponent.new(result: result, show_resolution: true, dependency_hidden: @dependency_hidden_ids.include?(result.id), beginner_mode: @beginner_mode) %>
     <% end %>
   </div>
 </div>
