@@ -5,8 +5,22 @@
   <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">원문 뷰어</h3>
 
   <% if extraction_failed? %>
-    <div class="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-4 text-sm text-amber-800 dark:text-amber-200">
-      분석 데이터를 구조화하는 데 실패했습니다. 원본 문서를 참고하세요.
+    <div class="rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-4 space-y-3">
+      <div class="flex items-start gap-2">
+        <span aria-hidden="true" class="text-amber-700 dark:text-amber-300 font-bold">!</span>
+        <div class="flex-1">
+          <p class="text-sm font-semibold text-amber-900 dark:text-amber-100">분석에 실패했습니다.</p>
+          <% if failure_reason.present? %>
+            <p class="mt-1 text-sm text-amber-800 dark:text-amber-200"><%= failure_reason %></p>
+          <% end %>
+          <p class="mt-1 text-xs text-amber-700 dark:text-amber-300">원본 문서를 참고하세요.</p>
+        </div>
+      </div>
+      <% if retry_path %>
+        <%= button_to "재시도", retry_path, method: :post,
+                      data: { turbo: false },
+                      class: "inline-flex items-center justify-center h-9 px-3 rounded-md bg-amber-600 dark:bg-amber-500 text-sm font-semibold text-white transition-colors hover:bg-amber-700 dark:hover:bg-amber-400 focus-visible:ring-2 focus-visible:ring-amber-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-amber-400/50 dark:focus-visible:ring-offset-slate-900" %>
+      <% end %>
     </div>
   <% elsif !has_data? %>
     <div class="rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-4 text-sm text-slate-500 dark:text-slate-400">

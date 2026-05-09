@@ -9,6 +9,8 @@ module Inspections
       @tab_key = params[:tab_key]
       return head(:not_found) unless VALID_TABS.include?(@tab_key)
 
+      @rights_report = RightsAnalysisReport.find_by(user: current_user, property: @property) if @tab_key == "rights_analysis"
+
       all_results = @property.inspection_results
         .where(user: current_user)
         .includes(:inspection_item)

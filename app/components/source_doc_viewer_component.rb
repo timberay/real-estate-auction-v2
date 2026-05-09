@@ -24,6 +24,15 @@ class SourceDocViewerComponent < ViewComponent::Base
     @report&.parsed_data&.dig("analysis_status") == "extraction_failed"
   end
 
+  def failure_reason
+    @report&.parsed_data&.dig("failure_reason")
+  end
+
+  def retry_path
+    return nil unless @property
+    Rails.application.routes.url_helpers.property_analysis_retry_path(@property)
+  end
+
   def has_data?
     @report.present? && !extraction_failed?
   end
