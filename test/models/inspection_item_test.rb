@@ -283,8 +283,8 @@ class InspectionItemReorganization202605Test < ActiveSupport::TestCase
   end
 
   test "checklist count after reorganization is 44" do
-    # A6 adds 5 veteran items (rights-025..029); count is now 49
-    assert_equal 49, InspectionItem.count
+    # A6 adds 5 veteran items (rights-025..029); B2 splits rights-008 into 당해세 + 일반국세 (rights-030); count is now 50
+    assert_equal 50, InspectionItem.count
   end
 
   test "inspect-005 lives in field_check tab" do
@@ -325,5 +325,49 @@ class InspectionItemReorganization202605Test < ActiveSupport::TestCase
     %w[rights-025 rights-026 rights-027 rights-028 rights-029].each do |code|
       assert InspectionItem.exists?(code: code), "#{code} must exist in seeds"
     end
+  end
+
+  # B2 (E-6): split rights-008 (선순위 세금 압류) into 당해세 vs 일반국세
+  test "rights-008 is now scoped to 당해세 (재산세·종합부동산세)" do
+    item = InspectionItem.find_by!(code: "rights-008")
+    assert_match(/당해세/, item.question, "rights-008 question must mention 당해세")
+    assert_match(/재산세|종합부동산세/, item.question, "rights-008 question must mention 재산세 or 종합부동산세")
+    assert_equal "상", item.priority
+    assert_equal false, item.yes_means_safe
+  end
+
+  test "rights-030 covers 일반 국세 (당해세 외) as a separate checklist item" do
+    item = InspectionItem.find_by!(code: "rights-030")
+    assert_match(/일반 국세|일반국세/, item.question, "rights-030 question must mention 일반 국세")
+    assert_equal "중", item.priority
+    assert_equal false, item.yes_means_safe
+    assert_equal "rights_analysis", item.tab
+  end
+
+  test "rights-008 and rights-030 ask distinct questions about separable tax categories" do
+    rights_008 = InspectionItem.find_by!(code: "rights-008")
+    rights_030 = InspectionItem.find_by!(code: "rights-030")
+    refute_equal rights_008.question, rights_030.question
+  end
+
+  test "rights-017 depends_on resolves to an existing checklist item" do
+    item = InspectionItem.find_by!(code: "rights-017")
+    parent_code = item.depends_on["code"]
+    assert InspectionItem.exists?(code: parent_code),
+           "rights-017 depends_on=#{parent_code.inspect} must resolve to a valid item"
+  end
+
+  test "권리분석 rights-* items have unique (tab, tab_position) combinations" do
+    # Scoped to rights-* because eviction-004 and manual-001 share tab_position 13 in 권리분석 (pre-existing, tracked separately).
+    rights_items = InspectionItem.where(tab: "rights_analysis").where("code LIKE ?", "rights-%")
+    positions = rights_items.pluck(:tab_position)
+    assert_equal positions.size, positions.uniq.size,
+                 "duplicate tab_position among rights-* items in 권리분석: #{positions.tally.select { |_, n| n > 1 }}"
+  end
+
+  test "all checklist item codes are unique" do
+    codes = InspectionItem.pluck(:code)
+    assert_equal codes.size, codes.uniq.size,
+                 "duplicate codes: #{codes.tally.select { |_, n| n > 1 }}"
   end
 end
