@@ -48,4 +48,42 @@ class Inspection::PdfPromptBuilderTest < ActiveSupport::TestCase
     assert_match(/dividend_requested/, prompt, "tenants schema must include dividend_requested field")
     assert_match(/배당요구/, prompt, "prompt must instruct LLM to extract 배당요구 column")
   end
+
+  test "prompt instructs cross-reference between 등기부등본 and 매각물건명세서 for contradictions" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    assert_includes prompt, "등기부", "prompt must reference 등기부"
+    assert_includes prompt, "매각물건명세서", "prompt must reference 매각물건명세서"
+    assert(prompt.include?("모순") || prompt.include?("불일치"),
+      "prompt must include a contradiction-related keyword (모순 or 불일치)")
+  end
+
+  test "prompt instructs setting verdict to caution on contradiction" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    contradiction_section = prompt[/\[(?:모순 검출 규칙|자기검증)\].*?(?=\[)/m]
+    assert contradiction_section.present?,
+      "prompt must contain a [모순 검출 규칙] or [자기검증] section"
+    assert_includes contradiction_section, "caution",
+      "contradiction section must instruct setting verdict to caution"
+    assert(contradiction_section.include?("모순") || contradiction_section.include?("불일치"),
+      "contradiction section must mention 모순 or 불일치 alongside caution")
+  end
+
+  test "prompt provides at least one concrete contradiction example" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    examples = [ "근저당", "가압류", "임차인 정보", "권리 설정일" ]
+    matched = examples.any? { |ex| prompt.include?(ex) }
+    assert matched,
+      "prompt must include at least one concrete contradiction example: #{examples.join(', ')}"
+  end
+
+  test "prompt requires reasoning to cite both documents on contradiction" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    contradiction_section = prompt[/\[(?:모순 검출 규칙|자기검증)\].*?(?=\[)/m]
+    assert contradiction_section.present?,
+      "prompt must contain a [모순 검출 규칙] or [자기검증] section"
+    assert_includes contradiction_section, "reasoning",
+      "contradiction section must reference reasoning field"
+    assert(contradiction_section.include?("양쪽") || contradiction_section.include?("모두 인용"),
+      "contradiction section must require citing both documents (양쪽 or 모두 인용)")
+  end
 end
