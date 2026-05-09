@@ -22,7 +22,7 @@ class BudgetSummaryComponentTest < ViewComponent::TestCase
 
     render_inline(BudgetSummaryComponent.new(setting: setting))
 
-    assert_text "유용자금"
+    assert_text "쓸 수 있는 현금"
     assert_text "3억"
     assert_text "예비비 합계"
     assert_text "1,140만원"
