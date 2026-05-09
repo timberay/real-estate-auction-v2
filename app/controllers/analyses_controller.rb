@@ -79,6 +79,11 @@ class AnalysesController < ApplicationController
       return
     end
 
+    unless current_user.user_properties.exists?(property_id: property_id)
+      redirect_to new_analysis_path, alert: "해당 물건을 찾을 수 없습니다."
+      return
+    end
+
     uploaded_files = Array(params[:documents]).reject { |f| f.is_a?(String) }
 
     if uploaded_files.empty?
@@ -105,6 +110,8 @@ class AnalysesController < ApplicationController
       document_blob_ids: blob_ids
     )
 
+    # CaseNumberMissingError / CaseNumberMismatchError are raised inside PdfAnalysisJob
+    # and broadcast to the user via Turbo Stream toast (see pdf_analysis_job.rb).
     respond_to do |format|
       format.turbo_stream do
         render turbo_stream: [
@@ -119,8 +126,6 @@ class AnalysesController < ApplicationController
         redirect_to new_analysis_path, notice: "분석이 시작되었습니다."
       end
     end
-  rescue PdfAnalysisService::CaseNumberMissingError, PdfAnalysisService::CaseNumberMismatchError => e
-    redirect_to new_analysis_path, alert: e.message
   end
 
   private

@@ -108,8 +108,10 @@ class PdfAnalysisService
     end
   end
 
+  # Strip only ASCII space (U+0020) — matches the REPLACE(' ', '') used in SQL queries,
+  # so Ruby comparison and DB lookup behave identically for Korean court case numbers.
   def normalize_case(s)
-    s.to_s.gsub(/\s+/, "").downcase
+    s.to_s.gsub(" ", "").downcase
   end
 
   def attach_documents_to_property(property, blobs)

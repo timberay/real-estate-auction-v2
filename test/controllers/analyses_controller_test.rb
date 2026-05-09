@@ -189,6 +189,26 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     assert_match(/PDF 형식/, flash[:alert])
   end
 
+  # IDOR: a logged-in user must NOT be able to enqueue analysis against
+  # another user's property by crafting a POST with that property's id.
+  test "POST create with another user's property_id is rejected (IDOR)" do
+    other_user = users(:guest_two)
+    other_property = properties(:basement_villa)
+    UserProperty.find_or_create_by!(user: other_user, property: other_property)
+
+    # Sanity: current session user must not own other_property
+    assert_not @user.user_properties.exists?(property: other_property)
+
+    pdf = fixture_file_upload("test/fixtures/files/test.pdf", "application/pdf")
+
+    assert_no_enqueued_jobs only: PdfAnalysisJob do
+      post analyses_path, params: { property_id: other_property.id, documents: [ pdf ] }
+    end
+
+    assert_redirected_to new_analysis_path
+    assert flash[:alert].present?
+  end
+
   test "POST manual with JSON missing case_number shows alert and stays on manual tab" do
     json_content = { "metadata" => { "address" => "test" }, "results" => {} }.to_json
     file = Rack::Test::UploadedFile.new(
