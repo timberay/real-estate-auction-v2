@@ -75,7 +75,7 @@ class AnalysesController < ApplicationController
     property_id = params[:property_id].presence
 
     unless property_id
-      redirect_to new_analysis_path, alert: PdfAnalysisService::CaseNumberMissingError.new("사건번호를 먼저 입력해 주세요.").message
+      redirect_to new_analysis_path, alert: "사건번호를 먼저 입력해 주세요."
       return
     end
 

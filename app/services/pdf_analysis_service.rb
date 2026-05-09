@@ -101,7 +101,10 @@ class PdfAnalysisService
     else
       llm_case = metadata&.dig("case_number").presence
       raise CaseNumberMissingError, "사건번호를 먼저 입력해 주세요." if llm_case.blank?
-      Property.find_by!(case_number: normalize_case(llm_case))
+      Property.find_by!(
+        "LOWER(REPLACE(case_number, ' ', '')) = ?",
+        normalize_case(llm_case)
+      )
     end
   end
 

@@ -221,6 +221,17 @@ class PdfAnalysisServiceTest < ActiveSupport::TestCase
     assert result.property.inspection_results.where(user: @user).any?
   end
 
+  test "find_by case_number is space-insensitive on lookup" do
+    # DB record has spaces; LLM returns compact form — find_by! must still match
+    property = Property.create!(case_number: "2024 타경 99999")
+    service = PdfAnalysisService.new(property: nil, documents: nil, user: @user)
+    metadata = { "case_number" => "2024타경99999" }
+
+    found = service.send(:resolve_property, metadata)
+
+    assert_equal property.id, found.id
+  end
+
   test "Path 3: logs analysis with provider manual and model user_input" do
     response_json = JSON.parse(File.read(Rails.root.join("test/fixtures/files/ai_inspection_response.json")))
 
