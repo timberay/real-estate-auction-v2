@@ -35,10 +35,20 @@ module Inspection
           end
           result.assign_attributes(source_type: "ai", has_risk: nil, evidence: evidence_attrs)
         else
-          source_label = ai_result["confidence"] == "high" ? "AI 분석" : "AI 분석 (추론)"
+          # Medium confidence + no-risk claim: demote has_risk to nil and require user
+          # confirmation (the dangerous failure mode is AI saying "no risk" when there IS risk).
+          # Medium + risk claim: surface as-is so user still sees the flag.
+          demote_no_risk = ai_result["confidence"] == "medium" && ai_result["has_risk"] == false
+          source_label = if ai_result["confidence"] == "high"
+            "AI 분석"
+          elsif demote_no_risk
+            "AI 의견 (확인 필요)"
+          else
+            "AI 분석 (추론)"
+          end
           result.assign_attributes(
             source_type: "ai",
-            has_risk: ai_result["has_risk"],
+            has_risk: demote_no_risk ? nil : ai_result["has_risk"],
             evidence: {
               source_label: source_label,
               confidence: ai_result["confidence"],
