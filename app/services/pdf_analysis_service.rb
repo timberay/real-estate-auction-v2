@@ -21,7 +21,16 @@ class PdfAnalysisService
     else
       call_with_llm
     end
+  rescue JSON::ParserError => e
+    write_extraction_failure(reason: "응답 JSON 파싱 실패: #{e.message.to_s.truncate(120)}")
+    log_failure(e)
+    raise
+  rescue Faraday::TimeoutError => e
+    write_extraction_failure(reason: "AI 서버 응답 시간 초과")
+    log_failure(e)
+    raise
   rescue => e
+    write_extraction_failure(reason: "분석 중 알 수 없는 오류 (#{e.class.name})")
     log_failure(e)
     raise
   end
@@ -156,7 +165,11 @@ class PdfAnalysisService
       report.update!(
         analyzed_at: Time.current,
         verdict_summary: nil,
-        report_data: { "analysis_status" => "extraction_failed", "failed_at" => Time.current.iso8601 }
+        report_data: {
+          "analysis_status" => "extraction_failed",
+          "failed_at" => Time.current.iso8601,
+          "failure_reason" => "AI 응답에서 rights_analysis 필드를 찾지 못했습니다."
+        }
       )
       return
     end
@@ -199,6 +212,27 @@ class PdfAnalysisService
         "discrepancies" => validation.discrepancies
       }
     )
+  end
+
+  # Persist a human-readable failure_reason on the report so the UI can
+  # surface "왜 실패했는지" + a retry button. Guarded: does nothing when
+  # @property is nil (case_number-first flow where the property has not
+  # been resolved yet — there's no report to attach to).
+  def write_extraction_failure(reason:)
+    return unless @property
+
+    report = RightsAnalysisReport.find_or_initialize_by(user: @user, property: @property)
+    report.update!(
+      analyzed_at: Time.current,
+      verdict_summary: nil,
+      report_data: {
+        "analysis_status" => "extraction_failed",
+        "failed_at" => Time.current.iso8601,
+        "failure_reason" => reason
+      }
+    )
+  rescue => e
+    Rails.logger.error "[PdfAnalysisService] Failed to write extraction failure: #{e.message}"
   end
 
   def log_failure(error)

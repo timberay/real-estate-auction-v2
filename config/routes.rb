@@ -59,6 +59,7 @@ Rails.application.routes.draw do
       patch :toggle_favorite
     end
     resources :documents, only: [ :create, :destroy ], controller: "properties/documents"
+    post "analyses/retry", to: "properties/analysis_retries#create", as: :analysis_retry
     namespace :inspections do
       resource :start, only: [ :create ], controller: "start"
       resources :tabs, only: [ :edit, :update ], param: :tab_key

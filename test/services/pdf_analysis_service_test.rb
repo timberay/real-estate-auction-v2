@@ -203,6 +203,88 @@ class PdfAnalysisServiceTest < ActiveSupport::TestCase
     Llm::Base.define_singleton_method(:for, original_for)
   end
 
+  test "stores failure_reason when rights_analysis key is missing" do
+    original = JSON.parse(File.read(Llm::Mock::FIXTURE_PATH))
+    no_rights = original.except("rights_analysis")
+
+    mock_llm = Llm::Mock.new
+    mock_llm.override_response = no_rights
+
+    original_for = Llm::Base.method(:for)
+    Llm::Base.define_singleton_method(:for) { mock_llm }
+
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    assert_not_nil report.report_data["failure_reason"]
+    assert_match(/rights_analysis/, report.report_data["failure_reason"])
+  ensure
+    Llm::Base.define_singleton_method(:for, original_for)
+  end
+
+  test "stores failure_reason on JSON::ParserError" do
+    mock_llm = Object.new
+    mock_llm.define_singleton_method(:analyze) { |**_| raise JSON::ParserError, "unexpected token" }
+    mock_llm.define_singleton_method(:provider_name) { "mock" }
+    mock_llm.define_singleton_method(:model_id) { "mock-1" }
+
+    original_for = Llm::Base.method(:for)
+    Llm::Base.define_singleton_method(:for) { mock_llm }
+
+    assert_raises(JSON::ParserError) do
+      PdfAnalysisService.call(property: @property, user: @user)
+    end
+
+    report = RightsAnalysisReport.find_by(property: @property, user: @user)
+    assert_not_nil report
+    assert_equal "extraction_failed", report.report_data["analysis_status"]
+    assert_match(/JSON 파싱/, report.report_data["failure_reason"])
+  ensure
+    Llm::Base.define_singleton_method(:for, original_for)
+  end
+
+  test "stores failure_reason on Faraday::TimeoutError" do
+    mock_llm = Object.new
+    mock_llm.define_singleton_method(:analyze) { |**_| raise Faraday::TimeoutError, "timed out" }
+    mock_llm.define_singleton_method(:provider_name) { "mock" }
+    mock_llm.define_singleton_method(:model_id) { "mock-1" }
+
+    original_for = Llm::Base.method(:for)
+    Llm::Base.define_singleton_method(:for) { mock_llm }
+
+    assert_raises(Faraday::TimeoutError) do
+      PdfAnalysisService.call(property: @property, user: @user)
+    end
+
+    report = RightsAnalysisReport.find_by(property: @property, user: @user)
+    assert_not_nil report
+    assert_equal "extraction_failed", report.report_data["analysis_status"]
+    assert_match(/시간 초과/, report.report_data["failure_reason"])
+  ensure
+    Llm::Base.define_singleton_method(:for, original_for)
+  end
+
+  test "does not crash when failure occurs before property is resolved" do
+    # No @property given (case_number-first flow); LLM raises before resolve.
+    mock_llm = Object.new
+    mock_llm.define_singleton_method(:analyze) { |**_| raise StandardError, "early failure" }
+    mock_llm.define_singleton_method(:provider_name) { "mock" }
+    mock_llm.define_singleton_method(:model_id) { "mock-1" }
+
+    original_for = Llm::Base.method(:for)
+    Llm::Base.define_singleton_method(:for) { mock_llm }
+
+    # Should re-raise without crashing and without writing a new report
+    # (no property to attach the report to).
+    initial_report_ids = RightsAnalysisReport.pluck(:id)
+    assert_raises(StandardError) do
+      PdfAnalysisService.call(documents: [ @pdf_blob ], user: @user)
+    end
+    assert_equal initial_report_ids.sort, RightsAnalysisReport.pluck(:id).sort
+  ensure
+    Llm::Base.define_singleton_method(:for, original_for)
+  end
+
   test "report creation is idempotent on re-analysis" do
     PdfAnalysisService.call(property: @property, user: @user)
     PdfAnalysisService.call(property: @property, user: @user)

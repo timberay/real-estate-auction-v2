@@ -1,5 +1,10 @@
 <%= render layout: "inspections/layout", locals: { property: @property, user_property: @user_property, active_tab: @tab_key } do %>
   <div id="top"></div>
+  <% if @tab_key == "rights_analysis" && @rights_report&.parsed_data&.dig("analysis_status") == "extraction_failed" %>
+    <div class="mb-4">
+      <%= render SourceDocViewerComponent.new(report: @rights_report, property: @property) %>
+    </div>
+  <% end %>
   <% if (tab_rating = flash[:tab_rating]) %>
     <% rating_key = tab_rating["rating"] %>
     <% badge_config = {

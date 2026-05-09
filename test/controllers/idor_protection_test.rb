@@ -71,6 +71,17 @@ class IdorProtectionTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "POST /properties/:id/analyses/retry returns 404 for other user's property" do
+    post property_analysis_retry_url(@other_property)
+    assert_response :not_found
+  end
+
+  test "POST /properties/:id/analyses/retry must not enqueue PdfAnalysisJob for other user's property" do
+    assert_no_enqueued_jobs only: PdfAnalysisJob do
+      post property_analysis_retry_url(@other_property)
+    end
+  end
+
   test "IDOR 404 must not enqueue AI jobs even when other user pre-attached docs" do
     # Other user has already attached PDFs (their analysis is ready). A naive
     # implementation would let session user trigger PdfAnalysisJob on those

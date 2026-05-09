@@ -16,7 +16,25 @@ class SourceDocViewerComponentTest < ViewComponent::TestCase
     report = rights_analysis_reports(:safe_apartment_report)
     report.report_data = { "analysis_status" => "extraction_failed" }
     render_inline(SourceDocViewerComponent.new(report: report))
-    assert_text "분석 데이터를 구조화하는 데 실패했습니다"
+    assert_text "분석에 실패했습니다"
+  end
+
+  test "renders failure_reason when present" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "analysis_status" => "extraction_failed",
+      "failure_reason" => "AI 응답에서 rights_analysis 필드를 찾지 못했습니다."
+    }
+    render_inline(SourceDocViewerComponent.new(report: report, property: report.property))
+    assert_text "AI 응답에서 rights_analysis 필드를 찾지 못했습니다"
+  end
+
+  test "renders retry button on extraction failure when property given" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = { "analysis_status" => "extraction_failed" }
+    render_inline(SourceDocViewerComponent.new(report: report, property: report.property))
+    assert_selector "form[action*='/properties/#{report.property.id}/analyses/retry']"
+    assert_text "재시도"
   end
 
   test "reads tenants from calculated namespace" do
