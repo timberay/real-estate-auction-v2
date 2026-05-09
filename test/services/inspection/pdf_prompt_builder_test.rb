@@ -121,4 +121,47 @@ class Inspection::PdfPromptBuilderTest < ActiveSupport::TestCase
     assert_includes results_section, "page_number"
     assert_includes results_section, "quote"
   end
+
+  # --- B8 / E-41: hug_waiver explicit citation requirement ---
+
+  test "prompt requires explicit 권리포기 확약서 for hug_waiver" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    assert_match(/확약서/, prompt, "prompt must mention 확약서 (waiver document) for hug_waiver")
+    assert_match(/단순히/, prompt, "prompt must explicitly forbid 단순히 (mere) non-explicit cases")
+  end
+
+  test "prompt requires opportunity_source_doc / opportunity_page_number / opportunity_quote for hug_waiver" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    assert_match(/opportunity_source_doc/, prompt, "prompt must require opportunity_source_doc field")
+    assert_match(/opportunity_page_number/, prompt, "prompt must require opportunity_page_number field")
+    assert_match(/opportunity_quote/, prompt, "prompt must require opportunity_quote field")
+  end
+
+  test "prompt scopes opportunity citation rule to hug_waiver only" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    # Rule must be hug_waiver-specific, not blanket for all opportunity_type values
+    assert_match(
+      /opportunity_type이\s*["']?hug_waiver["']?인\s*경우/,
+      prompt,
+      "prompt must scope citation rule to hug_waiver only"
+    )
+  end
+
+  test "prompt schema example includes opportunity citation fields in rights_analysis block" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    rights_section = prompt[/"rights_analysis":\s*\{.*?\n\s*\}/m]
+    assert rights_section.present?, "rights_analysis JSON example must exist"
+    assert_includes rights_section, "opportunity_source_doc"
+    assert_includes rights_section, "opportunity_page_number"
+    assert_includes rights_section, "opportunity_quote"
+  end
+
+  test "prompt forbids paraphrasing in opportunity_quote" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    # The opportunity_quote rule (in addition to existing item-level quote rule)
+    # must also forbid paraphrasing.
+    hug_section = prompt[/opportunity_type이.*?["']?hug_waiver["']?.*?(?=\[|\z)/m]
+    assert hug_section.present?, "hug_waiver instruction block must exist"
+    assert_match(/의역\s*금지/, hug_section, "hug_waiver block must forbid paraphrasing the quote")
+  end
 end

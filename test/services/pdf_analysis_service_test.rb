@@ -177,6 +177,73 @@ class PdfAnalysisServiceTest < ActiveSupport::TestCase
     assert report.opportunity_reason.present?
   end
 
+  # --- B8 / E-41: hug_waiver server-side citation enforcement ---
+
+  test "preserves opportunity_type=hug_waiver when all citation fields present" do
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    # Mock fixture provides opportunity_source_doc / opportunity_page_number / opportunity_quote
+    assert_equal "hug_waiver", report.opportunity_type
+    evidence = report.parsed_data["opportunity_evidence"]
+    assert_not_nil evidence, "opportunity_evidence must be stored in report_data"
+    assert evidence["source_doc"].present?
+    assert evidence["page_number"].present?
+    assert evidence["quote"].present?
+  end
+
+  test "nulls opportunity_type when hug_waiver returned without complete citation" do
+    incomplete = JSON.parse(File.read(Llm::Mock::FIXTURE_PATH))
+    incomplete["rights_analysis"]["opportunity_type"] = "hug_waiver"
+    incomplete["rights_analysis"]["opportunity_source_doc"] = nil
+    incomplete["rights_analysis"]["opportunity_page_number"] = 5
+    incomplete["rights_analysis"]["opportunity_quote"] = "원문 인용 문장"
+
+    mock_llm = Llm::Mock.new
+    mock_llm.override_response = incomplete
+    original_for = Llm::Base.method(:for)
+    Llm::Base.define_singleton_method(:for) { mock_llm }
+
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    assert_nil report.opportunity_type, "opportunity_type must be nulled when citation incomplete"
+  ensure
+    Llm::Base.define_singleton_method(:for, original_for)
+  end
+
+  test "preserves non-hug_waiver opportunity_type without citation fields" do
+    response = JSON.parse(File.read(Llm::Mock::FIXTURE_PATH))
+    response["rights_analysis"]["opportunity_type"] = "gap_investment"
+    response["rights_analysis"]["opportunity_source_doc"] = nil
+    response["rights_analysis"]["opportunity_page_number"] = nil
+    response["rights_analysis"]["opportunity_quote"] = nil
+
+    mock_llm = Llm::Mock.new
+    mock_llm.override_response = response
+    original_for = Llm::Base.method(:for)
+    Llm::Base.define_singleton_method(:for) { mock_llm }
+
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    # gap_investment does not require citation — guard must be hug_waiver-specific
+    assert_equal "gap_investment", report.opportunity_type
+  ensure
+    Llm::Base.define_singleton_method(:for, original_for)
+  end
+
+  test "stores opportunity_evidence in report_data for hug_waiver" do
+    result = PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: result.property, user: @user)
+
+    evidence = report.parsed_data["opportunity_evidence"]
+    assert_not_nil evidence
+    assert evidence["source_doc"].is_a?(String)
+    assert evidence["page_number"].is_a?(Integer)
+    assert evidence["quote"].is_a?(String)
+  end
+
   test "effective_tenants helper returns calculated tenants" do
     result = PdfAnalysisService.call(property: @property, user: @user)
     report = RightsAnalysisReport.find_by(property: result.property, user: @user)
