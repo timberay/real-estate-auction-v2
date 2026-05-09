@@ -1,0 +1,20 @@
+<div class="mt-1.5 text-xs" data-evidence-link>
+  <% if header? %>
+    <div class="flex items-center gap-1 text-slate-300 dark:text-slate-400">
+      <% if source_doc.present? %>
+        <span>📄 출처: <span class="font-medium text-slate-200 dark:text-slate-200"><%= source_doc %></span></span>
+      <% end %>
+      <% if source_doc.present? && page_number.present? %>
+        <span aria-hidden="true">·</span>
+      <% end %>
+      <% if page_number.present? %>
+        <span class="font-medium text-slate-200 dark:text-slate-200"><%= page_label %></span>
+      <% end %>
+    </div>
+  <% end %>
+  <% if quote.present? %>
+    <blockquote class="mt-1 border-l-2 border-slate-400 dark:border-slate-500 pl-2 italic text-slate-300 dark:text-slate-400">
+      <%= quote %>
+    </blockquote>
+  <% end %>
+</div>
