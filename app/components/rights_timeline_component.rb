@@ -18,6 +18,7 @@ class RightsTimelineComponent < ViewComponent::Base
         type: right["type"],
         holder: right["holder"],
         amount: right["amount"],
+        amount_type: right["amount_type"].presence,
         extinguished: right["extinguished_on_sale"],
         is_base: right["date"] == base_right_date,
         kind: :right
@@ -30,6 +31,7 @@ class RightsTimelineComponent < ViewComponent::Base
         type: "임차인 전입",
         holder: tenant["name"],
         amount: tenant["deposit"],
+        amount_type: nil,
         extinguished: false,
         is_base: false,
         kind: :tenant
@@ -46,5 +48,13 @@ class RightsTimelineComponent < ViewComponent::Base
   def format_amount(amount)
     return "—" if amount.nil?
     amount.to_fs(:delimited) + "원"
+  end
+
+  AMOUNT_TYPE_HINTS = {
+    "채권최고액" => "※ 실제 채권액과 다를 수 있음 (보통 110~120%)"
+  }.freeze
+
+  def amount_type_hint(amount_type)
+    AMOUNT_TYPE_HINTS[amount_type]
   end
 end

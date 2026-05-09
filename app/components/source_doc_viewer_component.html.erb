@@ -53,7 +53,7 @@
         <div class="mt-2 space-y-1">
           <% rights_timeline.each do |right| %>
             <p class="<%= right["extinguished_on_sale"] ? "text-slate-500 dark:text-slate-400" : "text-red-600 dark:text-red-400 font-semibold" %>">
-              • <%= right["date"] %> <%= right["type"] %> — <%= right["holder"] %> (<%= number_to_currency(right["amount"], unit: "₩", precision: 0) %>)
+              • <%= right["date"] %> <%= right["type"] %> — <%= right["holder"] %> (<%= number_to_currency(right["amount"], unit: "₩", precision: 0) %><%= " · #{right["amount_type"]}" if right["amount_type"].present? %>)
               <%= right["extinguished_on_sale"] ? "[소멸]" : "[인수]" %>
             </p>
           <% end %>
