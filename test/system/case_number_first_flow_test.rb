@@ -10,20 +10,19 @@ class CaseNumberFirstFlowTest < ApplicationSystemTestCase
     UserProperty.find_or_create_by!(user: @user, property: @property)
   end
 
-  test "PDF upload page requires picking an existing property first" do
+  test "analysis page defaults to manual tab when auto tab is disabled" do
     visit new_analysis_path
 
-    assert_text "분석할 물건을 먼저 선택하세요"
-    assert_selector "input[type=file][disabled]"
-    assert_selector "input[type=submit][disabled]"
+    # Manual tab panel is visible (manual analysis form shows)
+    assert_text "AI 수동분석이란?"
+    # Auto panel is not visible
+    assert_no_text "분석할 물건을 먼저 선택하세요"
   end
 
-  test "after picking property, PDF upload and submit become enabled" do
+  test "analysis page shows disclosure panel on load" do
     visit new_analysis_path
 
-    select "서울중앙지방법원 2026타경99001", from: "분석 대상 물건"
-
-    assert_selector "input[type=file]:not([disabled])"
-    assert_selector "input[type=submit]:not([disabled])"
+    assert_text "외부 LLM API로 전송되는 정보"
+    assert_text "프롬프트 복사"
   end
 end

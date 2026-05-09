@@ -17,10 +17,11 @@ export default class extends Controller {
 
   connect() {
     const params = new URLSearchParams(window.location.search)
-    if (params.get("tab") === "manual") {
-      this.showManual()
-    } else {
+    const autoDisabled = this.autoTabTarget.disabled || this.autoTabTarget.getAttribute("aria-disabled") === "true"
+    if (params.get("tab") === "auto" && !autoDisabled) {
       this.showAuto()
+    } else {
+      this.showManual()
     }
   }
 
