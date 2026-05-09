@@ -8,6 +8,7 @@ module Inspections
       @rating = rating_service.call
       @fully_evaluated = rating_service.fully_evaluated?
       @tabs_evaluated, @tabs_total = rating_service.tabs_evaluated_count
+      @unanswered_high_priority_count = rating_service.unanswered_high_priority_count
       @report = RightsAnalysisReport.find_by(property: @property, user: current_user)
       @budget_setting = current_user.budget_setting
 
