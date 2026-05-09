@@ -20,6 +20,11 @@ module Inspection
       - 데이터가 부족하여 판단할 수 없는 항목은 has_risk: null, confidence: "none"으로 반환하세요.
       - yes_means_safe=false인 항목은 "예"가 위험을 의미합니다. has_risk는 항상 "이 항목이 위험한가?"를 기준으로 판정하세요.
       - reasoning은 반드시 문서에서 확인한 구체적 근거를 인용하세요.
+      - 각 판정에는 인용한 PDF 문서의 위치를 함께 반환하세요. has_risk가 true 또는 false인 경우 다음 3개 필드를 반드시 채우세요:
+        - source_doc: 인용한 문서명 ("등기부등본", "매각물건명세서", "감정평가서", "현황조사서" 등 실제 PDF 명칭)
+        - page_number: 인용한 페이지 번호 (정수). 페이지를 특정할 수 없으면 null.
+        - quote: 해당 페이지에서 발췌한 한국어 원문 (50자 이상 200자 이하). **의역 금지** — PDF에 적힌 문장을 그대로 옮겨 적으세요.
+      - 단, confidence가 "none"이거나 has_risk가 null인 경우 source_doc, page_number, quote는 null로 두어도 됩니다 (강제하지 않음).
 
       [물건 종류별 판정 규칙]
       - 작업 1에서 추출한 property_type을 작업 2의 모든 판정에 반드시 참조하세요.
@@ -82,7 +87,10 @@ module Inspection
           "<item_code>": {
             "has_risk": true | false | null,
             "confidence": "high" | "medium" | "none",
-            "reasoning": "판정 근거 (한국어, 문서 인용 포함)"
+            "reasoning": "판정 근거 (한국어, 문서 인용 포함)",
+            "source_doc": "등기부등본" | "매각물건명세서" | "감정평가서" | null,
+            "page_number": 3 | null,
+            "quote": "해당 페이지에서 발췌한 원문 (의역 금지, 50-200자)"
           }
         },
         "rights_analysis": {

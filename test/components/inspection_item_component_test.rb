@@ -266,4 +266,40 @@ class InspectionItemComponentTest < ViewComponent::TestCase
 
     assert_selector "span.font-mono", text: result.inspection_item.code
   end
+
+  # --- B7 / E-19: source citation rendering ---
+
+  test "renders source citation block when evidence has source_doc / page_number / quote" do
+    result = inspection_results(:risky_villa_rights_003)
+    result.update!(
+      source_type: :ai, has_risk: true,
+      evidence: {
+        "source_label" => "AI 분석",
+        "confidence" => "high",
+        "reasoning" => "유치권 신고가 있습니다.",
+        "source_doc" => "매각물건명세서",
+        "page_number" => 4,
+        "quote" => "비고란에 '유치권 신고 있음(2024-08-12)' 으로 기재되어 있습니다."
+      }
+    )
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-evidence-link]"
+    assert_text "매각물건명세서"
+    assert_text "p.4"
+    assert_selector "blockquote", text: /유치권 신고 있음/
+  end
+
+  test "does not render citation block when evidence lacks citation fields" do
+    result = inspection_results(:risky_villa_rights_003)
+    result.update!(
+      source_type: :ai, has_risk: true,
+      evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "유치권 신고가 있습니다." }
+    )
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_selector "[data-evidence]"
+    assert_no_selector "[data-evidence-link]"
+    assert_no_selector "blockquote"
+  end
 end

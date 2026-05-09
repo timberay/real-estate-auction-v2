@@ -74,6 +74,11 @@
       <% if evidence["reasoning"].present? %>
         <div class="<%= evidence_label_classes %>"><span class="whitespace-pre-line <%= evidence_value_classes %>"><%= format_reasoning(evidence["reasoning"]) %></span></div>
       <% end %>
+      <%= render(EvidenceLinkComponent.new(
+        source_doc: evidence["source_doc"],
+        page_number: evidence["page_number"],
+        quote: evidence["quote"]
+      )) %>
       <% if evidence["fields"].present? %>
         <% evidence["fields"].each do |field| %>
           <div class="<%= evidence_label_classes %>"><%= field["label"] %>: <span class="<%= evidence_value_classes %>"><%= field["value"] %></span></div>
