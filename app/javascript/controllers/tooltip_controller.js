@@ -2,9 +2,17 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static values = { content: String }
+  static targets = ["content"]
 
   connect() {
     this.tooltipElement = null
+  }
+
+  // Click-toggle for pre-rendered content targets (e.g. LTV explainer)
+  toggle() {
+    if (this.hasContentTarget) {
+      this.contentTarget.classList.toggle("hidden")
+    }
   }
 
   show() {
@@ -32,5 +40,8 @@ export default class extends Controller {
 
   disconnect() {
     this.hide()
+    if (this.hasContentTarget) {
+      this.contentTarget.classList.add("hidden")
+    }
   }
 }
