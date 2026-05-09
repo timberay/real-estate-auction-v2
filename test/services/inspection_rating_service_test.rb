@@ -235,30 +235,22 @@ class InspectionRatingServiceTest < ActiveSupport::TestCase
   end
 
   test "unanswered_high_priority_count returns the exact gap" do
-    high_items = InspectionItem.where(priority: "상").to_a
-    visible_high_items = high_items.select { |item| item.applicable_for?(@property.property_type) && item.depends_on.blank? }
-    total_visible_high = visible_high_items.size
-    assert total_visible_high > 1, "test setup: need at least 2 visible high items"
+    service_baseline = InspectionRatingService.new(property: @property, user: @user)
+    baseline_unanswered = service_baseline.unanswered_high_priority_count
+    assert baseline_unanswered > 1, "test setup: need at least 2 visible high items"
 
-    # Answer exactly one
-    answerable = visible_high_items.first
+    # Answer exactly one visible high-priority item (no depends_on so unconditionally visible)
+    answerable = InspectionItem.where(priority: "상").find { |item|
+      item.applicable_for?(@property.property_type) && item.depends_on.blank?
+    }
     InspectionResult.create!(property: @property, inspection_item: answerable, user: @user, source_type: "auto", has_risk: false)
 
-    service = InspectionRatingService.new(property: @property, user: @user)
-    assert_equal total_visible_high - 1, service.unanswered_high_priority_count
+    service_after = InspectionRatingService.new(property: @property, user: @user)
+    assert_equal baseline_unanswered - 1, service_after.unanswered_high_priority_count
   end
 
   test "safe when all visible priority='상' items answered with no risks" do
-    # Answer ALL priority='상' items that are visible (no depends_on = unconditionally visible)
-    InspectionItem.where(priority: "상").each do |item|
-      next unless item.applicable_for?(@property.property_type)
-      next if item.depends_on.present?
-      InspectionResult.find_or_create_by!(property: @property, inspection_item: item, user: @user) do |r|
-        r.source_type = "auto"
-        r.has_risk = false
-      end
-    end
-
+    answer_all_high_priority_no_risk
     service = InspectionRatingService.new(property: @property, user: @user)
     assert_equal :safe, service.overall_rating
   end

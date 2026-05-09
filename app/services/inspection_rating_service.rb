@@ -97,13 +97,14 @@ class InspectionRatingService
   end
 
   def answered_high_count
-    high_codes = visible_high_items.map(&:code)
-    return 0 if high_codes.empty?
-    @property.inspection_results
-      .where(user: @user)
-      .where(inspection_item: visible_high_items)
-      .where.not(has_risk: nil)
-      .count
+    @answered_high_count ||= begin
+      return 0 if visible_high_items.empty?
+      @property.inspection_results
+        .where(user: @user)
+        .where(inspection_item: visible_high_items)
+        .where.not(has_risk: nil)
+        .count
+    end
   end
 
   def visible_results
