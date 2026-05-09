@@ -4,6 +4,8 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
   setup do
     get start_onboarding_url # creates guest session
     @user = User.find(session[:user_id])
+    @property = Property.create!(case_number: "2026타경CTL001")
+    UserProperty.find_or_create_by!(user: @user, property: @property)
   end
 
   test "GET new renders upload form" do
@@ -22,7 +24,7 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
   test "POST create with Turbo responds with form reset, toast, and indicator" do
     pdf = fixture_file_upload("test/fixtures/files/test.pdf", "application/pdf")
 
-    post analyses_path, params: { documents: [ pdf ] },
+    post analyses_path, params: { property_id: @property.id, documents: [ pdf ] },
       headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
     assert_response :success
@@ -38,17 +40,26 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
   test "POST create without Turbo redirects with notice" do
     pdf = fixture_file_upload("test/fixtures/files/test.pdf", "application/pdf")
 
-    post analyses_path, params: { documents: [ pdf ] }
+    post analyses_path, params: { property_id: @property.id, documents: [ pdf ] }
 
     assert_redirected_to new_analysis_path
     assert_equal "분석이 시작되었습니다.", flash[:notice]
   end
 
   test "POST create without documents shows alert" do
-    post analyses_path, params: {}
+    post analyses_path, params: { property_id: @property.id }
 
     assert_redirected_to new_analysis_path
     assert flash[:alert].present?
+  end
+
+  test "POST create without property_id redirects with missing case number alert" do
+    pdf = fixture_file_upload("test/fixtures/files/test.pdf", "application/pdf")
+
+    post analyses_path, params: { documents: [ pdf ] }
+
+    assert_redirected_to new_analysis_path
+    assert_equal "사건번호를 먼저 입력해 주세요.", flash[:alert]
   end
 
   # Task 3: prompt action
@@ -156,7 +167,7 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     )
 
     assert_no_enqueued_jobs only: PdfAnalysisJob do
-      post analyses_path, params: { documents: [ big_pdf ] }
+      post analyses_path, params: { property_id: @property.id, documents: [ big_pdf ] }
     end
 
     assert_redirected_to new_analysis_path
@@ -171,7 +182,7 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     )
 
     assert_no_enqueued_jobs only: PdfAnalysisJob do
-      post analyses_path, params: { documents: [ fake_pdf ] }
+      post analyses_path, params: { property_id: @property.id, documents: [ fake_pdf ] }
     end
 
     assert_redirected_to new_analysis_path

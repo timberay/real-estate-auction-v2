@@ -72,6 +72,13 @@ class AnalysesController < ApplicationController
   end
 
   def create
+    property_id = params[:property_id].presence
+
+    unless property_id
+      redirect_to new_analysis_path, alert: PdfAnalysisService::CaseNumberMissingError.new("사건번호를 먼저 입력해 주세요.").message
+      return
+    end
+
     uploaded_files = Array(params[:documents]).reject { |f| f.is_a?(String) }
 
     if uploaded_files.empty?
@@ -93,7 +100,7 @@ class AnalysesController < ApplicationController
     end
 
     PdfAnalysisJob.perform_later(
-      property_id: nil,
+      property_id: property_id,
       user_id: current_user.id,
       document_blob_ids: blob_ids
     )
@@ -112,6 +119,8 @@ class AnalysesController < ApplicationController
         redirect_to new_analysis_path, notice: "분석이 시작되었습니다."
       end
     end
+  rescue PdfAnalysisService::CaseNumberMissingError, PdfAnalysisService::CaseNumberMismatchError => e
+    redirect_to new_analysis_path, alert: e.message
   end
 
   private

@@ -1,13 +1,38 @@
-<div id="analysis_form" data-controller="file-upload">
+<div id="analysis_form" data-controller="analysis-form file-upload">
   <%= form_with url: analyses_path, method: :post, class: "space-y-3", data: { action: "submit->file-upload#submit" } do |f| %>
     <div>
-      <%= f.file_field :documents, multiple: true, accept: "application/pdf",
-          data: { file_upload_target: "input", action: "change->file-upload#select" },
-          class: "block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300 dark:hover:file:bg-blue-800 dark:text-slate-400" %>
+      <label for="property_select" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+        분석 대상 물건
+      </label>
+      <%= f.select :property_id,
+          current_user.properties.map { |p| ["#{p.court_name.presence ? "#{p.court_name} " : ""}#{p.case_number}", p.id] },
+          { prompt: "분석할 물건을 먼저 선택하세요" },
+          id: "property_select",
+          data: {
+            analysis_form_target: "propertySelect",
+            action: "change->analysis-form#togglePdf"
+          },
+          class: "block w-full rounded-md border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
     </div>
+
+    <div>
+      <%= f.file_field :documents, multiple: true, accept: "application/pdf",
+          disabled: true,
+          data: {
+            file_upload_target: "input",
+            analysis_form_target: "pdfInput",
+            action: "change->file-upload#select"
+          },
+          class: "block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-blue-900 dark:file:text-blue-300 dark:hover:file:bg-blue-800 dark:text-slate-400 disabled:opacity-50 disabled:cursor-not-allowed" %>
+    </div>
+
     <div data-file-upload-target="fileList" class="hidden text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 rounded-md p-3 border border-slate-200 dark:border-slate-700"></div>
+
     <%= f.submit "분석 시작",
-        data: { file_upload_target: "submit" },
+        data: {
+          file_upload_target: "submit",
+          analysis_form_target: "submitBtn"
+        },
         disabled: true,
         class: "inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" %>
   <% end %>
