@@ -9,7 +9,7 @@ class LazyGuestCreationTest < ActionDispatch::IntegrationTest
     assert_no_difference "User.count" do
       get root_url
     end
-    assert_response :redirect
+    assert_response :success
   end
 
   test "anonymous repeated GETs to public pages do not accumulate User rows" do

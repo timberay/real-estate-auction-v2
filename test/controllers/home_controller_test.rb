@@ -1,9 +1,10 @@
 require "test_helper"
 
 class HomeControllerTest < ActionDispatch::IntegrationTest
-  test "redirects to onboarding when no budget settings" do
+  test "shows landing to unauthenticated visitor" do
     get root_url
-    assert_redirected_to start_onboarding_url
+    assert_response :success
+    assert_select "h1", text: "법원 경매 권리분석 도구"
   end
 
   test "redirects to properties when budget settings completed" do
