@@ -1,5 +1,6 @@
 class InspectionRatingService
   ANALYSIS_TABS = %w[rights_analysis profit_analysis field_check bidding].freeze
+  REQUIRED_COVERAGE = 1.0 # All visible priority="상" items must be answered before :safe is possible
 
   def self.call(property:, user:)
     new(property:, user:).call
@@ -20,6 +21,8 @@ class InspectionRatingService
   end
 
   def overall_rating
+    return :incomplete if priority_high_coverage < REQUIRED_COVERAGE
+
     answered = visible_results.select { |r| !r.has_risk.nil? }
     return :incomplete if answered.empty?
 
@@ -32,6 +35,10 @@ class InspectionRatingService
     else
       :safe
     end
+  end
+
+  def unanswered_high_priority_count
+    visible_high_items.size - answered_high_count
   end
 
   def tab_rating(tab_key)
@@ -65,6 +72,35 @@ class InspectionRatingService
   end
 
   private
+
+  def priority_high_coverage
+    total = visible_high_items.size
+    return 1.0 if total == 0
+    answered_high_count.to_f / total
+  end
+
+  def visible_high_items
+    @visible_high_items ||= begin
+      all_results = @property.inspection_results.where(user: @user).includes(:inspection_item)
+      answered_context = all_results.index_by { |r| r.inspection_item.code }
+      all_items_by_code = InspectionItem.all.index_by(&:code)
+      property_type = @property.property_type
+
+      InspectionItem.where(priority: "상").select do |item|
+        item.visible_for?(property_type: property_type, answered_results: answered_context, all_items_by_code: all_items_by_code)
+      end
+    end
+  end
+
+  def answered_high_count
+    high_codes = visible_high_items.map(&:code)
+    return 0 if high_codes.empty?
+    @property.inspection_results
+      .where(user: @user)
+      .where(inspection_item: visible_high_items)
+      .where.not(has_risk: nil)
+      .count
+  end
 
   def visible_results
     @visible_results ||= begin
