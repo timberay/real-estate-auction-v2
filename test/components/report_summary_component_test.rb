@@ -101,7 +101,7 @@ class ReportSummaryComponentTest < ViewComponent::TestCase
     report.report_data = JSON.generate({
       "calculated" => {
         "unevaluated_rights" => [
-          { "right_type" => "유치권", "amount" => 50_000_000 }
+          { "type" => "유치권", "amount" => 50_000_000 }
         ],
         "disclaimer" => "추정치이며, 별도 평가 필요 항목이 1건 있습니다. 베테랑/공인중개사 검토를 권장합니다."
       }

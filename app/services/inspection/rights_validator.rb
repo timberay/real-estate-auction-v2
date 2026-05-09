@@ -64,7 +64,7 @@ module Inspection
     def calculate_amounts(validated_tenants)
       surviving = @rights_timeline.reject { |r| r["extinguished_on_sale"] }
       unevaluated, summable = surviving.partition do |r|
-        UNEVALUATED_TYPES.include?(r["right_type"].to_s.gsub(/\s+/, ""))
+        UNEVALUATED_TYPES.include?(r["type"].to_s.gsub(/\s+/, ""))
       end
 
       assumed = summable.sum { |r| r["amount"].to_i }

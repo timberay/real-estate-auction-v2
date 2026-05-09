@@ -44,9 +44,9 @@
       <ul class="mt-2 list-disc pl-6 text-sm text-amber-900 dark:text-amber-200">
         <% @report.unevaluated_rights.each do |r| %>
           <li>
-            <strong><%= r["right_type"] %></strong> — 별도 평가 필요. 본 도구는 채권액 합산에서 제외했습니다.
+            <strong><%= r["type"] %></strong> — 별도 평가 필요. 본 도구는 채권액 합산에서 제외했습니다.
             <% if r["amount"].present? && r["amount"].to_i > 0 %>
-              (참고 채권액: <%= number_to_currency(r["amount"], unit: "원") %>)
+              (참고 채권액: <%= format_price(r["amount"]) %>)
             <% end %>
           </li>
         <% end %>

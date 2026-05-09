@@ -187,13 +187,13 @@ class Inspection::RightsValidatorTest < ActiveSupport::TestCase
       base_right_date: "2024-01-01",
       tenants: [],
       rights_timeline: [
-        { "right_type" => "근저당", "amount" => 100_000_000, "extinguished_on_sale" => true },
-        { "right_type" => "유치권", "amount" => 50_000_000, "extinguished_on_sale" => false }
+        { "type" => "근저당", "amount" => 100_000_000, "extinguished_on_sale" => true },
+        { "type" => "유치권", "amount" => 50_000_000, "extinguished_on_sale" => false }
       ]
     )
     assert_equal 0, result.validated_amounts["assumed_amount"]
     assert_equal 1, result.validated_amounts["unevaluated_rights"].size
-    assert_equal "유치권", result.validated_amounts["unevaluated_rights"].first["right_type"]
+    assert_equal "유치권", result.validated_amounts["unevaluated_rights"].first["type"]
     assert_match(/별도 평가 필요/, result.validated_amounts["disclaimer"])
   end
 
@@ -202,7 +202,7 @@ class Inspection::RightsValidatorTest < ActiveSupport::TestCase
       base_right_date: "2024-01-01",
       tenants: [],
       rights_timeline: [
-        { "right_type" => "가등기", "amount" => 0, "extinguished_on_sale" => false }
+        { "type" => "가등기", "amount" => 0, "extinguished_on_sale" => false }
       ]
     )
     assert_equal 0, result.validated_amounts["assumed_amount"]
@@ -214,7 +214,7 @@ class Inspection::RightsValidatorTest < ActiveSupport::TestCase
       base_right_date: "2024-01-01",
       tenants: [],
       rights_timeline: [
-        { "right_type" => "가압류", "amount" => 30_000_000, "extinguished_on_sale" => false }
+        { "type" => "가압류", "amount" => 30_000_000, "extinguished_on_sale" => false }
       ]
     )
     assert_equal 30_000_000, result.validated_amounts["assumed_amount"]
@@ -227,10 +227,24 @@ class Inspection::RightsValidatorTest < ActiveSupport::TestCase
       base_right_date: "2024-01-01",
       tenants: [],
       rights_timeline: [
-        { "right_type" => "선순위 세금압류", "amount" => 10_000_000, "extinguished_on_sale" => false }
+        { "type" => "선순위 세금압류", "amount" => 10_000_000, "extinguished_on_sale" => false }
       ]
     )
     assert_equal 0, result.validated_amounts["assumed_amount"]
     assert_equal 1, result.validated_amounts["unevaluated_rights"].size
+  end
+
+  test "real LLM response with 'type' key correctly partitions 유치권" do
+    fixture_data = JSON.parse(file_fixture("ai_inspection_response.json").read)
+    rights = fixture_data.dig("rights_analysis", "rights_timeline") || []
+    rights << { "type" => "유치권", "amount" => 50_000_000, "extinguished_on_sale" => false }
+
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-01",
+      tenants: [],
+      rights_timeline: rights
+    )
+    refute_empty result.validated_amounts["unevaluated_rights"]
+    assert_equal "유치권", result.validated_amounts["unevaluated_rights"].first["type"]
   end
 end
