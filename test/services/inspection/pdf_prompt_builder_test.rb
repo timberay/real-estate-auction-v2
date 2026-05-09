@@ -48,4 +48,37 @@ class Inspection::PdfPromptBuilderTest < ActiveSupport::TestCase
     assert_match(/dividend_requested/, prompt, "tenants schema must include dividend_requested field")
     assert_match(/배당요구/, prompt, "prompt must instruct LLM to extract 배당요구 column")
   end
+
+  # --- B7 / E-19: source citation fields ---
+
+  test "prompt requires source_doc / page_number / quote on evidence" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    assert_match(/source_doc/, prompt, "prompt must require source_doc field")
+    assert_match(/page_number/, prompt, "prompt must require page_number field")
+    assert_match(/quote/, prompt, "prompt must require quote field")
+  end
+
+  test "prompt allows null source_doc when confidence is none" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    assert_match(
+      /confidence가\s*["']none["']이거나.+has_risk가\s*null.+source_doc/m,
+      prompt,
+      "prompt must explicitly relax citation requirement for none/null cases"
+    )
+  end
+
+  test "prompt forbids paraphrasing in quote" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    assert_match(/의역\s*금지/, prompt, "prompt must forbid paraphrasing the quote")
+  end
+
+  test "prompt schema example includes source_doc / page_number / quote in results block" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    # Ensure the citation fields appear in the JSON example for `results.<item_code>`
+    results_section = prompt[/"results":\s*\{.*?\}\s*\}/m]
+    assert results_section.present?, "results JSON example must exist"
+    assert_includes results_section, "source_doc"
+    assert_includes results_section, "page_number"
+    assert_includes results_section, "quote"
+  end
 end

@@ -67,6 +67,70 @@ class Inspection::InspectionResultMapperTest < ActiveSupport::TestCase
     assert result.evidence["reasoning"].present?
   end
 
+  test "passes source_doc / page_number / quote citation fields through to evidence" do
+    @property.inspection_results.where(user: @user).where.not(source_type: :manual).destroy_all
+
+    response_with_citations = @response.deep_dup
+    response_with_citations["results"]["rights-001"] = {
+      "has_risk" => false,
+      "confidence" => "medium",
+      "reasoning" => "매각물건명세서에 가처분 관련 기재가 없습니다.",
+      "source_doc" => "매각물건명세서",
+      "page_number" => 2,
+      "quote" => "비고란에 가처분, 가등기 등 추가 권리에 관한 기재 사항이 없음을 확인하였습니다."
+    }
+
+    Inspection::InspectionResultMapper.call(
+      response: response_with_citations, property: @property, user: @user, items: @items
+    )
+
+    result = find_result("rights-001")
+    assert_equal "매각물건명세서", result.evidence["source_doc"]
+    assert_equal 2, result.evidence["page_number"]
+    assert_includes result.evidence["quote"], "가처분"
+  end
+
+  test "citation keys exist (with nil values) when AI omits them" do
+    @property.inspection_results.where(user: @user).where.not(source_type: :manual).destroy_all
+
+    Inspection::InspectionResultMapper.call(
+      response: @response, property: @property, user: @user, items: @items
+    )
+
+    # rights-002 in fixture has no citation fields; mapper should still include the keys.
+    result = find_result("rights-002")
+    assert result.evidence.key?("source_doc"), "evidence should always carry source_doc key"
+    assert result.evidence.key?("page_number"), "evidence should always carry page_number key"
+    assert result.evidence.key?("quote"), "evidence should always carry quote key"
+    assert_nil result.evidence["source_doc"]
+    assert_nil result.evidence["page_number"]
+    assert_nil result.evidence["quote"]
+  end
+
+  test "citation passthrough also works for none confidence (with reasoning)" do
+    @property.inspection_results.where(user: @user).where.not(source_type: :manual).destroy_all
+
+    response_with_citation_none = @response.deep_dup
+    response_with_citation_none["results"]["rights-009"] = {
+      "has_risk" => nil,
+      "confidence" => "none",
+      "reasoning" => "관련 정보가 부족합니다.",
+      "source_doc" => "등기부등본",
+      "page_number" => 1,
+      "quote" => "을구에 HUG 관련 기재 사항이 없는 것으로 확인되었습니다."
+    }
+
+    Inspection::InspectionResultMapper.call(
+      response: response_with_citation_none, property: @property, user: @user, items: @items
+    )
+
+    result = find_result("rights-009")
+    assert_nil result.has_risk
+    assert_equal "등기부등본", result.evidence["source_doc"]
+    assert_equal 1, result.evidence["page_number"]
+    assert_includes result.evidence["quote"], "HUG"
+  end
+
   test "overrides has_risk to nil for items not applicable to property type" do
     finance_item = InspectionItem.create!(
       code: "finance-003", tab: :profit_analysis, tab_position: 2,
