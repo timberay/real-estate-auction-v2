@@ -32,6 +32,7 @@ module Inspection
       move_in = parse_date(tenant["move_in_date"])
       confirmed = parse_date(tenant["confirmed_date"])
 
+      same_day = @base_right_date && move_in && move_in == @base_right_date
       opposing = if @base_right_date && move_in
         move_in < @base_right_date
       else
@@ -46,7 +47,10 @@ module Inspection
         "deposit" => tenant["deposit"],
         "move_in_date" => tenant["move_in_date"],
         "confirmed_date" => tenant["confirmed_date"],
+        "dividend_requested" => tenant["dividend_requested"],
         "opposing_power" => opposing,
+        "same_day_warning" => same_day ? true : false,
+        "warning_message" => same_day ? "전입과 말소기준이 같은 날입니다. 대항력은 익일 0시 효력 발생 원칙상 후순위로 판정했으나, 전입 시각·전입세대열람 등 추가 확인이 필요합니다." : nil,
         "has_priority_repayment" => has_priority,
         "effective_date" => eff_date&.to_s,
         "priority_rank" => nil

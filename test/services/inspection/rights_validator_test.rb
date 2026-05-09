@@ -234,6 +234,42 @@ class Inspection::RightsValidatorTest < ActiveSupport::TestCase
     assert_equal 1, result.validated_amounts["unevaluated_rights"].size
   end
 
+  test "transit on same day as base right yields opposing_power=false but warns" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-15",
+      tenants: [ { "name" => "김임차", "deposit" => 100_000_000, "move_in_date" => "2024-01-15", "confirmed_date" => "2024-01-15" } ],
+      rights_timeline: []
+    )
+    tenant = result.validated_tenants.first
+    assert_equal false, tenant["opposing_power"]
+    assert_equal true, tenant["same_day_warning"]
+    assert_match(/익일 0시/, tenant["warning_message"])
+  end
+
+  test "earlier move-in does NOT trigger same_day_warning (still has opposing_power)" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-15",
+      tenants: [ { "name" => "김임차", "deposit" => 100_000_000, "move_in_date" => "2024-01-10", "confirmed_date" => "2024-01-10" } ],
+      rights_timeline: []
+    )
+    tenant = result.validated_tenants.first
+    assert_equal true, tenant["opposing_power"]
+    assert_equal false, tenant["same_day_warning"]
+    assert_nil tenant["warning_message"]
+  end
+
+  test "later move-in does NOT trigger same_day_warning (no opposing_power)" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-15",
+      tenants: [ { "name" => "김임차", "deposit" => 100_000_000, "move_in_date" => "2024-01-20", "confirmed_date" => "2024-01-20" } ],
+      rights_timeline: []
+    )
+    tenant = result.validated_tenants.first
+    assert_equal false, tenant["opposing_power"]
+    assert_equal false, tenant["same_day_warning"]
+    assert_nil tenant["warning_message"]
+  end
+
   test "real LLM response with 'type' key correctly partitions 유치권" do
     fixture_data = JSON.parse(file_fixture("ai_inspection_response.json").read)
     rights = fixture_data.dig("rights_analysis", "rights_timeline") || []
