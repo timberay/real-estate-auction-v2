@@ -234,18 +234,18 @@ class InspectionRatingServiceTest < ActiveSupport::TestCase
     assert_equal :incomplete, service.overall_rating
   end
 
-  test "unanswered_high_priority_count returns the gap" do
+  test "unanswered_high_priority_count returns the exact gap" do
     high_items = InspectionItem.where(priority: "상").to_a
-    total_visible_high = high_items.count { |item| item.applicable_for?(@property.property_type) && item.depends_on.blank? }
+    visible_high_items = high_items.select { |item| item.applicable_for?(@property.property_type) && item.depends_on.blank? }
+    total_visible_high = visible_high_items.size
+    assert total_visible_high > 1, "test setup: need at least 2 visible high items"
 
-    # Answer only the first applicable priority='상' item
-    answerable = high_items.find { |item| item.applicable_for?(@property.property_type) && item.depends_on.blank? }
+    # Answer exactly one
+    answerable = visible_high_items.first
     InspectionResult.create!(property: @property, inspection_item: answerable, user: @user, source_type: "auto", has_risk: false)
 
     service = InspectionRatingService.new(property: @property, user: @user)
-    count = service.unanswered_high_priority_count
-    assert count > 0, "Expected unanswered count > 0 but got #{count}"
-    assert_kind_of Integer, count
+    assert_equal total_visible_high - 1, service.unanswered_high_priority_count
   end
 
   test "safe when all visible priority='상' items answered with no risks" do

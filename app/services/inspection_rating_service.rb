@@ -1,6 +1,10 @@
 class InspectionRatingService
   ANALYSIS_TABS = %w[rights_analysis profit_analysis field_check bidding].freeze
-  REQUIRED_COVERAGE = 1.0 # All visible priority="상" items must be answered before :safe is possible
+  # Coverage requirement for the :safe rating gate.
+  # Uses VISIBLE priority='상' items (not all). Items with depends_on whose parent
+  # has no risk are hidden — they are "not applicable" in this context, so blocking
+  # :safe on them would be a false gate. (Audit Exp#13/#14, Task A7.)
+  REQUIRED_COVERAGE = 1.0
 
   def self.call(property:, user:)
     new(property:, user:).call
