@@ -22,7 +22,7 @@ class Inspection::InspectionResultMapperTest < ActiveSupport::TestCase
     assert_equal "AI 분석", result.evidence["source_label"]
   end
 
-  test "creates inspection results for medium confidence items" do
+  test "demotes medium confidence has_risk=false to nil for user confirmation" do
     @property.inspection_results.where(user: @user).where.not(source_type: :manual).destroy_all
 
     Inspection::InspectionResultMapper.call(
@@ -30,9 +30,43 @@ class Inspection::InspectionResultMapperTest < ActiveSupport::TestCase
     )
     result = find_result("rights-001")
     assert result.ai?
-    assert_equal false, result.has_risk
+    assert_nil result.has_risk, "medium + has_risk=false should be demoted to nil"
+    assert_equal "medium", result.evidence["confidence"]
+    assert_equal "AI 의견 (확인 필요)", result.evidence["source_label"]
+    assert result.evidence["reasoning"].present?, "reasoning should still be preserved in evidence"
+  end
+
+  test "preserves medium confidence has_risk=true so user still sees flagged risk" do
+    @property.inspection_results.where(user: @user).where.not(source_type: :manual).destroy_all
+
+    response_with_medium_true = @response.deep_dup
+    response_with_medium_true["results"]["rights-002"] = {
+      "has_risk" => true,
+      "confidence" => "medium",
+      "reasoning" => "추정으로 위험 신호가 보입니다."
+    }
+
+    Inspection::InspectionResultMapper.call(
+      response: response_with_medium_true, property: @property, user: @user, items: @items
+    )
+    result = find_result("rights-002")
+    assert result.ai?
+    assert_equal true, result.has_risk, "medium + has_risk=true should be preserved (not demoted)"
     assert_equal "medium", result.evidence["confidence"]
     assert_equal "AI 분석 (추론)", result.evidence["source_label"]
+  end
+
+  test "preserves high confidence has_risk=false unchanged" do
+    @property.inspection_results.where(user: @user).where.not(source_type: :manual).destroy_all
+
+    Inspection::InspectionResultMapper.call(
+      response: @response, property: @property, user: @user, items: @items
+    )
+    result = find_result("rights-019")
+    assert result.ai?
+    assert_equal false, result.has_risk
+    assert_equal "high", result.evidence["confidence"]
+    assert_equal "AI 분석", result.evidence["source_label"]
   end
 
   test "does not overwrite manual answers" do
