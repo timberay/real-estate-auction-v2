@@ -42,4 +42,10 @@ class Inspection::PdfPromptBuilderTest < ActiveSupport::TestCase
     assert result[:system].include?("주택도시보증공사")
     assert result[:system].include?("hug_waiver")
   end
+
+  test "tenants schema in SYSTEM_PROMPT requires dividend_requested field" do
+    prompt = Inspection::PdfPromptBuilder::SYSTEM_PROMPT
+    assert_match(/dividend_requested/, prompt, "tenants schema must include dividend_requested field")
+    assert_match(/배당요구/, prompt, "prompt must instruct LLM to extract 배당요구 column")
+  end
 end
