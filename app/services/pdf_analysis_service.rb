@@ -192,7 +192,9 @@ class PdfAnalysisService
           "tenants" => validation.validated_tenants,
           "assumed_amount" => validation.validated_amounts["assumed_amount"],
           "opposing_deposits" => validation.validated_amounts["opposing_deposits"],
-          "total_risk_amount" => validation.validated_amounts["total_risk_amount"]
+          "total_risk_amount" => validation.validated_amounts["total_risk_amount"],
+          "unevaluated_rights" => validation.validated_amounts["unevaluated_rights"],
+          "disclaimer" => validation.validated_amounts["disclaimer"]
         },
         "discrepancies" => validation.discrepancies
       }

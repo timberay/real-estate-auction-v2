@@ -96,6 +96,36 @@ class ReportSummaryComponentTest < ViewComponent::TestCase
     assert_text "위험 항목 없음"
   end
 
+  test "renders unevaluated_rights warning banner when present" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = JSON.generate({
+      "calculated" => {
+        "unevaluated_rights" => [
+          { "right_type" => "유치권", "amount" => 50_000_000 }
+        ],
+        "disclaimer" => "추정치이며, 별도 평가 필요 항목이 1건 있습니다. 베테랑/공인중개사 검토를 권장합니다."
+      }
+    })
+    property = properties(:safe_apartment)
+    render_inline(ReportSummaryComponent.new(report: report, property: property))
+    assert_text "자동 계산 불가 권리"
+    assert_text "유치권"
+    assert_text "별도 평가 필요"
+  end
+
+  test "does not render unevaluated_rights banner when all rights are summable" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = JSON.generate({
+      "calculated" => {
+        "unevaluated_rights" => [],
+        "disclaimer" => nil
+      }
+    })
+    property = properties(:safe_apartment)
+    render_inline(ReportSummaryComponent.new(report: report, property: property))
+    assert_no_text "자동 계산 불가 권리"
+  end
+
   test "checklist_refs memoizes — single query per render even with multiple calls" do
     report = rights_analysis_reports(:risky_villa_report)
     report.report_data = JSON.generate({ "checklist_references" => [ "rights-002", "rights-003" ] })

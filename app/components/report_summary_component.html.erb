@@ -36,6 +36,25 @@
     </div>
   </div>
 
+  <% if @report.unevaluated_rights.any? %>
+    <div class="rounded-md border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-400 p-4 my-4">
+      <h3 class="font-semibold text-amber-900 dark:text-amber-100">
+        ⚠️ 자동 계산 불가 권리 (<%= @report.unevaluated_rights.size %>건)
+      </h3>
+      <ul class="mt-2 list-disc pl-6 text-sm text-amber-900 dark:text-amber-200">
+        <% @report.unevaluated_rights.each do |r| %>
+          <li>
+            <strong><%= r["right_type"] %></strong> — 별도 평가 필요. 본 도구는 채권액 합산에서 제외했습니다.
+            <% if r["amount"].present? && r["amount"].to_i > 0 %>
+              (참고 채권액: <%= number_to_currency(r["amount"], unit: "원") %>)
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+      <p class="mt-2 text-xs text-amber-800 dark:text-amber-300"><%= @report.rights_disclaimer %></p>
+    </div>
+  <% end %>
+
   <% if opportunity? %>
     <div class="mt-4 flex items-center gap-2 rounded-lg bg-amber-100 dark:bg-amber-900/20 border border-amber-400 dark:border-amber-600 px-4 py-3">
       <span class="text-lg">💡</span>
