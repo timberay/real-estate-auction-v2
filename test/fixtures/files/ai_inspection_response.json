@@ -15,6 +15,9 @@
     "base_right_date": "2024-01-15",
     "opportunity_type": "hug_waiver",
     "opportunity_reason": "HUG(주택도시보증공사) 전세보증금반환채권이 설정되어 있으나, 배당요구종기일까지 권리신고를 하지 않아 낙찰자에게 인수되지 않습니다.",
+    "opportunity_source_doc": "매각물건명세서",
+    "opportunity_page_number": 3,
+    "opportunity_quote": "주택도시보증공사는 전세보증금반환채권에 관한 권리신고를 하지 아니하며, 본 사건의 매각으로 인하여 위 채권의 소멸에 동의함을 확약합니다.",
     "tenants": [
       {
         "name": "김○○",

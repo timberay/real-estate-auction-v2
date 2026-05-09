@@ -46,11 +46,16 @@ module Inspection
       - base_right_holder: 말소기준권리 권리자명
       - base_right_date: 말소기준권리 설정일 (YYYY-MM-DD)
       - opportunity_type: null | "hug_waiver" | "gap_investment" | "occupancy" | "preferred_purchase_risk"
-        - "hug_waiver": HUG(주택도시보증공사) 전세보증금반환채권이 설정되어 있으나 권리신고를 포기하여 낙찰자 인수 부담이 없는 경우
+        - "hug_waiver": HUG(주택도시보증공사) 등 채권자가 명시적인 권리포기 확약서(또는 동의서)를 제출한 경우에 한합니다. 단순히 권리신고를 누락한 경우는 hug_waiver로 분류하지 마세요. 확약서 또는 동의서 페이지를 직접 확인하지 못한 경우 null로 두세요.
         - "gap_investment": 시세 대비 저가 낙찰 가능성이 높은 갭투자 기회 물건
         - "occupancy": 점유 관련 기회 (임차인 자진퇴거 합의 등)
         - "preferred_purchase_risk": 공유자우선매수권 또는 전세사기 특별법 우선매수권 행사 가능성이 있어 낙찰 무산 위험이 있는 물건
       - opportunity_reason: 기회 요인 상세 설명 (없으면 null). HUG 관련 시 등기부에서 확인한 근거를 명시하세요.
+      - opportunity_type이 "hug_waiver"인 경우 다음 3개 필드를 반드시 채우세요:
+        - opportunity_source_doc: 확약서 또는 동의서가 포함된 문서명 (예: "매각물건명세서", "기일입찰서류")
+        - opportunity_page_number: 확약서/동의서가 있는 페이지 번호 (정수)
+        - opportunity_quote: 권리포기 또는 동의 의사를 드러내는 원문 문장 (50-200자, 의역 금지 — PDF에 적힌 문장을 그대로 옮겨 적으세요)
+        위 3개 필드 중 하나라도 채울 수 없다면 opportunity_type을 "hug_waiver"로 분류하지 말고 null로 두세요. hug_waiver 이외의 opportunity_type에는 적용되지 않습니다.
       - tenants: 임차인 배열. 각 항목은 { name, deposit(원), move_in_date(YYYY-MM-DD), confirmed_date(YYYY-MM-DD 또는 null, 확정일자), opposing_power(boolean, 참고용 — 서버에서 재계산), priority_rank(정수, 참고용 — 서버에서 재계산), dividend_requested(boolean | null, 배당요구 신청 여부) }
       - 임차인의 dividend_requested는 매각물건명세서 "배당요구일자/배당요구여부" 칼럼을 우선으로 추출하세요. 등기부에는 없으니 명세서가 없는 경우 null 처리합니다.
       - rights_timeline: 권리 설정 내역 배열. 각 항목은 { date(YYYY-MM-DD), type, holder, amount(원), extinguished_on_sale(boolean) }
@@ -89,6 +94,9 @@ module Inspection
           "base_right_date": "YYYY-MM-DD",
           "opportunity_type": null | "hug_waiver" | "gap_investment" | "occupancy" | "preferred_purchase_risk",
           "opportunity_reason": null | "...",
+          "opportunity_source_doc": null | "매각물건명세서",
+          "opportunity_page_number": null | 5,
+          "opportunity_quote": null | "권리포기 의사를 드러내는 원문 문장 (의역 금지, 50-200자)",
           "tenants": [{ "name": "...", "deposit": 0, "move_in_date": "YYYY-MM-DD", "confirmed_date": "YYYY-MM-DD", "opposing_power": true, "priority_rank": 1, "dividend_requested": true }],
           "rights_timeline": [{ "date": "YYYY-MM-DD", "type": "...", "holder": "...", "amount": 0, "extinguished_on_sale": true }],
           "reasoning": "...",

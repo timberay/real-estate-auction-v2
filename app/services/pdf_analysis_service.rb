@@ -170,6 +170,8 @@ class PdfAnalysisService
       rights_timeline: rights_timeline
     )
 
+    opportunity_type, opportunity_evidence = enforce_hug_waiver_citation(rights_data, property)
+
     report.update!(
       analyzed_at: Time.current,
       verdict: rights_data["verdict"],
@@ -179,7 +181,7 @@ class PdfAnalysisService
       base_right_date: rights_data["base_right_date"],
       assumed_amount: validation.validated_amounts["assumed_amount"],
       total_risk_amount: validation.validated_amounts["total_risk_amount"],
-      opportunity_type: rights_data["opportunity_type"],
+      opportunity_type: opportunity_type,
       opportunity_reason: rights_data["opportunity_reason"],
       report_data: {
         "llm_raw" => {
@@ -196,9 +198,36 @@ class PdfAnalysisService
           "unevaluated_rights" => validation.validated_amounts["unevaluated_rights"],
           "disclaimer" => validation.validated_amounts["disclaimer"]
         },
+        "opportunity_evidence" => opportunity_evidence,
         "discrepancies" => validation.discrepancies
       }
     )
+  end
+
+  # B8 / E-41: hug_waiver requires explicit citation evidence (source_doc + page_number + quote).
+  # If LLM returns hug_waiver without all three, null the opportunity_type defensively.
+  # Other opportunity_type values are unaffected.
+  def enforce_hug_waiver_citation(rights_data, property)
+    raw_type = rights_data["opportunity_type"]
+    source_doc = rights_data["opportunity_source_doc"].presence
+    page_number = rights_data["opportunity_page_number"]
+    quote = rights_data["opportunity_quote"].presence
+
+    evidence = {
+      "source_doc" => source_doc,
+      "page_number" => page_number,
+      "quote" => quote
+    }
+
+    if raw_type == "hug_waiver" && (source_doc.blank? || page_number.blank? || quote.blank?)
+      Rails.logger.warn(
+        "[PdfAnalysisService] LLM returned hug_waiver without complete citation; " \
+        "opportunity_type nulled for property=#{property.id}"
+      )
+      [ nil, evidence ]
+    else
+      [ raw_type, evidence ]
+    end
   end
 
   def log_failure(error)
