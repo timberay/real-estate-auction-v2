@@ -1,6 +1,9 @@
 class PdfAnalysisService
   Result = Struct.new(:success?, :property, :error, keyword_init: true)
 
+  class CaseNumberMissingError < StandardError; end
+  class CaseNumberMismatchError < StandardError; end
+
   def self.call(property: nil, documents: nil, user:, response_json: nil)
     new(property:, documents:, user:, response_json:).call
   end
@@ -88,18 +91,27 @@ class PdfAnalysisService
   end
 
   def resolve_property(metadata)
-    return @property if @property
+    if @property
+      llm_case = metadata&.dig("case_number").presence
+      if llm_case && normalize_case(llm_case) != normalize_case(@property.case_number)
+        raise CaseNumberMismatchError,
+              "PDF에서 추출된 사건번호(#{llm_case})가 선택한 물건(#{@property.case_number})과 다릅니다."
+      end
+      @property
+    else
+      llm_case = metadata&.dig("case_number").presence
+      raise CaseNumberMissingError, "사건번호를 먼저 입력해 주세요." if llm_case.blank?
+      Property.find_by!(
+        "LOWER(REPLACE(case_number, ' ', '')) = ?",
+        normalize_case(llm_case)
+      )
+    end
+  end
 
-    case_number = metadata&.dig("case_number")
-    property = Property.find_by(case_number: case_number) if case_number.present?
-
-    property || Property.create!(
-      case_number: case_number || "PDF-#{SecureRandom.hex(4)}",
-      address: metadata&.dig("address"),
-      property_type: metadata&.dig("property_type"),
-      appraisal_price: metadata&.dig("appraisal_price"),
-      min_bid_price: metadata&.dig("min_bid_price")
-    )
+  # Strip only ASCII space (U+0020) — matches the REPLACE(' ', '') used in SQL queries,
+  # so Ruby comparison and DB lookup behave identically for Korean court case numbers.
+  def normalize_case(s)
+    s.to_s.gsub(" ", "").downcase
   end
 
   def attach_documents_to_property(property, blobs)
@@ -180,7 +192,9 @@ class PdfAnalysisService
           "tenants" => validation.validated_tenants,
           "assumed_amount" => validation.validated_amounts["assumed_amount"],
           "opposing_deposits" => validation.validated_amounts["opposing_deposits"],
-          "total_risk_amount" => validation.validated_amounts["total_risk_amount"]
+          "total_risk_amount" => validation.validated_amounts["total_risk_amount"],
+          "unevaluated_rights" => validation.validated_amounts["unevaluated_rights"],
+          "disclaimer" => validation.validated_amounts["disclaimer"]
         },
         "discrepancies" => validation.discrepancies
       }

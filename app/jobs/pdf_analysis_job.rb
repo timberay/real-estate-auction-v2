@@ -13,7 +13,7 @@ class PdfAnalysisJob < ApplicationJob
 
     result = if document_blob_ids
       documents = ActiveStorage::Blob.where(id: document_blob_ids).to_a
-      PdfAnalysisService.call(documents: documents, user: @user)
+      PdfAnalysisService.call(property: @property, documents: documents, user: @user)
     else
       PdfAnalysisService.call(property: @property, user: @user)
     end

@@ -1,10 +1,14 @@
 require "test_helper"
 
 class PdfAnalysisServiceTest < ActiveSupport::TestCase
+  # Mock LLM fixture always returns case_number "2024타경12345".
+  # @property must match so the mismatch check passes for general tests.
+  MOCK_CASE_NUMBER = "2024타경12345"
+
   setup do
     ENV["USE_MOCK"] = "true"
     @user = users(:guest)
-    @property = properties(:safe_apartment)
+    @property = Property.create!(case_number: MOCK_CASE_NUMBER)
     @pdf_blob = ActiveStorage::Blob.create_and_upload!(
       io: StringIO.new("%PDF-1.4 test content"),
       filename: "test_doc.pdf",
@@ -42,21 +46,42 @@ class PdfAnalysisServiceTest < ActiveSupport::TestCase
     assert_equal "문서를 먼저 업로드해주세요.", result.error
   end
 
-  test "Path 2: creates property from metadata when documents provided directly" do
-    docs = [ @pdf_blob ]
-    result = PdfAnalysisService.call(documents: docs, user: @user)
+  test "Path 2: finds property by case_number from LLM metadata when documents provided directly" do
+    # @property already has case_number matching mock fixture ("2024타경12345")
+    result = PdfAnalysisService.call(property: @property, documents: [ @pdf_blob ], user: @user)
 
     assert result.success?
-    assert result.property.persisted?
-    # Mock fixture returns case_number "2024타경12345"
-    assert_equal "2024타경12345", result.property.case_number
+    assert_equal @property.id, result.property.id
   end
 
-  test "Path 2: attaches documents to found/created property" do
-    docs = [ @pdf_blob ]
-    result = PdfAnalysisService.call(documents: docs, user: @user)
+  test "Path 2: attaches documents to found property" do
+    result = PdfAnalysisService.call(property: @property, documents: [ @pdf_blob ], user: @user)
 
     assert result.property.documents.attached?
+  end
+
+  test "raises CaseNumberMissingError when no property given and LLM returns no case_number" do
+    mock_llm = Llm::Mock.new
+    mock_llm.override_response = { "metadata" => {}, "results" => [] }
+    original_for = Llm::Base.method(:for)
+    Llm::Base.define_singleton_method(:for) { mock_llm }
+
+    docs = [ @pdf_blob ]
+    assert_raises(PdfAnalysisService::CaseNumberMissingError) do
+      PdfAnalysisService.call(documents: docs, user: @user)
+    end
+    assert_equal 0, Property.where("case_number LIKE 'PDF-%'").count
+  ensure
+    Llm::Base.define_singleton_method(:for, original_for)
+  end
+
+  test "raises CaseNumberMismatchError when LLM extracts a different case_number than provided property" do
+    # Mock fixture returns "2024타경12345"; this property has a different case_number
+    other_property = properties(:safe_apartment)  # case_number "2026타경10001"
+    other_property.documents.attach(@pdf_blob)
+    assert_raises(PdfAnalysisService::CaseNumberMismatchError) do
+      PdfAnalysisService.call(property: other_property, user: @user)
+    end
   end
 
   test "raises error for unsupported LLM provider" do
@@ -194,6 +219,17 @@ class PdfAnalysisServiceTest < ActiveSupport::TestCase
     assert result.property.persisted?
     assert_equal "2024타경12345", result.property.case_number
     assert result.property.inspection_results.where(user: @user).any?
+  end
+
+  test "find_by case_number is space-insensitive on lookup" do
+    # DB record has spaces; LLM returns compact form — find_by! must still match
+    property = Property.create!(case_number: "2024 타경 99999")
+    service = PdfAnalysisService.new(property: nil, documents: nil, user: @user)
+    metadata = { "case_number" => "2024타경99999" }
+
+    found = service.send(:resolve_property, metadata)
+
+    assert_equal property.id, found.id
   end
 
   test "Path 3: logs analysis with provider manual and model user_input" do

@@ -4,6 +4,8 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
   setup do
     get start_onboarding_url # creates guest session
     @user = User.find(session[:user_id])
+    @property = Property.create!(case_number: "2026타경CTL001")
+    UserProperty.find_or_create_by!(user: @user, property: @property)
   end
 
   test "GET new renders upload form" do
@@ -22,7 +24,7 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
   test "POST create with Turbo responds with form reset, toast, and indicator" do
     pdf = fixture_file_upload("test/fixtures/files/test.pdf", "application/pdf")
 
-    post analyses_path, params: { documents: [ pdf ] },
+    post analyses_path, params: { property_id: @property.id, documents: [ pdf ] },
       headers: { "Accept" => "text/vnd.turbo-stream.html" }
 
     assert_response :success
@@ -38,17 +40,26 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
   test "POST create without Turbo redirects with notice" do
     pdf = fixture_file_upload("test/fixtures/files/test.pdf", "application/pdf")
 
-    post analyses_path, params: { documents: [ pdf ] }
+    post analyses_path, params: { property_id: @property.id, documents: [ pdf ] }
 
     assert_redirected_to new_analysis_path
     assert_equal "분석이 시작되었습니다.", flash[:notice]
   end
 
   test "POST create without documents shows alert" do
-    post analyses_path, params: {}
+    post analyses_path, params: { property_id: @property.id }
 
     assert_redirected_to new_analysis_path
     assert flash[:alert].present?
+  end
+
+  test "POST create without property_id redirects with missing case number alert" do
+    pdf = fixture_file_upload("test/fixtures/files/test.pdf", "application/pdf")
+
+    post analyses_path, params: { documents: [ pdf ] }
+
+    assert_redirected_to new_analysis_path
+    assert_equal "사건번호를 먼저 입력해 주세요.", flash[:alert]
   end
 
   # Task 3: prompt action
@@ -65,12 +76,13 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
 
   # Task 4: manual action
   test "POST manual with valid JSON processes and redirects to inspection tab" do
+    # Property must already exist; service will find it by case_number from JSON
+    property = Property.create!(case_number: "2024타경12345")
     json_file = fixture_file_upload("test/fixtures/files/ai_inspection_response.json", "application/json")
 
     post manual_analyses_path, params: { json_file: json_file }
 
-    property = Property.find_by(case_number: "2024타경12345")
-    assert_not_nil property
+    property.reload
     assert_redirected_to edit_property_inspections_tab_path(property, tab_key: "rights_analysis")
     assert_equal "분석 결과가 저장되었습니다.", flash[:notice]
   end
@@ -83,6 +95,8 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "POST manual with json_text param processes pasted JSON" do
+    # Property must already exist; service will find it by case_number from JSON text
+    Property.create!(case_number: "2024타경PASTE")
     json_text = { "metadata" => { "case_number" => "2024타경PASTE" }, "results" => {} }.to_json
 
     post manual_analyses_path, params: { json_text: json_text }
@@ -153,7 +167,7 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     )
 
     assert_no_enqueued_jobs only: PdfAnalysisJob do
-      post analyses_path, params: { documents: [ big_pdf ] }
+      post analyses_path, params: { property_id: @property.id, documents: [ big_pdf ] }
     end
 
     assert_redirected_to new_analysis_path
@@ -168,11 +182,31 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     )
 
     assert_no_enqueued_jobs only: PdfAnalysisJob do
-      post analyses_path, params: { documents: [ fake_pdf ] }
+      post analyses_path, params: { property_id: @property.id, documents: [ fake_pdf ] }
     end
 
     assert_redirected_to new_analysis_path
     assert_match(/PDF 형식/, flash[:alert])
+  end
+
+  # IDOR: a logged-in user must NOT be able to enqueue analysis against
+  # another user's property by crafting a POST with that property's id.
+  test "POST create with another user's property_id is rejected (IDOR)" do
+    other_user = users(:guest_two)
+    other_property = properties(:basement_villa)
+    UserProperty.find_or_create_by!(user: other_user, property: other_property)
+
+    # Sanity: current session user must not own other_property
+    assert_not @user.user_properties.exists?(property: other_property)
+
+    pdf = fixture_file_upload("test/fixtures/files/test.pdf", "application/pdf")
+
+    assert_no_enqueued_jobs only: PdfAnalysisJob do
+      post analyses_path, params: { property_id: other_property.id, documents: [ pdf ] }
+    end
+
+    assert_redirected_to new_analysis_path
+    assert flash[:alert].present?
   end
 
   test "POST manual with JSON missing case_number shows alert and stays on manual tab" do

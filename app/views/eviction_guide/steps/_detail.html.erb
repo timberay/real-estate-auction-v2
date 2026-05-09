@@ -1,0 +1,42 @@
+<article class="mx-auto max-w-3xl py-8 px-4
+                [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4
+                [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mt-6 [&_h2]:mb-2
+                [&_p]:my-3 [&_p]:leading-7 [&_p]:text-zinc-800 dark:[&_p]:text-zinc-200
+                [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-3
+                [&_dt]:font-medium [&_dt]:text-zinc-700 dark:[&_dt]:text-zinc-300
+                [&_dd]:text-zinc-900 dark:[&_dd]:text-zinc-100">
+  <h1><%= @step.name %></h1>
+
+  <% if @step.description.present? %>
+    <p><%= @step.description %></p>
+  <% end %>
+
+  <% required_documents = @step.required_documents.is_a?(Array) ? @step.required_documents : [] %>
+  <% if required_documents.any? %>
+    <h2>필요 서류</h2>
+    <ul>
+      <% required_documents.each do |doc| %>
+        <li><%= doc %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <dl class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <% if @step.estimated_duration.present? %>
+      <div>
+        <dt>예상 기간</dt>
+        <dd><%= @step.estimated_duration %></dd>
+      </div>
+    <% end %>
+    <% if @step.estimated_cost.present? %>
+      <div>
+        <dt>예상 비용</dt>
+        <dd><%= @step.estimated_cost %></dd>
+      </div>
+    <% end %>
+  </dl>
+
+  <div class="mt-8">
+    <%= link_to "← 시뮬레이터로 돌아가기", eviction_guide_simulator_path, class: "text-blue-600 hover:underline" %>
+  </div>
+</article>

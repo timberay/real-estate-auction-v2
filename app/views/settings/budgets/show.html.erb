@@ -43,7 +43,7 @@
       <% end %>
 
       <%# Section 1: Available Cash %>
-      <%= render CardComponent.new(title: "유용자금") do %>
+      <%= render CardComponent.new(title: "쓸 수 있는 현금") do %>
         <div class="flex items-center gap-2" data-controller="number-format" data-number-format-initial-value="<%= @setting.available_cash %>">
           <input type="text"
             class="flex-1 min-w-0 h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
@@ -163,11 +163,11 @@
                 예비비 합계: <span class="tabular-nums" data-reserve-fund-target="total">0</span>만원
               </p>
               <p class="text-sm text-slate-500 dark:text-slate-400">
-                유용자금: <span class="tabular-nums"><%= number_with_delimiter(@setting.available_cash.to_i) %></span>만원
+                쓸 수 있는 현금: <span class="tabular-nums"><%= number_with_delimiter(@setting.available_cash.to_i) %></span>만원
               </p>
             </div>
             <p class="mt-1 text-sm text-red-600 dark:text-red-400 hidden" data-reserve-fund-target="warning">
-              예비비가 유용자금을 초과합니다. 예비비를 조정해 주세요.
+              예비비가 쓸 수 있는 현금을 초과합니다. 예비비를 조정해 주세요.
             </p>
           </div>
         </div>

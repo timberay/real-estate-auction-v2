@@ -2,7 +2,7 @@
 
 class WizardStepComponent < ViewComponent::Base
   STEP_LABELS = {
-    1 => "유용자금",
+    1 => "현금",
     2 => "예비비",
     3 => "대출 설정"
   }.freeze

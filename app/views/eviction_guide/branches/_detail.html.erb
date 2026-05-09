@@ -1,0 +1,47 @@
+<article class="mx-auto max-w-3xl py-8 px-4
+                [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-4
+                [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mt-6 [&_h2]:mb-2
+                [&_p]:my-3 [&_p]:leading-7 [&_p]:text-zinc-800 dark:[&_p]:text-zinc-200
+                [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-3
+                [&_li]:my-1
+                [&_dt]:font-medium [&_dt]:text-zinc-700 dark:[&_dt]:text-zinc-300
+                [&_dd]:text-zinc-900 dark:[&_dd]:text-zinc-100">
+  <h1><%= @branch.name %></h1>
+
+  <% if @branch.description.present? %>
+    <p><%= @branch.description %></p>
+  <% end %>
+
+  <% if @branch.problem_summary.present? %>
+    <h2>문제 요약</h2>
+    <p><%= @branch.problem_summary %></p>
+  <% end %>
+
+  <% if @branch.root_cause.present? %>
+    <h2>원인</h2>
+    <p><%= @branch.root_cause %></p>
+  <% end %>
+
+  <% action_steps = @branch.action_steps.is_a?(Array) ? @branch.action_steps : [] %>
+  <% if action_steps.any? %>
+    <h2>조치 단계</h2>
+    <ul>
+      <% action_steps.each do |action| %>
+        <li><%= action %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <% if @branch.estimated_duration.present? %>
+    <dl class="mt-6">
+      <div>
+        <dt>예상 소요 기간</dt>
+        <dd><%= @branch.estimated_duration %></dd>
+      </div>
+    </dl>
+  <% end %>
+
+  <div class="mt-8">
+    <%= link_to "← 시뮬레이터로 돌아가기", eviction_guide_simulator_path, class: "text-blue-600 hover:underline" %>
+  </div>
+</article>

@@ -40,12 +40,14 @@ module Inspection
       - base_right_type: 말소기준권리 유형 ("근저당권", "전세권", "가압류", "담보가등기" 등)
       - base_right_holder: 말소기준권리 권리자명
       - base_right_date: 말소기준권리 설정일 (YYYY-MM-DD)
-      - opportunity_type: null | "hug_waiver" | "gap_investment" | "occupancy"
+      - opportunity_type: null | "hug_waiver" | "gap_investment" | "occupancy" | "preferred_purchase_risk"
         - "hug_waiver": HUG(주택도시보증공사) 전세보증금반환채권이 설정되어 있으나 권리신고를 포기하여 낙찰자 인수 부담이 없는 경우
         - "gap_investment": 시세 대비 저가 낙찰 가능성이 높은 갭투자 기회 물건
         - "occupancy": 점유 관련 기회 (임차인 자진퇴거 합의 등)
+        - "preferred_purchase_risk": 공유자우선매수권 또는 전세사기 특별법 우선매수권 행사 가능성이 있어 낙찰 무산 위험이 있는 물건
       - opportunity_reason: 기회 요인 상세 설명 (없으면 null). HUG 관련 시 등기부에서 확인한 근거를 명시하세요.
-      - tenants: 임차인 배열. 각 항목은 { name, deposit(원), move_in_date(YYYY-MM-DD), confirmed_date(YYYY-MM-DD 또는 null, 확정일자), opposing_power(boolean, 참고용 — 서버에서 재계산), priority_rank(정수, 참고용 — 서버에서 재계산) }
+      - tenants: 임차인 배열. 각 항목은 { name, deposit(원), move_in_date(YYYY-MM-DD), confirmed_date(YYYY-MM-DD 또는 null, 확정일자), opposing_power(boolean, 참고용 — 서버에서 재계산), priority_rank(정수, 참고용 — 서버에서 재계산), dividend_requested(boolean | null, 배당요구 신청 여부) }
+      - 임차인의 dividend_requested는 매각물건명세서 "배당요구일자/배당요구여부" 칼럼을 우선으로 추출하세요. 등기부에는 없으니 명세서가 없는 경우 null 처리합니다.
       - rights_timeline: 권리 설정 내역 배열. 각 항목은 { date(YYYY-MM-DD), type, holder, amount(원), extinguished_on_sale(boolean) }
       - reasoning: 분석 과정과 판단 근거를 단계적으로 서술하세요 (Chain of Thought). 어떤 권리가 말소되고 어떤 권리가 인수되는지 명시적으로 설명하세요.
       - checklist_references: 관련된 점검항목 코드 배열 (예: ["rights-002"])
@@ -77,9 +79,9 @@ module Inspection
           "base_right_type": "...",
           "base_right_holder": "...",
           "base_right_date": "YYYY-MM-DD",
-          "opportunity_type": null | "hug_waiver" | "gap_investment" | "occupancy",
+          "opportunity_type": null | "hug_waiver" | "gap_investment" | "occupancy" | "preferred_purchase_risk",
           "opportunity_reason": null | "...",
-          "tenants": [{ "name": "...", "deposit": 0, "move_in_date": "YYYY-MM-DD", "confirmed_date": "YYYY-MM-DD", "opposing_power": true, "priority_rank": 1 }],
+          "tenants": [{ "name": "...", "deposit": 0, "move_in_date": "YYYY-MM-DD", "confirmed_date": "YYYY-MM-DD", "opposing_power": true, "priority_rank": 1, "dividend_requested": true }],
           "rights_timeline": [{ "date": "YYYY-MM-DD", "type": "...", "holder": "...", "amount": 0, "extinguished_on_sale": true }],
           "reasoning": "...",
           "checklist_references": ["..."]

@@ -1,8 +1,8 @@
 <turbo-frame id="onboarding_wizard">
   <%= render BudgetSummaryComponent.new(setting: @setting) %>
   <%= render WizardStepComponent.new(
-    title: "투자 가능한 유용자금을 입력하세요",
-    description: "유용자금이란 현재 투자에 사용할 수 있는 현금을 말합니다",
+    title: "투자에 쓸 수 있는 현금을 입력하세요",
+    description: "예: 예금·CMA·MMF처럼 즉시 출금 가능한 금액",
     current_step: 1,
     total_steps: 3
   ) do %>
@@ -25,7 +25,7 @@
       </div>
 
       <div class="mb-6" data-controller="number-format" data-number-format-initial-value="<%= @setting.available_cash || 3000 %>">
-        <label for="available_cash_display" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">유용자금</label>
+        <label for="available_cash_display" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">쓸 수 있는 현금</label>
         <div class="flex items-center gap-2">
           <input type="text" id="available_cash_display"
             inputmode="numeric"

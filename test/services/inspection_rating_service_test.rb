@@ -1,4 +1,5 @@
 require "test_helper"
+require "ostruct"
 
 class InspectionRatingServiceTest < ActiveSupport::TestCase
   setup do
@@ -9,32 +10,73 @@ class InspectionRatingServiceTest < ActiveSupport::TestCase
     UserProperty.find_or_create_by!(user: @user, property: @property)
   end
 
+  # Answers ALL visible priority='상' items as no-risk so the A7 gate passes.
+  # Items in `except` are skipped — the caller creates those results separately (and may set has_risk: true).
+  # `except_has_risk`: treat excepted items as has_risk: true when computing visibility of dependent items.
+  # Iterates up to 5 passes to resolve chains of conditional visibility.
+  def answer_all_high_priority_no_risk(except: nil, except_has_risk: true)
+    excluded_codes = Array(except).map(&:code)
+    all_items_by_code = InspectionItem.all.index_by(&:code)
+    property_type = @property.property_type
+
+    # Build a fake answered_context for excepted items so conditional dependents become visible
+    fake_results = excluded_codes.filter_map do |code|
+      item = all_items_by_code[code]
+      next unless item
+      stub = OpenStruct.new(has_risk: except_has_risk ? true : false, inspection_item: item)
+      [ code, stub ]
+    end.to_h
+
+    5.times do
+      db_results = @property.inspection_results.where(user: @user).includes(:inspection_item)
+      answered_context = db_results.index_by { |r| r.inspection_item.code }.merge(fake_results)
+
+      created_any = false
+      InspectionItem.where(priority: "상").each do |item|
+        next if excluded_codes.include?(item.code)
+        next unless item.visible_for?(property_type: property_type, answered_results: answered_context, all_items_by_code: all_items_by_code)
+        next if db_results.map { |r| r.inspection_item.code }.include?(item.code)
+
+        InspectionResult.create!(property: @property, inspection_item: item, user: @user, source_type: "auto", has_risk: false)
+        created_any = true
+      end
+
+      break unless created_any
+    end
+  end
+
   test "rates safe when no risks" do
-    InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: false)
+    # All priority='상' items answered no-risk → gate passes → :safe
+    answer_all_high_priority_no_risk
     rating = InspectionRatingService.call(property: @property, user: @user)
     assert_equal :safe, rating
     assert_equal "safe", UserProperty.find_by(user: @user, property: @property).safety_rating
   end
 
   test "rates caution when risks are all resolvable" do
+    # Gate requires all priority='상' answered; answer others no-risk, leave @item as the risk
+    answer_all_high_priority_no_risk(except: @item)
     InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: true, resolvable: true)
     rating = InspectionRatingService.call(property: @property, user: @user)
     assert_equal :caution, rating
   end
 
   test "rates danger when any risk is unresolvable" do
+    answer_all_high_priority_no_risk(except: @item)
     InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: true, resolvable: false)
     rating = InspectionRatingService.call(property: @property, user: @user)
     assert_equal :danger, rating
   end
 
   test "rates danger when risk present but resolvable not yet decided" do
+    answer_all_high_priority_no_risk(except: @item)
     InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: true, resolvable: nil)
     rating = InspectionRatingService.call(property: @property, user: @user)
     assert_equal :danger, rating
   end
 
   test "tab_rating returns danger when risk present but resolvable not yet decided" do
+    # tab_rating is unaffected by the A7 gate (gate only applies to overall_rating)
     InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: true, resolvable: nil)
     service = InspectionRatingService.new(property: @property, user: @user)
     assert_equal :danger, service.tab_rating("rights_analysis")
@@ -42,6 +84,8 @@ class InspectionRatingServiceTest < ActiveSupport::TestCase
 
   test "rates caution only when all risks are explicitly marked resolvable" do
     item2 = inspection_items(:rights_002)
+    # Skip both @item and item2 in the no-risk setup so we can set specific has_risk values below
+    answer_all_high_priority_no_risk(except: [ @item, item2 ])
     InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: true, resolvable: true)
     InspectionResult.create!(property: @property, inspection_item: item2, user: @user, source_type: "auto", has_risk: true, resolvable: nil)
     rating = InspectionRatingService.call(property: @property, user: @user)
@@ -91,20 +135,23 @@ class InspectionRatingServiceTest < ActiveSupport::TestCase
   end
 
   # Partial evaluation: call method (Tasks 1)
-  test "rates safe when some items answered safe and others unanswered" do
+  # A7: priority='상' coverage gate fires before risk logic.
+  # With unanswered priority='상' items, overall_rating must return :incomplete — not :safe or :danger.
+  test "rates incomplete when some priority=상 items answered safe and others unanswered" do
     item2 = inspection_items(:rights_002)
     InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: false)
     InspectionResult.create!(property: @property, inspection_item: item2, user: @user)
     rating = InspectionRatingService.call(property: @property, user: @user)
-    assert_equal :safe, rating
+    assert_equal :incomplete, rating
   end
 
-  test "rates danger when answered item has unresolvable risk despite unanswered items" do
+  test "rates incomplete when answered item has unresolvable risk but other priority=상 items unanswered" do
     item2 = inspection_items(:rights_002)
     InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: true, resolvable: false)
     InspectionResult.create!(property: @property, inspection_item: item2, user: @user)
     rating = InspectionRatingService.call(property: @property, user: @user)
-    assert_equal :danger, rating
+    # A7: gate returns :incomplete before reaching danger logic — coverage < 100%
+    assert_equal :incomplete, rating
   end
 
   # Partial evaluation: tab_rating method (Task 2)
@@ -157,6 +204,8 @@ class InspectionRatingServiceTest < ActiveSupport::TestCase
 
   # overall_rating: non-mutating read of overall rating (Task: tabs component reuse)
   test "overall_rating returns rating without mutating user_property" do
+    # All priority='상' answered (gate passes); @item is the one risk (resolvable) → :caution
+    answer_all_high_priority_no_risk(except: @item)
     InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: true, resolvable: true)
     user_property = UserProperty.find_by!(user: @user, property: @property)
     user_property.update!(safety_rating: nil, analyzed_at: nil)
@@ -173,5 +222,36 @@ class InspectionRatingServiceTest < ActiveSupport::TestCase
   test "overall_rating returns incomplete when no items answered" do
     service = InspectionRatingService.new(property: @property, user: @user)
     assert_equal :incomplete, service.overall_rating
+  end
+
+  # A7: priority='상' coverage gate
+  test "incomplete when priority='상' coverage < 100% even if no risks" do
+    # Answer only one priority='상' item as no-risk; leave all others unanswered
+    high_item = InspectionItem.where(priority: "상").first
+    InspectionResult.create!(property: @property, inspection_item: high_item, user: @user, source_type: "auto", has_risk: false)
+
+    service = InspectionRatingService.new(property: @property, user: @user)
+    assert_equal :incomplete, service.overall_rating
+  end
+
+  test "unanswered_high_priority_count returns the exact gap" do
+    service_baseline = InspectionRatingService.new(property: @property, user: @user)
+    baseline_unanswered = service_baseline.unanswered_high_priority_count
+    assert baseline_unanswered > 1, "test setup: need at least 2 visible high items"
+
+    # Answer exactly one visible high-priority item (no depends_on so unconditionally visible)
+    answerable = InspectionItem.where(priority: "상").find { |item|
+      item.applicable_for?(@property.property_type) && item.depends_on.blank?
+    }
+    InspectionResult.create!(property: @property, inspection_item: answerable, user: @user, source_type: "auto", has_risk: false)
+
+    service_after = InspectionRatingService.new(property: @property, user: @user)
+    assert_equal baseline_unanswered - 1, service_after.unanswered_high_priority_count
+  end
+
+  test "safe when all visible priority='상' items answered with no risks" do
+    answer_all_high_priority_no_risk
+    service = InspectionRatingService.new(property: @property, user: @user)
+    assert_equal :safe, service.overall_rating
   end
 end

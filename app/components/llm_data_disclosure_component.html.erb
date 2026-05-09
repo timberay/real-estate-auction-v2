@@ -1,0 +1,24 @@
+<aside class="rounded-md border border-zinc-300 bg-zinc-50 dark:bg-zinc-800/50 dark:border-zinc-600 p-4 my-4 text-sm">
+  <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">📤 외부 LLM API로 전송되는 정보</h3>
+  <dl class="space-y-1.5 text-zinc-700 dark:text-zinc-300">
+    <div class="flex gap-2">
+      <dt class="font-medium min-w-fit">전송 항목:</dt>
+      <dd>업로드한 PDF의 추출된 텍스트만 전송됩니다.</dd>
+    </div>
+    <div class="flex gap-2">
+      <dt class="font-medium min-w-fit">제공처:</dt>
+      <dd>Anthropic Claude, OpenAI ChatGPT, Google Gemini 중 1개사 (선택에 따라)</dd>
+    </div>
+    <div class="flex gap-2">
+      <dt class="font-medium min-w-fit">보유 기간:</dt>
+      <dd>1회 분석 후 즉시 폐기. 본 서비스 서버에 영구 저장되지 않습니다.</dd>
+    </div>
+    <div class="flex gap-2">
+      <dt class="font-medium min-w-fit">개인정보 처리:</dt>
+      <dd>주소·주민등록번호는 자동 마스킹되어 전송됩니다.</dd>
+    </div>
+  </dl>
+  <p class="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
+    자세한 처리 사항은 <%= link_to "개인정보처리방침", privacy_path, class: "underline" %>을 확인해 주세요.
+  </p>
+</aside>

@@ -19,6 +19,14 @@ class RightsAnalysisReport < ApplicationRecord
     parsed_data&.dig("discrepancies") || []
   end
 
+  def unevaluated_rights
+    parsed_data&.dig("calculated", "unevaluated_rights") || []
+  end
+
+  def rights_disclaimer
+    parsed_data&.dig("calculated", "disclaimer")
+  end
+
   def checklist_reference_codes
     data = parsed_data
     return [] if data.blank?

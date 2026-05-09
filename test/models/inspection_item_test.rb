@@ -283,7 +283,8 @@ class InspectionItemReorganization202605Test < ActiveSupport::TestCase
   end
 
   test "checklist count after reorganization is 44" do
-    assert_equal 44, InspectionItem.count
+    # A6 adds 5 veteran items (rights-025..029); count is now 49
+    assert_equal 49, InspectionItem.count
   end
 
   test "inspect-005 lives in field_check tab" do
@@ -312,5 +313,17 @@ class InspectionItemReorganization202605Test < ActiveSupport::TestCase
   test "tax-007 and exit-002 are deleted" do
     assert_nil InspectionItem.find_by(code: "tax-007")
     assert_nil InspectionItem.find_by(code: "exit-002")
+  end
+
+  # A6: rights-021 priority bump + 5 new veteran items
+  test "rights-021 (전세사기 특별법 우선매수권) priority is 상" do
+    item = InspectionItem.find_by!(code: "rights-021")
+    assert_equal "상", item.priority
+  end
+
+  test "veteran-required items rights-025..029 all exist in seed" do
+    %w[rights-025 rights-026 rights-027 rights-028 rights-029].each do |code|
+      assert InspectionItem.exists?(code: code), "#{code} must exist in seeds"
+    end
   end
 end

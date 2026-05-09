@@ -1,17 +1,6 @@
 <% content_for :title, "이용약관 — Real Estate Auction" %>
 <% content_for :page_title, "이용약관" %>
 
-<article class="prose prose-slate dark:prose-invert max-w-3xl mx-auto py-8">
-  <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-6">이용약관</h1>
-
-  <section class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed space-y-4">
-    <p>
-      본 약관은 정식 출시 전 작성 중입니다. 자세한 내용은 정식 출시 시점에 공지됩니다.
-    </p>
-    <p>
-      서비스 이용 관련 문의는
-      <a href="mailto:tonny.kim@timberay.com" class="text-blue-600 dark:text-blue-400 underline">tonny.kim@timberay.com</a>
-      으로 연락 주세요.
-    </p>
-  </section>
+<article class="mx-auto max-w-3xl py-8 px-4 [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mt-0 [&_h1]:mb-6 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mt-8 [&_h2]:mb-3 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-2 [&_p]:my-3 [&_p]:leading-7 [&_p]:text-zinc-800 [&_blockquote]:border-l-4 [&_blockquote]:border-zinc-300 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-zinc-600 [&_blockquote]:my-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-3 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-3 [&_a]:text-blue-700 [&_a]:underline dark:[&_h1]:text-zinc-100 dark:[&_h2]:text-zinc-100 dark:[&_p]:text-zinc-200 dark:[&_blockquote]:text-zinc-400">
+  <%= markdown(@legal_content) %>
 </article>

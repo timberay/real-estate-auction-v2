@@ -181,4 +181,106 @@ class Inspection::RightsValidatorTest < ActiveSupport::TestCase
     tenant = result.validated_tenants.first
     assert_equal false, tenant["opposing_power"]
   end
+
+  test "유치권 is excluded from assumed_amount and surfaced as unevaluated" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-01",
+      tenants: [],
+      rights_timeline: [
+        { "type" => "근저당", "amount" => 100_000_000, "extinguished_on_sale" => true },
+        { "type" => "유치권", "amount" => 50_000_000, "extinguished_on_sale" => false }
+      ]
+    )
+    assert_equal 0, result.validated_amounts["assumed_amount"]
+    assert_equal 1, result.validated_amounts["unevaluated_rights"].size
+    assert_equal "유치권", result.validated_amounts["unevaluated_rights"].first["type"]
+    assert_match(/별도 평가 필요/, result.validated_amounts["disclaimer"])
+  end
+
+  test "선순위 가등기 (extinguished_on_sale=false) is unevaluated" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-01",
+      tenants: [],
+      rights_timeline: [
+        { "type" => "가등기", "amount" => 0, "extinguished_on_sale" => false }
+      ]
+    )
+    assert_equal 0, result.validated_amounts["assumed_amount"]
+    assert_equal 1, result.validated_amounts["unevaluated_rights"].size
+  end
+
+  test "summable rights still aggregate correctly when no unevaluated" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-01",
+      tenants: [],
+      rights_timeline: [
+        { "type" => "가압류", "amount" => 30_000_000, "extinguished_on_sale" => false }
+      ]
+    )
+    assert_equal 30_000_000, result.validated_amounts["assumed_amount"]
+    assert_empty result.validated_amounts["unevaluated_rights"]
+    assert_nil result.validated_amounts["disclaimer"]
+  end
+
+  test "right_type with whitespace matches UNEVALUATED_TYPES" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-01",
+      tenants: [],
+      rights_timeline: [
+        { "type" => "선순위 세금압류", "amount" => 10_000_000, "extinguished_on_sale" => false }
+      ]
+    )
+    assert_equal 0, result.validated_amounts["assumed_amount"]
+    assert_equal 1, result.validated_amounts["unevaluated_rights"].size
+  end
+
+  test "transit on same day as base right yields opposing_power=false but warns" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-15",
+      tenants: [ { "name" => "김임차", "deposit" => 100_000_000, "move_in_date" => "2024-01-15", "confirmed_date" => "2024-01-15" } ],
+      rights_timeline: []
+    )
+    tenant = result.validated_tenants.first
+    assert_equal false, tenant["opposing_power"]
+    assert_equal true, tenant["same_day_warning"]
+    assert_match(/익일 0시/, tenant["warning_message"])
+  end
+
+  test "earlier move-in does NOT trigger same_day_warning (still has opposing_power)" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-15",
+      tenants: [ { "name" => "김임차", "deposit" => 100_000_000, "move_in_date" => "2024-01-10", "confirmed_date" => "2024-01-10" } ],
+      rights_timeline: []
+    )
+    tenant = result.validated_tenants.first
+    assert_equal true, tenant["opposing_power"]
+    assert_equal false, tenant["same_day_warning"]
+    assert_nil tenant["warning_message"]
+  end
+
+  test "later move-in does NOT trigger same_day_warning (no opposing_power)" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-15",
+      tenants: [ { "name" => "김임차", "deposit" => 100_000_000, "move_in_date" => "2024-01-20", "confirmed_date" => "2024-01-20" } ],
+      rights_timeline: []
+    )
+    tenant = result.validated_tenants.first
+    assert_equal false, tenant["opposing_power"]
+    assert_equal false, tenant["same_day_warning"]
+    assert_nil tenant["warning_message"]
+  end
+
+  test "real LLM response with 'type' key correctly partitions 유치권" do
+    fixture_data = JSON.parse(file_fixture("ai_inspection_response.json").read)
+    rights = fixture_data.dig("rights_analysis", "rights_timeline") || []
+    rights << { "type" => "유치권", "amount" => 50_000_000, "extinguished_on_sale" => false }
+
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-01",
+      tenants: [],
+      rights_timeline: rights
+    )
+    refute_empty result.validated_amounts["unevaluated_rights"]
+    assert_equal "유치권", result.validated_amounts["unevaluated_rights"].first["type"]
+  end
 end
