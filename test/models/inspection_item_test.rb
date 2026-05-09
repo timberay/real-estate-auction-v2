@@ -358,6 +358,7 @@ class InspectionItemReorganization202605Test < ActiveSupport::TestCase
   end
 
   test "권리분석 rights-* items have unique (tab, tab_position) combinations" do
+    # Scoped to rights-* because eviction-004 and manual-001 share tab_position 13 in 권리분석 (pre-existing, tracked separately).
     rights_items = InspectionItem.where(tab: "rights_analysis").where("code LIKE ?", "rights-%")
     positions = rights_items.pluck(:tab_position)
     assert_equal positions.size, positions.uniq.size,
