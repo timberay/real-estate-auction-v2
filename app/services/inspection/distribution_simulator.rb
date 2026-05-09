@@ -19,6 +19,9 @@ module Inspection
   class DistributionSimulator
     EXECUTION_COST_RATE = 0.03
 
+    # Tenants paid before liens when dates tie (tenant 우선변제 takes the same date slot first).
+    KIND_TIEBREAK = { "tenant" => 0, "lien" => 1 }.freeze
+
     DISCLAIMER = "본 시뮬레이션은 추정치입니다. 집행비용은 매각가의 3%로 단순 가정했고, " \
                  "최우선변제(소액임차인)와 당해세는 계산에서 제외했습니다. 실제 배당과 차이가 있을 수 있으니 참고용으로만 사용하세요.".freeze
 
@@ -105,7 +108,7 @@ module Inspection
         end
 
       lien_claimants = @rights_timeline
-        .select { |r| r["extinguished_on_sale"] && lien_type?(r["type"]) }
+        .select { |r| r["extinguished_on_sale"] && lien_type?(r["type"]) && (r["registered_date"] || r["date"]).present? }
         .map do |r|
           {
             kind: "lien",
@@ -116,7 +119,8 @@ module Inspection
           }
         end
 
-      (tenant_claimants + lien_claimants).sort_by { |c| c[:sort_date] }
+      (tenant_claimants + lien_claimants)
+        .sort_by.with_index { |c, i| [ c[:sort_date], KIND_TIEBREAK[c[:kind]] || 99, i ] }
     end
 
     def build_tenant_outcomes(tenant_dividends)

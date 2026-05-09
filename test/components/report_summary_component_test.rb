@@ -150,6 +150,26 @@ class ReportSummaryComponentTest < ViewComponent::TestCase
     assert_text "집행비용"
   end
 
+  test "simulator table headers have scope=col for screen readers" do
+    report = rights_analysis_reports(:risky_villa_report)
+    report.report_data = JSON.generate({
+      "calculated" => {
+        "tenants" => [
+          {
+            "name" => "김임차", "deposit" => 50_000_000, "opposing_power" => true,
+            "has_priority_repayment" => true, "effective_date" => "2023-06-15", "priority_rank" => 1
+          }
+        ],
+        "unevaluated_rights" => [],
+        "disclaimer" => nil
+      }
+    })
+    property = properties(:risky_villa)
+    property.min_bid_price = 100_000_000
+    render_inline(ReportSummaryComponent.new(report: report, property: property))
+    assert_selector "th[scope='col']", count: 4
+  end
+
   test "does NOT render simulator section when there are no tenants" do
     report = rights_analysis_reports(:safe_apartment_report)
     property = properties(:safe_apartment)

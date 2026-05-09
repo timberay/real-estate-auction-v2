@@ -243,6 +243,74 @@ class Inspection::DistributionSimulatorTest < ActiveSupport::TestCase
   # ---------------------------------------------------------------------------
   # Distributions list shape
   # ---------------------------------------------------------------------------
+  # ---------------------------------------------------------------------------
+  # Sort stability and undated lien handling
+  # ---------------------------------------------------------------------------
+  test "deterministic dividend assignment when two claimants share a date" do
+    tenants = [
+      {
+        "name" => "A", "deposit" => 30_000_000, "opposing_power" => true,
+        "has_priority_repayment" => true, "effective_date" => "2024-01-01", "priority_rank" => 1
+      },
+      {
+        "name" => "B", "deposit" => 30_000_000, "opposing_power" => true,
+        "has_priority_repayment" => true, "effective_date" => "2024-01-01", "priority_rank" => 2
+      }
+    ]
+
+    run1 = Inspection::DistributionSimulator.call(sale_price: 50_000_000, validated_tenants: tenants, rights_timeline: [])
+    run2 = Inspection::DistributionSimulator.call(sale_price: 50_000_000, validated_tenants: tenants, rights_timeline: [])
+
+    assert_equal run1.distributions, run2.distributions
+    assert_equal run1.tenant_outcomes, run2.tenant_outcomes
+  end
+
+  test "tenant ordered before lien when dates are identical" do
+    tenants = [
+      {
+        "name" => "임차인", "deposit" => 30_000_000, "opposing_power" => true,
+        "has_priority_repayment" => true, "effective_date" => "2024-01-01", "priority_rank" => 1
+      }
+    ]
+    rights = [
+      { "type" => "근저당", "amount" => 100_000_000, "registered_date" => "2024-01-01", "extinguished_on_sale" => true }
+    ]
+
+    # Sale 50M − 1.5M = 48.5M. Tenant first (30M), lien gets 18.5M.
+    result = Inspection::DistributionSimulator.call(
+      sale_price: 50_000_000,
+      validated_tenants: tenants,
+      rights_timeline: rights
+    )
+    tenant_outcome = result.tenant_outcomes.first
+    assert_equal 30_000_000, tenant_outcome["dividend"]
+    assert_equal 0, tenant_outcome["uncovered_remainder"]
+  end
+
+  test "undated lien is excluded from waterfall" do
+    tenants = [
+      {
+        "name" => "임차인", "deposit" => 50_000_000, "opposing_power" => true,
+        "has_priority_repayment" => true, "effective_date" => "2024-06-01", "priority_rank" => 1
+      }
+    ]
+    rights = [
+      { "type" => "근저당", "amount" => 100_000_000, "registered_date" => nil, "date" => nil, "extinguished_on_sale" => true }
+    ]
+
+    # Without exclusion, the undated lien with sort_date "" would sort before the tenant
+    # and consume the proceeds. Tenant should still get its 50M.
+    result = Inspection::DistributionSimulator.call(
+      sale_price: 100_000_000,
+      validated_tenants: tenants,
+      rights_timeline: rights
+    )
+    tenant_outcome = result.tenant_outcomes.first
+    assert_equal 50_000_000, tenant_outcome["dividend"]
+    assert_equal 0, tenant_outcome["uncovered_remainder"]
+    refute(result.distributions.any? { |d| d["kind"] == "lien" })
+  end
+
   test "distributions list contains entries with kind, label, amount in waterfall order" do
     tenants = [
       {
