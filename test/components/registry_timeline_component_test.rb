@@ -124,6 +124,24 @@ class RegistryTimelineComponentTest < ViewComponent::TestCase
     assert_text "배당요구 ○"
   end
 
+  test "renders 동일자 전입 warning chip when same_day_warning is true" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => { "rights_timeline" => [] },
+      "calculated" => {
+        "tenants" => [
+          { "name" => "김임차", "deposit" => 100_000_000, "move_in_date" => "2024-01-15",
+            "confirmed_date" => "2024-01-15", "opposing_power" => false,
+            "same_day_warning" => true,
+            "warning_message" => "전입과 말소기준이 같은 날입니다. 대항력은 익일 0시 효력 발생 원칙상 후순위로 판정했으나, 전입 시각·전입세대열람 등 추가 확인이 필요합니다." }
+        ]
+      },
+      "discrepancies" => []
+    }
+    render_inline(RegistryTimelineComponent.new(report: report))
+    assert_text "동일자 전입 — 추가 확인 필요"
+  end
+
   test "renders '배당요구 ✗' when dividend_requested is false" do
     report = rights_analysis_reports(:safe_apartment_report)
     report.report_data = {
