@@ -55,6 +55,50 @@
     </div>
   <% end %>
 
+  <% if show_simulator? %>
+    <div class="mt-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-800/60 p-4">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold text-slate-900 dark:text-slate-100">예상 매각가 기준 임차인 미배당 잔액</h3>
+        <span class="text-xs text-slate-500 dark:text-slate-400">⚠️ 추정치</span>
+      </div>
+      <div class="text-xs text-slate-600 dark:text-slate-400 mb-3">
+        예상 매각가 <strong class="text-slate-900 dark:text-slate-100"><%= format_price(distribution_result.sale_price) %></strong>로 시뮬레이션 (집행비용 3% 차감 후 우선변제 순서대로 배당)
+      </div>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="text-left text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
+            <th scope="col" class="pr-3 pb-2 font-medium">임차인</th>
+            <th scope="col" class="pr-3 pb-2 font-medium text-right">보증금</th>
+            <th scope="col" class="pr-3 pb-2 font-medium text-right">예상 배당</th>
+            <th scope="col" class="pb-2 font-medium text-right">미배당 잔액</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% distribution_result.tenant_outcomes.each do |t| %>
+            <tr class="text-slate-700 dark:text-slate-300 border-b border-slate-100 dark:border-slate-800 last:border-b-0">
+              <td class="pr-3 py-1">
+                <%= t["name"] %>
+                <% if t["opposing_power"] %>
+                  <span class="ml-1 inline-flex items-center rounded bg-amber-100 dark:bg-amber-900/30 px-1.5 py-0.5 text-xs text-amber-800 dark:text-amber-200">대항력</span>
+                <% end %>
+              </td>
+              <td class="pr-3 py-1 text-right tabular-nums"><%= format_price(t["deposit"]) %></td>
+              <td class="pr-3 py-1 text-right tabular-nums"><%= format_price(t["dividend"]) %></td>
+              <td class="py-1 text-right tabular-nums font-semibold <%= t["uncovered_remainder"].to_i.positive? ? "text-rose-700 dark:text-rose-300" : "text-slate-500 dark:text-slate-400" %>">
+                <%= format_price(t["uncovered_remainder"]) %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+      <div class="mt-3 flex items-center justify-between rounded-md bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 px-3 py-2">
+        <span class="text-sm font-medium text-rose-900 dark:text-rose-200">대항력 임차인 인수 부담 합계</span>
+        <span class="text-sm font-bold text-rose-900 dark:text-rose-100 tabular-nums"><%= format_price(distribution_result.buyer_assumed_amount) %></span>
+      </div>
+      <p class="mt-2 text-xs text-slate-500 dark:text-slate-400 leading-relaxed"><%= distribution_result.disclaimer %></p>
+    </div>
+  <% end %>
+
   <% if opportunity? %>
     <div class="mt-4 flex items-center gap-2 rounded-lg bg-amber-100 dark:bg-amber-900/20 border border-amber-400 dark:border-amber-600 px-4 py-3">
       <span class="text-lg">💡</span>

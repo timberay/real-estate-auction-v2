@@ -126,6 +126,57 @@ class ReportSummaryComponentTest < ViewComponent::TestCase
     assert_no_text "자동 계산 불가 권리"
   end
 
+  test "renders distribution simulator when tenants are present" do
+    report = rights_analysis_reports(:risky_villa_report)
+    report.report_data = JSON.generate({
+      "calculated" => {
+        "tenants" => [
+          {
+            "name" => "김임차", "deposit" => 50_000_000, "opposing_power" => true,
+            "has_priority_repayment" => true, "effective_date" => "2023-06-15", "priority_rank" => 1
+          }
+        ],
+        "unevaluated_rights" => [],
+        "disclaimer" => nil
+      }
+    })
+    property = properties(:risky_villa)
+    property.min_bid_price = 100_000_000
+    render_inline(ReportSummaryComponent.new(report: report, property: property))
+    assert_text "예상 매각가 기준 임차인 미배당 잔액"
+    assert_text "김임차"
+    assert_text "대항력 임차인 인수 부담 합계"
+    assert_text "최우선변제"
+    assert_text "집행비용"
+  end
+
+  test "simulator table headers have scope=col for screen readers" do
+    report = rights_analysis_reports(:risky_villa_report)
+    report.report_data = JSON.generate({
+      "calculated" => {
+        "tenants" => [
+          {
+            "name" => "김임차", "deposit" => 50_000_000, "opposing_power" => true,
+            "has_priority_repayment" => true, "effective_date" => "2023-06-15", "priority_rank" => 1
+          }
+        ],
+        "unevaluated_rights" => [],
+        "disclaimer" => nil
+      }
+    })
+    property = properties(:risky_villa)
+    property.min_bid_price = 100_000_000
+    render_inline(ReportSummaryComponent.new(report: report, property: property))
+    assert_selector "th[scope='col']", count: 4
+  end
+
+  test "does NOT render simulator section when there are no tenants" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    property = properties(:safe_apartment)
+    render_inline(ReportSummaryComponent.new(report: report, property: property))
+    assert_no_text "예상 매각가 기준 임차인 미배당 잔액"
+  end
+
   test "checklist_refs memoizes — single query per render even with multiple calls" do
     report = rights_analysis_reports(:risky_villa_report)
     report.report_data = JSON.generate({ "checklist_references" => [ "rights-002", "rights-003" ] })
