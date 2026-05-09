@@ -91,4 +91,52 @@ class RegistryTimelineComponentTest < ViewComponent::TestCase
     render_inline(RegistryTimelineComponent.new(report: report))
     assert_selector "li", text: "[tax-007] (삭제된 항목)", normalize_ws: true
   end
+
+  test "renders '확인 필요' when dividend_requested is nil" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => { "rights_timeline" => [] },
+      "calculated" => {
+        "tenants" => [
+          { "name" => "김임차", "deposit" => 30_000_000, "move_in_date" => "2023-01-01",
+            "confirmed_date" => nil, "opposing_power" => false, "dividend_requested" => nil }
+        ]
+      },
+      "discrepancies" => []
+    }
+    render_inline(RegistryTimelineComponent.new(report: report))
+    assert_text "확인 필요"
+  end
+
+  test "renders '배당요구 ○' when dividend_requested is true" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => { "rights_timeline" => [] },
+      "calculated" => {
+        "tenants" => [
+          { "name" => "이임차", "deposit" => 30_000_000, "move_in_date" => "2023-01-01",
+            "confirmed_date" => nil, "opposing_power" => false, "dividend_requested" => true }
+        ]
+      },
+      "discrepancies" => []
+    }
+    render_inline(RegistryTimelineComponent.new(report: report))
+    assert_text "배당요구 ○"
+  end
+
+  test "renders '배당요구 ✗' when dividend_requested is false" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => { "rights_timeline" => [] },
+      "calculated" => {
+        "tenants" => [
+          { "name" => "박임차", "deposit" => 30_000_000, "move_in_date" => "2023-01-01",
+            "confirmed_date" => nil, "opposing_power" => false, "dividend_requested" => false }
+        ]
+      },
+      "discrepancies" => []
+    }
+    render_inline(RegistryTimelineComponent.new(report: report))
+    assert_text "배당요구 ✗"
+  end
 end
