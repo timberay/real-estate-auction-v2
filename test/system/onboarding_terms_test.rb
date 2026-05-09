@@ -42,4 +42,12 @@ class OnboardingTermsTest < ApplicationSystemTestCase
     find("[data-controller='tooltip'] button").click
     assert_text "집값 대비 빌릴 수 있는 비율"
   end
+
+  # Regression guard: no user-facing view or component must contain "유용자금"
+  test "no '유용자금' string in user-facing views or components" do
+    views = Dir.glob(Rails.root.join("app/views/**/*.{erb,html}").to_s)
+    views += Dir.glob(Rails.root.join("app/components/**/*.{rb,erb,html}").to_s)
+    offenders = views.reject { |f| f.include?("/test/") }.select { |f| File.read(f).include?("유용자금") }
+    assert_empty offenders, "Files still contain '유용자금': #{offenders.join(', ')}"
+  end
 end

@@ -15,7 +15,7 @@
       <%= render SummaryTableComponent.new(
         title: "비용 내역",
         rows: [
-          { label: "유용자금", value: format_price_in_eok(@setting.available_cash) },
+          { label: "쓸 수 있는 현금", value: format_price_in_eok(@setting.available_cash) },
           { label: "수선비", value: format_price_in_eok(@setting.repair_cost) },
           { label: "취득세", value: format_price_in_eok(@setting.acquisition_tax) },
           { label: "법무사비", value: format_price_in_eok(@setting.scrivener_fee) },

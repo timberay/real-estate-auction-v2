@@ -66,7 +66,7 @@
           <% end %>
         </div>
 
-        <%# 합계 + 유용자금 비교 %>
+        <%# 합계 + 쓸 수 있는 현금 비교 %>
         <div class="mt-4 p-3 rounded-lg border transition-colors"
              data-reserve-fund-target="summaryBox">
           <div class="flex justify-between items-center">
@@ -74,11 +74,11 @@
               예비비 합계: <span class="tabular-nums" data-reserve-fund-target="total">0</span>만원
             </p>
             <p class="text-sm text-slate-500 dark:text-slate-400">
-              유용자금: <span class="tabular-nums"><%= number_with_delimiter(@setting.available_cash.to_i) %></span>만원
+              쓸 수 있는 현금: <span class="tabular-nums"><%= number_with_delimiter(@setting.available_cash.to_i) %></span>만원
             </p>
           </div>
           <p class="mt-1 text-sm text-red-600 dark:text-red-400 hidden" data-reserve-fund-target="warning">
-            예비비가 유용자금을 초과합니다. 예비비를 조정해 주세요.
+            예비비가 쓸 수 있는 현금을 초과합니다. 예비비를 조정해 주세요.
           </p>
         </div>
 
