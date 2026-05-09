@@ -181,4 +181,56 @@ class Inspection::RightsValidatorTest < ActiveSupport::TestCase
     tenant = result.validated_tenants.first
     assert_equal false, tenant["opposing_power"]
   end
+
+  test "유치권 is excluded from assumed_amount and surfaced as unevaluated" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-01",
+      tenants: [],
+      rights_timeline: [
+        { "right_type" => "근저당", "amount" => 100_000_000, "extinguished_on_sale" => true },
+        { "right_type" => "유치권", "amount" => 50_000_000, "extinguished_on_sale" => false }
+      ]
+    )
+    assert_equal 0, result.validated_amounts["assumed_amount"]
+    assert_equal 1, result.validated_amounts["unevaluated_rights"].size
+    assert_equal "유치권", result.validated_amounts["unevaluated_rights"].first["right_type"]
+    assert_match(/별도 평가 필요/, result.validated_amounts["disclaimer"])
+  end
+
+  test "선순위 가등기 (extinguished_on_sale=false) is unevaluated" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-01",
+      tenants: [],
+      rights_timeline: [
+        { "right_type" => "가등기", "amount" => 0, "extinguished_on_sale" => false }
+      ]
+    )
+    assert_equal 0, result.validated_amounts["assumed_amount"]
+    assert_equal 1, result.validated_amounts["unevaluated_rights"].size
+  end
+
+  test "summable rights still aggregate correctly when no unevaluated" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-01",
+      tenants: [],
+      rights_timeline: [
+        { "right_type" => "가압류", "amount" => 30_000_000, "extinguished_on_sale" => false }
+      ]
+    )
+    assert_equal 30_000_000, result.validated_amounts["assumed_amount"]
+    assert_empty result.validated_amounts["unevaluated_rights"]
+    assert_nil result.validated_amounts["disclaimer"]
+  end
+
+  test "right_type with whitespace matches UNEVALUATED_TYPES" do
+    result = Inspection::RightsValidator.call(
+      base_right_date: "2024-01-01",
+      tenants: [],
+      rights_timeline: [
+        { "right_type" => "선순위 세금압류", "amount" => 10_000_000, "extinguished_on_sale" => false }
+      ]
+    )
+    assert_equal 0, result.validated_amounts["assumed_amount"]
+    assert_equal 1, result.validated_amounts["unevaluated_rights"].size
+  end
 end

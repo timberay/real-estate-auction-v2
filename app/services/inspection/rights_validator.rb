@@ -2,6 +2,8 @@ module Inspection
   class RightsValidator
     Result = Struct.new(:validated_tenants, :validated_amounts, :discrepancies, keyword_init: true)
 
+    UNEVALUATED_TYPES = %w[가등기 가처분 유치권 법정지상권 선순위세금압류].freeze
+
     def self.call(base_right_date:, tenants:, rights_timeline:)
       new(base_right_date:, tenants:, rights_timeline:).call
     end
@@ -60,10 +62,12 @@ module Inspection
     end
 
     def calculate_amounts(validated_tenants)
-      assumed = @rights_timeline
-        .reject { |r| r["extinguished_on_sale"] }
-        .sum { |r| r["amount"].to_i }
+      surviving = @rights_timeline.reject { |r| r["extinguished_on_sale"] }
+      unevaluated, summable = surviving.partition do |r|
+        UNEVALUATED_TYPES.include?(r["right_type"].to_s.gsub(/\s+/, ""))
+      end
 
+      assumed = summable.sum { |r| r["amount"].to_i }
       opposing_deposits = validated_tenants
         .select { |t| t["opposing_power"] }
         .sum { |t| t["deposit"].to_i }
@@ -71,7 +75,9 @@ module Inspection
       {
         "assumed_amount" => assumed,
         "opposing_deposits" => opposing_deposits,
-        "total_risk_amount" => assumed + opposing_deposits
+        "total_risk_amount" => assumed + opposing_deposits,
+        "unevaluated_rights" => unevaluated,
+        "disclaimer" => unevaluated.empty? ? nil : "추정치이며, 별도 평가 필요 항목이 #{unevaluated.size}건 있습니다. 베테랑/공인중개사 검토를 권장합니다."
       }
     end
 
