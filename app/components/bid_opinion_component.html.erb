@@ -1,13 +1,5 @@
-<div class="rounded-lg border-2 p-5 <%= @config[:bg] %>">
-  <h3 class="text-lg font-bold <%= @config[:text] %>"><%= @config[:label] %></h3>
-  <p class="mt-1 text-sm <%= @config[:text] %> opacity-80"><%= reasoning %></p>
-
-  <div class="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
-    <% key_figures.each do |fig| %>
-      <div class="flex justify-between py-1.5 border-b border-black/5 dark:border-white/5">
-        <span class="text-slate-600 dark:text-slate-400"><%= fig[:label] %></span>
-        <span class="font-semibold text-slate-900 dark:text-slate-100"><%= fig[:value] %></span>
-      </div>
-    <% end %>
-  </div>
+<div class="rounded border bg-zinc-50 dark:bg-zinc-800 p-4">
+  <h3 class="font-semibold text-zinc-900 dark:text-zinc-100"><%= headline %></h3>
+  <p class="mt-1 text-sm text-zinc-700 dark:text-zinc-300">본인 판단 필요. 베테랑/공인중개사 상담을 권장합니다.</p>
+  <p class="mt-2 text-xs text-zinc-600 dark:text-zinc-400"><%= disclaimer %></p>
 </div>

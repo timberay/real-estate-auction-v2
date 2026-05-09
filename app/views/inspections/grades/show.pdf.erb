@@ -9,11 +9,8 @@
   <%# ===== Verdict Section ===== %>
   <%= render GradeSummaryComponent.new(rating: @rating, fully_evaluated: @fully_evaluated, tabs_evaluated: @tabs_evaluated, tabs_total: @tabs_total) %>
   <%= render BidOpinionComponent.new(
-    rating: @rating,
-    report: @report,
-    risk_results: @risk_results,
-    budget_setting: @budget_setting,
-    property: @property
+    risk_count: @risk_results.size,
+    opportunity_count: @report&.opportunity_type.present? ? 1 : 0
   ) %>
 
   <%# ===== Core Info Sections ===== %>

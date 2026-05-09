@@ -1,74 +1,29 @@
 require "test_helper"
 
 class BidOpinionComponentTest < ViewComponent::TestCase
-  test "renders safe verdict" do
-    render_inline(BidOpinionComponent.new(
-      rating: :safe,
-      report: rights_analysis_reports(:safe_apartment_report),
-      risk_results: [],
-      budget_setting: budget_settings(:completed),
-      property: properties(:safe_apartment)
-    ))
-    assert_text "입찰 검토 가능합니다"
+  test "never renders 입찰 권유 phrasing" do
+    rendered = render_inline(BidOpinionComponent.new(risk_count: 0, opportunity_count: 5)).to_s
+    refute_match(/입찰을 권/, rendered)
+    refute_match(/입찰 검토 가능/, rendered)
+    refute_match(/입찰 권합니다/, rendered)
+    refute_match(/추천/, rendered)
   end
 
-  test "renders danger verdict with unresolvable items" do
-    risk_results = InspectionResult.where(has_risk: true, property: properties(:risky_villa), user: users(:guest))
-    render_inline(BidOpinionComponent.new(
-      rating: :danger,
-      report: rights_analysis_reports(:risky_villa_report),
-      risk_results: risk_results.includes(:inspection_item),
-      budget_setting: budget_settings(:completed),
-      property: properties(:risky_villa)
-    ))
-    assert_text "입찰을 권하지 않습니다"
+  test "shows risk count and 본인 판단 필요" do
+    rendered = render_inline(BidOpinionComponent.new(risk_count: 3, opportunity_count: 1)).to_s
+    assert_match(/위험 항목 3건/, rendered)
+    assert_match(/기회 항목 1건/, rendered)
+    assert_match(/본인 판단 필요/, rendered)
   end
 
-  test "renders caution verdict" do
-    render_inline(BidOpinionComponent.new(
-      rating: :caution,
-      report: rights_analysis_reports(:safe_apartment_report),
-      risk_results: [],
-      budget_setting: budget_settings(:completed),
-      property: properties(:safe_apartment)
-    ))
-    assert_text "입찰 검토 가능하나 확인 필요"
+  test "shows disclaimer about responsibility" do
+    rendered = render_inline(BidOpinionComponent.new(risk_count: 0, opportunity_count: 0)).to_s
+    assert_match(/입찰 권유가 아닙니다/, rendered)
+    assert_match(/모든 투자 결정의 책임은 사용자에게/, rendered)
   end
 
-  test "renders incomplete verdict" do
-    render_inline(BidOpinionComponent.new(
-      rating: :incomplete,
-      report: nil,
-      risk_results: [],
-      budget_setting: budget_settings(:completed),
-      property: properties(:safe_apartment)
-    ))
-    assert_text "분석이 완료되지 않았습니다"
-  end
-
-  test "renders key figures table" do
-    render_inline(BidOpinionComponent.new(
-      rating: :safe,
-      report: rights_analysis_reports(:safe_apartment_report),
-      risk_results: [],
-      budget_setting: budget_settings(:completed),
-      property: properties(:safe_apartment)
-    ))
-    assert_text "감정가"
-    assert_text "최저매각가격"
-    assert_text "인수금액"
-    assert_text "최대 입찰가"
-  end
-
-  test "renders without budget setting" do
-    render_inline(BidOpinionComponent.new(
-      rating: :safe,
-      report: rights_analysis_reports(:safe_apartment_report),
-      risk_results: [],
-      budget_setting: nil,
-      property: properties(:safe_apartment)
-    ))
-    assert_text "입찰 검토 가능합니다"
-    assert_text "감정가"
+  test "renders zero counts gracefully" do
+    rendered = render_inline(BidOpinionComponent.new(risk_count: 0, opportunity_count: 0)).to_s
+    assert_match(/위험 항목 0건/, rendered)
   end
 end

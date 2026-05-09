@@ -40,11 +40,8 @@
   <div class="mt-10 space-y-10">
     <%= render ReportSectionComponent.new(number: 1, title: "종합 판정", anchor: "verdict") do %>
       <%= render BidOpinionComponent.new(
-        rating: @rating,
-        report: @report,
-        risk_results: @risk_results,
-        budget_setting: @budget_setting,
-        property: @property
+        risk_count: @risk_results.size,
+        opportunity_count: @report&.opportunity_type.present? ? 1 : 0
       ) %>
     <% end %>
 
