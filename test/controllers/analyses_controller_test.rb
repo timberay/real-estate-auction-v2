@@ -65,12 +65,13 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
 
   # Task 4: manual action
   test "POST manual with valid JSON processes and redirects to inspection tab" do
+    # Property must already exist; service will find it by case_number from JSON
+    property = Property.create!(case_number: "2024타경12345")
     json_file = fixture_file_upload("test/fixtures/files/ai_inspection_response.json", "application/json")
 
     post manual_analyses_path, params: { json_file: json_file }
 
-    property = Property.find_by(case_number: "2024타경12345")
-    assert_not_nil property
+    property.reload
     assert_redirected_to edit_property_inspections_tab_path(property, tab_key: "rights_analysis")
     assert_equal "분석 결과가 저장되었습니다.", flash[:notice]
   end
@@ -83,6 +84,8 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "POST manual with json_text param processes pasted JSON" do
+    # Property must already exist; service will find it by case_number from JSON text
+    Property.create!(case_number: "2024타경PASTE")
     json_text = { "metadata" => { "case_number" => "2024타경PASTE" }, "results" => {} }.to_json
 
     post manual_analyses_path, params: { json_text: json_text }

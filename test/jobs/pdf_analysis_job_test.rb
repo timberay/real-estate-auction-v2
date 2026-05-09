@@ -6,7 +6,8 @@ class PdfAnalysisJobTest < ActiveSupport::TestCase
   setup do
     ENV["USE_MOCK"] = "true"
     @user = users(:guest)
-    @property = properties(:safe_apartment)
+    # Mock LLM returns case_number "2024타경12345"; property must match to pass mismatch check
+    @property = Property.create!(case_number: "2024타경12345")
     pdf_blob = ActiveStorage::Blob.create_and_upload!(
       io: StringIO.new("%PDF-1.4 test"),
       filename: "test.pdf",
