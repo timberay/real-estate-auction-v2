@@ -4,8 +4,10 @@ require "application_system_test_case"
 
 class LlmDataDisclosureTest < ApplicationSystemTestCase
   setup do
-    visit root_path  # establish guest session
-    @user = User.last
+    # Phase A removed lazy guest creation on root_path; protected pages now
+    # require an authenticated user. Sign in as a fixture non-guest user.
+    @user = users(:budget_user)
+    sign_in_as(@user)
 
     @property = Property.create!(case_number: "2026타경88001", court_name: "서울중앙지방법원")
     UserProperty.find_or_create_by!(user: @user, property: @property)

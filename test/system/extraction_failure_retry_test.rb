@@ -44,9 +44,17 @@ class ExtractionFailureRetryTest < ApplicationSystemTestCase
     sign_in_as(@user)
     visit edit_property_inspections_tab_path(@property, tab_key: "rights_analysis")
 
-    assert_enqueued_with(job: PdfAnalysisJob,
-                         args: [ { property_id: @property.id, user_id: @user.id } ]) do
+    # Use the block form so Capybara waits for the Turbo Stream response
+    # (toast text "분석을 다시 시작했습니다") before asserting on the job queue.
+    # Without this synchronization, CI can race the button submission and
+    # observe an empty queue. See Properties::AnalysisRetriesController#create.
+    assert_enqueued_jobs 1, only: PdfAnalysisJob do
       click_button "재시도"
+      assert_text "분석을 다시 시작했습니다", wait: 5
     end
+
+    enqueued_args = enqueued_jobs.find { |j| j[:job] == PdfAnalysisJob }[:args].first
+    assert_equal @property.id, enqueued_args["property_id"]
+    assert_equal @user.id, enqueued_args["user_id"]
   end
 end

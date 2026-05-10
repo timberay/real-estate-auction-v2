@@ -2,10 +2,12 @@ require "application_system_test_case"
 
 class CaseNumberFirstFlowTest < ApplicationSystemTestCase
   setup do
-    visit root_path  # establish guest session
-    @user = User.last
+    # Phase A removed lazy guest creation on root_path; protected pages now
+    # require an authenticated user. Sign in as a fixture non-guest user.
+    @user = users(:budget_user)
+    sign_in_as(@user)
 
-    # Give the guest user a property so the select has an option
+    # Give the user a property so the select has an option
     @property = Property.create!(case_number: "2026타경99001", court_name: "서울중앙지방법원")
     UserProperty.find_or_create_by!(user: @user, property: @property)
   end
