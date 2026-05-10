@@ -75,6 +75,7 @@ Rails.application.routes.draw do
     collection do
       get :prompt
       post :manual
+      get :history
     end
   end
 

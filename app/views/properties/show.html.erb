@@ -34,13 +34,21 @@
 
   <%= render CardComponent.new(title: "AI 분석") do %>
     <div class="space-y-4">
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-2">
         <%= link_to edit_property_inspections_tab_path(@property, tab_key: "rights_analysis"),
             class: "inline-flex items-center gap-1.5 h-10 rounded-md bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-400 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900" do %>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
           </svg>
           분석결과보기
+        <% end %>
+        <%# B15 / E-44: link to AI 분석 이력 (provider/model/executed_at/status). %>
+        <%= link_to history_analyses_path(property_id: @property.id),
+            class: "inline-flex items-center gap-1.5 h-10 rounded-md border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900" do %>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          분석 이력 보기
         <% end %>
       </div>
 

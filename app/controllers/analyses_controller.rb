@@ -71,6 +71,23 @@ class AnalysesController < ApplicationController
     redirect_to new_analysis_path(tab: "manual"), alert: "분석 결과 저장 중 오류가 발생했습니다: #{e.message}"
   end
 
+  # B15 / E-44: AI 분석 이력. List recent LlmAnalysisLog entries for a property
+  # the current user owns (provider / model / executed_at / status).
+  def history
+    property_id = params[:property_id].presence
+
+    unless property_id && current_user.user_properties.exists?(property_id: property_id)
+      redirect_to properties_path, alert: "해당 물건을 찾을 수 없습니다."
+      return
+    end
+
+    @property = Property.find(property_id)
+    @logs = @property.llm_analysis_logs
+      .where(user: current_user)
+      .order(Arel.sql("COALESCE(executed_at, created_at) DESC"))
+      .limit(50)
+  end
+
   def create
     property_id = params[:property_id].presence
 
