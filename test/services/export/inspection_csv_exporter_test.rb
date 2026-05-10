@@ -104,6 +104,15 @@ class Export::InspectionCsvExporterTest < ActiveSupport::TestCase
     assert_nil rows[1][10], "Expected blank 명도난이도 when no simulation"
   end
 
+  test "명도난이도 is blank when simulation exists but difficulty_level is nil" do
+    sim = EvictionSimulation.create!(property: @property, difficulty_level: nil, completed: false)
+    csv = Export::InspectionCsvExporter.new(property: @property, user: @user).to_csv
+    rows = CSV.parse(csv.delete_prefix("\xEF\xBB\xBF"))
+    assert_nil rows[1][10], "Expected blank 명도난이도 when difficulty_level is nil"
+  ensure
+    sim&.destroy
+  end
+
   # ---------------------------------------------------------------------------
   # Eviction difficulty label mapping
   # ---------------------------------------------------------------------------

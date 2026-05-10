@@ -45,7 +45,7 @@ module Export
         VERDICT_LABELS[verdict],
         report&.total_risk_amount,
         report ? report.effective_tenants.size : 0,
-        simulation ? DIFFICULTY_LABELS[simulation.difficulty_level] : nil,
+        simulation&.difficulty_level.then { |lvl| lvl ? DIFFICULTY_LABELS[lvl] : nil },
         report&.analyzed_at&.in_time_zone&.strftime("%Y-%m-%d %H:%M")
       ]
     end
