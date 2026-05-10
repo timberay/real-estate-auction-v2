@@ -20,13 +20,13 @@ class BudgetSettingTest < ActiveSupport::TestCase
     )
     bs = BudgetSetting.new(user: users(:guest), available_cash: 20000)
     assert_not bs.valid?
-    assert_includes bs.errors[:user_id], "has already been taken"
+    assert_includes bs.errors[:user_id], "은(는) 이미 사용 중입니다"
   end
 
   test "available_cash must be positive" do
     bs = BudgetSetting.new(user: users(:guest), available_cash: -100)
     assert_not bs.valid?
-    assert_includes bs.errors[:available_cash], "must be greater than 0"
+    assert_includes bs.errors[:available_cash], "은(는) 0보다 커야 합니다"
   end
 
   test "regulated_region? is true for Seoul and false otherwise" do
@@ -95,7 +95,7 @@ class BudgetSettingTest < ActiveSupport::TestCase
     BudgetSetting::RESERVE_FIELDS.each do |field|
       bs = BudgetSetting.new(user: users(:guest), available_cash: 30000, field => -100)
       assert_not bs.valid?, "expected #{field} = -100 to be invalid"
-      assert_includes bs.errors[field], "must be greater than or equal to 0"
+      assert_includes bs.errors[field], "은(는) 0 이상이어야 합니다"
     end
   end
 

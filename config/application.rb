@@ -29,5 +29,13 @@ module RealEstateAuction
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Default to Korean for all user-facing copy (validation messages,
+    # ActiveRecord attribute names, etc). Falls back to English when a
+    # translation is missing — this keeps the app functional during
+    # gradual locale rollout without exposing missing-translation strings.
+    config.i18n.default_locale = :ko
+    config.i18n.available_locales = [ :ko, :en ]
+    config.i18n.fallbacks = [ :en ]
   end
 end

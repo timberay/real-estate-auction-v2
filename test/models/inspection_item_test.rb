@@ -37,8 +37,8 @@ class InspectionItemTest < ActiveSupport::TestCase
   test "question and category are required" do
     item = InspectionItem.new(code: "test-002", tab: "rights_analysis", tab_position: 1, question: nil, category: nil, priority: "상")
     assert_not item.valid?
-    assert_includes item.errors[:question], "can't be blank"
-    assert_includes item.errors[:category], "can't be blank"
+    assert_includes item.errors[:question], "을(를) 입력해 주세요"
+    assert_includes item.errors[:category], "을(를) 입력해 주세요"
   end
 
   test "ordered scope returns items by tab and tab_position" do

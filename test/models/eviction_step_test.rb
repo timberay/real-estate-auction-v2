@@ -15,7 +15,7 @@ class EvictionStepTest < ActiveSupport::TestCase
       step_type: "main", name: "중복", description: "중복", position: 99
     )
     assert_not dup.valid?
-    assert_includes dup.errors[:code], "has already been taken"
+    assert_includes dup.errors[:code], "은(는) 이미 사용 중입니다"
   end
 
   test "step_type enum" do

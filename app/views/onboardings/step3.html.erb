@@ -10,9 +10,19 @@
          data-loan-slider-total-reserves-value="<%= @setting.total_reserves %>">
       <%= form_with model: @setting, url: step3_onboarding_path, method: :post, data: { turbo_frame: "_top" } do |f| %>
         <% if @setting.errors.any? %>
-          <div class="mb-4 p-3 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg text-sm">
+          <div class="mb-4 p-3 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg text-sm" role="alert">
             <% @setting.errors.full_messages.each do |msg| %>
-              <p><%= msg %></p>
+              <p class="font-medium"><%= msg %></p>
+            <% end %>
+            <% if @setting.errors[:loan_ratio].any? %>
+              <p class="mt-1 text-red-600 dark:text-red-400/80">
+                대출 비율(LTV)은 아래 슬라이더에서 0%~90% 사이로 조정해 주세요.
+              </p>
+            <% end %>
+            <% if @setting.errors[:available_cash].any? %>
+              <p class="mt-1 text-red-600 dark:text-red-400/80">
+                예비비 합계가 쓸 수 있는 현금을 넘지 않도록 1단계로 돌아가 금액을 다시 확인해 주세요.
+              </p>
             <% end %>
           </div>
         <% end %>

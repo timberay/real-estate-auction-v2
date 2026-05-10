@@ -26,7 +26,7 @@ class LoanPolicyTest < ActiveSupport::TestCase
       effective_date: Date.new(2026, 1, 1)
     )
     assert_not lp.valid?
-    assert_includes lp.errors[:loan_ratio], "must be less than or equal to 1"
+    assert_includes lp.errors[:loan_ratio], "은(는) 1 이하여야 합니다"
   end
 
   test "invalid without regulated_loan_ratio" do
@@ -36,7 +36,7 @@ class LoanPolicyTest < ActiveSupport::TestCase
       effective_date: Date.new(2026, 1, 1)
     )
     assert_not lp.valid?
-    assert_includes lp.errors[:regulated_loan_ratio], "can't be blank"
+    assert_includes lp.errors[:regulated_loan_ratio], "을(를) 입력해 주세요"
   end
 
   test "invalid with regulated_loan_ratio outside 0-1 range" do
@@ -46,7 +46,7 @@ class LoanPolicyTest < ActiveSupport::TestCase
       effective_date: Date.new(2026, 1, 1)
     )
     assert_not lp.valid?
-    assert_includes lp.errors[:regulated_loan_ratio], "must be less than or equal to 1"
+    assert_includes lp.errors[:regulated_loan_ratio], "은(는) 1 이하여야 합니다"
   end
 
   test "ratio_for(region) returns regulated ratio for Seoul, non-regulated otherwise" do
