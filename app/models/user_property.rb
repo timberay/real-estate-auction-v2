@@ -6,6 +6,9 @@ class UserProperty < ApplicationRecord
 
   has_many_attached :photos
 
+  REJECTED_IMAGE_TYPES = %w[image/svg+xml image/x-icon].freeze
+  MAX_PHOTO_SIZE = 10.megabytes
+
   validate :photos_must_be_images
 
   scope :ordered_for_list, -> { order(favorite: :desc, created_at: :desc) }
@@ -14,8 +17,12 @@ class UserProperty < ApplicationRecord
 
   def photos_must_be_images
     photos.each do |photo|
-      unless photo.content_type&.start_with?("image/")
+      if !photo.content_type&.start_with?("image/")
         errors.add(:photos, "이미지 파일만 업로드할 수 있습니다.")
+      elsif REJECTED_IMAGE_TYPES.include?(photo.content_type)
+        errors.add(:photos, "지원하지 않는 이미지 형식입니다. (SVG/ICO 제외)")
+      elsif photo.byte_size > MAX_PHOTO_SIZE
+        errors.add(:photos, "파일 크기는 10MB 이하로 업로드해 주세요.")
       end
     end
   end
