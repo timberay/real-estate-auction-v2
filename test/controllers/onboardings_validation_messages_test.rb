@@ -44,5 +44,4 @@ class OnboardingsValidationMessagesTest < ActionDispatch::IntegrationTest
     # Actionable hint: tells the user that loan_ratio is bound to the slider.
     assert_match(/슬라이더/, body)
   end
-
 end
