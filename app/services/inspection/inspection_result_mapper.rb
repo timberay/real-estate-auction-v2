@@ -22,6 +22,12 @@ module Inspection
 
         next result if result.persisted? && result.manual?
 
+        # E-16/E-18: never overwrite a persisted AI judgment once the user has
+        # confirmed the rights-analysis report. The report becomes the
+        # source-of-truth at confirmation time; re-analysis after that point
+        # would silently destroy the user's reviewed decision.
+        next result if result.persisted? && result.ai? && report_confirmed?
+
         ai_result = results[item.code]
         if ai_result.nil?
           result.assign_attributes(source_type: nil, has_risk: nil, evidence: nil)
@@ -63,8 +69,10 @@ module Inspection
           )
         end
 
-        # Server-side: override AI result for non-applicable property types
-        if @property_type.present? && item.applicable_types.present? && !item.applicable_for?(@property_type)
+        # Server-side: override AI result for non-applicable property types.
+        # Skip when the report is already confirmed (E-16/E-18).
+        if @property_type.present? && item.applicable_types.present? && !item.applicable_for?(@property_type) &&
+            !(result.persisted? && result.ai? && report_confirmed?)
           original_reasoning = ai_result&.dig("reasoning")
           override_reasoning = "해당 물건은 #{@property_type}이므로 이 항목(#{item.applicable_types.join('·')} 전용)은 직접 확인이 필요합니다."
           override_reasoning += " AI 의견: #{original_reasoning}" if original_reasoning.present?
@@ -80,9 +88,27 @@ module Inspection
           )
         end
 
+        # Snapshot the prior AI state before persisting an overwrite, so
+        # veterans can recover their previous reading. Only snapshot when
+        # there is real prior state (persisted AI result) AND attributes are
+        # actually changing — avoids no-op version rows.
+        if result.persisted? && result.source_type_was == "ai" && result.changed?
+          # Snapshot uses the in-database (was-) values, not the new ones.
+          previous = InspectionResult.find(result.id)
+          previous.snapshot_version!
+        end
+
         result.save!
         result
       end
+    end
+
+    private
+
+    def report_confirmed?
+      return @report_confirmed if defined?(@report_confirmed)
+      report = RightsAnalysisReport.find_by(user: @user, property: @property)
+      @report_confirmed = report.present? && report.user_confirmed_at.present?
     end
   end
 end
