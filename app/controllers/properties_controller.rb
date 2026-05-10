@@ -6,7 +6,7 @@ class PropertiesController < ApplicationController
 
   def index
     @user_properties = current_user.user_properties
-      .includes(property: :inspection_results)
+      .includes(property: [ :inspection_results, :next_auction_schedule ])
       .ordered_for_list
     @user_properties = @user_properties.where(safety_rating: params[:safety_rating]) if params[:safety_rating].present?
     if params[:search].present?
