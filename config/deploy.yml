@@ -22,9 +22,11 @@ servers:
 #
 # Don't use this when deploying to multiple web servers (then you have to terminate SSL at your load balancer).
 #
-# proxy:
-#   ssl: true
-#   host: app.example.com
+# OPERATOR: replace <REPLACE_BEFORE_DEPLOY> with the real domain before the first `kamal deploy`.
+# Also ensure APP_HOST is set to the same value in .kamal/secrets (or your secrets manager) so Rails boots.
+proxy:
+  ssl: true
+  host: <REPLACE_BEFORE_DEPLOY>
 
 # Where you keep your container images.
 registry:
@@ -42,6 +44,7 @@ registry:
 env:
   secret:
     - RAILS_MASTER_KEY
+    - APP_HOST
   clear:
     RAILS_RELATIVE_URL_ROOT: /real-estate-auction
 
