@@ -32,19 +32,6 @@
     </div>
   <% end %>
 
-  <%= render CardComponent.new(title: "내 메모 / 임장 노트") do %>
-    <div class="space-y-4">
-      <%= render "properties/user_property_settings/notes_display",
-            user_property: @user_property, property: @property %>
-
-      <div class="border-t border-slate-200 dark:border-slate-700 pt-4">
-        <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">임장 사진</h4>
-        <%= render "properties/photos/photos",
-              user_property: @user_property, property: @property %>
-      </div>
-    </div>
-  <% end %>
-
   <%= render CardComponent.new(title: "AI 분석") do %>
     <div class="space-y-4">
       <div class="flex flex-wrap items-center gap-2">
@@ -75,6 +62,19 @@
           <%= render LlmDataDisclosureComponent.new %>
           <%= render "analyses/manual_form" %>
         </div>
+      </div>
+    </div>
+  <% end %>
+
+  <%= render CardComponent.new(title: "내 메모 / 임장 노트") do %>
+    <div class="space-y-4">
+      <%= render "properties/user_property_settings/notes_display",
+            user_property: @user_property, property: @property %>
+
+      <div class="border-t border-slate-200 dark:border-slate-700 pt-4">
+        <h4 class="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">임장 사진</h4>
+        <%= render "properties/photos/photos",
+              user_property: @user_property, property: @property %>
       </div>
     </div>
   <% end %>
