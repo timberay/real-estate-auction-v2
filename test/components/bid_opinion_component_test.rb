@@ -26,4 +26,12 @@ class BidOpinionComponentTest < ViewComponent::TestCase
     rendered = render_inline(BidOpinionComponent.new(risk_count: 0, opportunity_count: 0)).to_s
     assert_match(/위험 항목 0건/, rendered)
   end
+
+  test "B28: renders 추정치 framing alongside responsibility statement" do
+    rendered = render_inline(BidOpinionComponent.new(risk_count: 2, opportunity_count: 0)).to_s
+
+    # Both halves of the spread-disclaimer should appear on every prediction surface
+    assert_match(/추정치/, rendered)
+    assert_match(/투자 결정의 (최종 )?책임은 사용자에게/, rendered)
+  end
 end

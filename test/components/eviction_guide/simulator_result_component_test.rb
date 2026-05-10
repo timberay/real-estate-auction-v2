@@ -60,6 +60,18 @@ module EvictionGuide
       assert_text "기본 난이도와 추가 위험 중 더 높은 쪽이 최종 난이도"
     end
 
+    test "renders compact legal disclaimer about user responsibility (B28)" do
+      simulation = EvictionSimulation.new(
+        occupant_type: "junior_tenant",
+        difficulty_level: "low",
+        result_path: []
+      )
+
+      rendered = render_inline(SimulatorResultComponent.new(simulation: simulation)).to_s
+
+      assert_match(/투자 결정의 (최종 )?책임은 사용자에게/, rendered)
+    end
+
     test "uses caller-provided breakdown without re-running the assessor" do
       breakdown = EvictionGuide::DifficultyAssessor::Result.new(
         level: "high",

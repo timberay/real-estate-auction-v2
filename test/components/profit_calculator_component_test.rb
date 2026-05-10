@@ -106,4 +106,14 @@ class ProfitCalculatorComponentTest < ViewComponent::TestCase
 
     assert_selector "[data-controller='tooltip'][data-tooltip-content-value='수선비·취득세 등은 양도세 계산 시 차감 가능']"
   end
+
+  test "renders compact legal disclaimer about user responsibility (B28)" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget,
+      report: @report
+    )).to_s
+
+    assert_match(/투자 결정의 (최종 )?책임은 사용자에게/, rendered)
+  end
 end
