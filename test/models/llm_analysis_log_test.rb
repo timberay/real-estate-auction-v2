@@ -104,6 +104,23 @@ class LlmAnalysisLogTest < ActiveSupport::TestCase
     assert_equal({ "secret" => "value" }, log.response_json)
   end
 
+  test "status_label returns Korean label for each status" do
+    log = LlmAnalysisLog.new(
+      property: @property,
+      system_prompt: "test",
+      user_prompt: "test"
+    )
+
+    log.status = :pending
+    assert_equal "진행 중", log.status_label
+
+    log.status = :completed
+    assert_equal "완료", log.status_label
+
+    log.status = :failed
+    assert_equal "실패", log.status_label
+  end
+
   test "latest_for scope returns most recent completed log" do
     older = LlmAnalysisLog.create!(
       property: @property, system_prompt: "s", user_prompt: "u",
