@@ -95,4 +95,21 @@ class InspectionTabsComponent < ViewComponent::Base
     palette = GRADE_BUTTON_CLASSES[tab[:rating]] || GRADE_DEFAULT_CLASSES
     palette[tab[:active] ? :active : :inactive]
   end
+
+  # Plain-text label for the mobile <select>. <option> can't render badges, so
+  # we fold the rating badge label and progress count into the option text.
+  def mobile_option_label(tab)
+    parts = []
+    if (badge = rating_badge(tab[:rating]))
+      parts << "[#{badge[:label]}]"
+    end
+    parts << tab[:label]
+    if tab[:total].to_i > 0
+      parts << "(#{tab[:checked]}/#{tab[:total]})"
+    end
+    if tab[:partial]
+      parts << "(진행 중)"
+    end
+    parts.join(" ")
+  end
 end

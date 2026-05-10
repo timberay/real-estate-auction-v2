@@ -1,4 +1,18 @@
-<nav id="inspection-tabs-nav" class="mb-4 overflow-x-auto">
+<%# Mobile (< sm): a single <select> avoids horizontal scroll on narrow viewports. %>
+<div class="block sm:hidden mb-4" data-controller="tab-select">
+  <select class="w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100"
+          data-action="change->tab-select#navigate"
+          aria-label="섹션 선택">
+    <% tabs.each do |tab| %>
+      <option value="<%= tab[:url] %>" <%= "selected" if tab[:active] %>>
+        <%= mobile_option_label(tab) %>
+      </option>
+    <% end %>
+  </select>
+</div>
+
+<%# Desktop (sm and up): keep the horizontal tab strip. %>
+<nav id="inspection-tabs-nav" class="hidden sm:block mb-4 overflow-x-auto">
   <div class="flex items-center gap-1 text-sm min-w-max">
     <% tabs.each do |tab| %>
       <% if tab[:key] == "grade" %>
