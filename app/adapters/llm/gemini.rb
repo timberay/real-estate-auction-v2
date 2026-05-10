@@ -25,7 +25,7 @@ module Llm
       model = model_id
       conn = connection(base_url)
       response = conn.post("/v1beta/models/#{model}:generateContent") do |req|
-        req.params["key"] = key
+        req.headers["x-goog-api-key"] = key
         req.body = {
           system_instruction: { parts: [ { text: system } ] },
           contents: [ { parts: content_parts } ],

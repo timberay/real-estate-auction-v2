@@ -22,7 +22,7 @@ class Llm::GeminiTest < ActiveSupport::TestCase
     ENV["GEMINI_API_KEY"] = "test-key"
 
     stub = stub_request(:post, "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")
-      .with(query: { "key" => "test-key" })
+      .with(headers: { "x-goog-api-key" => "test-key" })
       .to_return(status: 200, body: @api_response.to_json, headers: { "Content-Type" => "application/json" })
 
     result = @adapter.analyze(system: "system", prompt: "user")
@@ -37,7 +37,7 @@ class Llm::GeminiTest < ActiveSupport::TestCase
     ENV["GEMINI_API_KEY"] = "test-key"
 
     stub_request(:post, "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")
-      .with(query: { "key" => "test-key" })
+      .with(headers: { "x-goog-api-key" => "test-key" })
       .to_return(status: 400, body: '{"error": "bad request"}', headers: { "Content-Type" => "application/json" })
 
     assert_raises(RuntimeError) { @adapter.analyze(system: "test", prompt: "test") }
