@@ -5,6 +5,11 @@ module Properties
     before_action :set_user_property
     before_action :set_report
 
+    def show_base_right_date
+      render partial: "properties/rights_analysis_reports/base_right_date",
+             locals: { report: @report, property: @property }
+    end
+
     def edit_base_right_date
       render partial: "properties/rights_analysis_reports/edit_base_right_date_form",
              locals: { report: @report, property: @property }

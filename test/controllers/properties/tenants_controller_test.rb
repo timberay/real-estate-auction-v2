@@ -90,4 +90,23 @@ class Properties::TenantsControllerTest < ActionDispatch::IntegrationTest
       params: { tenant: { deposit: 1_000_000 } }
     assert_response :not_found
   end
+
+  # Show — cancel restores display row inside turbo frame
+  test "GET show returns 200 and wraps row in tenant-row-N turbo frame" do
+    get property_report_tenant_path(@property, 0)
+    assert_response :success
+    assert_select "turbo-frame[id='tenant-row-0']"
+    assert_select "turbo-frame[id='tenant-row-0'] .rounded-lg"
+  end
+
+  test "unauthenticated GET show redirects to login" do
+    delete auth_logout_path
+    get property_report_tenant_path(@property, 0)
+    assert_redirected_to auth_login_path
+  end
+
+  test "GET show with out-of-bounds index returns 404" do
+    get property_report_tenant_path(@property, 99)
+    assert_response :not_found
+  end
 end

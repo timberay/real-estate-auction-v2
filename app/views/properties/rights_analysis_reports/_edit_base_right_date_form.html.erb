@@ -10,7 +10,7 @@
       <%= f.submit "저장",
             class: "rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700" %>
       <%= link_to "취소",
-            edit_property_inspections_tab_path(property, tab_key: "rights_analysis"),
+            base_right_date_property_report_path(property),
             class: "text-xs text-slate-600 dark:text-slate-400 hover:underline",
             data: { turbo_frame: "base-right-date" } %>
     </div>

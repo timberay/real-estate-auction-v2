@@ -30,7 +30,7 @@
       <%= f.submit "저장",
             class: "rounded bg-blue-600 px-3 py-1 text-sm font-medium text-white hover:bg-blue-700" %>
       <%= link_to "취소",
-            edit_property_inspections_tab_path(property, tab_key: "rights_analysis"),
+            property_report_tenant_path(property, index),
             class: "rounded border border-slate-300 dark:border-slate-600 px-3 py-1 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700",
             data: { turbo_frame: "tenant-row-#{index}" } %>
     </div>

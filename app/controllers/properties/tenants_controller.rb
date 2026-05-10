@@ -6,6 +6,10 @@ module Properties
     before_action :set_report
     before_action :set_tenant_index
 
+    def show
+      @tenant = @report.effective_tenants[@tenant_index]
+    end
+
     def edit
       @tenant = @report.effective_tenants[@tenant_index]
     end
