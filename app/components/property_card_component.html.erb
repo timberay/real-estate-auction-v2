@@ -53,6 +53,15 @@
           </span>
           <span class="font-medium text-slate-700 dark:text-slate-300"><%= formatted_price(@property.min_bid_price) %></span>
         </div>
+        <% if (info = helpers.next_auction_schedule_info(@property)) %>
+          <div class="flex items-center justify-between text-sm" data-property-card="next-auction">
+            <span class="text-slate-500 dark:text-slate-400">다음 매각기일</span>
+            <span class="flex items-center gap-1.5">
+              <span class="font-medium text-slate-700 dark:text-slate-300"><%= info[:date].strftime("%Y.%m.%d") %></span>
+              <span class="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-semibold <%= info[:dday_class] %>"><%= info[:dday_text] %></span>
+            </span>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>
