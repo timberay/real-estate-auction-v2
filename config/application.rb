@@ -27,7 +27,8 @@ module RealEstateAuction
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # All user-facing date/time arithmetic (e.g., 매각기일 D-day) targets KST.
+    config.time_zone = "Asia/Seoul"
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Default to Korean for all user-facing copy (validation messages,
