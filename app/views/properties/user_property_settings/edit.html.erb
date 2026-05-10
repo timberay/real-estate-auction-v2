@@ -1,0 +1,30 @@
+<turbo-frame id="user-property-notes-edit">
+  <%= form_with model: @user_property,
+        url: property_user_property_settings_path(@property),
+        method: :patch do |f| %>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" for="user_property_notes">메모</label>
+        <%= f.text_area :notes,
+              id: "user_property_notes",
+              rows: 5,
+              placeholder: "예) OO부동산 사장님 010-1234-5678 시세 8.5억",
+              class: "w-full rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400" %>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" for="user_property_inspection_visited_on">임장 일자</label>
+        <%= f.date_field :inspection_visited_on,
+              id: "user_property_inspection_visited_on",
+              class: "rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" %>
+      </div>
+      <div class="flex gap-2">
+        <%= f.submit "저장",
+              class: "rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" %>
+        <%= link_to "취소",
+              property_path(@property),
+              class: "rounded border border-slate-300 dark:border-slate-600 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700",
+              data: { turbo_frame: "user-property-notes-edit" } %>
+      </div>
+    </div>
+  <% end %>
+</turbo-frame>

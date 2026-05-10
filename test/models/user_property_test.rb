@@ -54,4 +54,83 @@ class UserPropertyTest < ActiveSupport::TestCase
     assert_equal non_favorited.sort_by { |up| -up.created_at.to_i }, non_favorited,
       "non-favorited items should be ordered by created_at desc"
   end
+
+  test "notes and inspection_visited_on persist correctly" do
+    up = user_properties(:guest_safe_apartment)
+    up.update!(notes: "OO부동산 010-1234-5678 시세 8.5억", inspection_visited_on: Date.new(2026, 5, 10))
+
+    up.reload
+    assert_equal "OO부동산 010-1234-5678 시세 8.5억", up.notes
+    assert_equal Date.new(2026, 5, 10), up.inspection_visited_on
+  end
+
+  test "notes can be blank" do
+    up = user_properties(:guest_safe_apartment)
+    up.update!(notes: nil, inspection_visited_on: nil)
+    assert up.valid?
+  end
+
+  test "non-image photo attachment is invalid" do
+    up = user_properties(:guest_safe_apartment)
+    up.photos.attach(
+      io: StringIO.new("not an image"),
+      filename: "bad.txt",
+      content_type: "text/plain"
+    )
+    assert_not up.valid?
+    assert_includes up.errors[:photos], "이미지 파일만 업로드할 수 있습니다."
+  end
+
+  test "image photo attachment is valid" do
+    up = user_properties(:guest_safe_apartment)
+    up.photos.attach(
+      io: StringIO.new("fake png data"),
+      filename: "photo.png",
+      content_type: "image/png"
+    )
+    assert up.valid?
+  end
+
+  test "SVG photo attachment is invalid" do
+    up = user_properties(:guest_safe_apartment)
+    up.photos.attach(
+      io: StringIO.new("<svg><script>alert(1)</script></svg>"),
+      filename: "evil.svg",
+      content_type: "image/svg+xml"
+    )
+    assert_not up.valid?
+    assert_includes up.errors[:photos], "지원하지 않는 이미지 형식입니다. (SVG/ICO 제외)"
+  end
+
+  test "ICO photo attachment is invalid" do
+    up = user_properties(:guest_safe_apartment)
+    up.photos.attach(
+      io: StringIO.new("fake ico data"),
+      filename: "favicon.ico",
+      content_type: "image/x-icon"
+    )
+    assert_not up.valid?
+    assert_includes up.errors[:photos], "지원하지 않는 이미지 형식입니다. (SVG/ICO 제외)"
+  end
+
+  test "oversized photo attachment is invalid" do
+    up = user_properties(:guest_safe_apartment)
+    up.photos.attach(
+      io: StringIO.new("x" * (11 * 1024 * 1024)),
+      filename: "large.png",
+      content_type: "image/png"
+    )
+    assert_not up.valid?
+    assert_includes up.errors[:photos], "파일 크기는 10MB 이하로 업로드해 주세요."
+  end
+
+  test "photo exactly at 10MB limit is valid" do
+    up = user_properties(:guest_safe_apartment)
+    up.photos.attach(
+      io: StringIO.new("x" * (10 * 1024 * 1024)),
+      filename: "exact.png",
+      content_type: "image/png"
+    )
+    assert up.valid?
+  end
 end

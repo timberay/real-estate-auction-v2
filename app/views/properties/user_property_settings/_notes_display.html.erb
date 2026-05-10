@@ -1,0 +1,22 @@
+<turbo-frame id="user-property-notes-edit">
+  <% if user_property.notes.present? || user_property.inspection_visited_on.present? %>
+    <div class="space-y-2">
+      <% if user_property.notes.present? %>
+        <p class="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap"><%= user_property.notes %></p>
+      <% end %>
+      <% if user_property.inspection_visited_on.present? %>
+        <p class="text-sm text-slate-500 dark:text-slate-400">
+          임장일: <span class="text-slate-700 dark:text-slate-300 font-medium"><%= user_property.inspection_visited_on.strftime("%Y.%m.%d") %></span>
+        </p>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-sm text-slate-400 dark:text-slate-500">메모 없음</p>
+  <% end %>
+  <div class="mt-3">
+    <%= link_to "메모 편집",
+          edit_property_user_property_settings_path(property),
+          class: "text-sm text-blue-600 dark:text-blue-400 hover:underline",
+          data: { turbo_frame: "user-property-notes-edit" } %>
+  </div>
+</turbo-frame>
