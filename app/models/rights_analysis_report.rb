@@ -40,4 +40,30 @@ class RightsAnalysisReport < ApplicationRecord
   rescue JSON::ParserError
     {}
   end
+
+  # Persists user-supplied corrections to a single tenant entry.
+  # NOTE: Does not re-run RightsValidator — derived fields (opposing_power,
+  # priority_rank) retain their AI-computed values and may be stale after edit.
+  # The next AI analysis run will recompute them. Rows edited here are flagged
+  # with "user_edited": true so reviewers know the AI value was overridden.
+  def update_tenant!(index, attrs)
+    data = parsed_data&.deep_dup || {}
+    tenants = data.dig("calculated", "tenants") || data["tenants"] || []
+    raise IndexError, "tenant index #{index} out of bounds (size #{tenants.size})" if index >= tenants.size
+
+    tenants[index] = tenants[index].merge(
+      "deposit"         => attrs[:deposit].present? ? Integer(attrs[:deposit]) : tenants[index]["deposit"],
+      "move_in_date"    => attrs[:move_in_date].presence || tenants[index]["move_in_date"],
+      "confirmed_date"  => attrs[:confirmed_date].presence || tenants[index]["confirmed_date"],
+      "user_edited"     => true
+    )
+
+    if data.dig("calculated", "tenants")
+      data["calculated"]["tenants"] = tenants
+    else
+      data["tenants"] = tenants
+    end
+
+    update!(report_data: data)
+  end
 end
