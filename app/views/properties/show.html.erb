@@ -35,13 +35,18 @@
           </svg>
           분석결과보기
         <% end %>
-        <%= link_to new_analysis_path(property_id: @property.id),
-            class: "inline-flex items-center gap-1.5 h-10 rounded-md bg-slate-100 px-4 text-sm font-medium text-slate-700 hover:bg-slate-200 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:bg-slate-700 dark:text-slate-300 dark:hover:bg-slate-600 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900" do %>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-          </svg>
-          다시분석
-        <% end %>
+      </div>
+
+      <%# B14 / E-43: inline AI 수동분석 등록 — replaces the standalone /analyses/new redirect. %>
+      <div class="space-y-3 border-t border-slate-200 dark:border-slate-700 pt-4">
+        <h3 class="font-semibold text-slate-900 dark:text-slate-100">AI 수동분석 등록</h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400">
+          아래 프롬프트를 복사해 ChatGPT·Claude·Gemini에 PDF와 함께 입력한 뒤, 받은 JSON 결과를 업로드하세요.
+        </p>
+        <div data-controller="analysis-tabs" data-analysis-tabs-prompt-url-value="<%= prompt_analyses_path %>">
+          <%= render LlmDataDisclosureComponent.new %>
+          <%= render "analyses/manual_form" %>
+        </div>
       </div>
     </div>
   <% end %>
