@@ -1,8 +1,20 @@
 <%= render layout: "inspections/layout", locals: { property: @property, user_property: @user_property, active_tab: "grade" } do %>
   <% has_risks = @risk_results.any? %>
+  <% beginner_mode = current_user&.beginner_mode? %>
 
   <%# ===== Status banner (above section 1) ===== %>
   <%= render GradeSummaryComponent.new(rating: @rating, fully_evaluated: @fully_evaluated, tabs_evaluated: @tabs_evaluated, tabs_total: @tabs_total, compact: true) %>
+
+  <%# ===== B24 / B-18: Beginner-mode order guide callout ===== %>
+  <% if beginner_mode %>
+    <div class="rounded-lg border-l-4 border-blue-500 bg-blue-50 dark:bg-blue-900/20 p-4 mt-4 text-sm" role="note">
+      <p class="font-semibold text-blue-900 dark:text-blue-100">초심자라면 1·2·3 순서로 보세요</p>
+      <p class="mt-1 text-blue-800 dark:text-blue-200">
+        1️⃣ 종합 판정 → 2️⃣ 물건 기본 정보 → 3️⃣ 순수익 계산기 순서로 살펴본 뒤,
+        4번 이하는 필요할 때 차례로 보면 됩니다.
+      </p>
+    </div>
+  <% end %>
 
   <%# ===== A7: Incomplete-input warning banner ===== %>
   <% if @rating == :incomplete && @unanswered_high_priority_count > 0 %>
@@ -38,18 +50,30 @@
 
   <%# ===== Numbered report sections ===== %>
   <div class="mt-10 space-y-10">
-    <%= render ReportSectionComponent.new(number: 1, title: "종합 판정", anchor: "verdict") do %>
+    <%= render ReportSectionComponent.new(
+      number: 1, title: "종합 판정", anchor: "verdict",
+      beginner_mode: beginner_mode,
+      beginner_summary: "이 물건이 안전한지 한 눈에 확인하는 핵심 카드입니다."
+    ) do %>
       <%= render BidOpinionComponent.new(
         risk_count: @risk_results.size,
         opportunity_count: @report&.opportunity_type.present? ? 1 : 0
       ) %>
     <% end %>
 
-    <%= render ReportSectionComponent.new(number: 2, title: "물건 기본 정보", anchor: "property") do %>
+    <%= render ReportSectionComponent.new(
+      number: 2, title: "물건 기본 정보", anchor: "property",
+      beginner_mode: beginner_mode,
+      beginner_summary: "주소·가격·매각기일 등 매물의 기본 정보입니다."
+    ) do %>
       <%= render PropertyInfoComponent.new(property: @property, show_title: false) %>
     <% end %>
 
-    <%= render ReportSectionComponent.new(number: 3, title: "순수익 계산기", anchor: "profit") do %>
+    <%= render ReportSectionComponent.new(
+      number: 3, title: "순수익 계산기", anchor: "profit",
+      beginner_mode: beginner_mode,
+      beginner_summary: "낙찰가를 입력하면 예상 순수익을 자동 계산합니다."
+    ) do %>
       <%= render ProfitCalculatorComponent.new(
         property: @property,
         budget_setting: @budget_setting,
@@ -58,27 +82,47 @@
       ) %>
     <% end %>
 
-    <%= render ReportSectionComponent.new(number: 4, title: "탭별 평가 요약", anchor: "tabs") do %>
+    <%= render ReportSectionComponent.new(
+      number: 4, title: "탭별 평가 요약", anchor: "tabs",
+      beginner_mode: beginner_mode,
+      beginner_summary: "각 카테고리(권리·세금·명도)별 안전 등급 요약입니다."
+    ) do %>
       <%= render TabSummaryTableComponent.new(results_by_tab: @results_by_tab, property: @property) %>
     <% end %>
 
     <% if has_risks %>
-      <%= render ReportSectionComponent.new(number: 5, title: "위험 항목 상세", anchor: "risks") do %>
+      <%= render ReportSectionComponent.new(
+        number: 5, title: "위험 항목 상세", anchor: "risks",
+        beginner_mode: beginner_mode,
+        beginner_summary: "발견된 위험 항목들의 자세한 설명과 권장 대응입니다."
+      ) do %>
         <%= render RiskItemsListComponent.new(risk_results: @risk_results) %>
       <% end %>
     <% end %>
 
-    <%= render ReportSectionComponent.new(number: (has_risks ? 6 : 5), title: "권리 분석 리포트", anchor: "rights") do %>
+    <%= render ReportSectionComponent.new(
+      number: (has_risks ? 6 : 5), title: "권리 분석 리포트", anchor: "rights",
+      beginner_mode: beginner_mode,
+      beginner_summary: "등기부등본 기반 권리 시점·금액 분석입니다."
+    ) do %>
       <%= render RightsReportSectionComponent.new(report: @report, property: @property, show_title: false) %>
     <% end %>
 
     <% if has_risks %>
-      <%= render ReportSectionComponent.new(number: 7, title: "전문가 상담 가이드", anchor: "consultation") do %>
+      <%= render ReportSectionComponent.new(
+        number: 7, title: "전문가 상담 가이드", anchor: "consultation",
+        beginner_mode: beginner_mode,
+        beginner_summary: "이 항목은 전문가와 상의해 결정하는 게 안전합니다."
+      ) do %>
         <%= render ConsultationGuideComponent.new(risk_results: @risk_results, show_title: false) %>
       <% end %>
     <% end %>
 
-    <%= render ReportSectionComponent.new(number: (has_risks ? 8 : 6), title: "명도 시나리오", anchor: "eviction") do %>
+    <%= render ReportSectionComponent.new(
+      number: (has_risks ? 8 : 6), title: "명도 시나리오", anchor: "eviction",
+      beginner_mode: beginner_mode,
+      beginner_summary: "낙찰 후 점유자에게 인도받기까지 예상 절차와 비용입니다."
+    ) do %>
       <div class="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
         <div class="flex items-center justify-between gap-3">
           <div>
