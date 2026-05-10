@@ -39,7 +39,10 @@ class AuctionBackup
         next
       end
 
-      ok = system("sqlite3 #{Shellwords.escape(src)} \".backup #{Shellwords.escape(dst)}\"")
+      # src is escaped at the shell level; dst is single-quoted for sqlite3's
+      # own dot-command parser, which splits on spaces and does NOT understand
+      # backslash-escaped spaces (only single-quoted args work there).
+      ok = system("sqlite3 #{Shellwords.escape(src)} \".backup '#{dst}'\"")
       raise "sqlite3 .backup failed for #{src}" unless ok
 
       verify_integrity!(dst)

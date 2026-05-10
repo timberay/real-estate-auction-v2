@@ -143,31 +143,37 @@ class AuctionBackupTest < ActiveSupport::TestCase
     assert Dir.exist?(boundary_dir), "13-day-old dir should be kept"
   end
 
-  # --- Path with spaces (Shellwords.escape coverage) ---
+  # --- Path with spaces (sqlite3 dot-command single-quote coverage) ---
 
-  test "backup succeeds when tmpdir path contains spaces" do
-    spaced_source = Dir.mktmpdir("auction backup source") # name has a space
-    spaced_target = Dir.mktmpdir("auction backup target")
+  test "backup succeeds when target path contains a space" do
+    # Dir.mktmpdir's prefix is sanitized on Linux (spaces stripped), so we must
+    # build the space-containing path explicitly. The *destination* (base_dir)
+    # flows into the sqlite3 .backup dot-command — that is what we are testing.
+    parent = Dir.mktmpdir("auction_space_test")
+    base_with_space = File.join(parent, "auction backup root")
+    FileUtils.mkdir_p(base_with_space)
+
     begin
       BACKUP_DBS.each do |db_name|
-        path = File.join(spaced_source, "#{db_name}.sqlite3")
+        path = File.join(@source_dir, "#{db_name}.sqlite3")
+        # Source DBs are already created in setup; skip if already present.
+        next if File.exist?(path)
+
         SQLite3::Database.new(path) do |db|
           db.execute("CREATE TABLE IF NOT EXISTS _healthcheck (id INTEGER PRIMARY KEY)")
         end
       end
 
-      clock = fixed_clock(Time.new(2026, 5, 11, 4, 0, 0))
-      backup = AuctionBackup.new(base_dir: spaced_target, storage_dir: spaced_source, clock: clock)
-
-      assert_nothing_raised { backup.call }
+      clock = fixed_clock(Time.new(2026, 5, 12, 4, 0, 0)) # Tuesday
+      backup = AuctionBackup.new(base_dir: base_with_space, storage_dir: @source_dir, clock: clock)
+      result = backup.call
 
       BACKUP_DBS.each do |db_name|
-        assert Dir.glob(File.join(spaced_target, "**", "#{db_name}.sqlite3")).any?,
-               "Expected #{db_name}.sqlite3 in backup tree under #{spaced_target}"
+        path = File.join(result, "#{db_name}.sqlite3")
+        assert File.exist?(path), "backup file should be created in space-containing path: #{path}"
       end
     ensure
-      FileUtils.rm_rf(spaced_source)
-      FileUtils.rm_rf(spaced_target)
+      FileUtils.rm_rf(parent)
     end
   end
 
