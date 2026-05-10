@@ -94,6 +94,27 @@ class Export::InspectionCsvExporterTest < ActiveSupport::TestCase
     assert_nil rows[1][11], "Expected blank 분석일시 when no report"
   end
 
+  test "분석일시 is formatted as YYYY-MM-DD HH:MM when report exists" do
+    travel_to Time.zone.parse("2026-05-10 12:34:56") do
+      report = RightsAnalysisReport.create!(
+        property: @property,
+        user: @user,
+        base_right_type: "근저당",
+        base_right_date: "2024-01-15",
+        base_right_holder: "은행",
+        assumed_amount: 0,
+        total_risk_amount: 0,
+        verdict: 0,
+        analyzed_at: Time.current
+      )
+      csv = Export::InspectionCsvExporter.new(property: @property, user: @user).to_csv
+      rows = CSV.parse(csv.delete_prefix("\xEF\xBB\xBF"))
+      assert_match(/\A\d{4}-\d{2}-\d{2} \d{2}:\d{2}\z/, rows[1][11], "분석일시 should be formatted as YYYY-MM-DD HH:MM")
+    ensure
+      report&.destroy
+    end
+  end
+
   # ---------------------------------------------------------------------------
   # Missing eviction_simulation → blank difficulty
   # ---------------------------------------------------------------------------
