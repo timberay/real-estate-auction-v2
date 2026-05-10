@@ -66,7 +66,7 @@ Rails.application.routes.draw do
     post "analyses/retry", to: "properties/analysis_retries#create", as: :analysis_retry
     resource :rights_analysis_report, only: [], as: :report, module: :properties do
       resources :tenants, only: [ :edit, :update ]
-      get  :edit_base_right_date, to: "rights_analysis_reports#edit_base_right_date"
+      get :edit_base_right_date, to: "rights_analysis_reports#edit_base_right_date"
       patch :base_right_date, to: "rights_analysis_reports#update_base_right_date"
     end
     namespace :inspections do
