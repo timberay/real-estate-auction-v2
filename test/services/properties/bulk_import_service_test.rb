@@ -165,6 +165,14 @@ module Properties
       assert_equal "2026타채0001", rows.first.case_number
     end
 
+    test "case number with internal whitespace is normalized" do
+      raw = "서울중앙지방법원 2026 타경 1234"
+      rows = parse_input(raw)
+      assert_equal 1, rows.size
+      assert_equal "2026타경1234", rows.first.case_number
+      assert_nil rows.first.error_message
+    end
+
     private
 
     def parse_input(input)

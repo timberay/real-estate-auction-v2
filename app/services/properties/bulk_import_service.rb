@@ -59,7 +59,7 @@ module Properties
 
       if parts.size == 2
         court_name = parts[0].strip
-        case_number_candidate = parts[1].strip
+        case_number_candidate = parts[1].strip.gsub(/\s+/, "")
         if CASE_NUMBER_PATTERN.match?(case_number_candidate)
           return Row.new(
             line_number: line_number, raw: raw,
