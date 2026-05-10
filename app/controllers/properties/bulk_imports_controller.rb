@@ -16,7 +16,7 @@ module Properties
 
     def bulk_input_text
       if (file = params[:csv_file]).present?
-        file.read.force_encoding("UTF-8")
+        file.read.force_encoding("UTF-8").delete_prefix("\xEF\xBB\xBF")
       else
         params[:bulk_input].to_s
       end

@@ -76,5 +76,24 @@ module Properties
       assert result.succeeded.empty?
       assert result.failed.empty?
     end
+
+    test "POST /properties/bulk_import with BOM-prefixed CSV strips BOM and parses correctly" do
+      stub_request(:post, ENDPOINT).to_return(status: 200, body: @fixture)
+
+      bom = "\xEF\xBB\xBF".b.force_encoding("UTF-8")
+      csv_content = "#{bom}법원,사건번호\n제주지방법원,2022타경564\n"
+      csv_file = Rack::Test::UploadedFile.new(
+        StringIO.new(csv_content),
+        "text/csv",
+        original_filename: "cases_with_bom.csv"
+      )
+
+      post bulk_import_properties_url, params: { csv_file: csv_file }
+
+      result = assigns(:result)
+      assert_equal 0, result.failed.count { |r| r.error_message&.include?("형식 오류") },
+        "BOM-prefixed header should be skipped, not treated as a format error"
+      assert result.succeeded.any?
+    end
   end
 end
