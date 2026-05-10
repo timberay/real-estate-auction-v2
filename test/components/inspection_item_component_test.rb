@@ -32,6 +32,30 @@ class InspectionItemComponentTest < ViewComponent::TestCase
     assert_text logic["no"]
   end
 
+  test "logic labels are localized to Korean (예 선택 시 / 아니오 선택 시)" do
+    result = inspection_results(:safe_apartment_rights_002)
+    render_inline(InspectionItemComponent.new(result: result))
+
+    assert_text "예 선택 시:"
+    assert_text "아니오 선택 시:"
+    # English labels should no longer be visible to the user.
+    assert_no_text(/^Yes:/)
+    assert_no_text(/^No:/)
+  end
+
+  test "edit-mode override radios use Korean labels (예/아니오 with safe/위험 hint)" do
+    # safe_apartment_rights_002 has source_type: auto and yes_means_safe: true, so when
+    # show_resolution is enabled, edit mode renders override radios with normal polarity
+    # labels (Yes => 안전, No => 위험).
+    result = inspection_results(:safe_apartment_rights_002)
+    render_inline(InspectionItemComponent.new(result: result, show_resolution: true))
+
+    assert_text "예 (안전)"
+    assert_text "아니오 (위험)"
+    assert_no_text "Yes (안전)"
+    assert_no_text "No (위험)"
+  end
+
   test "highlights selected answer — yes when has_risk is false" do
     result = inspection_results(:safe_apartment_rights_002)
     assert_equal false, result.has_risk
