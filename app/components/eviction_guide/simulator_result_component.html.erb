@@ -51,6 +51,9 @@
     이 결과는 시뮬레이션이며, 실제 명도 작업은 반드시 법률 전문가와 상담 후 진행하세요.
   </div>
 
+  <%# Spread legal disclaimer (B28, E-37) %>
+  <%= render LegalDisclaimerComponent.new(compact: true) %>
+
   <%# Action CTAs %>
   <div class="flex flex-wrap items-center justify-end gap-3 print:hidden" data-controller="print">
     <button type="button"

@@ -203,4 +203,7 @@
   <div class="p-3 bg-amber-100 dark:bg-amber-900/10 border border-amber-400 dark:border-amber-800 rounded-lg text-sm text-amber-800 dark:text-amber-300">
     이 계산은 추정치이며 실제 세금과 다를 수 있습니다. 정확한 세금은 세무사에게 상담하세요. 양도소득세는 소유형태와 보유기간에 따른 실효세율로 간이 계산한 값입니다.
   </div>
+
+  <%# ===== Spread legal disclaimer (B28, E-37) ===== %>
+  <%= render LegalDisclaimerComponent.new(compact: true) %>
 </div>

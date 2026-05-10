@@ -4,6 +4,7 @@
     <div class="logo-accent"></div>
     <h1>경매 분석 리포트</h1>
     <p class="subtitle"><%= [@property.court_name.presence, @property.case_number].compact.join(" ") %> | 생성일: <%= Date.current.strftime("%Y년 %m월 %d일") %></p>
+    <p class="cover-disclaimer">⚠️ 본 보고서는 참고용이며 투자 결정의 최종 책임은 사용자에게 있습니다.</p>
   </div>
 
   <%# ===== Verdict Section ===== %>

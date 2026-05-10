@@ -2,4 +2,7 @@
   <h3 class="font-semibold text-zinc-900 dark:text-zinc-100"><%= headline %></h3>
   <p class="mt-1 text-sm text-zinc-700 dark:text-zinc-300">본인 판단 필요. 베테랑/공인중개사 상담을 권장합니다.</p>
   <p class="mt-2 text-xs text-zinc-600 dark:text-zinc-400"><%= disclaimer %></p>
+
+  <%# Spread legal disclaimer (B28, E-37) — adds 추정치 framing on top of the responsibility line %>
+  <%= render LegalDisclaimerComponent.new(compact: true) %>
 </div>
