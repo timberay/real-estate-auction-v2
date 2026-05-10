@@ -8,6 +8,18 @@ module Properties
     end
 
     def update
+      @user_property.update!(user_property_params)
+
+      respond_to do |format|
+        format.turbo_stream do
+          render turbo_stream: turbo_stream.replace(
+            "user-property-notes-edit",
+            partial: "properties/user_property_settings/notes_display",
+            locals: { user_property: @user_property, property: @property }
+          )
+        end
+        format.html { redirect_to property_path(@property) }
+      end
     end
 
     private
