@@ -11,6 +11,8 @@
 
   <%= form_with url: bulk_import_properties_path, method: :post, multipart: true do |f| %>
     <div class="space-y-4">
+      <%= f.label :bulk_input, "법원,사건번호 목록 (최대 50건)",
+          class: "block mb-1.5 text-sm font-medium text-slate-700 dark:text-slate-300" %>
       <%= f.text_area :bulk_input, rows: 12,
           placeholder: "예시:\n서울중앙지방법원,2026타경1234\n수원지방법원,2025타경5678",
           class: "w-full rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 font-mono" %>
@@ -21,6 +23,8 @@
         <div class="flex-1 border-t border-slate-200 dark:border-slate-600"></div>
       </div>
 
+      <%= f.label :csv_file, "CSV 파일 업로드",
+          class: "block mb-1.5 text-sm font-medium text-slate-700 dark:text-slate-300" %>
       <%= f.file_field :csv_file, accept: ".csv,.txt",
           class: "block text-sm text-slate-500 dark:text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-slate-100 file:text-slate-700 dark:file:bg-slate-700 dark:file:text-slate-300 hover:file:bg-slate-200 dark:hover:file:bg-slate-600" %>
 

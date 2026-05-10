@@ -22,6 +22,13 @@ module Properties
       assert_nil assigns(:result)
     end
 
+    test "GET /properties/bulk_import renders accessible labels for textarea and file inputs" do
+      get bulk_import_properties_url
+      assert_response :success
+      assert_select "label[for=bulk_input]"
+      assert_select "label[for=csv_file]"
+    end
+
     test "POST /properties/bulk_import with valid input returns 200 and renders success count" do
       stub_request(:post, ENDPOINT).to_return(status: 200, body: @fixture)
 
