@@ -36,4 +36,13 @@ class SharedErrorPageTest < ActionView::TestCase
     assert_match(/문의/, rendered)
     assert_match(/@/, rendered, "support contact must include an email-like target")
   end
+
+  test "support contact is not the placeholder address" do
+    flash = ActionDispatch::Flash::FlashHash.new
+    flash[:alert] = "오류"
+    rendered = render(template: "shared/error", layout: false, locals: { flash: flash })
+
+    refute_match(/@example\.com/, rendered,
+      "support email must be a real ops address before launch (B21 follow-up)")
+  end
 end
