@@ -35,7 +35,9 @@ module EvictionGuide
       ))
 
       assert_selector "[data-test='branch-indicator']"
-      assert_text "분기 경로"
+      assert_text "추가 확인 — 답에 따라 절차가 달라져요"
+      assert_no_text "분기 경로 진입"
+      assert_no_text "리스크 확인 질문"
       assert_no_selector "[data-test='main-progress']"
     end
   end
