@@ -1,5 +1,12 @@
 <div class="space-y-4">
-  <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">등기부 타임라인</h3>
+  <div class="flex items-center justify-between">
+    <h3 class="text-base font-semibold text-slate-900 dark:text-slate-100">등기부 타임라인</h3>
+    <% if @report.base_right_date.present? && @property %>
+      <turbo-frame id="base-right-date">
+        <%= render "properties/rights_analysis_reports/base_right_date", report: @report, property: @property %>
+      </turbo-frame>
+    <% end %>
+  </div>
 
   <% if @timeline.any? || @tenants.any? %>
     <div class="relative pl-6 border-l-2 border-slate-200 dark:border-slate-700 ml-2 space-y-4">

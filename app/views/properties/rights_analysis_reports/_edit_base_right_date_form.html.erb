@@ -1,0 +1,18 @@
+<div class="rounded-lg border border-blue-400 bg-blue-50 dark:border-blue-600 dark:bg-blue-900/20 px-3 py-2">
+  <%= form_with url: base_right_date_property_report_path(property),
+        method: :patch,
+        data: { turbo_frame: "base-right-date" } do |f| %>
+    <div class="flex items-center gap-2">
+      <label class="text-xs text-slate-600 dark:text-slate-400 whitespace-nowrap" for="rights_analysis_report_base_right_date">말소기준일</label>
+      <%= date_field_tag "rights_analysis_report[base_right_date]", report.base_right_date,
+            id: "rights_analysis_report_base_right_date",
+            class: "rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-0.5 text-sm text-slate-900 dark:text-slate-100" %>
+      <%= f.submit "저장",
+            class: "rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700" %>
+      <%= link_to "취소",
+            edit_property_inspections_tab_path(property, tab_key: "rights_analysis"),
+            class: "text-xs text-slate-600 dark:text-slate-400 hover:underline",
+            data: { turbo_frame: "base-right-date" } %>
+    </div>
+  <% end %>
+</div>
