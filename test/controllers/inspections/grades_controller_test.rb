@@ -49,4 +49,27 @@ class Inspections::GradesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_equal "application/pdf", response.content_type
   end
+
+  test "show responds to CSV format with correct content type" do
+    get property_inspections_grade_url(@property, format: :csv)
+    assert_response :success
+    assert_match %r{text/csv}, response.content_type
+  end
+
+  test "CSV response has attachment disposition with correct filename" do
+    travel_to Time.zone.parse("2026-05-10 12:00:00") do
+      get property_inspections_grade_url(@property, format: :csv)
+    end
+    assert_response :success
+    disposition = response.headers["Content-Disposition"]
+    assert_match "attachment", disposition
+    assert_match "2026-05-10.csv", disposition
+    assert_match @property.case_number, URI.decode_www_form_component(disposition)
+  end
+
+  test "CSV response body starts with UTF-8 BOM" do
+    get property_inspections_grade_url(@property, format: :csv)
+    assert_response :success
+    assert response.body.start_with?("\xEF\xBB\xBF"), "Expected UTF-8 BOM at start of CSV body"
+  end
 end
