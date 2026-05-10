@@ -22,4 +22,8 @@ class RegistryTimelineComponent < ViewComponent::Base
     return "—" if amount.nil?
     amount.to_fs(:delimited) + "원"
   end
+
+  def amount_type_hint(amount_type)
+    AmountTypeHints.for(amount_type)
+  end
 end

@@ -17,7 +17,15 @@
                 </div>
                 <span class="text-sm text-slate-500 dark:text-slate-400"><%= right["date"] %></span>
               </div>
-              <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">채권액: <%= format_amount(right["amount"]) %></div>
+              <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                채권액: <%= format_amount(right["amount"]) %>
+                <% if right["amount_type"].present? %>
+                  <% hint = amount_type_hint(right["amount_type"]) %>
+                  <span class="ml-1 text-xs" <%= hint ? "title=\"#{hint}\"".html_safe : "".html_safe %>>
+                    (<%= right["amount_type"] %>)
+                  </span>
+                <% end %>
+              </div>
             </div>
           </div>
         <% else %>

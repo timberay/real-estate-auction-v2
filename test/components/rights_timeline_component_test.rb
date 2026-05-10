@@ -78,4 +78,55 @@ class RightsTimelineComponentTest < ViewComponent::TestCase
     render_inline(RightsTimelineComponent.new(report: report))
     assert_text "권리 설정 내역이 없습니다"
   end
+
+  test "renders amount_type label next to amount when present" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => {
+        "rights_timeline" => [
+          { "date" => "2024-01-15", "type" => "근저당권", "holder" => "○○은행",
+            "amount" => 200_000_000, "amount_type" => "채권최고액", "extinguished_on_sale" => true }
+        ]
+      },
+      "calculated" => { "tenants" => [] },
+      "discrepancies" => []
+    }
+    render_inline(RightsTimelineComponent.new(report: report))
+    assert_text "채권최고액"
+  end
+
+  test "shows tooltip hint for 채권최고액" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => {
+        "rights_timeline" => [
+          { "date" => "2024-01-15", "type" => "근저당권", "holder" => "○○은행",
+            "amount" => 200_000_000, "amount_type" => "채권최고액", "extinguished_on_sale" => true }
+        ]
+      },
+      "calculated" => { "tenants" => [] },
+      "discrepancies" => []
+    }
+    render_inline(RightsTimelineComponent.new(report: report))
+    assert_selector "[title*='실제 채권액과 다를 수 있']"
+  end
+
+  test "renders amount without label when amount_type is nil" do
+    report = rights_analysis_reports(:safe_apartment_report)
+    report.report_data = {
+      "llm_raw" => {
+        "rights_timeline" => [
+          { "date" => "2024-01-15", "type" => "근저당권", "holder" => "○○은행",
+            "amount" => 200_000_000, "extinguished_on_sale" => true }
+        ]
+      },
+      "calculated" => { "tenants" => [] },
+      "discrepancies" => []
+    }
+    render_inline(RightsTimelineComponent.new(report: report))
+    assert_no_text "채권최고액"
+    assert_no_text "원금"
+    assert_no_text "청구금액"
+    refute_match(/nil/i, page.text)
+  end
 end

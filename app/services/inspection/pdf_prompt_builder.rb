@@ -58,7 +58,14 @@ module Inspection
         위 3개 필드 중 하나라도 채울 수 없다면 opportunity_type을 "hug_waiver"로 분류하지 말고 null로 두세요. hug_waiver 이외의 opportunity_type에는 적용되지 않습니다.
       - tenants: 임차인 배열. 각 항목은 { name, deposit(원), move_in_date(YYYY-MM-DD), confirmed_date(YYYY-MM-DD 또는 null, 확정일자), opposing_power(boolean, 참고용 — 서버에서 재계산), priority_rank(정수, 참고용 — 서버에서 재계산), dividend_requested(boolean | null, 배당요구 신청 여부) }
       - 임차인의 dividend_requested는 매각물건명세서 "배당요구일자/배당요구여부" 칼럼을 우선으로 추출하세요. 등기부에는 없으니 명세서가 없는 경우 null 처리합니다.
-      - rights_timeline: 권리 설정 내역 배열. 각 항목은 { date(YYYY-MM-DD), type, holder, amount(원), extinguished_on_sale(boolean) }
+      - rights_timeline: 권리 설정 내역 배열. 각 항목은 { date(YYYY-MM-DD), type, holder, amount(원), amount_type, extinguished_on_sale(boolean) }
+      - amount_type: amount가 어떤 종류의 금액인지 구분하는 라벨. 다음 중 하나로 반환하세요:
+        - "채권최고액": 근저당권·근질권 등에서 등기부에 명시된 최고 한도 (실제 채권액과 다를 수 있음, 보통 110~120%)
+        - "원금": 등기부에 원금이 명시된 경우
+        - "청구금액": 가압류·압류·강제경매개시결정 등 소장·결정문에 기재된 청구금액
+        - "확정채권액": 확정·확약된 채권액
+        - "기타": 위 분류에 해당하지 않거나 불명확한 경우
+      - rights_timeline의 각 항목에 대해 amount_type을 반드시 명시하세요. 근저당의 amount는 일반적으로 채권최고액(실제 채권액 대비 110~120%)이므로 그대로 인수금액 산정에 사용하면 부풀려질 수 있습니다. 가능하면 등기부의 명시 표현(예: "채권최고액 1억 5천만원")을 따르고, 불분명하면 "기타"로 표기하세요.
       - reasoning: 분석 과정과 판단 근거를 단계적으로 서술하세요 (Chain of Thought). 어떤 권리가 말소되고 어떤 권리가 인수되는지 명시적으로 설명하세요.
       - checklist_references: 관련된 점검항목 코드 배열 (예: ["rights-002"])
 
@@ -110,7 +117,7 @@ module Inspection
           "opportunity_page_number": null | 5,
           "opportunity_quote": null | "권리포기 의사를 드러내는 원문 문장 (의역 금지, 50-200자)",
           "tenants": [{ "name": "...", "deposit": 0, "move_in_date": "YYYY-MM-DD", "confirmed_date": "YYYY-MM-DD", "opposing_power": true, "priority_rank": 1, "dividend_requested": true }],
-          "rights_timeline": [{ "date": "YYYY-MM-DD", "type": "...", "holder": "...", "amount": 0, "extinguished_on_sale": true }],
+          "rights_timeline": [{ "date": "YYYY-MM-DD", "type": "...", "holder": "...", "amount": 0, "amount_type": "채권최고액", "extinguished_on_sale": true }],
           "reasoning": "...",
           "checklist_references": ["..."]
         }
