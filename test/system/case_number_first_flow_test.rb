@@ -15,8 +15,8 @@ class CaseNumberFirstFlowTest < ApplicationSystemTestCase
   test "analysis page defaults to manual tab when auto tab is disabled" do
     visit new_analysis_path
 
-    # Manual tab panel is visible (manual analysis form shows)
-    assert_text "AI 수동분석이란?"
+    # Manual tab panel is visible (manual analysis stepper shows)
+    assert_text "프롬프트 복사"
     # Auto panel is not visible
     assert_no_text "분석할 물건을 먼저 선택하세요"
   end
