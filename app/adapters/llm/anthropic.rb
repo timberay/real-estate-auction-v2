@@ -2,7 +2,7 @@ module Llm
   class Anthropic < Base
     DEFAULT_BASE_URL = "https://api.anthropic.com"
     DEFAULT_MODEL = "claude-sonnet-4-20250514"
-    DEFAULT_MAX_TOKENS = 8192
+    DEFAULT_MAX_TOKENS = 16384
     DEFAULT_API_VERSION = "2023-06-01"
 
     def provider_name
@@ -36,6 +36,7 @@ module Llm
         }
       end
       handle_response(response)
+      detect_truncation(response.body)
       sanitize_and_parse_json(response.body["content"][0]["text"])
     end
 
@@ -51,6 +52,18 @@ module Llm
 
     def api_version
       ENV.fetch("ANTHROPIC_API_VERSION", DEFAULT_API_VERSION)
+    end
+
+    # Fail fast when Anthropic stops generation because it ran out of token
+    # budget. Without this, downstream `sanitize_and_parse_json` would crash on
+    # incomplete JSON with a confusing parser error instead of pointing at the
+    # real cause.
+    def detect_truncation(body)
+      return unless body.is_a?(Hash) && body["stop_reason"] == "max_tokens"
+
+      raise Llm::Errors::ResponseTruncated,
+        "Anthropic response truncated at max_tokens=#{max_tokens}. " \
+        "Increase ANTHROPIC_MAX_TOKENS or reduce prompt size."
     end
 
     def build_user_content(prompt, encoded_pdfs)

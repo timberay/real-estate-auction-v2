@@ -82,4 +82,59 @@ class Llm::AnthropicTest < ActiveSupport::TestCase
   ensure
     ENV["ANTHROPIC_API_KEY"] = original_key
   end
+
+  test "DEFAULT_MAX_TOKENS is 16384 to fit 89-item inspection + rights_analysis output" do
+    assert_equal 16384, Llm::Anthropic::DEFAULT_MAX_TOKENS
+  end
+
+  test "sends max_tokens=16384 in request body by default" do
+    original_key = ENV["ANTHROPIC_API_KEY"]
+    original_max = ENV["ANTHROPIC_MAX_TOKENS"]
+    ENV["ANTHROPIC_API_KEY"] = "test-key"
+    ENV.delete("ANTHROPIC_MAX_TOKENS")
+
+    stub = stub_request(:post, "https://api.anthropic.com/v1/messages")
+      .with { |req| JSON.parse(req.body)["max_tokens"] == 16384 }
+      .to_return(status: 200, body: @api_response.to_json, headers: { "Content-Type" => "application/json" })
+
+    @adapter.analyze(system: "test", prompt: "test")
+    assert_requested stub
+  ensure
+    ENV["ANTHROPIC_API_KEY"] = original_key
+    ENV["ANTHROPIC_MAX_TOKENS"] = original_max
+  end
+
+  test "raises ResponseTruncated when stop_reason is max_tokens" do
+    original_key = ENV["ANTHROPIC_API_KEY"]
+    ENV["ANTHROPIC_API_KEY"] = "test-key"
+
+    truncated_response = {
+      "content" => [ { "text" => '{"partial":' } ],
+      "stop_reason" => "max_tokens",
+      "role" => "assistant"
+    }
+    stub_request(:post, "https://api.anthropic.com/v1/messages")
+      .to_return(status: 200, body: truncated_response.to_json, headers: { "Content-Type" => "application/json" })
+
+    error = assert_raises(Llm::Errors::ResponseTruncated) do
+      @adapter.analyze(system: "test", prompt: "test")
+    end
+    assert_match(/max_tokens/, error.message)
+  ensure
+    ENV["ANTHROPIC_API_KEY"] = original_key
+  end
+
+  test "parses normally when stop_reason is end_turn" do
+    original_key = ENV["ANTHROPIC_API_KEY"]
+    ENV["ANTHROPIC_API_KEY"] = "test-key"
+
+    normal_response = @api_response.merge("stop_reason" => "end_turn")
+    stub_request(:post, "https://api.anthropic.com/v1/messages")
+      .to_return(status: 200, body: normal_response.to_json, headers: { "Content-Type" => "application/json" })
+
+    result = @adapter.analyze(system: "test", prompt: "test")
+    assert_equal true, result["results"]["rights-002"]["has_risk"]
+  ensure
+    ENV["ANTHROPIC_API_KEY"] = original_key
+  end
 end
