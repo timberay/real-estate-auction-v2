@@ -1,7 +1,7 @@
 <% content_for(:page_title, "내 물건") %>
 
 <%# app/views/properties/index.html.erb %>
-<div class="space-y-6" data-controller="property-compare">
+<div class="space-y-6 pb-20" data-controller="property-compare">
   <div class="flex items-start justify-between gap-4 flex-wrap">
     <%= render "case_number_form", setting: @setting %>
     <%= link_to "여러 건 한 번에 추가 →", bulk_import_properties_path,
@@ -94,7 +94,9 @@
        data-property-compare-target="actionBar">
     <div class="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
       <span class="text-sm font-medium text-slate-700 dark:text-slate-300"
-            data-property-compare-target="count">선택한 0건</span>
+            data-property-compare-target="count"
+            role="status"
+            aria-live="polite">선택한 0건</span>
       <div class="flex items-center gap-2">
         <button type="button"
                 data-action="click->property-compare#clear"
