@@ -31,6 +31,7 @@ module Inspections
       respond_to do |format|
         format.html
         format.pdf { send_report_pdf }
+        format.csv { send_report_csv }
       end
     end
 
@@ -41,6 +42,12 @@ module Inspections
       pdf_binary = PdfExportService.call(html: html)
       filename = "경매분석리포트_#{@property.case_number}_#{Date.current}.pdf"
       send_data pdf_binary, filename: filename, type: "application/pdf", disposition: "attachment"
+    end
+
+    def send_report_csv
+      csv_data = Export::InspectionCsvExporter.new(property: @property, user: current_user).to_csv
+      filename = "경매분석리포트_#{@property.case_number}_#{Date.current}.csv"
+      send_data csv_data, filename: filename, type: "text/csv; charset=utf-8", disposition: "attachment"
     end
   end
 end

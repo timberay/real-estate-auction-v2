@@ -144,6 +144,11 @@
         data: { turbo: false } do %>
       PDF 다운로드
     <% end %>
+    <%= link_to property_inspections_grade_path(@property, format: :csv),
+        class: "flex-1 rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm font-semibold text-center text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors",
+        data: { turbo: false } do %>
+      CSV 다운로드
+    <% end %>
     <%= link_to "목록으로 돌아가기", properties_path, class: "flex-1 rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm font-semibold text-center text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" %>
   </div>
 <% end %>
