@@ -1,11 +1,67 @@
 class PdfAnalysisJob < ApplicationJob
   queue_as :default
 
-  RETRY_WAIT = ENV.fetch("PDF_ANALYSIS_RETRY_WAIT_SECONDS", 5).to_i.seconds
-  RETRY_ATTEMPTS = ENV.fetch("PDF_ANALYSIS_RETRY_ATTEMPTS", 2).to_i
+  retry_on Faraday::TimeoutError, attempts: 3, wait: :polynomially_longer do |job, error|
+    user_id = job.arguments.first&.dig(:user_id)
+    Rails.logger.error({
+      event: "pdf_analysis_job.timeout_exhausted",
+      job_id: job.job_id,
+      arguments: { user_id: user_id },
+      error_class: error.class.name,
+      error_message: error.message
+    }.to_json)
+    job.send(:broadcast_failure_for_user, user_id, "AI 서버가 응답하지 않습니다. 잠시 후 다시 시도해주세요.")
+  end
 
-  retry_on Faraday::TimeoutError, wait: RETRY_WAIT, attempts: RETRY_ATTEMPTS
-  discard_on ActiveJob::DeserializationError
+  retry_on ActiveRecord::ConnectionTimeoutError, attempts: 5, wait: 1.minute do |job, error|
+    user_id = job.arguments.first&.dig(:user_id)
+    Rails.logger.error({
+      event: "pdf_analysis_job.db_connection_exhausted",
+      job_id: job.job_id,
+      arguments: { user_id: user_id },
+      error_class: error.class.name,
+      error_message: error.message
+    }.to_json)
+    job.send(:broadcast_failure_for_user, user_id, "데이터베이스 연결 오류로 분석이 실패했습니다. 다시 시도해주세요.")
+  end
+
+  discard_on ActiveJob::DeserializationError do |job, error|
+    Rails.logger.error({
+      event: "pdf_analysis_job.deserialization_discard",
+      job_id: job.job_id,
+      error_class: error.class.name,
+      error_message: error.message
+    }.to_json)
+  end
+
+  discard_on JSON::ParserError do |job, error|
+    _log_data_error(job, error, event: "pdf_analysis_job.json_parse_discard")
+    job.send(:broadcast_failure_for_user, job.arguments.first&.dig(:user_id),
+             "AI 응답을 분석할 수 없습니다. 잠시 후 다시 시도해주세요.")
+  end
+
+  discard_on PdfAnalysisService::CaseNumberMismatchError do |job, error|
+    _log_data_error(job, error, event: "pdf_analysis_job.case_number_mismatch_discard")
+    job.send(:broadcast_failure_for_user, job.arguments.first&.dig(:user_id),
+             "PDF에서 추출된 사건번호가 선택한 물건과 다릅니다. 올바른 PDF인지 확인해주세요.")
+  end
+
+  discard_on PdfAnalysisService::CaseNumberMissingError do |job, error|
+    _log_data_error(job, error, event: "pdf_analysis_job.case_number_missing_discard")
+    job.send(:broadcast_failure_for_user, job.arguments.first&.dig(:user_id),
+             "사건번호를 먼저 입력해 주세요.")
+  end
+
+  def self._log_data_error(job, error, event:)
+    user_id = job.arguments.first&.dig(:user_id)
+    Rails.logger.warn({
+      event: event,
+      job_id: job.job_id,
+      arguments: { user_id: user_id },
+      error_class: error.class.name,
+      error_message: error.message
+    }.to_json)
+  end
 
   def perform(property_id: nil, user_id:, document_blob_ids: nil)
     @user = User.find(user_id)
@@ -25,21 +81,53 @@ class PdfAnalysisJob < ApplicationJob
         action_label: "결과 보기")
       broadcast_indicator(active: false)
     else
-      broadcast_toast(result.error, :danger)
-      broadcast_indicator(active: false)
+      broadcast_failure(result.error)
     end
-  rescue Faraday::TimeoutError => e
-    Rails.logger.error "[PdfAnalysisJob] Timeout: #{e.message}"
-    broadcast_toast("AI 서버 응답 시간이 초과되었습니다. 자동 재시도됩니다.", :danger)
-    broadcast_indicator(active: false)
+  rescue ActiveRecord::RecordNotFound => e
+    Rails.logger.warn({
+      event: "pdf_analysis_job.record_not_found",
+      job_id: job_id,
+      arguments: { property_id:, user_id:, document_blob_ids: },
+      error_class: e.class.name,
+      error_message: e.message
+    }.to_json)
+    broadcast_failure("요청한 자료를 찾을 수 없습니다.")
+  rescue JSON::ParserError,
+         PdfAnalysisService::CaseNumberMismatchError,
+         PdfAnalysisService::CaseNumberMissingError,
+         Faraday::TimeoutError,
+         ActiveRecord::ConnectionTimeoutError
     raise
   rescue => e
-    Rails.logger.error "[PdfAnalysisJob] Failed: #{e.message}"
-    broadcast_toast("분석 중 오류가 발생했습니다: #{e.message}", :danger)
-    broadcast_indicator(active: false)
+    Rails.logger.error({
+      event: "pdf_analysis_job.unexpected_error",
+      job_id: job_id,
+      arguments: { property_id:, user_id:, document_blob_ids: },
+      error_class: e.class.name,
+      error_message: e.message
+    }.to_json)
+    broadcast_failure("분석 중 오류가 발생했습니다. 문제가 지속되면 고객센터에 문의해주세요.")
   end
 
   private
+
+  def broadcast_failure(message)
+    broadcast_toast(message, :danger)
+    broadcast_indicator(active: false)
+  end
+
+  # Called from retry_on/discard_on class-level blocks where @user is not set.
+  # Looks up the user by id from the job arguments to obtain the channel name.
+  def broadcast_failure_for_user(user_id, message)
+    return unless user_id
+
+    @user = User.find_by(id: user_id)
+    return unless @user
+
+    broadcast_failure(message)
+  rescue => e
+    Rails.logger.error "[PdfAnalysisJob] broadcast_failure_for_user failed: #{e.message}"
+  end
 
   def channel_name
     "user_notifications_#{@user.id}"
