@@ -1,5 +1,6 @@
 require "sqlite3"
 require "fileutils"
+require "shellwords"
 
 class AuctionBackup
   class IntegrityError < StandardError; end
@@ -38,7 +39,7 @@ class AuctionBackup
         next
       end
 
-      ok = system("sqlite3 #{src} \".backup '#{dst}'\"")
+      ok = system("sqlite3 #{Shellwords.escape(src)} \".backup #{Shellwords.escape(dst)}\"")
       raise "sqlite3 .backup failed for #{src}" unless ok
 
       verify_integrity!(dst)
@@ -67,7 +68,7 @@ class AuctionBackup
   def prune_older_than(dir, days)
     return unless Dir.exist?(dir)
 
-    cutoff = Time.now - (days * 24 * 3600)
+    cutoff = @clock.current - (days * 24 * 3600)
     Dir.each_child(dir) do |entry|
       full_path = File.join(dir, entry)
       next unless File.directory?(full_path)

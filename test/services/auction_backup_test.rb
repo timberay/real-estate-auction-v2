@@ -84,7 +84,8 @@ class AuctionBackupTest < ActiveSupport::TestCase
   # --- Rotation ---
 
   test "rotation removes daily subdirs older than 14 days" do
-    clock = fixed_clock(Time.new(2026, 5, 11, 4, 0, 0))
+    frozen_now = Time.new(2026, 5, 11, 4, 0, 0)
+    clock = fixed_clock(frozen_now)
     backup = AuctionBackup.new(base_dir: @tmpdir, storage_dir: @source_dir, clock: clock)
 
     # Create fake old and recent daily dirs
@@ -93,8 +94,8 @@ class AuctionBackupTest < ActiveSupport::TestCase
     FileUtils.mkdir_p(old_dir)
     FileUtils.mkdir_p(recent_dir)
 
-    old_time = Time.now - (15 * 24 * 3600) # 15 days ago
-    recent_time = Time.now - (3 * 24 * 3600) # 3 days ago
+    old_time = frozen_now - (15 * 24 * 3600) # 15 days before frozen clock
+    recent_time = frozen_now - (3 * 24 * 3600) # 3 days before frozen clock
     File.utime(old_time, old_time, old_dir)
     File.utime(recent_time, recent_time, recent_dir)
 
@@ -105,7 +106,8 @@ class AuctionBackupTest < ActiveSupport::TestCase
   end
 
   test "rotation removes weekly subdirs older than 28 days" do
-    clock = fixed_clock(Time.new(2026, 5, 11, 4, 0, 0))
+    frozen_now = Time.new(2026, 5, 11, 4, 0, 0)
+    clock = fixed_clock(frozen_now)
     backup = AuctionBackup.new(base_dir: @tmpdir, storage_dir: @source_dir, clock: clock)
 
     old_dir = File.join(@tmpdir, "weekly", "20260405-040000")
@@ -113,8 +115,8 @@ class AuctionBackupTest < ActiveSupport::TestCase
     FileUtils.mkdir_p(old_dir)
     FileUtils.mkdir_p(recent_dir)
 
-    old_time = Time.now - (29 * 24 * 3600) # 29 days ago
-    recent_time = Time.now - (5 * 24 * 3600) # 5 days ago
+    old_time = frozen_now - (29 * 24 * 3600) # 29 days before frozen clock
+    recent_time = frozen_now - (5 * 24 * 3600) # 5 days before frozen clock
     File.utime(old_time, old_time, old_dir)
     File.utime(recent_time, recent_time, recent_dir)
 
@@ -125,19 +127,75 @@ class AuctionBackupTest < ActiveSupport::TestCase
   end
 
   test "rotation keeps daily dirs that are under 14 days old (boundary)" do
-    clock = fixed_clock(Time.new(2026, 5, 11, 4, 0, 0))
+    frozen_now = Time.new(2026, 5, 11, 4, 0, 0)
+    clock = fixed_clock(frozen_now)
     backup = AuctionBackup.new(base_dir: @tmpdir, storage_dir: @source_dir, clock: clock)
 
     boundary_dir = File.join(@tmpdir, "daily", "20260428-040000")
     FileUtils.mkdir_p(boundary_dir)
 
-    # 13 days old — should be kept (cutoff is > 14 days)
-    boundary_time = Time.now - (13 * 24 * 3600)
+    # 13 days before frozen clock — should be kept (cutoff is > 14 days)
+    boundary_time = frozen_now - (13 * 24 * 3600)
     File.utime(boundary_time, boundary_time, boundary_dir)
 
     backup.rotate
 
     assert Dir.exist?(boundary_dir), "13-day-old dir should be kept"
+  end
+
+  # --- Path with spaces (Shellwords.escape coverage) ---
+
+  test "backup succeeds when tmpdir path contains spaces" do
+    spaced_source = Dir.mktmpdir("auction backup source") # name has a space
+    spaced_target = Dir.mktmpdir("auction backup target")
+    begin
+      BACKUP_DBS.each do |db_name|
+        path = File.join(spaced_source, "#{db_name}.sqlite3")
+        SQLite3::Database.new(path) do |db|
+          db.execute("CREATE TABLE IF NOT EXISTS _healthcheck (id INTEGER PRIMARY KEY)")
+        end
+      end
+
+      clock = fixed_clock(Time.new(2026, 5, 11, 4, 0, 0))
+      backup = AuctionBackup.new(base_dir: spaced_target, storage_dir: spaced_source, clock: clock)
+
+      assert_nothing_raised { backup.call }
+
+      BACKUP_DBS.each do |db_name|
+        assert Dir.glob(File.join(spaced_target, "**", "#{db_name}.sqlite3")).any?,
+               "Expected #{db_name}.sqlite3 in backup tree under #{spaced_target}"
+      end
+    ensure
+      FileUtils.rm_rf(spaced_source)
+      FileUtils.rm_rf(spaced_target)
+    end
+  end
+
+  # --- Rotation uses injected clock for cutoff ---
+
+  test "rotation cutoff is computed from injected clock, not wall clock" do
+    # Fix the clock at a specific moment so the test is deterministic.
+    frozen_now = Time.new(2026, 5, 11, 4, 0, 0)
+    clock = fixed_clock(frozen_now)
+    backup = AuctionBackup.new(base_dir: @tmpdir, storage_dir: @source_dir, clock: clock)
+
+    daily_dir = File.join(@tmpdir, "daily")
+    # One dir whose mtime is 15 days before the frozen clock → should be pruned
+    old_dir = File.join(daily_dir, "20260426-040000")
+    # One dir whose mtime is 3 days before the frozen clock → should be kept
+    new_dir = File.join(daily_dir, "20260508-040000")
+    FileUtils.mkdir_p(old_dir)
+    FileUtils.mkdir_p(new_dir)
+
+    old_mtime = frozen_now - (15 * 24 * 3600)
+    new_mtime  = frozen_now - (3  * 24 * 3600)
+    File.utime(old_mtime, old_mtime, old_dir)
+    File.utime(new_mtime,  new_mtime,  new_dir)
+
+    backup.rotate
+
+    refute Dir.exist?(old_dir), "Dir 15 days before frozen_now should be pruned"
+    assert Dir.exist?(new_dir),  "Dir 3 days before frozen_now should be kept"
   end
 
   # --- Missing source DB ---
