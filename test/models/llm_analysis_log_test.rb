@@ -31,7 +31,7 @@ class LlmAnalysisLogTest < ActiveSupport::TestCase
       user_prompt: "Analyze this property."
     )
     assert_not log.valid?
-    assert_includes log.errors[:property], "must exist"
+    assert_includes log.errors[:property], "이(가) 필요합니다"
   end
 
   test "invalid without system_prompt" do
@@ -41,7 +41,7 @@ class LlmAnalysisLogTest < ActiveSupport::TestCase
       user_prompt: "Analyze this property."
     )
     assert_not log.valid?
-    assert_includes log.errors[:system_prompt], "can't be blank"
+    assert_includes log.errors[:system_prompt], "을(를) 입력해 주세요"
   end
 
   test "invalid without user_prompt" do
@@ -51,7 +51,7 @@ class LlmAnalysisLogTest < ActiveSupport::TestCase
       user_prompt: nil
     )
     assert_not log.valid?
-    assert_includes log.errors[:user_prompt], "can't be blank"
+    assert_includes log.errors[:user_prompt], "을(를) 입력해 주세요"
   end
 
   test "status enum values" do

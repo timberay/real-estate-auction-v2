@@ -9,20 +9,20 @@ class PropertyTypeTest < ActiveSupport::TestCase
   test "invalid without name" do
     pt = PropertyType.new(name: nil, code: "test", enabled: true)
     assert_not pt.valid?
-    assert_includes pt.errors[:name], "can't be blank"
+    assert_includes pt.errors[:name], "을(를) 입력해 주세요"
   end
 
   test "invalid without code" do
     pt = PropertyType.new(name: "테스트", code: nil, enabled: true)
     assert_not pt.valid?
-    assert_includes pt.errors[:code], "can't be blank"
+    assert_includes pt.errors[:code], "을(를) 입력해 주세요"
   end
 
   test "invalid with duplicate code" do
     PropertyType.create!(name: "아파트", code: "dup_test", enabled: true)
     pt = PropertyType.new(name: "아파트2", code: "dup_test", enabled: true)
     assert_not pt.valid?
-    assert_includes pt.errors[:code], "has already been taken"
+    assert_includes pt.errors[:code], "은(는) 이미 사용 중입니다"
   end
 
   test "scope enabled returns only enabled types" do

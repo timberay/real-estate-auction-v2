@@ -1,0 +1,109 @@
+# Korean translations for ActiveRecord/ActiveModel validation messages.
+#
+# Korean grammar requires distinct postpositional particles depending on whether
+# the preceding word ends in a consonant ("받침"). Rails locale strings can't
+# carry that logic, so we use the conventional dual-particle form like
+# "을(를)" / "은(는)" / "이(가)" — readable and unambiguous.
+#
+# The `errors.format` is set to "%{attribute} %{message}" (no separator) so the
+# message can begin with the appropriate particle and read naturally:
+#   "쓸 수 있는 현금 은(는) 0보다 커야 합니다"
+ko:
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      blank: "을(를) 입력해 주세요"
+      present: "을(를) 비워 두세요"
+      taken: "은(는) 이미 사용 중입니다"
+      invalid: "이(가) 올바르지 않습니다"
+      not_a_number: "은(는) 숫자여야 합니다"
+      not_an_integer: "은(는) 정수여야 합니다"
+      greater_than: "은(는) %{count}보다 커야 합니다"
+      greater_than_or_equal_to: "은(는) %{count} 이상이어야 합니다"
+      less_than: "은(는) %{count}보다 작아야 합니다"
+      less_than_or_equal_to: "은(는) %{count} 이하여야 합니다"
+      equal_to: "은(는) %{count}이어야 합니다"
+      other_than: "은(는) %{count}이(가) 아니어야 합니다"
+      odd: "은(는) 홀수여야 합니다"
+      even: "은(는) 짝수여야 합니다"
+      inclusion: "은(는) 허용된 값이 아닙니다"
+      exclusion: "은(는) 사용할 수 없는 값입니다"
+      too_long: "은(는) 너무 깁니다 (최대 %{count}자)"
+      too_short: "은(는) 너무 짧습니다 (최소 %{count}자)"
+      wrong_length: "은(는) 길이가 올바르지 않습니다 (정확히 %{count}자)"
+      confirmation: "이(가) 일치하지 않습니다"
+      accepted: "을(를) 동의해 주세요"
+      empty: "을(를) 입력해 주세요"
+      required: "이(가) 필요합니다"
+      model_invalid: "검증 실패: %{errors}"
+
+  activerecord:
+    errors:
+      messages:
+        record_invalid: "검증 실패: %{errors}"
+        restrict_dependent_destroy:
+          has_one: "%{record}이(가) 존재하므로 삭제할 수 없습니다"
+          has_many: "%{record}이(가) 존재하므로 삭제할 수 없습니다"
+    attributes:
+      budget_setting:
+        available_cash: "쓸 수 있는 현금"
+        loan_ratio: "대출 비율"
+        loan_policy_id: "대출 정책"
+        property_type_id: "부동산 유형"
+        region: "관심 지역"
+        repair_cost: "수선비"
+        acquisition_tax: "취득세"
+        scrivener_fee: "법무사비"
+        moving_cost: "이사비"
+        maintenance_fee: "미납 관리비"
+        max_bid_amount: "최대 입찰가"
+        area_range_min: "최소 면적"
+        area_range_max: "최대 면적"
+      property:
+        case_number: "사건번호"
+        documents: "문서"
+      user:
+        email: "이메일"
+        password: "비밀번호"
+      user_property:
+        property_id: "부동산"
+      identity:
+        provider: "제공자"
+        uid: "식별자"
+      property_type:
+        name: "이름"
+        code: "코드"
+      api_credential:
+        provider_name: "제공자"
+      loan_policy:
+        policy_name: "정책 이름"
+        loan_ratio: "대출 비율"
+        regulated_loan_ratio: "규제 지역 대출 비율"
+        effective_date: "시행일"
+      auction_schedule:
+        schedule_date: "기일"
+        min_price: "최저가"
+      reserve_fund_default:
+        property_type_id: "부동산 유형"
+        area_range_min: "최소 면적"
+        area_range_max: "최대 면적"
+      eviction_step:
+        code: "코드"
+        phase: "단계"
+        step_code: "단계 코드"
+        step_type: "단계 유형"
+        name: "이름"
+        description: "설명"
+        position: "순서"
+      eviction_simulator_question:
+        code: "코드"
+        question: "질문"
+      inspection_item:
+        question: "질문"
+        category: "분류"
+        tab: "탭"
+      llm_analysis_log:
+        system_prompt: "시스템 프롬프트"
+        user_prompt: "사용자 프롬프트"
+      rights_analysis_report:
+        analyzed_at: "분석 일시"

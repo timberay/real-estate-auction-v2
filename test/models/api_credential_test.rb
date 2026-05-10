@@ -22,20 +22,20 @@ class ApiCredentialTest < ActiveSupport::TestCase
   test "validates provider_name presence" do
     cred = ApiCredential.new(user: @user, provider_name: nil)
     assert_not cred.valid?
-    assert_includes cred.errors[:provider_name], "can't be blank"
+    assert_includes cred.errors[:provider_name], "을(를) 입력해 주세요"
   end
 
   test "validates provider_name inclusion" do
     cred = ApiCredential.new(user: @user, provider_name: "invalid_provider")
     assert_not cred.valid?
-    assert_includes cred.errors[:provider_name], "is not included in the list"
+    assert_includes cred.errors[:provider_name], "은(는) 허용된 값이 아닙니다"
   end
 
   test "validates provider_name uniqueness per user" do
     ApiCredential.create!(user: @user, provider_name: "court_auction", enabled: true)
     duplicate = ApiCredential.new(user: @user, provider_name: "court_auction", enabled: true)
     assert_not duplicate.valid?
-    assert_includes duplicate.errors[:provider_name], "has already been taken"
+    assert_includes duplicate.errors[:provider_name], "은(는) 이미 사용 중입니다"
   end
 
   test "encrypts api_key" do

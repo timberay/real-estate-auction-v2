@@ -14,14 +14,14 @@ class PropertyTest < ActiveSupport::TestCase
   test "case_number is required" do
     property = Property.new(case_number: nil)
     assert_not property.valid?
-    assert_includes property.errors[:case_number], "can't be blank"
+    assert_includes property.errors[:case_number], "을(를) 입력해 주세요"
   end
 
   test "case_number must be unique" do
     Property.create!(case_number: "2026타경12345", address: "서울시", appraisal_price: 500000000, min_bid_price: 350000000)
     duplicate = Property.new(case_number: "2026타경12345")
     assert_not duplicate.valid?
-    assert_includes duplicate.errors[:case_number], "has already been taken"
+    assert_includes duplicate.errors[:case_number], "은(는) 이미 사용 중입니다"
   end
 
   test "has_many auction_schedules" do
