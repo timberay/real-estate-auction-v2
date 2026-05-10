@@ -8,7 +8,7 @@
         대항력 <%= has_power ? '있음' : '없음' %>
       </span>
       <% if user_edited %>
-        <span class="ml-2 inline-flex items-center rounded bg-yellow-100 dark:bg-yellow-900/30 px-1.5 py-0.5 text-xs text-yellow-800 dark:text-yellow-200">
+        <span title="AI 재분석 시 초기화됩니다" class="ml-2 inline-flex items-center rounded bg-yellow-100 dark:bg-yellow-900/30 px-1.5 py-0.5 text-xs text-yellow-800 dark:text-yellow-200">
           사용자 수정
         </span>
       <% end %>
@@ -29,7 +29,7 @@
     </div>
   </div>
   <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">
-    보증금: <%= number_with_delimiter(tenant["deposit"]) %>원 · 확정일자: <%= tenant["confirmed_date"] || "없음" %> ·
+    보증금: <%= tenant["deposit"].present? ? number_with_delimiter(tenant["deposit"]) : "—" %>원 · 확정일자: <%= tenant["confirmed_date"] || "없음" %> ·
     <% if tenant["dividend_requested"].nil? %>
       <span class="text-zinc-400">확인 필요</span>
     <% elsif tenant["dividend_requested"] %>
