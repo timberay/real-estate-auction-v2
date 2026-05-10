@@ -7,6 +7,7 @@
 
     <%# Numbered circle %>
     <div data-step-number="1"
+         aria-hidden="true"
          class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white ring-4 ring-blue-100 dark:bg-blue-500 dark:ring-blue-900/40">
       1
     </div>
@@ -29,6 +30,7 @@
     <div class="absolute left-5 top-10 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700" aria-hidden="true"></div>
 
     <div data-step-number="2"
+         aria-hidden="true"
          class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-400 text-sm font-bold text-white dark:bg-slate-600">
       2
     </div>
@@ -51,17 +53,17 @@
           <circle cx="32" cy="11" r="3.5" fill="currentColor" class="text-green-400"/>
           <text x="90" y="15" font-size="7" text-anchor="middle" fill="currentColor" class="text-slate-500 dark:text-slate-400">ChatGPT / Claude / Gemini</text>
           <%# PDF attachment chip %>
-          <rect x="10" y="28" width="54" height="20" rx="4" fill="currentColor" class="text-blue-100 dark:text-blue-900/60" stroke="currentColor" stroke-width="0.8" class="text-blue-300 dark:text-blue-700"/>
+          <rect x="10" y="28" width="54" height="20" rx="4" fill="currentColor" class="text-blue-100 dark:text-blue-900/60"/>
           <text x="18" y="41" font-size="7" fill="currentColor" class="text-blue-700 dark:text-blue-300">📄 경매.pdf</text>
           <%# Prompt text bubble (user message) %>
-          <rect x="10" y="54" width="145" height="42" rx="6" fill="currentColor" class="text-blue-500 dark:text-blue-600" opacity="0.15" stroke="currentColor" stroke-width="0.8" class="text-blue-300 dark:text-blue-600"/>
+          <rect x="10" y="54" width="145" height="42" rx="6" fill="currentColor" class="text-blue-500 dark:text-blue-600" opacity="0.15"/>
           <text x="17" y="66" font-size="6" fill="currentColor" class="text-slate-700 dark:text-slate-300">다음 법원경매 물건을 분석해</text>
           <text x="17" y="75" font-size="6" fill="currentColor" class="text-slate-700 dark:text-slate-300">주세요. 아래 형식으로 답해</text>
           <text x="17" y="84" font-size="6" fill="currentColor" class="text-slate-700 dark:text-slate-300">주세요: { "result": ... }</text>
           <%# Paste cursor hint %>
           <rect x="155" y="54" width="2" height="12" rx="1" fill="currentColor" class="text-blue-500"/>
           <%# Bottom input bar %>
-          <rect x="10" y="108" width="168" height="16" rx="4" fill="currentColor" class="text-slate-100 dark:text-slate-700" stroke="currentColor" stroke-width="0.8" class="text-slate-200 dark:text-slate-600"/>
+          <rect x="10" y="108" width="168" height="16" rx="4" fill="currentColor" class="text-slate-100 dark:text-slate-700"/>
           <text x="18" y="119" font-size="6" fill="currentColor" class="text-slate-400">메시지 입력...</text>
           <rect x="178" y="108" width="16" height="16" rx="4" fill="currentColor" class="text-blue-500 dark:text-blue-600"/>
           <text x="186" y="119" font-size="8" text-anchor="middle" fill="white">↑</text>
@@ -80,6 +82,7 @@
     <div class="absolute left-5 top-10 bottom-0 w-0.5 bg-slate-200 dark:bg-slate-700" aria-hidden="true"></div>
 
     <div data-step-number="3"
+         aria-hidden="true"
          class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-400 text-sm font-bold text-white dark:bg-slate-600">
       3
     </div>
@@ -102,7 +105,7 @@
           <circle cx="32" cy="11" r="3.5" fill="currentColor" class="text-green-400"/>
           <text x="90" y="15" font-size="7" text-anchor="middle" fill="currentColor" class="text-slate-500 dark:text-slate-400">AI 답변</text>
           <%# AI response bubble (assistant) — left aligned %>
-          <rect x="10" y="28" width="160" height="70" rx="6" fill="currentColor" class="text-slate-100 dark:text-slate-800" stroke="currentColor" stroke-width="0.8" class="text-slate-200 dark:text-slate-600"/>
+          <rect x="10" y="28" width="160" height="70" rx="6" fill="currentColor" class="text-slate-100 dark:text-slate-800"/>
           <%# Highlighted / selected JSON text %>
           <rect x="14" y="32" width="100" height="9" rx="2" fill="currentColor" class="text-blue-200 dark:text-blue-800" opacity="0.8"/>
           <text x="16" y="40" font-size="6" fill="currentColor" class="text-slate-800 dark:text-slate-200" font-family="monospace">{ "result": "낙찰가 추정",</text>
@@ -132,6 +135,7 @@
   <%# Step 4: 결과 업로드 (interactive — blue accent, no connector line below) %>
   <div data-step="4" class="relative flex gap-4">
     <div data-step-number="4"
+         aria-hidden="true"
          class="relative z-10 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white ring-4 ring-blue-100 dark:bg-blue-500 dark:ring-blue-900/40">
       4
     </div>
