@@ -64,6 +64,10 @@ Rails.application.routes.draw do
     end
     resources :documents, only: [ :create, :destroy ], controller: "properties/documents"
     post "analyses/retry", to: "properties/analysis_retries#create", as: :analysis_retry
+    resource :rights_analysis_report, only: [], as: :report, module: :properties do
+      resources :tenants, only: [ :edit, :update ]
+      patch :base_right_date, to: "rights_analysis_reports#update_base_right_date"
+    end
     namespace :inspections do
       resource :start, only: [ :create ], controller: "start"
       resources :tabs, only: [ :edit, :update ], param: :tab_key
