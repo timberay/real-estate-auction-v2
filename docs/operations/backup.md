@@ -48,22 +48,35 @@ External off-host backup is intentionally **not** automated (decision made 2026-
 
 ## Cron registration on Cafe24
 
-Log into the server and add the following entry via `crontab -e` (as the `rails` system user):
+The cron entry must run the command **inside the container** using `kamal app exec`. Add the following entry via `crontab -e` on the **host** (as the deploy user):
 
 ```
-0 4 * * * cd /rails && bin/rails db:backup >> /var/log/auction-backup.log 2>&1
+0 4 * * * /usr/bin/kamal app exec "bin/rails db:backup" >> /var/log/auction-backup.log 2>&1
 ```
 
 This runs the backup daily at 04:00 local time. The output log captures both stdout (target path) and stderr (any errors).
 
-### Pre-requisite: writable backup directory
+> **Why `kamal app exec`?** The Rails process runs inside a Docker container managed by Kamal. Running `bin/rails` directly on the host will not work — it is not in the container's environment. `kamal app exec` executes the command in the running container.
 
-The `/var/backups/auction/` directory must exist and be writable by the `rails` system user **before** the first cron run. Create it once on the server:
+### Pre-requisite: host directory must exist before first deploy
+
+`/var/backups/auction` is bind-mounted from the host into the container at the same path (`config/deploy.yml`). The host directory **must be created with the correct ownership BEFORE the first `kamal deploy`** after this change. If the directory does not exist, Docker will create it as root and backups will fail with a permission error.
+
+Run these commands once on the Cafe24 host:
 
 ```sh
 sudo mkdir -p /var/backups/auction
-sudo chown rails:rails /var/backups/auction
+sudo chown 1000:1000 /var/backups/auction   # UID:GID matching the container's rails user (1000:1000 in the standard rails image)
+sudo chmod 775 /var/backups/auction
 ```
+
+To confirm the UID inside the container:
+
+```sh
+kamal app exec "id"
+```
+
+If the output shows a different UID, adjust the `chown` command accordingly.
 
 ## Manually verifying a backup
 
