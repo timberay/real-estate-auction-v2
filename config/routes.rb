@@ -55,6 +55,10 @@ Rails.application.routes.draw do
   end
 
   resources :properties, only: [ :index, :show, :create, :destroy ] do
+    collection do
+      get  :bulk_import, to: "properties/bulk_imports#new",    as: :bulk_import
+      post :bulk_import, to: "properties/bulk_imports#create"
+    end
     member do
       patch :toggle_favorite
     end

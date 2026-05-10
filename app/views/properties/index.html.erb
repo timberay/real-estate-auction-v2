@@ -2,7 +2,11 @@
 
 <%# app/views/properties/index.html.erb %>
 <div class="space-y-6">
-  <%= render "case_number_form", setting: @setting %>
+  <div class="flex items-start justify-between gap-4 flex-wrap">
+    <%= render "case_number_form", setting: @setting %>
+    <%= link_to "여러 건 한 번에 추가 →", bulk_import_properties_path,
+        class: "text-sm text-slate-500 dark:text-slate-400 underline hover:text-slate-700 dark:hover:text-slate-200 whitespace-nowrap mt-7" %>
+  </div>
 
   <% filters_applied = params[:safety_rating].present? || params[:search].present? || params[:within_budget].present? %>
 
