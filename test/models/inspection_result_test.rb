@@ -68,4 +68,42 @@ class InspectionResultTest < ActiveSupport::TestCase
     assert_nil result.has_risk
     assert_nil result.source_type
   end
+
+  test "has_many :versions destroys versions when result is destroyed" do
+    result = InspectionResult.create!(
+      property: properties(:safe_apartment),
+      inspection_item: inspection_items(:rights_005),
+      user: users(:guest),
+      source_type: "ai",
+      has_risk: false,
+      evidence: { "source_label" => "AI 분석" }
+    )
+    result.versions.create!(version_number: 1, snapshotted_at: Time.current, source_type: "ai")
+    assert_difference -> { InspectionResultVersion.count }, -1 do
+      result.destroy
+    end
+  end
+
+  test "#snapshot_version! captures current attributes and increments version_number" do
+    result = InspectionResult.create!(
+      property: properties(:safe_apartment),
+      inspection_item: inspection_items(:rights_005),
+      user: users(:guest),
+      source_type: "ai",
+      has_risk: true,
+      evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "위험" },
+      resolution_note: "메모"
+    )
+
+    version = result.snapshot_version!
+    assert_equal 1, version.version_number
+    assert_equal "ai", version.source_type
+    assert_equal true, version.has_risk
+    assert_equal "high", version.evidence["confidence"]
+    assert_equal "메모", version.resolution_note
+    assert_not_nil version.snapshotted_at
+
+    second = result.snapshot_version!
+    assert_equal 2, second.version_number
+  end
 end
