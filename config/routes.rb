@@ -63,6 +63,8 @@ Rails.application.routes.draw do
       patch :toggle_favorite
     end
     resources :documents, only: [ :create, :destroy ], controller: "properties/documents"
+    resource :user_property_settings, only: [ :edit, :update ], controller: "properties/user_property_settings"
+    resources :photos, only: [ :create, :destroy ], controller: "properties/photos"
     post "analyses/retry", to: "properties/analysis_retries#create", as: :analysis_retry
     resource :rights_analysis_report, only: [], as: :report, module: :properties do
       resources :tenants, only: [ :show, :edit, :update ]
