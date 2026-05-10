@@ -1,0 +1,7 @@
+<turbo-frame id="tenant-row-<%= params[:id] %>">
+  <%= render "properties/tenants/edit_form",
+        tenant: @tenant,
+        index: @tenant_index,
+        report: @report,
+        property: @property %>
+</turbo-frame>
