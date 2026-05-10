@@ -8,8 +8,14 @@
   ) do %>
     <%= form_with model: @setting, url: step1_onboarding_path, method: :post, data: { turbo_frame: "onboarding_wizard" } do |f| %>
       <% if @setting.errors[:available_cash].any? %>
-        <div class="mb-4 p-3 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg text-sm">
-          <%= @setting.errors[:available_cash].join(", ") %>
+        <div class="mb-4 p-3 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg text-sm" role="alert">
+          <p class="font-medium">
+            <%= BudgetSetting.human_attribute_name(:available_cash) %>
+            <%= @setting.errors[:available_cash].first %>
+          </p>
+          <p class="mt-1 text-red-600 dark:text-red-400/80">
+            쓸 수 있는 현금은 0보다 큰 숫자(만원 단위)로 입력해 주세요.
+          </p>
         </div>
       <% end %>
 
