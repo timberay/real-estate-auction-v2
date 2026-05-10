@@ -17,7 +17,9 @@ class CaseNumberAddTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "select[name=court_code][required]"
     assert_select "input[name=case_number][required]"
-    assert_match "법원과 사건번호를 입력해주세요", response.body
+    # Helper text now points users to courtauction.go.kr and the in-app 조건검색 shortcut (B18 / B-8).
+    assert_match "법원경매 사이트", response.body
+    assert_match "조건검색으로 찾기", response.body
 
     # Submit form
     post properties_path, params: { court_code: "B000530", case_number: "2022타경564" }

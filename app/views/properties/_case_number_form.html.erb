@@ -29,5 +29,8 @@
     </div>
   <% end %>
   <p class="hidden text-sm text-red-500 dark:text-red-400 mt-1" data-criteria-search-target="caseError">사건번호를 입력해주세요</p>
-  <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">법원과 사건번호를 입력해주세요</p>
+  <p class="text-sm text-slate-500 dark:text-slate-400 mt-1.5">
+    사건번호는 <a href="https://www.courtauction.go.kr" target="_blank" rel="noopener" class="underline hover:text-blue-600 dark:hover:text-blue-400">법원경매 사이트</a>에서 확인할 수 있어요.
+    사건번호를 모르면 <%= link_to "조건검색으로 찾기", search_path, class: "underline hover:text-blue-600 dark:hover:text-blue-400" %>를 이용하세요.
+  </p>
 </div>
