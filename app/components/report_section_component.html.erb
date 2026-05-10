@@ -6,6 +6,9 @@
       </span>
       <h2 class="text-2xl font-bold text-slate-900 dark:text-slate-100 break-keep"><%= title %></h2>
     </div>
+    <% if show_beginner_summary? %>
+      <p class="beginner-summary mt-2 ml-11 text-sm italic text-slate-600 dark:text-slate-400"><%= beginner_summary %></p>
+    <% end %>
   </div>
   <div>
     <%= content %>
