@@ -80,6 +80,30 @@ class LlmAnalysisLogTest < ActiveSupport::TestCase
     assert log.pending?
   end
 
+  test "PII columns are encrypted at rest" do
+    log = LlmAnalysisLog.create!(
+      property: @property,
+      user: users(:guest),
+      system_prompt: "secret-system-text",
+      user_prompt: "secret-user-text",
+      response_json: { "secret" => "value" },
+      status: :completed,
+      executed_at: Time.current,
+      provider: "test",
+      model: "test"
+    )
+    raw = ActiveRecord::Base.connection.execute(
+      "SELECT system_prompt, user_prompt, response_json FROM llm_analysis_logs WHERE id = #{log.id}"
+    ).first
+    refute_includes raw["system_prompt"], "secret-system-text"
+    refute_includes raw["user_prompt"], "secret-user-text"
+    refute_includes raw["response_json"], "value"
+    # Model still decrypts on read:
+    log.reload
+    assert_equal "secret-system-text", log.system_prompt
+    assert_equal({ "secret" => "value" }, log.response_json)
+  end
+
   test "latest_for scope returns most recent completed log" do
     older = LlmAnalysisLog.create!(
       property: @property, system_prompt: "s", user_prompt: "u",
