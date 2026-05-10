@@ -1,7 +1,28 @@
-<%# app/views/shared/error.html.erb %>
-<div class="mx-auto max-w-lg px-4 py-16 text-center">
-  <h1 class="text-2xl font-bold text-gray-900"><%= flash[:alert] || flash[:notice] %></h1>
-  <p class="mt-4 text-gray-600">
-    <%= link_to "돌아가기", :back, class: "text-blue-600 hover:underline" %>
+<%# app/views/shared/error.html.erb
+    Friendlier server-error / transient-failure page.
+    B-14 (UX audit): explains the transient nature of the error,
+    offers a clear retry CTA, and points to a support contact. %>
+<div class="mx-auto max-w-lg px-4 py-16 text-center" role="alert" aria-live="polite">
+  <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-3">
+    <%= flash[:alert] || flash[:notice] || "문제가 발생했습니다" %>
+  </h1>
+
+  <p class="text-slate-600 dark:text-slate-400 mb-6">
+    일시적 문제가 발생했어요.
+    잠시 후(약 1분 뒤) 다시 시도해 주세요.
+  </p>
+
+  <div class="flex flex-col sm:flex-row gap-3 justify-center">
+    <%= link_to "다시 시도", :back,
+        class: "inline-flex items-center justify-center gap-2 h-10 px-5 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium dark:bg-blue-500 dark:hover:bg-blue-400 transition-colors" %>
+    <%= link_to "처음으로", root_path,
+        class: "inline-flex items-center justify-center gap-2 h-10 px-5 rounded-md border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" %>
+  </div>
+
+  <%# TODO(ops): replace placeholder with real support address before launch (#B21). %>
+  <p class="mt-8 text-sm text-slate-500 dark:text-slate-400">
+    문제가 계속되면
+    <a href="mailto:support@example.com" class="text-blue-600 dark:text-blue-400 hover:underline">support@example.com</a>
+    으로 문의해 주세요.
   </p>
 </div>
