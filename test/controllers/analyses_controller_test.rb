@@ -209,6 +209,75 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     assert flash[:alert].present?
   end
 
+  # B15 / E-44: analysis history view
+  test "GET history renders 200 with logs for owned property" do
+    log_completed = LlmAnalysisLog.create!(
+      property: @property, user: @user,
+      system_prompt: "s", user_prompt: "u",
+      provider: "anthropic", model: "claude-opus-4",
+      status: :completed, executed_at: 1.hour.ago
+    )
+    log_failed = LlmAnalysisLog.create!(
+      property: @property, user: @user,
+      system_prompt: "s", user_prompt: "u",
+      provider: "openai", model: "gpt-5",
+      status: :failed, error_message: "rate limited",
+      executed_at: 30.minutes.ago
+    )
+
+    get history_analyses_path(property_id: @property.id)
+
+    assert_response :success
+    assert_select "body" do
+      assert_select "*", text: /anthropic/
+      assert_select "*", text: /claude-opus-4/
+      assert_select "*", text: /openai/
+      assert_select "*", text: /gpt-5/
+      assert_select "*", text: /완료/
+      assert_select "*", text: /실패/
+    end
+  end
+
+  test "GET history with empty logs renders empty state" do
+    get history_analyses_path(property_id: @property.id)
+
+    assert_response :success
+    assert_select "body", text: /분석 이력이 없습니다/
+  end
+
+  test "GET history without property_id redirects" do
+    get history_analyses_path
+
+    assert_redirected_to properties_path
+    assert flash[:alert].present?
+  end
+
+  test "GET history with non-existent property_id redirects" do
+    get history_analyses_path(property_id: 99999)
+
+    assert_redirected_to properties_path
+    assert flash[:alert].present?
+  end
+
+  test "GET history with another user's property is rejected (IDOR)" do
+    other_user = users(:guest_two)
+    other_property = properties(:basement_villa)
+    UserProperty.find_or_create_by!(user: other_user, property: other_property)
+    LlmAnalysisLog.create!(
+      property: other_property, user: other_user,
+      system_prompt: "s", user_prompt: "u",
+      provider: "anthropic", model: "claude-opus-4",
+      status: :completed, executed_at: 1.hour.ago
+    )
+
+    assert_not @user.user_properties.exists?(property: other_property)
+
+    get history_analyses_path(property_id: other_property.id)
+
+    assert_redirected_to properties_path
+    assert flash[:alert].present?
+  end
+
   test "POST manual with JSON missing case_number shows alert and stays on manual tab" do
     json_content = { "metadata" => { "address" => "test" }, "results" => {} }.to_json
     file = Rack::Test::UploadedFile.new(
