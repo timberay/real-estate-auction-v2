@@ -120,6 +120,7 @@ class PropertyCardComponentTest < ViewComponent::TestCase
       assert_selector "[data-property-card='next-auction']", text: "다음 매각기일"
       assert_selector "[data-property-card='next-auction']", text: schedule_date.strftime("%Y.%m.%d")
       assert_selector "[data-property-card='next-auction']", text: "D-5"
+      assert_selector "[data-property-card='next-auction'] [aria-label='매각 5일 전']"
     end
   end
 

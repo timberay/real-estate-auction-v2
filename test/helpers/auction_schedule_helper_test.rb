@@ -29,6 +29,7 @@ class AuctionScheduleHelperTest < ActionView::TestCase
     info = next_auction_schedule_info(@property)
     assert_equal schedule.schedule_date, info[:date]
     assert_equal "D-day", info[:dday_text]
+    assert_equal "오늘 매각", info[:dday_aria]
     assert_includes info[:dday_class], "bg-red-100"
     assert_includes info[:dday_class], "text-red-700"
   end
@@ -37,6 +38,7 @@ class AuctionScheduleHelperTest < ActionView::TestCase
     @property.auction_schedules.create!(schedule_date: Date.current + 3.days, schedule_time: "1000")
     info = next_auction_schedule_info(@property)
     assert_equal "D-3", info[:dday_text]
+    assert_equal "매각 3일 전", info[:dday_aria]
     assert_includes info[:dday_class], "bg-amber-100"
   end
 
