@@ -159,4 +159,42 @@ class PropertyCardComponentTest < ViewComponent::TestCase
       assert_no_selector "[data-property-card='next-auction']"
     end
   end
+
+  # B29: 삭제 버튼은 더보기(overflow) 메뉴 안에 숨기고, confirm 카피를 부드럽게.
+  test "renders overflow menu trigger button with aria-haspopup" do
+    property = properties(:safe_apartment)
+    render_inline(PropertyCardComponent.new(property: property))
+    assert_selector "[data-controller~='overflow-menu'] button[aria-haspopup='true'][aria-expanded='false']"
+  end
+
+  test "overflow menu is initially hidden" do
+    property = properties(:safe_apartment)
+    render_inline(PropertyCardComponent.new(property: property))
+    assert_selector "[data-overflow-menu-target='menu'][hidden]", visible: :all
+  end
+
+  test "delete form is inside the overflow menu, not at card level" do
+    property = properties(:safe_apartment)
+    render_inline(PropertyCardComponent.new(property: property))
+    # button_to renders a <form method="post"> with _method=delete; assert it lives inside the hidden menu.
+    path = Rails.application.routes.url_helpers.property_path(property)
+    assert_selector "[data-overflow-menu-target='menu'] form[action='#{path}'][method='post']", visible: :all
+  end
+
+  test "confirm message uses softened copy (B-37)" do
+    property = properties(:safe_apartment)
+    render_inline(PropertyCardComponent.new(property: property))
+    confirm = page.find("[data-overflow-menu-target='menu'] button[data-turbo-confirm]", visible: :all)["data-turbo-confirm"]
+    assert_includes confirm, "내 메모, AI 분석 결과, 권리 보고서"
+    assert_includes confirm, "되돌릴 수 없어요"
+    assert_includes confirm, "계속하시겠습니까?"
+  end
+
+  test "confirm message no longer uses the old technical phrase" do
+    property = properties(:safe_apartment)
+    render_inline(PropertyCardComponent.new(property: property))
+    confirm = page.find("[data-overflow-menu-target='menu'] button[data-turbo-confirm]", visible: :all)["data-turbo-confirm"]
+    refute_includes confirm, "저장된 분석 결과, 권리분석 보고서 등"
+    refute_includes confirm, "복구할 수 없습니다"
+  end
 end
