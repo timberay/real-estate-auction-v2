@@ -38,6 +38,22 @@ class Properties::PhotosControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "non-owner DELETE destroy returns 404" do
+    other_property = properties(:risky_villa)
+    other_user_property = UserProperty.find_by!(property: other_property)
+    other_user_property.photos.attach(
+      io: StringIO.new("fake img"),
+      filename: "photo.png",
+      content_type: "image/png"
+    )
+    photo_id = other_user_property.photos.last.id
+
+    UserProperty.where(user: @user, property: other_property).destroy_all
+
+    delete property_photo_path(other_property, photo_id)
+    assert_response :not_found
+  end
+
   # Happy path — create
   test "POST create with image attaches photo" do
     assert_difference -> { @user_property.photos.count }, 1 do
