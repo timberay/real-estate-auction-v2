@@ -20,10 +20,12 @@
     </div>
     <div class="flex items-center gap-2">
       <span class="text-sm text-slate-500 dark:text-slate-400"><%= tenant["move_in_date"] %></span>
-      <%= link_to "수정",
-            edit_property_report_tenant_path(property, index),
-            class: "text-xs text-blue-600 dark:text-blue-400 hover:underline",
-            data: { turbo_frame: "tenant-row-#{index}" } %>
+      <% if property %>
+        <%= link_to "수정",
+              edit_property_report_tenant_path(property, index),
+              class: "text-xs text-blue-600 dark:text-blue-400 hover:underline",
+              data: { turbo_frame: "tenant-row-#{index}" } %>
+      <% end %>
     </div>
   </div>
   <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">
