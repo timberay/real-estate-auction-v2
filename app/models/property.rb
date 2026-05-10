@@ -1,5 +1,10 @@
 class Property < ApplicationRecord
   has_many :auction_schedules, dependent: :destroy
+  # Eager-loadable single-record association for the next upcoming schedule.
+  # Lambda re-evaluates Date.current each request so preload stays fresh.
+  has_one :next_auction_schedule,
+          -> { where("schedule_date >= ?", Date.current).order(:schedule_date) },
+          class_name: "AuctionSchedule"
 
   has_many :user_properties, dependent: :destroy
   has_many :users, through: :user_properties

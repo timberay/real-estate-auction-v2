@@ -241,6 +241,27 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "GET index does not fire per-card auction_schedules query (N+1 regression)" do
+    # Add future schedules to two existing user-owned properties so each card
+    # renders the "다음 매각기일" row (which is what fires the N+1 query).
+    property_a = user_properties(:guest_safe_apartment).property
+    property_b = user_properties(:guest_favorited_villa).property
+    [ property_a, property_b ].each do |p|
+      p.auction_schedules.create!(schedule_date: Date.current + 5.days, schedule_time: "1000")
+    end
+
+    # Warm any one-time queries (schema, session lookups).
+    get properties_url
+
+    auction_schedule_queries = capture_queries(table: "auction_schedules") { get properties_url }
+
+    # With the has_one preload there should be exactly ONE auction_schedules
+    # query (the eager-load), regardless of card count. Without preloading,
+    # this would fire once per card (2+).
+    assert_equal 1, auction_schedule_queries,
+      "expected a single eager-loaded auction_schedules query, saw #{auction_schedule_queries} (N+1 regression)"
+  end
+
   test "GET index returns favorited user_properties before non-favorited" do
     get properties_url
 
@@ -250,5 +271,20 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     non_favorited_pos = body.index(user_properties(:guest_safe_apartment).property.case_number)
     assert favorited_pos < non_favorited_pos,
       "favorited card should appear before non-favorited in HTML"
+  end
+
+  private
+
+  # Counts SELECT queries that touch the given table during the block.
+  # Filters SCHEMA / TRANSACTION noise so the assertion is stable.
+  def capture_queries(table:, &block)
+    queries = []
+    callback = lambda do |*, payload|
+      next if payload[:name] == "SCHEMA"
+      next if payload[:sql] =~ /\A\s*(BEGIN|COMMIT|ROLLBACK|SAVEPOINT|RELEASE)/i
+      queries << payload[:sql] if payload[:sql].include?(%("#{table}"))
+    end
+    ActiveSupport::Notifications.subscribed(callback, "sql.active_record", &block)
+    queries.size
   end
 end
