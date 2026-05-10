@@ -1,0 +1,38 @@
+<div class="rounded-lg border border-blue-400 bg-blue-50 dark:border-blue-600 dark:bg-blue-900/20 p-3">
+  <%= form_with url: property_report_tenant_path(property, index),
+        method: :patch,
+        data: { turbo_frame: "tenant-row-#{index}" } do |f| %>
+    <p class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-2">
+      <%= tenant["name"] %> — 임차인 정보 수정
+    </p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+      <div>
+        <label class="block text-xs text-slate-600 dark:text-slate-400 mb-1" for="tenant_deposit">보증금 (원)</label>
+        <%= number_field_tag "tenant[deposit]", tenant["deposit"],
+              id: "tenant_deposit",
+              class: "w-full rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-1 text-sm text-slate-900 dark:text-slate-100",
+              min: 0 %>
+      </div>
+      <div>
+        <label class="block text-xs text-slate-600 dark:text-slate-400 mb-1" for="tenant_move_in_date">전입일</label>
+        <%= date_field_tag "tenant[move_in_date]", tenant["move_in_date"],
+              id: "tenant_move_in_date",
+              class: "w-full rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-1 text-sm text-slate-900 dark:text-slate-100" %>
+      </div>
+      <div>
+        <label class="block text-xs text-slate-600 dark:text-slate-400 mb-1" for="tenant_confirmed_date">확정일자</label>
+        <%= date_field_tag "tenant[confirmed_date]", tenant["confirmed_date"],
+              id: "tenant_confirmed_date",
+              class: "w-full rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-2 py-1 text-sm text-slate-900 dark:text-slate-100" %>
+      </div>
+    </div>
+    <div class="flex gap-2">
+      <%= f.submit "저장",
+            class: "rounded bg-blue-600 px-3 py-1 text-sm font-medium text-white hover:bg-blue-700" %>
+      <%= link_to "취소",
+            property_report_tenant_path(property, index),
+            class: "rounded border border-slate-300 dark:border-slate-600 px-3 py-1 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700",
+            data: { turbo_frame: "tenant-row-#{index}" } %>
+    </div>
+  <% end %>
+</div>

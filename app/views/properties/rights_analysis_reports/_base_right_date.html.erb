@@ -1,0 +1,9 @@
+<div class="flex items-center gap-2">
+  <span class="text-sm font-semibold text-red-600 dark:text-red-400">★ 말소기준일: <%= report.base_right_date %></span>
+  <% if property %>
+    <%= link_to "수정",
+          edit_base_right_date_property_report_path(property),
+          class: "text-xs text-blue-600 dark:text-blue-400 hover:underline",
+          data: { turbo_frame: "base-right-date" } %>
+  <% end %>
+</div>
