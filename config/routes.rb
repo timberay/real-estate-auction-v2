@@ -56,6 +56,7 @@ Rails.application.routes.draw do
 
   resources :properties, only: [ :index, :show, :create, :destroy ] do
     collection do
+      get  :compare,     to: "properties/comparisons#show"
       get  :bulk_import, to: "properties/bulk_imports#new",    as: :bulk_import
       post :bulk_import, to: "properties/bulk_imports#create"
     end
