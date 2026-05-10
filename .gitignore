@@ -50,6 +50,7 @@
 # IDE and AI tool local state.
 .superpowers/
 .worktrees/
+.claire/
 .claude/
 .ruby-lsp/
 .vscode/
