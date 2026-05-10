@@ -84,4 +84,26 @@ class ProfitCalculatorComponentTest < ViewComponent::TestCase
 
     assert_selector "[data-profit-calculator-assumed-amount-value='3000']"
   end
+
+  # B25 / audit B-19 — tax terms must carry a tooltip explaining their effect
+  # on 양도세 (capital-gains tax) so beginners know why the row is annotated.
+  test "renders tooltip for 경비 불산입 explaining it is excluded from CGT base" do
+    render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget,
+      report: @report
+    ))
+
+    assert_selector "[data-controller='tooltip'][data-tooltip-content-value='양도세 계산 시 차감 불가 (지출했지만 공제 안 됨)']"
+  end
+
+  test "renders tooltip for 필요경비만 공제 explaining only deductible costs reduce CGT" do
+    render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget,
+      report: @report
+    ))
+
+    assert_selector "[data-controller='tooltip'][data-tooltip-content-value='수선비·취득세 등은 양도세 계산 시 차감 가능']"
+  end
 end
