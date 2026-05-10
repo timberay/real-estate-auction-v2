@@ -2,7 +2,10 @@ require "application_system_test_case"
 
 class MyPropertiesTest < ApplicationSystemTestCase
   setup do
-    visit root_path  # establish guest session (project doesn't have sign_in_as helper)
+    # Phase A removed lazy guest creation on root_path; protected pages now
+    # require an authenticated user. Sign in as a fixture non-guest user.
+    @user = users(:budget_user)
+    sign_in_as(@user)
   end
 
   test "내 물건 page renders 사건번호 form and property cards grid" do
@@ -21,10 +24,8 @@ class MyPropertiesTest < ApplicationSystemTestCase
   end
 
   test "내 물건 page does NOT show inline budget box (moved to header)" do
-    user = User.last
-    user.update!(guest: false, email: "test@example.com")
-    user.create_budget_setting!(max_bid_amount: 50_000) unless user.budget_setting
-    user.budget_setting.update!(max_bid_amount: 50_000)
+    @user.create_budget_setting!(max_bid_amount: 50_000) unless @user.budget_setting
+    @user.budget_setting.update!(max_bid_amount: 50_000)
 
     visit properties_path
 
