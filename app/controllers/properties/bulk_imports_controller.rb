@@ -1,7 +1,5 @@
 module Properties
   class BulkImportsController < ApplicationController
-    MAX_ROWS = 50
-
     def new
       @result = nil
     end
