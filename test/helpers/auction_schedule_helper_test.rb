@@ -4,8 +4,15 @@ require "test_helper"
 
 class AuctionScheduleHelperTest < ActionView::TestCase
   setup do
+    # Pin the clock so D-N strings stay stable regardless of when tests run
+    # (avoids UTC-midnight flakiness).
+    travel_to Time.zone.local(2026, 5, 10, 12, 0, 0)
     @property = properties(:safe_apartment)
     @property.auction_schedules.delete_all
+  end
+
+  teardown do
+    travel_back
   end
 
   test "returns nil when property has no auction schedules" do

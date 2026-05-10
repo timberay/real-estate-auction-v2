@@ -109,45 +109,53 @@ class PropertyCardComponentTest < ViewComponent::TestCase
   end
 
   test "renders next auction schedule row with D-day badge when future schedule exists" do
-    property = properties(:safe_apartment)
-    property.auction_schedules.delete_all
-    schedule_date = Date.current + 5.days
-    property.auction_schedules.create!(schedule_date: schedule_date, schedule_time: "1000")
+    travel_to Time.zone.local(2026, 5, 10, 12, 0, 0) do
+      property = properties(:safe_apartment)
+      property.auction_schedules.delete_all
+      schedule_date = Date.current + 5.days
+      property.auction_schedules.create!(schedule_date: schedule_date, schedule_time: "1000")
 
-    render_inline(PropertyCardComponent.new(property: property))
+      render_inline(PropertyCardComponent.new(property: property))
 
-    assert_selector "[data-property-card='next-auction']", text: "다음 매각기일"
-    assert_selector "[data-property-card='next-auction']", text: schedule_date.strftime("%Y.%m.%d")
-    assert_selector "[data-property-card='next-auction']", text: "D-5"
+      assert_selector "[data-property-card='next-auction']", text: "다음 매각기일"
+      assert_selector "[data-property-card='next-auction']", text: schedule_date.strftime("%Y.%m.%d")
+      assert_selector "[data-property-card='next-auction']", text: "D-5"
+    end
   end
 
   test "uses red D-day styling when schedule is today" do
-    property = properties(:safe_apartment)
-    property.auction_schedules.delete_all
-    property.auction_schedules.create!(schedule_date: Date.current, schedule_time: "1000")
+    travel_to Time.zone.local(2026, 5, 10, 12, 0, 0) do
+      property = properties(:safe_apartment)
+      property.auction_schedules.delete_all
+      property.auction_schedules.create!(schedule_date: Date.current, schedule_time: "1000")
 
-    render_inline(PropertyCardComponent.new(property: property))
+      render_inline(PropertyCardComponent.new(property: property))
 
-    assert_selector "[data-property-card='next-auction'] .bg-red-100", text: "D-day"
+      assert_selector "[data-property-card='next-auction'] .bg-red-100", text: "D-day"
+    end
   end
 
   test "does not render next auction row when no future schedule exists" do
-    property = properties(:safe_apartment)
-    property.auction_schedules.delete_all
+    travel_to Time.zone.local(2026, 5, 10, 12, 0, 0) do
+      property = properties(:safe_apartment)
+      property.auction_schedules.delete_all
 
-    render_inline(PropertyCardComponent.new(property: property))
+      render_inline(PropertyCardComponent.new(property: property))
 
-    assert_no_selector "[data-property-card='next-auction']"
-    assert_no_text "다음 매각기일"
+      assert_no_selector "[data-property-card='next-auction']"
+      assert_no_text "다음 매각기일"
+    end
   end
 
   test "does not render next auction row when only past schedules exist" do
-    property = properties(:safe_apartment)
-    property.auction_schedules.delete_all
-    property.auction_schedules.create!(schedule_date: Date.current - 30.days, schedule_time: "1000")
+    travel_to Time.zone.local(2026, 5, 10, 12, 0, 0) do
+      property = properties(:safe_apartment)
+      property.auction_schedules.delete_all
+      property.auction_schedules.create!(schedule_date: Date.current - 30.days, schedule_time: "1000")
 
-    render_inline(PropertyCardComponent.new(property: property))
+      render_inline(PropertyCardComponent.new(property: property))
 
-    assert_no_selector "[data-property-card='next-auction']"
+      assert_no_selector "[data-property-card='next-auction']"
+    end
   end
 end

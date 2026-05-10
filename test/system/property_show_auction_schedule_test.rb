@@ -2,6 +2,8 @@ require "application_system_test_case"
 
 class PropertyShowAuctionScheduleTest < ApplicationSystemTestCase
   setup do
+    # Pin the clock so D-N strings stay stable regardless of when tests run.
+    travel_to Time.zone.local(2026, 5, 10, 12, 0, 0)
     @user = users(:budget_user)
     sign_in_as(@user)
 
@@ -24,6 +26,10 @@ class PropertyShowAuctionScheduleTest < ApplicationSystemTestCase
       source_type: :manual,
       has_risk: false
     )
+  end
+
+  teardown do
+    travel_back
   end
 
   test "property show page displays next auction date with D-day badge" do
