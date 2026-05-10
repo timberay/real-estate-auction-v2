@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_10_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_10_131239) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -184,6 +184,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_000001) do
     t.boolean "yes_means_safe", default: true, null: false
     t.index ["code"], name: "index_inspection_items_on_code", unique: true
     t.index ["tab", "tab_position"], name: "index_inspection_items_on_tab_and_tab_position"
+  end
+
+  create_table "inspection_result_versions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.json "evidence"
+    t.boolean "has_risk"
+    t.integer "inspection_result_id", null: false
+    t.text "resolution_note"
+    t.datetime "snapshotted_at", null: false
+    t.integer "source_type"
+    t.datetime "updated_at", null: false
+    t.integer "version_number", null: false
+    t.index ["inspection_result_id", "version_number"], name: "idx_inspection_result_versions_unique", unique: true
+    t.index ["inspection_result_id"], name: "index_inspection_result_versions_on_inspection_result_id"
   end
 
   create_table "inspection_results", force: :cascade do |t|
@@ -385,6 +399,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_10_000001) do
   add_foreign_key "budget_settings", "users"
   add_foreign_key "eviction_simulations", "properties"
   add_foreign_key "identities", "users"
+  add_foreign_key "inspection_result_versions", "inspection_results"
   add_foreign_key "inspection_results", "inspection_items"
   add_foreign_key "inspection_results", "properties"
   add_foreign_key "inspection_results", "users"

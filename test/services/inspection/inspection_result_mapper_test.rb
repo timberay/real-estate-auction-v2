@@ -165,6 +165,178 @@ class Inspection::InspectionResultMapperTest < ActiveSupport::TestCase
     assert_includes result.evidence["quote"], "HUG"
   end
 
+  test "snapshots prior AI state into versions before overwriting" do
+    # Seed an AI result so the mapper has something to overwrite.
+    item = InspectionItem.find_by!(code: "rights-002")
+    prior = InspectionResult.find_or_initialize_by(
+      property: @property, inspection_item: item, user: @user
+    )
+    prior.update!(
+      source_type: "ai",
+      has_risk: false,
+      evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "이전 판단" }
+    )
+
+    Inspection::InspectionResultMapper.call(
+      response: @response, property: @property, user: @user, items: @items
+    )
+
+    versions = prior.reload.versions.order(:version_number)
+    assert_equal 1, versions.size
+    snapshot = versions.first
+    assert_equal 1, snapshot.version_number
+    assert_equal "ai", snapshot.source_type
+    assert_equal false, snapshot.has_risk
+    assert_equal "이전 판단", snapshot.evidence["reasoning"]
+    assert_not_nil snapshot.snapshotted_at
+  end
+
+  test "skips overwrite when report user_confirmed_at is set" do
+    item = InspectionItem.find_by!(code: "rights-002")
+    prior = InspectionResult.find_or_initialize_by(
+      property: @property, inspection_item: item, user: @user
+    )
+    prior.update!(
+      source_type: "ai",
+      has_risk: false,
+      evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "확정된 판단" }
+    )
+
+    report = RightsAnalysisReport.find_or_initialize_by(user: @user, property: @property)
+    report.assign_attributes(analyzed_at: Time.current, user_confirmed_at: Time.current)
+    report.save!(validate: false)
+
+    Inspection::InspectionResultMapper.call(
+      response: @response, property: @property, user: @user, items: @items
+    )
+
+    refreshed = prior.reload
+    assert_equal false, refreshed.has_risk, "confirmed AI result must not be overwritten"
+    assert_equal "확정된 판단", refreshed.evidence["reasoning"]
+    assert_equal 0, refreshed.versions.count, "no snapshot when nothing was overwritten"
+  end
+
+  test "still overwrites when report exists but user_confirmed_at is nil" do
+    item = InspectionItem.find_by!(code: "rights-002")
+    prior = InspectionResult.find_or_initialize_by(
+      property: @property, inspection_item: item, user: @user
+    )
+    prior.update!(
+      source_type: "ai",
+      has_risk: false,
+      evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "이전 판단" }
+    )
+
+    # @property already has risky_villa_report fixture with user_confirmed_at: nil — verify.
+    report = RightsAnalysisReport.find_by(user: @user, property: @property)
+    assert_nil report&.user_confirmed_at
+
+    Inspection::InspectionResultMapper.call(
+      response: @response, property: @property, user: @user, items: @items
+    )
+
+    refreshed = prior.reload
+    # The fixture response asserts has_risk=true for rights-002, so we know overwrite ran.
+    assert_equal true, refreshed.has_risk
+    assert_equal 1, refreshed.versions.count
+  end
+
+  test "manual results still short-circuit regardless of confirmation" do
+    report = RightsAnalysisReport.find_or_initialize_by(user: @user, property: @property)
+    report.assign_attributes(analyzed_at: Time.current, user_confirmed_at: Time.current)
+    report.save!(validate: false)
+
+    Inspection::InspectionResultMapper.call(
+      response: @response, property: @property, user: @user, items: @items
+    )
+
+    result = find_result("manual-001")
+    assert result.manual?
+    assert_equal "임차인과 협의 완료", result.resolution_note
+    assert_equal 0, result.versions.count
+  end
+
+  test "applicable_for? override does not run when report is confirmed" do
+    finance_item = InspectionItem.create!(
+      code: "finance-007", tab: :profit_analysis, tab_position: 7,
+      category: "자금&대출 분석",
+      question: "등기부등본에 근저당 설정 이력이 있습니까?",
+      applicable_types: [ "아파트" ],
+      yes_means_safe: true
+    )
+    prior = InspectionResult.create!(
+      property: @property, inspection_item: finance_item, user: @user,
+      source_type: "ai", has_risk: true,
+      evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "확정 의견" }
+    )
+
+    report = RightsAnalysisReport.find_or_initialize_by(user: @user, property: @property)
+    report.assign_attributes(analyzed_at: Time.current, user_confirmed_at: Time.current)
+    report.save!(validate: false)
+
+    response_with_detached = @response.deep_dup
+    response_with_detached["metadata"]["property_type"] = "단독주택"
+    response_with_detached["results"]["finance-007"] = {
+      "has_risk" => false, "confidence" => "high", "reasoning" => "신규 의견"
+    }
+
+    Inspection::InspectionResultMapper.call(
+      response: response_with_detached, property: @property, user: @user,
+      items: @items.to_a + [ finance_item ]
+    )
+
+    refreshed = prior.reload
+    assert_equal true, refreshed.has_risk, "confirmed AI result must not be touched by applicable_for? override"
+    assert_equal "확정 의견", refreshed.evidence["reasoning"]
+    assert_equal 0, refreshed.versions.count
+  ensure
+    finance_item&.destroy
+  end
+
+  test "creates no version when AI result is first persisted" do
+    @property.inspection_results.where(user: @user).where.not(source_type: :manual).destroy_all
+
+    Inspection::InspectionResultMapper.call(
+      response: @response, property: @property, user: @user, items: @items
+    )
+
+    result = find_result("rights-002")
+    assert result.ai?
+    assert_equal 0, result.versions.count, "first persist should not snapshot"
+  end
+
+  test "version_number increments correctly across multiple overwrites" do
+    item = InspectionItem.find_by!(code: "rights-002")
+    prior = InspectionResult.find_or_initialize_by(
+      property: @property, inspection_item: item, user: @user
+    )
+    prior.update!(
+      source_type: "ai", has_risk: false,
+      evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "v0" }
+    )
+
+    response_a = @response.deep_dup
+    response_a["results"]["rights-002"] = {
+      "has_risk" => true, "confidence" => "high", "reasoning" => "v1"
+    }
+    response_b = @response.deep_dup
+    response_b["results"]["rights-002"] = {
+      "has_risk" => false, "confidence" => "high", "reasoning" => "v2"
+    }
+
+    Inspection::InspectionResultMapper.call(
+      response: response_a, property: @property, user: @user, items: @items
+    )
+    Inspection::InspectionResultMapper.call(
+      response: response_b, property: @property, user: @user, items: @items
+    )
+
+    versions = prior.reload.versions.order(:version_number)
+    assert_equal [ 1, 2 ], versions.pluck(:version_number)
+    assert_equal "v0", versions.first.evidence["reasoning"], "v1 snapshot captures prior v0 state"
+    assert_equal "v1", versions.second.evidence["reasoning"], "v2 snapshot captures prior v1 state"
+  end
+
   test "overrides has_risk to nil for items not applicable to property type" do
     finance_item = InspectionItem.create!(
       code: "finance-003", tab: :profit_analysis, tab_position: 2,
