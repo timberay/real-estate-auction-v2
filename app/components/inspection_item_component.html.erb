@@ -56,13 +56,13 @@
            data-inspection-item-target="logicYes"
            <% if selected_answer == 'yes' %>data-logic-selected="yes"<% end %>>
         <span class="shrink-0" data-inspection-item-target="logicYesIcon"><%= selected_answer == "yes" ? "✔" : "○" %></span>
-        <span>Yes: <%= @item.logic["yes"] %></span>
+        <span>예 선택 시: <%= @item.logic["yes"] %></span>
       </div>
       <div class="flex items-start gap-1.5 rounded px-2 py-1 <%= logic_no_classes %>"
            data-inspection-item-target="logicNo"
            <% if selected_answer == 'no' %>data-logic-selected="no"<% end %>>
         <span class="shrink-0" data-inspection-item-target="logicNoIcon"><%= selected_answer == "no" ? "✔" : "○" %></span>
-        <span>No: <%= @item.logic["no"] %></span>
+        <span>아니오 선택 시: <%= @item.logic["no"] %></span>
       </div>
     </div>
   <% end %>
@@ -101,13 +101,13 @@
           <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", yes_radio_value, @result.has_risk == (yes_radio_value == "true"),
               disabled: true,
               data: { action: "change->inspection-item#toggleManualRisk", inspection_item_target: "overrideRadio" },
-              class: "mr-1.5" %> <%= @item.yes_means_safe? ? "Yes (안전)" : "Yes (위험)" %>
+              class: "mr-1.5" %> <%= @item.yes_means_safe? ? "예 (안전)" : "예 (위험)" %>
         </label>
         <label class="inline-flex items-center text-sm text-slate-700 dark:text-slate-200">
           <%= radio_button_tag "resolutions[#{@result.id}][has_risk]", no_radio_value, @result.has_risk == (no_radio_value == "true"),
               disabled: true,
               data: { action: "change->inspection-item#toggleManualRisk", inspection_item_target: "overrideRadio" },
-              class: "mr-1.5" %> <%= @item.yes_means_safe? ? "No (위험)" : "No (안전)" %>
+              class: "mr-1.5" %> <%= @item.yes_means_safe? ? "아니오 (위험)" : "아니오 (안전)" %>
         </label>
       </div>
       <%# Hidden field to signal this is an override %>
