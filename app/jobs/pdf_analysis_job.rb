@@ -34,20 +34,33 @@ class PdfAnalysisJob < ApplicationJob
     }.to_json)
   end
 
-  discard_on(
-    JSON::ParserError,
-    PdfAnalysisService::CaseNumberMismatchError,
-    PdfAnalysisService::CaseNumberMissingError
-  ) do |job, error|
+  discard_on JSON::ParserError do |job, error|
+    _log_data_error(job, error, event: "pdf_analysis_job.json_parse_discard")
+    job.send(:broadcast_failure_for_user, job.arguments.first&.dig(:user_id),
+             "AI 응답을 분석할 수 없습니다. 잠시 후 다시 시도해주세요.")
+  end
+
+  discard_on PdfAnalysisService::CaseNumberMismatchError do |job, error|
+    _log_data_error(job, error, event: "pdf_analysis_job.case_number_mismatch_discard")
+    job.send(:broadcast_failure_for_user, job.arguments.first&.dig(:user_id),
+             "PDF에서 추출된 사건번호가 선택한 물건과 다릅니다. 올바른 PDF인지 확인해주세요.")
+  end
+
+  discard_on PdfAnalysisService::CaseNumberMissingError do |job, error|
+    _log_data_error(job, error, event: "pdf_analysis_job.case_number_missing_discard")
+    job.send(:broadcast_failure_for_user, job.arguments.first&.dig(:user_id),
+             "사건번호를 먼저 입력해 주세요.")
+  end
+
+  def self._log_data_error(job, error, event:)
     user_id = job.arguments.first&.dig(:user_id)
     Rails.logger.warn({
-      event: "pdf_analysis_job.data_error_discard",
+      event: event,
       job_id: job.job_id,
       arguments: { user_id: user_id },
       error_class: error.class.name,
       error_message: error.message
     }.to_json)
-    job.send(:broadcast_failure_for_user, user_id, error.message)
   end
 
   def perform(property_id: nil, user_id:, document_blob_ids: nil)
@@ -93,7 +106,7 @@ class PdfAnalysisJob < ApplicationJob
       error_class: e.class.name,
       error_message: e.message
     }.to_json)
-    broadcast_failure("분석 중 오류가 발생했습니다: #{e.message}")
+    broadcast_failure("분석 중 오류가 발생했습니다. 문제가 지속되면 고객센터에 문의해주세요.")
   end
 
   private
