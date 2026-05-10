@@ -1,0 +1,37 @@
+<turbo-frame id="user-property-photos">
+  <div class="space-y-3">
+    <% if user_property.photos.attached? %>
+      <div class="flex flex-wrap gap-2">
+        <% user_property.photos.each do |photo| %>
+          <div class="relative">
+            <%= image_tag url_for(photo),
+                  class: "max-w-32 max-h-32 object-cover rounded border border-slate-200 dark:border-slate-600",
+                  alt: "임장 사진" %>
+            <%= button_to "×",
+                  property_photo_path(property, photo.id),
+                  method: :delete,
+                  data: { turbo_frame: "user-property-photos" },
+                  class: "absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white hover:bg-red-600",
+                  form: { class: "inline" } %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%= form_with url: property_photos_path(property),
+          method: :post,
+          data: { turbo_frame: "user-property-photos" } do |f| %>
+      <div class="flex items-center gap-2">
+        <%= f.file_field :photo,
+              accept: "image/*",
+              class: "text-sm text-slate-600 dark:text-slate-400 file:mr-2 file:rounded file:border-0 file:bg-blue-50 file:px-3 file:py-1 file:text-sm file:font-medium file:text-blue-700 dark:file:bg-blue-900/30 dark:file:text-blue-300 hover:file:bg-blue-100" %>
+        <%= f.submit "업로드",
+              class: "rounded bg-slate-600 px-3 py-1 text-sm font-medium text-white hover:bg-slate-700" %>
+      </div>
+    <% end %>
+
+    <% if defined?(errors) && errors.present? %>
+      <p class="text-sm text-red-600 dark:text-red-400"><%= errors %></p>
+    <% end %>
+  </div>
+</turbo-frame>
