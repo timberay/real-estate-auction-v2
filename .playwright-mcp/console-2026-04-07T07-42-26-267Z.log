@@ -1,8 +1,0 @@
-[     478ms] [WARNING] Heroicon: Failed to find heroicon: play-circle @ http://localhost:3000/properties:258
-[   24821ms] [WARNING] Heroicon: Failed to find heroicon: play-circle @ :2
-[   27811ms] [WARNING] The resource http://localhost:3000/assets/tailwind-66b0fc73.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/onboarding:0
-[   27811ms] [WARNING] The resource http://localhost:3000/assets/application-8b441ae0.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/onboarding:0
-[   45062ms] [WARNING] Heroicon: Failed to find heroicon: play-circle @ :2
-[   45104ms] [WARNING] Heroicon: Failed to find heroicon: play-circle @ :2
-[   48101ms] [WARNING] The resource http://localhost:3000/assets/tailwind-66b0fc73.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/properties:0
-[   48101ms] [WARNING] The resource http://localhost:3000/assets/application-8b441ae0.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/properties:0
