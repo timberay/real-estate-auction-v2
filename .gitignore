@@ -51,7 +51,9 @@
 .superpowers/
 .worktrees/
 .claire/
-.claude/
+.claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/worktrees/
 .ruby-lsp/
 .vscode/
 .idea/
