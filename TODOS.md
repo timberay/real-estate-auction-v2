@@ -1,55 +1,30 @@
 # TODOS
 
-Deferred work captured by `/plan-eng-review`. Each item includes context so a future session can pick it up without losing the reasoning.
+> **이 파일은 2026-05-12 부로 폐기되었습니다.** 모든 항목은 아래 두 문서로 흡수되었습니다.
 
----
+## 진실 소스
 
-## Post-launch follow-ups (case-number direct registration)
+| 종류 | 문서 |
+|------|------|
+| **기존 기능 부채 (전체 코드베이스 감사)** | [`docs/superpowers/plans/2026-05-12-existing-feature-debt.md`](docs/superpowers/plans/2026-05-12-existing-feature-debt.md) |
+| **출시 후 신규 구현 로드맵 (Wave 1-4)** | [`docs/superpowers/plans/2026-05-10-post-launch-roadmap.md`](docs/superpowers/plans/2026-05-10-post-launch-roadmap.md) |
+| **PR #107~#125 리뷰 follow-up 22건** | [`docs/superpowers/plans/2026-05-10-ux-audit-remaining-backlog.md`](docs/superpowers/plans/2026-05-10-ux-audit-remaining-backlog.md) |
 
-### Auto-discovery fallback (60-court iteration)
+## 폐기된 항목의 새 위치
 
-**What**: When `court_code` is not provided in the case-number-add form, iterate `priority_court_codes` (Seoul → Gyeonggi → rest, 60 entries) via the same `pgj15A/selectAuctnCsSrchRslt.on` HTTP endpoint, with adaptive backoff (BASE_DELAY 0.5s → MAX_DELAY 5s, abort after 5 consecutive HTTP errors).
+원래 이 파일에 있던 3건은 다음 위치에서 추적됩니다:
 
-**Why**: Some users know the case_number from external sources (newspapers, brokerage listings) but not which court holds it. Today they have to look it up separately. The fallback closes that gap.
+| 원본 항목 | 새 위치 |
+|---------|---------|
+| 자동 법원 탐색 fallback (60-court iteration) | `2026-05-12-existing-feature-debt.md` §C2 |
+| CaseSearchService race-rescue 테스트 | `2026-05-12-existing-feature-debt.md` §C2 |
+| `Property#refresh_from_court_auction!` | `2026-05-12-existing-feature-debt.md` §C2 |
 
-**Pros**: Removes a UX dead-end for the user-without-court-knowledge segment. Implementation pattern is well-specified (recoverable from `git show 4521efb^:app/services/case_search_service.rb`'s `discover_court` method).
+## 과거 참조에 대한 안내
 
-**Cons**: Worst-case 60s wait under sustained court-site degradation holds a Puma worker. On Cafe24 4GB single-server with 5 default Puma threads, multiple concurrent submissions could exhaust workers. Required to ship as ActiveJob + Turbo Stream broadcast, not sync — adds background-worker infra (Solid Queue or similar).
+다음 plan 문서가 본 파일을 deferred-items dump 로 가리키고 있으나, 해당 문서들은 작성 시점의 컨텍스트를 보존하는 역사 자료이므로 그대로 둡니다:
 
-**Context**: Originally implemented in commit `c15c23a` (2026-04-09), removed in `4521efb` (2026-04-11) as part of MVP scope reduction. Current `/plan-eng-review` (2026-05-04) explicitly dropped it from the revival PR for launch-timing reasons.
+- `docs/superpowers/plans/2026-05-04-case-number-direct-add.md` §"Out of Scope (deferred to TODOS.md)"
+- `docs/superpowers/plans/2026-04-22-sns-login-plan.md` (line ~3125)
 
-**Depends on / blocked by**: Solid Queue (or equivalent) deployed on Cafe24. Decision needed on background-worker infrastructure for the production deployment.
-
----
-
-### CaseSearchService race-rescue test that exercises the rescue branch
-
-**What**: Add a test in `test/services/case_search_service_test.rb` that actually triggers `rescue ActiveRecord::RecordNotUnique` inside `CaseSearchService#persist`. Currently the "race condition" test pre-creates the Property, so `find_or_create_by!` takes the find path and the rescue block at `case_search_service.rb:39-40` is dead code from the test suite's perspective.
-
-**Why**: Coverage gap flagged by the post-implementation final review. The rescue path exists for genuine concurrent submits (two browser tabs, simultaneous POST). If a future refactor breaks the rescue, no test catches it.
-
-**Pros**: Closes the only untested branch in CaseSearchService. Inexpensive insurance against future regressions.
-
-**Cons**: Requires Mocha or stub-based fakery to make `find_or_create_by!` raise `RecordNotUnique` on first call and succeed on second. Slightly more invasive than a simple test.
-
-**Context**: Identified by the final code review on commit `bae42ff`. Original test at `test/services/case_search_service_test.rb` line 65 named "race condition: concurrent insert resolves to existing Property" — passes for the right reason (existing property returned) but never enters the rescue branch.
-
-**Depends on / blocked by**: nothing.
-
----
-
-### Property refresh from court auction site
-
-**What**: Add `Property#refresh_from_court_auction!` instance method. Uses stored `court_code` + `case_number` to re-call `pgj15A/selectAuctnCsSrchRslt.on`, re-runs `parse_case_search`, updates Property attributes (status, min_bid_price, failed_bid_count, auction_date, etc.) without losing user-entered data.
-
-**Why**: Auction details change weekly — bid dates shift, failed-bid counts increment, case status changes (진행중 → 종결). Today users must re-search via the criteria flow to see updates, which is wasteful when they already track the property.
-
-**Pros**: Real-time data freshness without forcing users back through criteria search. Most natural pairing with the case-number direct add: same code path, same auth-free HTTP API.
-
-**Cons**: Need to define refresh policy — manual button vs scheduled job vs on-page-view-trigger. Each has different cost/complexity trade-offs.
-
-**Context**: Enabled by A1 migration adding `court_code/court_name` columns to Property in this PR. Without those columns, refresh would require a separate court-discovery step.
-
-**Depends on / blocked by**: The case-number direct registration PR (this design doc) must ship first to populate `court_code` on existing properties via the 1-time backfill.
-
----
+새로운 deferred 항목이 발생하면 이 파일이 아닌 **두 진실 소스 중 적절한 곳**(부채는 debt 문서, 신규는 roadmap)에 추가하십시오.
