@@ -1,5 +1,4 @@
 import { Controller } from "@hotwired/stimulus"
-import { KOR_EOK_TO_MAN } from "controllers/constants"
 
 // Manages Step 2 reserve fund form:
 // - Area / property-type / household-tier changes trigger auto-recalculation
@@ -182,17 +181,15 @@ export default class extends Controller {
     return { bid, rate }
   }
 
-  updateHints(match) {
-    const priceLabel = `평균 ${(match.average_price / KOR_EOK_TO_MAN).toFixed(1)}억`
-
+  updateHints(_match) {
     if (this.hasRepairCostHintTarget)
-      this.repairCostHintTarget.textContent = `${priceLabel} 기준 수선비`
+      this.repairCostHintTarget.textContent = `면적 기준 수선비`
     if (this.hasAcquisitionTaxHintTarget) {
       const tax = this.computeAuto()
       this.acquisitionTaxHintTarget.textContent = `예상 낙찰가 기반 ${tax.toLocaleString("ko-KR")}만원`
     }
     if (this.hasScrivenerFeeHintTarget)
-      this.scrivenerFeeHintTarget.textContent = `${priceLabel} 기준 법무사 수수료`
+      this.scrivenerFeeHintTarget.textContent = `면적 기준 법무사 수수료`
     if (this.hasMovingCostHintTarget)
       this.movingCostHintTarget.textContent = `면적 기준 이사비`
     if (this.hasMaintenanceFeeHintTarget)

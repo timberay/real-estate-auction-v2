@@ -329,10 +329,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_230000) do
   end
 
   create_table "reserve_fund_defaults", force: :cascade do |t|
-    t.decimal "acquisition_tax_rate", precision: 5, scale: 4, null: false
     t.integer "area_range_max", null: false
     t.integer "area_range_min", null: false
-    t.integer "average_price", default: 0, null: false
     t.datetime "created_at", null: false
     t.integer "maintenance_fee", null: false
     t.integer "moving_cost", null: false

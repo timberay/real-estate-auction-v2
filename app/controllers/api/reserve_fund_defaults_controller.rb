@@ -5,7 +5,7 @@ module Api
                                    .order(:area_range_min)
       render json: defaults.select(
         :id, :area_range_min, :area_range_max, :repair_cost,
-        :acquisition_tax_rate, :scrivener_fee, :moving_cost, :maintenance_fee
+        :scrivener_fee, :moving_cost, :maintenance_fee
       )
     end
   end
