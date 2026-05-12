@@ -202,4 +202,40 @@ class ProfitCalculatorComponentTest < ViewComponent::TestCase
     refute_nil checked
     assert_equal "homeless", checked["value"]
   end
+
+  # F-C-1 — propagate the precise-mode opt-in so the JS bracket lookup can
+  # switch to the progressive formula in the 6~9억 bracket.
+  test "exposes precise_mode=true when budget_setting opts in" do
+    @budget.update!(acquisition_tax_precise_mode: true)
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget,
+      report: @report
+    ))
+
+    root = rendered.css("[data-controller='profit-calculator']").first
+    assert_equal "true", root["data-profit-calculator-precise-mode-value"]
+  end
+
+  test "exposes precise_mode=false by default" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget,
+      report: @report
+    ))
+
+    root = rendered.css("[data-controller='profit-calculator']").first
+    assert_equal "false", root["data-profit-calculator-precise-mode-value"]
+  end
+
+  test "exposes precise_mode=false when budget_setting is nil" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: nil,
+      report: @report
+    ))
+
+    root = rendered.css("[data-controller='profit-calculator']").first
+    assert_equal "false", root["data-profit-calculator-precise-mode-value"]
+  end
 end

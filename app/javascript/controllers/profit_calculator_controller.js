@@ -26,8 +26,21 @@ export default class extends Controller {
     repairCost: Number,
     movingCost: Number,
     maintenanceFee: Number,
-    taxBrackets: Object
+    taxBrackets: Object,
+    preciseMode: Boolean,
+    areaOver85: Boolean
   }
+
+  // F-C-1 — bid range (in 만원) where the precise progressive formula
+  // `(가액(억) × 2/3 − 3) / 100` overrides the bracket midpoint. Mirrors
+  // the 6~9억 row in `AcquisitionTaxRate`.
+  static PRECISE_BRACKET_MIN_MANWON = 60000
+  static PRECISE_BRACKET_MAX_MANWON = 90000
+
+  // Flat 농어촌특별세 surcharge baked into `area_over_85=true` rows of the
+  // simplified seed table; re-applied on top of the precise formula so the
+  // over-85 case stays differentiated from under-85.
+  static AREA_OVER_85_SURCHARGE = 0.002
 
   // Effective capital gains tax rates by ownership tier + holding period.
   // Keys mirror AcquisitionTaxRate::HOUSEHOLD_TIERS.
@@ -216,8 +229,15 @@ export default class extends Controller {
 
   // Resolves the acquisition tax rate for a given bid amount + tier by
   // walking the server-supplied bracket list. Mirrors the SQL bracket
-  // lookup in AcquisitionTaxCalculator#lookup_row.
+  // lookup in AcquisitionTaxCalculator#lookup_row. When precise mode is
+  // opted in (F-C-1) and the bid falls inside the 6~9억 bracket, returns
+  // the progressive formula rate instead of the bracket midpoint.
   findAcqTaxRate(bidManwon, tier) {
+    if (this.preciseModeValue && this.isInPreciseBracket(bidManwon)) {
+      return this.preciseProgressiveRate(bidManwon) +
+             (this.areaOver85Value ? this.constructor.AREA_OVER_85_SURCHARGE : 0)
+    }
+
     const brackets = this.taxBracketsValue?.[tier] || []
     for (const b of brackets) {
       if (b.max === null || b.max === undefined || bidManwon < b.max) {
@@ -228,6 +248,17 @@ export default class extends Controller {
     // rate when available, else the constant fallback.
     if (brackets.length > 0) return parseFloat(brackets[brackets.length - 1].rate)
     return this.constructor.ACQ_TAX_FALLBACK_RATE
+  }
+
+  isInPreciseBracket(bidManwon) {
+    return bidManwon >= this.constructor.PRECISE_BRACKET_MIN_MANWON &&
+           bidManwon < this.constructor.PRECISE_BRACKET_MAX_MANWON
+  }
+
+  // (가액(억) × 2/3 − 3) / 100 — the base rate, in decimal.
+  preciseProgressiveRate(bidManwon) {
+    const bidEok = bidManwon / 10000
+    return (bidEok * (2 / 3) - 3) / 100
   }
 
   selectedHoldingPeriod() {
