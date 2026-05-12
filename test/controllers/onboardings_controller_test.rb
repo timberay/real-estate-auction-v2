@@ -155,6 +155,22 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "span.font-medium", text: "경락대출 (1금융)"
   end
 
+  test "step2 renders all enabled property types as options in the 부동산 유형 select" do
+    get start_onboarding_url
+    post step1_onboarding_url, params: { budget_setting: { available_cash: 30000 } }
+    assert_response :success
+
+    enabled = PropertyType.enabled.ordered
+    assert_operator enabled.count, :>, 0, "fixtures must provide at least one enabled property type"
+
+    assert_select "select[name='budget_setting[property_type_id]']" do
+      assert_select "option:not([value=''])", count: enabled.count
+      enabled.each do |pt|
+        assert_select "option[value='#{pt.id}']", text: pt.name
+      end
+    end
+  end
+
   test "GET complete shows results" do
     get start_onboarding_url
     guest = User.find(session[:user_id])
