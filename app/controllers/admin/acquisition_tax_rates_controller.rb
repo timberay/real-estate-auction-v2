@@ -15,6 +15,7 @@ module Admin
     def create
       @rate = AcquisitionTaxRate.new(create_params)
       if @rate.save
+        record_audit("created", @rate, { after: @rate.attributes })
         redirect_to admin_acquisition_tax_rates_url,
                     notice: "새 취득세율을 추가했습니다."
       else
@@ -44,6 +45,18 @@ module Admin
 
     def load_rate
       @rate = AcquisitionTaxRate.find(params[:id])
+    end
+
+    # F-D-3 — write an append-only audit row for a successful mutation.
+    # `rate` may be nil only for the `destroyed` action when callers
+    # prefer to detach the FK; we still always have the JSON payload.
+    def record_audit(action, rate, payload)
+      AcquisitionTaxRateAuditLog.create!(
+        acquisition_tax_rate_id: rate&.id,
+        user_id: current_user.id,
+        action: action,
+        changes_json: payload.to_json
+      )
     end
 
     # On edit, property_type_id + household_tier are identity-like keys and

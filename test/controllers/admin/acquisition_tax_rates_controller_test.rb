@@ -160,4 +160,58 @@ class Admin::AcquisitionTaxRatesControllerTest < ActionDispatch::IntegrationTest
     end
     assert_response :not_found
   end
+
+  # F-D-3 — every successful mutation records an audit row attributed to
+  # the acting admin. Failed validations and non-admin requests must NOT
+  # produce audit rows.
+  test "POST create writes one audit row attributed to the admin" do
+    post "/testing/sign_in", params: { user_id: @admin.id }
+    assert_difference -> { AcquisitionTaxRateAuditLog.count }, +1 do
+      post admin_acquisition_tax_rates_url, params: {
+        acquisition_tax_rate: {
+          property_type_id: property_types(:villa).id,
+          household_tier: "homeless",
+          price_bucket_min_manwon: 0,
+          price_bucket_max_manwon: 60_000,
+          area_over_85: false,
+          regulated_region: nil,
+          total_rate: 0.012
+        }
+      }
+    end
+    log = AcquisitionTaxRateAuditLog.order(:id).last
+    assert_equal "created", log.action
+    assert_equal @admin.id, log.user_id
+    payload = JSON.parse(log.changes_json)
+    assert payload.key?("after"), payload.inspect
+    assert_in_delta 0.012, payload.dig("after", "total_rate").to_f, 1e-6
+  end
+
+  test "POST create with invalid params writes no audit row" do
+    post "/testing/sign_in", params: { user_id: @admin.id }
+    assert_no_difference -> { AcquisitionTaxRateAuditLog.count } do
+      post admin_acquisition_tax_rates_url, params: {
+        acquisition_tax_rate: {
+          property_type_id: property_types(:villa).id,
+          household_tier: "homeless",
+          price_bucket_min_manwon: 0,
+          total_rate: 0.50
+        }
+      }
+    end
+  end
+
+  test "POST create from non-admin writes no audit row" do
+    post "/testing/sign_in", params: { user_id: @non_admin.id }
+    assert_no_difference -> { AcquisitionTaxRateAuditLog.count } do
+      post admin_acquisition_tax_rates_url, params: {
+        acquisition_tax_rate: {
+          property_type_id: property_types(:villa).id,
+          household_tier: "homeless",
+          price_bucket_min_manwon: 0,
+          total_rate: 0.012
+        }
+      }
+    end
+  end
 end
