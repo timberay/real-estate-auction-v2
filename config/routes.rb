@@ -55,7 +55,7 @@ Rails.application.routes.draw do
   end
 
   namespace :admin do
-    resources :acquisition_tax_rates, only: [ :index, :edit, :update ]
+    resources :acquisition_tax_rates, only: [ :index, :new, :create, :edit, :update, :destroy ]
   end
 
   resources :properties, only: [ :index, :show, :create, :destroy ] do
