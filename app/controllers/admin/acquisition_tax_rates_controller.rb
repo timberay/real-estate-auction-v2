@@ -27,7 +27,10 @@ module Admin
     end
 
     def update
+      before_snapshot = @rate.attributes
       if @rate.update(rate_params)
+        record_audit("updated", @rate,
+                     { before: before_snapshot, after: @rate.attributes })
         redirect_to admin_acquisition_tax_rates_url,
                     notice: "취득세율을 업데이트했습니다."
       else
@@ -36,7 +39,17 @@ module Admin
     end
 
     def destroy
+      destroyed_id = @rate.id
+      before_snapshot = @rate.attributes
       @rate.destroy
+      # Pass nil for rate so the audit row stores the id but no FK link
+      # (the row is gone — we record the old id directly).
+      AcquisitionTaxRateAuditLog.create!(
+        acquisition_tax_rate_id: destroyed_id,
+        user_id: current_user.id,
+        action: "destroyed",
+        changes_json: { before: before_snapshot }.to_json
+      )
       redirect_to admin_acquisition_tax_rates_url,
                   notice: "취득세율 행을 삭제했습니다."
     end
