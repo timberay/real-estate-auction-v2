@@ -237,4 +237,22 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
     @setting.reload
     assert_equal 40000, @setting.available_cash
   end
+
+  test "PATCH update persists acquisition_tax_precise_mode opt-in" do
+    assert_equal false, @setting.acquisition_tax_precise_mode
+
+    patch settings_budget_url, params: {
+      budget_setting: {
+        available_cash: @setting.available_cash,
+        property_type_id: @setting.property_type_id,
+        area_category: "mid",
+        loan_policy_id: @setting.loan_policy_id,
+        loan_ratio: @setting.loan_ratio,
+        acquisition_tax_precise_mode: "1"
+      }
+    }
+
+    assert_redirected_to settings_budget_url
+    assert_equal true, @setting.reload.acquisition_tax_precise_mode
+  end
 end

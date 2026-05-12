@@ -115,7 +115,7 @@ module Settings
     def budget_params
       params.expect(budget_setting: [
         :available_cash, :property_type_id, :area_category,
-        :household_tier, :acquisition_tax_auto,
+        :household_tier, :acquisition_tax_auto, :acquisition_tax_precise_mode,
         :repair_cost, :acquisition_tax, :scrivener_fee,
         :moving_cost, :maintenance_fee, :loan_policy_id, :loan_ratio,
         :region
