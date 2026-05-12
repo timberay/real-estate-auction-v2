@@ -3,9 +3,12 @@ class BudgetSetting < ApplicationRecord
   belongs_to :property_type, optional: true
   belongs_to :loan_policy, optional: true
 
+  HOUSEHOLD_TIERS = AcquisitionTaxRate::HOUSEHOLD_TIERS
+
   validates :user_id, uniqueness: true
   validates :available_cash, numericality: { greater_than: 0 }, allow_nil: true
   validates :loan_ratio, numericality: { greater_than: 0, less_than_or_equal_to: 1 }, allow_nil: true
+  validates :household_tier, inclusion: { in: HOUSEHOLD_TIERS }
   RESERVE_FIELDS = %i[repair_cost acquisition_tax scrivener_fee moving_cost maintenance_fee].freeze
 
   RESERVE_FIELDS.each do |field|
@@ -70,5 +73,9 @@ class BudgetSetting < ApplicationRecord
 
   def regulated_region?
     Regions.regulated?(region)
+  end
+
+  def area_over_85?
+    area_range_min.to_i >= 85
   end
 end
