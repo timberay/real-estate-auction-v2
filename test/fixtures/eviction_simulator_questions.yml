@@ -27,3 +27,23 @@ q5_delivery_order:
   yes_next_code: "Q6"
   no_next_code: "Q5B"
   difficulty_impact: "high"
+
+do_q1_delivery_order:
+  code: "DO-Q1"
+  phase: 0
+  step_code: "DO-S1"
+  question: "잔금 납부와 동시에 인도명령을 신청했나요?"
+  help_text: "채무자(소유자)는 인도명령 대상자가 명확합니다."
+  yes_next_code: "DO-Q2"
+  no_next_code: "DO-Q1G"
+  occupant_type: "debtor_owner"
+
+do_q2_notice:
+  code: "DO-Q2"
+  phase: 0
+  step_code: "DO-S2"
+  question: "소유권이전등기 후 채무자에게 1차 통보를 발송했나요?"
+  help_text: "내용증명은 강제집행 단계에서 협상 노력의 증거가 됩니다."
+  yes_next_code: "END"
+  no_next_code: "DO-Q2G"
+  occupant_type: "debtor_owner"

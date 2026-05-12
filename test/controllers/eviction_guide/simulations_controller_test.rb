@@ -86,4 +86,23 @@ class EvictionGuide::SimulationsControllerTest < ActionDispatch::IntegrationTest
     sim.reload
     assert_equal true, sim.answers["Q1"]
   end
+
+  test "DO-Q1 Yes advances to DO-Q2 and the page renders" do
+    # E2E sweep reported clicking 네 on DO-Q1 not advancing. Lock the real
+    # debtor_owner branch end-to-end so any regression in seed data or
+    # rendering surfaces here.
+    post eviction_guide_simulation_url, params: { property_id: "", occupant_type: "debtor_owner" }
+    assert_response :redirect
+
+    do_q1 = EvictionSimulatorQuestion.find_by!(code: "DO-Q1")
+    assert_equal "DO-Q2", do_q1.yes_next_code
+
+    patch eviction_guide_simulation_url, params: {
+      question_code: "DO-Q1", answer: "true", next_code: do_q1.yes_next_code
+    }
+    assert_redirected_to eviction_guide_simulator_question_path(code: "DO-Q2")
+
+    follow_redirect!
+    assert_response :success
+  end
 end
