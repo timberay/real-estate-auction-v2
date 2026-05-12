@@ -29,6 +29,7 @@ class PropertyTypeTest < ActiveSupport::TestCase
     BudgetSetting.delete_all
     LoanPolicy.delete_all
     ReserveFundDefault.delete_all
+    AcquisitionTaxRate.delete_all
     PropertyType.delete_all
     PropertyType.create!(name: "아파트", code: "apartment", enabled: true, sort_order: 0)
     PropertyType.create!(name: "단독주택", code: "house", enabled: false, sort_order: 3)
@@ -41,6 +42,7 @@ class PropertyTypeTest < ActiveSupport::TestCase
     BudgetSetting.delete_all
     LoanPolicy.delete_all
     ReserveFundDefault.delete_all
+    AcquisitionTaxRate.delete_all
     PropertyType.delete_all
     PropertyType.create!(name: "오피스텔", code: "officetel", enabled: true, sort_order: 2)
     PropertyType.create!(name: "아파트", code: "apartment", enabled: true, sort_order: 0)

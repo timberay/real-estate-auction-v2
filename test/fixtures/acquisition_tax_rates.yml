@@ -1,0 +1,61 @@
+apartment_homeless_under6_under85:
+  property_type: apartment
+  household_tier: homeless
+  regulated_region: # null
+  price_bucket_min_manwon: 0
+  price_bucket_max_manwon: 60000
+  area_over_85: false
+  total_rate: 0.0110
+
+apartment_homeless_under6_over85:
+  property_type: apartment
+  household_tier: homeless
+  price_bucket_min_manwon: 0
+  price_bucket_max_manwon: 60000
+  area_over_85: true
+  total_rate: 0.0130
+
+apartment_homeless_6to9_under85:
+  property_type: apartment
+  household_tier: homeless
+  price_bucket_min_manwon: 60000
+  price_bucket_max_manwon: 90000
+  area_over_85: false
+  total_rate: 0.0220
+
+apartment_homeless_over9_over85:
+  property_type: apartment
+  household_tier: homeless
+  price_bucket_min_manwon: 90000
+  price_bucket_max_manwon: # null
+  area_over_85: true
+  total_rate: 0.0350
+
+apartment_multi2_regulated:
+  property_type: apartment
+  household_tier: multi_home_2
+  regulated_region: true
+  price_bucket_min_manwon: 0
+  price_bucket_max_manwon: # null
+  area_over_85: # null
+  total_rate: 0.0840
+
+apartment_multi3plus_regulated:
+  property_type: apartment
+  household_tier: multi_home_3plus
+  regulated_region: true
+  price_bucket_min_manwon: 0
+  total_rate: 0.1240
+
+apartment_multi3plus_nonregulated:
+  property_type: apartment
+  household_tier: multi_home_3plus
+  regulated_region: false
+  price_bucket_min_manwon: 0
+  total_rate: 0.0840
+
+officetel_any:
+  property_type: officetel
+  household_tier: homeless
+  price_bucket_min_manwon: 0
+  total_rate: 0.0460

@@ -11,6 +11,20 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[8.1].define(version: 2026_05_12_100100) do
+  create_table "acquisition_tax_rates", force: :cascade do |t|
+    t.boolean "area_over_85"
+    t.datetime "created_at", null: false
+    t.string "household_tier", null: false
+    t.integer "price_bucket_max_manwon"
+    t.integer "price_bucket_min_manwon", default: 0, null: false
+    t.integer "property_type_id", null: false
+    t.boolean "regulated_region"
+    t.decimal "total_rate", precision: 5, scale: 4, null: false
+    t.datetime "updated_at", null: false
+    t.index ["property_type_id", "household_tier", "regulated_region", "area_over_85"], name: "index_acquisition_tax_rates_on_lookup"
+    t.index ["property_type_id"], name: "index_acquisition_tax_rates_on_property_type_id"
+  end
+
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -52,20 +66,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_100100) do
     t.index ["user_id"], name: "index_api_credentials_on_user_id"
   end
 
-  create_table "acquisition_tax_rates", force: :cascade do |t|
-    t.boolean "area_over_85"
-    t.datetime "created_at", null: false
-    t.string "household_tier", null: false
-    t.bigint "price_bucket_max_manwon"
-    t.integer "price_bucket_min_manwon", default: 0, null: false
-    t.bigint "property_type_id", null: false
-    t.boolean "regulated_region"
-    t.decimal "total_rate", precision: 5, scale: 4, null: false
-    t.datetime "updated_at", null: false
-    t.index ["property_type_id", "household_tier", "regulated_region", "area_over_85"], name: "index_acquisition_tax_rates_on_lookup"
-    t.index ["property_type_id"], name: "index_acquisition_tax_rates_on_property_type_id"
-  end
-
   create_table "auction_schedules", force: :cascade do |t|
     t.date "bid_end_date"
     t.date "bid_start_date"
@@ -85,11 +85,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_100100) do
 
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
+    t.boolean "acquisition_tax_auto", default: true, null: false
     t.integer "area_range_max"
     t.integer "area_range_min"
     t.integer "available_cash"
     t.datetime "completed_at"
     t.datetime "created_at", null: false
+    t.string "household_tier", default: "homeless", null: false
     t.integer "loan_policy_id"
     t.decimal "loan_ratio", precision: 3, scale: 2
     t.integer "maintenance_fee"
@@ -101,8 +103,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_100100) do
     t.integer "scrivener_fee"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
-    t.string "household_tier", default: "homeless", null: false
-    t.boolean "acquisition_tax_auto", default: true, null: false
     t.index ["loan_policy_id"], name: "index_budget_settings_on_loan_policy_id"
     t.index ["property_type_id"], name: "index_budget_settings_on_property_type_id"
     t.index ["user_id"], name: "index_budget_settings_on_user_id", unique: true
@@ -408,10 +408,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_100100) do
     t.index ["guest_token"], name: "index_users_on_guest_token", unique: true
   end
 
+  add_foreign_key "acquisition_tax_rates", "property_types"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "api_credentials", "users"
-  add_foreign_key "acquisition_tax_rates", "property_types"
   add_foreign_key "auction_schedules", "properties"
   add_foreign_key "budget_settings", "loan_policies"
   add_foreign_key "budget_settings", "property_types"
