@@ -21,8 +21,17 @@ export default class extends Controller {
     defaults: Object, // reserve_fund_defaults grouped by property_type_id
     availableCash: { type: Number, default: 0 },
     taxBrackets: { type: Array, default: [] },
-    loanRatio: { type: Number, default: 0.7 }
+    loanRatio: { type: Number, default: 0.7 },
+    preciseMode: { type: Boolean, default: false },
+    areaOver85: { type: Boolean, default: false }
   }
+
+  // F-C-2 — boundaries + slope for the 6~9억 progressive precise formula.
+  // Must stay in sync with BudgetCalculationService's PRECISE_* constants.
+  static PRECISE_BRACKET_MAX_MANWON = 90_000
+  static PRECISE_RATE_SLOPE_DENOMINATOR = 1_500_000
+  static PRECISE_RATE_INTERCEPT = 0.03
+  static PRECISE_AREA_OVER_85_SURCHARGE = 0.002
 
   connect() {
     if (this.hasAcquisitionTaxTarget && this.hasAutoCalcTarget) {
@@ -115,7 +124,9 @@ export default class extends Controller {
   }
 
   // Closed-form bracket iteration mirroring BudgetCalculationService.
-  // Returns acquisition tax in 만원 (integer).
+  // Returns acquisition tax in 만원 (integer). In precise mode, the 6~9억
+  // bracket switches to the quadratic solver to honour the progressive
+  // formula `(가액(억) × 2/3 − 3)/100`.
   computeAuto() {
     const cash = this.availableCashValue
     const loanRatio = this.loanRatioValue
@@ -128,17 +139,47 @@ export default class extends Controller {
       this.movingCostTarget, this.maintenanceFeeTarget
     ].reduce((sum, f) => sum + (parseInt(String(f.value).replace(/,/g, ""), 10) || 0), 0)
 
-    if (cash - reserveExclTax <= 0) return 0
+    const cashLessReserves = cash - reserveExclTax
+    if (cashLessReserves <= 0) return 0
 
     for (const b of brackets) {
+      if (this.preciseModeValue &&
+          b.max === this.constructor.PRECISE_BRACKET_MAX_MANWON) {
+        const solved = this.solvePreciseQuadratic(cashLessReserves, loanRatio)
+        if (solved && solved.bid <= this.constructor.PRECISE_BRACKET_MAX_MANWON) {
+          return Math.round(solved.rate * solved.bid)
+        }
+        continue
+      }
+
       const rate = parseFloat(b.rate)
       const denom = 1 - loanRatio + rate
-      const candidate = Math.floor((cash - reserveExclTax) / denom)
+      const candidate = Math.floor(cashLessReserves / denom)
       if (b.max == null || candidate <= b.max) {
         return Math.round(rate * candidate)
       }
     }
     return 0
+  }
+
+  // Positive root of `B²/D + B(1 − L − I + s) − (A − R) = 0` where D, I,
+  // and s are the precise-formula constants above. Returns `null` when no
+  // real solution exists (shouldn't happen for cashLessReserves > 0).
+  solvePreciseQuadratic(cashLessReserves, loanRatio) {
+    const surcharge = this.areaOver85Value
+      ? this.constructor.PRECISE_AREA_OVER_85_SURCHARGE
+      : 0
+    const a = 1 / this.constructor.PRECISE_RATE_SLOPE_DENOMINATOR
+    const b = 1 - loanRatio - this.constructor.PRECISE_RATE_INTERCEPT + surcharge
+    const c = -cashLessReserves
+
+    const discriminant = b * b - 4 * a * c
+    if (discriminant < 0) return null
+
+    const bid = Math.floor((-b + Math.sqrt(discriminant)) / (2 * a))
+    const rate = bid / this.constructor.PRECISE_RATE_SLOPE_DENOMINATOR -
+                 this.constructor.PRECISE_RATE_INTERCEPT + surcharge
+    return { bid, rate }
   }
 
   updateHints(match) {

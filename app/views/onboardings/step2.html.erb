@@ -10,7 +10,9 @@
          data-reserve-fund-available-cash-value="<%= @setting.available_cash.to_i %>"
          data-reserve-fund-tax-brackets-value="<%= @tax_brackets.to_json %>"
          data-reserve-fund-loan-ratio-value="<%= @setting.loan_ratio.to_f.zero? ? 0.7 : @setting.loan_ratio.to_f %>"
-         data-reserve-fund-acquisition-tax-auto-value="<%= @setting.acquisition_tax_auto %>">
+         data-reserve-fund-acquisition-tax-auto-value="<%= @setting.acquisition_tax_auto %>"
+         data-reserve-fund-precise-mode-value="<%= @setting.acquisition_tax_precise_mode %>"
+         data-reserve-fund-area-over-85-value="<%= @setting.area_over_85? %>">
       <%= form_with model: @setting, url: step2_onboarding_path, method: :post, data: { turbo_frame: "onboarding_wizard" } do |f| %>
         <%# 부동산 유형 %>
         <div class="mb-4">
