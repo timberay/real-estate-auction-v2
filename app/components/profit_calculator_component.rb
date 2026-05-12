@@ -37,6 +37,25 @@ class ProfitCalculatorComponent < ViewComponent::Base
     @budget&.maintenance_fee.to_i
   end
 
+  # F-B — feed per-bracket acquisition tax data into the Stimulus controller
+  # so the bid slider drives bracket-accurate rates instead of the legacy
+  # flat effective-rate constants. Returns a hash keyed by household_tier;
+  # each value is an ordered array of {rate, max} pairs (rate as decimal,
+  # max in 만원, nil for the open-ended top bracket).
+  def acquisition_tax_brackets
+    return {} unless @budget&.property_type_id
+    area_over_85 = @property.exclusive_area.to_f >= 85
+    regulated = @budget.regulated_region?
+    AcquisitionTaxRate::HOUSEHOLD_TIERS.index_with do |tier|
+      AcquisitionTaxCalculator.brackets_for(
+        property_type_id: @budget.property_type_id,
+        household_tier: tier,
+        regulated_region: regulated,
+        area_over_85: area_over_85
+      )
+    end
+  end
+
   # B25 / audit B-19 — tooltip copy for tax-treatment terminology shown
   # in the breakdown table 비고 column.
   TAX_TERM_TOOLTIPS = {
