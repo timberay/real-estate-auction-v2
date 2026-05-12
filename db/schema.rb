@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_12_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_12_210000) do
   create_table "acquisition_tax_rates", force: :cascade do |t|
     t.boolean "area_over_85"
     t.datetime "created_at", null: false
@@ -393,6 +393,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_200000) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.boolean "admin", default: false, null: false
     t.string "avatar_url"
     t.boolean "beginner_mode", default: true, null: false
     t.datetime "created_at", null: false
@@ -404,6 +405,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_200000) do
     t.string "name"
     t.datetime "terms_accepted_at"
     t.datetime "updated_at", null: false
+    t.index ["admin"], name: "index_users_on_admin_when_true", where: "admin = 1"
     t.index ["email"], name: "index_users_on_email_when_account", unique: true, where: "guest = 0 AND email IS NOT NULL"
     t.index ["guest", "last_seen_at"], name: "index_users_on_guest_and_last_seen_at"
     t.index ["guest_token"], name: "index_users_on_guest_token", unique: true

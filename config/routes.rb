@@ -54,6 +54,10 @@ Rails.application.routes.draw do
     resources :reserve_fund_defaults, only: [ :index ]
   end
 
+  namespace :admin do
+    resources :acquisition_tax_rates, only: [ :index, :edit, :update ]
+  end
+
   resources :properties, only: [ :index, :show, :create, :destroy ] do
     collection do
       get  :compare,     to: "properties/comparisons#show"

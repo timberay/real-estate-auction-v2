@@ -55,4 +55,17 @@ class UserTest < ActiveSupport::TestCase
     names = User.mergeable_reflections.map(&:name)
     refute_includes names, :llm_analysis_logs
   end
+
+  # F-D-1 — admin flag drives the Admin::* namespace gate. Defaults to
+  # false; new admins are minted via the Rails console after migration so
+  # the column never carries hidden privilege.
+  test "new user defaults to admin: false" do
+    user = User.create!
+    assert_equal false, user.admin?
+  end
+
+  test "admin? returns true when admin column is set" do
+    user = User.create!(guest: false, email: "ops@example.com", admin: true)
+    assert user.admin?
+  end
 end

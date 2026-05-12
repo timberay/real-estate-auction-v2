@@ -1,0 +1,49 @@
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <header class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">취득세율 관리</h1>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+      세법 개정 시 시드 PR 없이 바로 수정합니다. 변경 사항은 즉시 모든 사용자의 계산에 반영됩니다.
+    </p>
+  </header>
+
+  <div class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-100 dark:bg-slate-800">
+        <tr>
+          <th class="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">부동산 유형</th>
+          <th class="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">세대</th>
+          <th class="px-4 py-2 text-right font-semibold text-slate-600 dark:text-slate-400">가액 구간 (만원)</th>
+          <th class="px-4 py-2 text-center font-semibold text-slate-600 dark:text-slate-400">85㎡↑</th>
+          <th class="px-4 py-2 text-center font-semibold text-slate-600 dark:text-slate-400">조정지역</th>
+          <th class="px-4 py-2 text-right font-semibold text-slate-600 dark:text-slate-400">세율</th>
+          <th class="px-4 py-2"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @rates.each do |rate| %>
+          <tr class="border-t border-slate-100 dark:border-slate-800">
+            <td class="px-4 py-2 text-slate-900 dark:text-slate-100"><%= rate.property_type.name %></td>
+            <td class="px-4 py-2 text-slate-900 dark:text-slate-100"><%= rate.household_tier %></td>
+            <td class="px-4 py-2 text-right text-slate-900 dark:text-slate-100">
+              <%= number_with_delimiter(rate.price_bucket_min_manwon) %> –
+              <%= rate.price_bucket_max_manwon ? number_with_delimiter(rate.price_bucket_max_manwon) : "∞" %>
+            </td>
+            <td class="px-4 py-2 text-center text-slate-600 dark:text-slate-400">
+              <%= rate.area_over_85.nil? ? "—" : (rate.area_over_85 ? "예" : "아니오") %>
+            </td>
+            <td class="px-4 py-2 text-center text-slate-600 dark:text-slate-400">
+              <%= rate.regulated_region.nil? ? "—" : (rate.regulated_region ? "예" : "아니오") %>
+            </td>
+            <td class="px-4 py-2 text-right font-mono text-slate-900 dark:text-slate-100">
+              <%= number_to_percentage(rate.total_rate * 100, precision: 2) %>
+            </td>
+            <td class="px-4 py-2 text-right">
+              <%= link_to "수정", edit_admin_acquisition_tax_rate_path(rate),
+                    class: "text-blue-600 hover:underline text-sm" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
