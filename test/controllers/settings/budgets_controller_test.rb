@@ -255,4 +255,32 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to settings_budget_url
     assert_equal true, @setting.reload.acquisition_tax_precise_mode
   end
+
+  # F-C-2 — flipping precise_mode flows through to BudgetCalculationService
+  # and changes the saved acquisition_tax. With A=30000, R=780, L=0.7 the
+  # simplified path lands on bracket 3 (rate 0.033, bid ≈ 87,747, tax ≈ 2896),
+  # while precise mode lands inside the 6~9억 quadratic (rate ≈ 0.0292,
+  # bid ≈ 88,762, tax ≈ 2589). Identical inputs except the toggle.
+  test "PATCH update with precise_mode lowers acquisition_tax via 6~9억 formula" do
+    common_params = {
+      available_cash: 30_000,
+      property_type_id: @setting.property_type_id,
+      area_category: "mid",
+      loan_policy_id: @setting.loan_policy_id,
+      loan_ratio: 0.7,
+      repair_cost: 500, scrivener_fee: 80, moving_cost: 150, maintenance_fee: 50
+    }
+
+    patch settings_budget_url, params: { budget_setting: common_params }
+    simplified_tax = @setting.reload.acquisition_tax
+
+    patch settings_budget_url, params: {
+      budget_setting: common_params.merge(acquisition_tax_precise_mode: "1")
+    }
+    precise_tax = @setting.reload.acquisition_tax
+
+    assert precise_tax < simplified_tax,
+           "expected precise_mode to lower tax (got simplified=#{simplified_tax}, precise=#{precise_tax})"
+    assert_in_delta 2589, precise_tax, 5
+  end
 end

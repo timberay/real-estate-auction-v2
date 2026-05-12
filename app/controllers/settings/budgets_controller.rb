@@ -39,7 +39,9 @@ module Settings
         },
         loan_ratio: @setting.loan_ratio.to_f,
         tax_brackets: brackets,
-        acquisition_tax_override: @setting.acquisition_tax_auto? ? nil : @setting.acquisition_tax.to_i
+        acquisition_tax_override: @setting.acquisition_tax_auto? ? nil : @setting.acquisition_tax.to_i,
+        precise_mode: @setting.acquisition_tax_precise_mode,
+        area_over_85: @setting.area_over_85?
       )
 
       @setting.acquisition_tax = result[:acquisition_tax] if @setting.acquisition_tax_auto?
