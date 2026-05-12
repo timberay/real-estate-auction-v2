@@ -15,3 +15,11 @@ budget_user:
   guest: false
   terms_accepted_at: <%= 1.day.ago %>
   last_seen_at: <%= 10.minutes.ago %>
+
+admin_user:
+  email: "admin@auction.local"
+  name: "Admin User"
+  guest: false
+  admin: true
+  terms_accepted_at: <%= 1.day.ago %>
+  last_seen_at: <%= 10.minutes.ago %>
