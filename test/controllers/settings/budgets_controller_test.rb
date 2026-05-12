@@ -53,6 +53,20 @@ class Settings::BudgetsControllerTest < ActionDispatch::IntegrationTest
     assert_equal BudgetSetting::DEFAULT_REGION, @setting.reload.region
   end
 
+  test "PATCH update_region builds a budget_setting when the user has none yet" do
+    # Onboarding step1 fires region-select ajax before the form has been submitted,
+    # so current_user.budget_setting can be nil. The endpoint must not 500.
+    @setting.destroy!
+    @user.reload
+
+    patch update_region_settings_budget_url, params: {
+      budget_setting: { region: "서울특별시" }
+    }
+
+    assert_response :ok
+    assert_equal "서울특별시", @user.reload.budget_setting&.region
+  end
+
   test "GET show exposes loan policies for every enabled property type as JSON for client-side switching" do
     get settings_budget_url
     assert_response :success

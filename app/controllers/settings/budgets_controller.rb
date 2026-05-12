@@ -49,7 +49,9 @@ module Settings
     end
 
     def update_region
-      @setting = current_user.budget_setting
+      # Onboarding step1 fires this ajax before the form has been submitted,
+      # so the user may not have a persisted budget_setting yet.
+      @setting = current_user.budget_setting || current_user.build_budget_setting
       if @setting.update(region: params.dig(:budget_setting, :region))
         head :ok
       else
