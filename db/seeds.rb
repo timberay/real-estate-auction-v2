@@ -33,6 +33,26 @@ reserve_data.each do |group|
 end
 puts "  -> #{ReserveFundDefault.count} reserve fund defaults"
 
+puts "Seeding acquisition tax rates..."
+tax_data = JSON.parse(File.read(Rails.root.join("db/seeds/acquisition_tax_rates.json")))
+tax_data.each do |group|
+  next unless group["property_type_code"]
+  pt = PropertyType.find_by!(code: group["property_type_code"])
+  AcquisitionTaxRate.where(property_type: pt).destroy_all
+  group["rates"].each do |attrs|
+    AcquisitionTaxRate.create!(
+      property_type: pt,
+      household_tier: attrs["household_tier"],
+      regulated_region: attrs["regulated_region"],
+      price_bucket_min_manwon: attrs["price_bucket_min_manwon"],
+      price_bucket_max_manwon: attrs["price_bucket_max_manwon"],
+      area_over_85: attrs["area_over_85"],
+      total_rate: attrs["total_rate"]
+    )
+  end
+end
+puts "  -> #{AcquisitionTaxRate.count} acquisition tax rates"
+
 puts "Seeding loan policies..."
 loan_data = JSON.parse(File.read(Rails.root.join("db/seeds/loan_policies.json")))
 loan_data.each do |group|
