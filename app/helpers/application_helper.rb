@@ -43,4 +43,23 @@ module ApplicationHelper
   def inspection_item_total
     @_inspection_item_total ||= InspectionItem.count
   end
+
+  # One-line basis explaining how the budget's acquisition_tax was derived.
+  # Returns nil when override mode is on or when figures aren't computable.
+  def tax_basis_line(setting)
+    return nil unless setting&.acquisition_tax_auto?
+    return nil if setting.max_bid_amount.to_i.zero? || setting.acquisition_tax.to_i.zero?
+
+    rate_pct = (setting.acquisition_tax.to_d / setting.max_bid_amount.to_d * 100).round(1)
+    tier_label = {
+      "homeless" => "1세대 무주택",
+      "single_home" => "1주택",
+      "multi_home_2" => "2주택",
+      "multi_home_3plus" => "3주택 이상"
+    }.fetch(setting.household_tier, "")
+    area_label = setting.area_over_85? ? "전용 85㎡ 초과" : "전용 85㎡ 이하"
+
+    "낙찰가 #{number_with_delimiter(setting.max_bid_amount)}만원 × #{rate_pct}% = " \
+      "#{number_with_delimiter(setting.acquisition_tax)}만원 (#{tier_label}, #{area_label})"
+  end
 end

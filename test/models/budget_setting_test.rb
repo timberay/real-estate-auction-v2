@@ -115,4 +115,35 @@ class BudgetSettingTest < ActiveSupport::TestCase
     mid = BudgetSetting::AREA_CATEGORIES.find { |c| c[:key] == "mid" }
     assert_equal "중형 (30~34평 / 60~85㎡)", mid[:label]
   end
+
+  test "household_tier defaults to homeless on new record" do
+    bs = BudgetSetting.create!(user: users(:guest), available_cash: 30000)
+    assert_equal "homeless", bs.reload.household_tier
+  end
+
+  test "household_tier must be in HOUSEHOLD_TIERS" do
+    bs = BudgetSetting.new(user: users(:guest), available_cash: 30000, household_tier: "invalid")
+    assert_not bs.valid?
+    assert_not_empty bs.errors[:household_tier]
+  end
+
+  test "acquisition_tax_auto defaults to true on new record" do
+    bs = BudgetSetting.create!(user: users(:guest), available_cash: 30000)
+    assert_equal true, bs.reload.acquisition_tax_auto
+  end
+
+  test "area_over_85? is true when area_range_min >= 85" do
+    bs = BudgetSetting.new(area_range_min: 85, area_range_max: 102)
+    assert bs.area_over_85?
+  end
+
+  test "area_over_85? is false when area_range_min < 85" do
+    bs = BudgetSetting.new(area_range_min: 60, area_range_max: 85)
+    assert_not bs.area_over_85?
+  end
+
+  test "area_over_85? is false when area_range_min is nil" do
+    bs = BudgetSetting.new
+    assert_not bs.area_over_85?
+  end
 end

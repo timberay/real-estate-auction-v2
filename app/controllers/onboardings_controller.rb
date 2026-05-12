@@ -53,18 +53,33 @@ class OnboardingsController < ApplicationController
       return
     end
 
+    unless @setting.valid?
+      load_step3_data
+      render :step3, status: :unprocessable_entity
+      return
+    end
+
+    brackets = AcquisitionTaxCalculator.brackets_for(
+      property_type_id: @setting.property_type_id,
+      household_tier: @setting.household_tier,
+      regulated_region: @setting.regulated_region?,
+      area_over_85: @setting.area_over_85?
+    )
+
     result = BudgetCalculationService.call(
       available_cash: @setting.available_cash,
-      reserve_funds: {
+      reserves_excluding_acquisition_tax: {
         repair: @setting.repair_cost.to_i,
-        acquisition_tax: @setting.acquisition_tax.to_i,
         scrivener: @setting.scrivener_fee.to_i,
         moving: @setting.moving_cost.to_i,
         maintenance: @setting.maintenance_fee.to_i
       },
-      loan_ratio: @setting.loan_ratio.to_f
+      loan_ratio: @setting.loan_ratio.to_f,
+      tax_brackets: brackets,
+      acquisition_tax_override: @setting.acquisition_tax_auto? ? nil : @setting.acquisition_tax.to_i
     )
 
+    @setting.acquisition_tax = result[:acquisition_tax] if @setting.acquisition_tax_auto?
     @setting.max_bid_amount = result[:max_bid_amount]
     @setting.completed_at = Time.current
 
@@ -74,7 +89,7 @@ class OnboardingsController < ApplicationController
       load_step3_data
       render :step3, status: :unprocessable_entity
     end
-  rescue BudgetCalculationService::InsufficientFundsError
+  rescue BudgetCalculationService::InsufficientFundsError, ArgumentError
     @setting.errors.add(:available_cash, "이(가) 예비비 합계보다 작습니다")
     load_step3_data
     render :step3, status: :unprocessable_entity
@@ -97,6 +112,7 @@ class OnboardingsController < ApplicationController
   def step2_params
     params.expect(budget_setting: [
       :property_type_id, :area_category,
+      :household_tier, :acquisition_tax_auto,
       :repair_cost, :acquisition_tax, :scrivener_fee, :moving_cost, :maintenance_fee
     ])
   end
@@ -111,6 +127,18 @@ class OnboardingsController < ApplicationController
       property_type_id: @property_types.pluck(:id)
     ).group_by(&:property_type_id)
     apply_step2_defaults
+    @household_tier_options = [
+      [ "무주택 (현재 집이 없거나 곧 처분)", "homeless" ],
+      [ "1주택 (현재 1채 보유)",          "single_home" ],
+      [ "2주택 보유",                     "multi_home_2" ],
+      [ "3주택 이상",                     "multi_home_3plus" ]
+    ]
+    @tax_brackets = AcquisitionTaxCalculator.brackets_for(
+      property_type_id: @setting.property_type_id,
+      household_tier: @setting.household_tier,
+      regulated_region: @setting.regulated_region?,
+      area_over_85: @setting.area_over_85?
+    )
   end
 
   def apply_step2_defaults
