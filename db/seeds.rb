@@ -22,9 +22,7 @@ reserve_data.each do |group|
       property_type: pt,
       area_range_min: attrs["area_range_min"],
       area_range_max: attrs["area_range_max"],
-      average_price: attrs["average_price"],
       repair_cost: attrs["repair_cost"],
-      acquisition_tax_rate: attrs["acquisition_tax_rate"],
       scrivener_fee: attrs["scrivener_fee"],
       moving_cost: attrs["moving_cost"],
       maintenance_fee: attrs["maintenance_fee"]
