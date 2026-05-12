@@ -1,0 +1,58 @@
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <header class="mb-6 flex items-end justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">취득세율 변경 이력</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+        가장 최근 100건. 모든 관리자 변경(생성·수정·삭제)이 자동으로 기록됩니다.
+      </p>
+    </div>
+    <%= link_to "취득세율 관리로 돌아가기", admin_acquisition_tax_rates_path,
+          class: "h-10 px-4 inline-flex items-center rounded-md border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 whitespace-nowrap" %>
+  </header>
+
+  <div class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-100 dark:bg-slate-800">
+        <tr>
+          <th class="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">시각</th>
+          <th class="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">사용자</th>
+          <th class="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">동작</th>
+          <th class="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">대상 행</th>
+          <th class="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">변경 내용</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @logs.each do |log| %>
+          <tr class="border-t border-slate-100 dark:border-slate-800 align-top">
+            <td class="px-4 py-2 text-slate-700 dark:text-slate-300 whitespace-nowrap">
+              <%= l(log.created_at, format: :short) rescue log.created_at.to_s %>
+            </td>
+            <td class="px-4 py-2 text-slate-900 dark:text-slate-100">
+              <%= log.user&.email || "(삭제된 사용자)" %>
+            </td>
+            <td class="px-4 py-2 text-slate-900 dark:text-slate-100"><%= log.action %></td>
+            <td class="px-4 py-2 text-slate-700 dark:text-slate-300">
+              <% if log.acquisition_tax_rate %>
+                <%= log.acquisition_tax_rate.property_type&.name %> /
+                <%= log.acquisition_tax_rate.household_tier %> /
+                <%= number_with_delimiter(log.acquisition_tax_rate.price_bucket_min_manwon) %>–<%= log.acquisition_tax_rate.price_bucket_max_manwon ? number_with_delimiter(log.acquisition_tax_rate.price_bucket_max_manwon) : "∞" %>
+              <% else %>
+                <span class="text-slate-400">#<%= log.acquisition_tax_rate_id || "?" %> (삭제됨)</span>
+              <% end %>
+            </td>
+            <td class="px-4 py-2 text-slate-700 dark:text-slate-300">
+              <pre class="text-xs font-mono whitespace-pre-wrap break-all bg-slate-50 dark:bg-slate-900 p-2 rounded max-w-xl"><%= JSON.pretty_generate(JSON.parse(log.changes_json)) rescue log.changes_json %></pre>
+            </td>
+          </tr>
+        <% end %>
+        <% if @logs.empty? %>
+          <tr>
+            <td colspan="5" class="px-4 py-6 text-center text-slate-500 dark:text-slate-400">
+              아직 기록된 변경이 없습니다.
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
