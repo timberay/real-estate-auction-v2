@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_12_100100) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_12_200000) do
   create_table "acquisition_tax_rates", force: :cascade do |t|
     t.boolean "area_over_85"
     t.datetime "created_at", null: false
@@ -86,6 +86,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_100100) do
   create_table "budget_settings", force: :cascade do |t|
     t.integer "acquisition_tax"
     t.boolean "acquisition_tax_auto", default: true, null: false
+    t.boolean "acquisition_tax_precise_mode", default: false, null: false
     t.integer "area_range_max"
     t.integer "area_range_min"
     t.integer "available_cash"

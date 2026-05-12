@@ -132,6 +132,11 @@ class BudgetSettingTest < ActiveSupport::TestCase
     assert_equal true, bs.reload.acquisition_tax_auto
   end
 
+  test "acquisition_tax_precise_mode defaults to false on new record" do
+    bs = BudgetSetting.create!(user: users(:guest), available_cash: 30000)
+    assert_equal false, bs.reload.acquisition_tax_precise_mode
+  end
+
   test "area_over_85? is true when area_range_min >= 85" do
     bs = BudgetSetting.new(area_range_min: 85, area_range_max: 102)
     assert bs.area_over_85?

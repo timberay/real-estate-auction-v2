@@ -56,6 +56,21 @@ class ProfitCalculatorComponent < ViewComponent::Base
     end
   end
 
+  # F-C-1 — opt-in flag for the precise 6~9억 progressive formula.
+  # When true, the JS controller switches from a flat bracket rate to
+  # `(가액(억) × 2/3 − 3) / 100` within the 6~9억 range.
+  def precise_acquisition_tax?
+    @budget&.acquisition_tax_precise_mode == true
+  end
+
+  # Re-derived from the property record so the JS can reapply the
+  # 농어촌특별세 surcharge on top of the precise formula. Mirrors the
+  # filter used in `acquisition_tax_brackets` so a single source of truth
+  # drives both bracket selection and surcharge.
+  def area_over_85?
+    @property.exclusive_area.to_f >= 85
+  end
+
   HOUSEHOLD_TIER_LABELS = {
     "homeless" => "무주택",
     "single_home" => "1주택",
