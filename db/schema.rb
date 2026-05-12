@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_12_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_12_100100) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -101,6 +101,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_100000) do
     t.integer "scrivener_fee"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.string "household_tier", default: "homeless", null: false
+    t.boolean "acquisition_tax_auto", default: true, null: false
     t.index ["loan_policy_id"], name: "index_budget_settings_on_loan_policy_id"
     t.index ["property_type_id"], name: "index_budget_settings_on_property_type_id"
     t.index ["user_id"], name: "index_budget_settings_on_user_id", unique: true
