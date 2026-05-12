@@ -10,7 +10,18 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_12_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_12_230000) do
+  create_table "acquisition_tax_rate_audit_logs", force: :cascade do |t|
+    t.integer "acquisition_tax_rate_id"
+    t.string "action", null: false
+    t.text "changes_json", null: false
+    t.datetime "created_at", null: false
+    t.integer "user_id", null: false
+    t.index ["acquisition_tax_rate_id", "created_at"], name: "index_acq_tax_rate_audit_logs_on_rate_and_time"
+    t.index ["user_id", "created_at"], name: "index_acq_tax_rate_audit_logs_on_user_and_time"
+    t.index ["user_id"], name: "index_acquisition_tax_rate_audit_logs_on_user_id"
+  end
+
   create_table "acquisition_tax_rates", force: :cascade do |t|
     t.boolean "area_over_85"
     t.datetime "created_at", null: false
@@ -411,6 +422,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_210000) do
     t.index ["guest_token"], name: "index_users_on_guest_token", unique: true
   end
 
+  add_foreign_key "acquisition_tax_rate_audit_logs", "users"
   add_foreign_key "acquisition_tax_rates", "property_types"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
