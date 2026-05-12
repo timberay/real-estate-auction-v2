@@ -5,6 +5,19 @@ class AcquisitionTaxCalculator
 
   def self.call(**kwargs) = new(**kwargs).call
 
+  def self.brackets_for(property_type_id:, household_tier:,
+                        regulated_region:, area_over_85:)
+    scope = AcquisitionTaxRate
+      .where(property_type_id: property_type_id, household_tier: household_tier)
+      .where("regulated_region IS NULL OR regulated_region = ?", regulated_region)
+      .where("area_over_85 IS NULL OR area_over_85 = ?", area_over_85)
+      .order(:price_bucket_min_manwon)
+
+    scope.map do |row|
+      { rate: row.total_rate.to_d, max: row.price_bucket_max_manwon }
+    end
+  end
+
   def initialize(bid_manwon:, property_type_id:, household_tier:,
                  regulated_region:, area_over_85: nil)
     @bid_manwon = bid_manwon.to_i

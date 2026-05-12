@@ -90,4 +90,55 @@ class AcquisitionTaxCalculatorTest < ActiveSupport::TestCase
       )
     end
   end
+
+  test "brackets_for returns ordered brackets for housing homeless under 85㎡ non-regulated" do
+    brackets = AcquisitionTaxCalculator.brackets_for(
+      property_type_id: @apartment_id,
+      household_tier: "homeless",
+      regulated_region: false,
+      area_over_85: false
+    )
+    assert_equal 3, brackets.length
+    assert_in_delta 0.011, brackets[0][:rate], 1e-6
+    assert_equal 60000, brackets[0][:max]
+    assert_in_delta 0.022, brackets[1][:rate], 1e-6
+    assert_equal 90000, brackets[1][:max]
+    assert_in_delta 0.033, brackets[2][:rate], 1e-6
+    assert_nil brackets[2][:max]
+  end
+
+  test "brackets_for returns a single open-ended bracket for multi_home_3plus regulated" do
+    brackets = AcquisitionTaxCalculator.brackets_for(
+      property_type_id: @apartment_id,
+      household_tier: "multi_home_3plus",
+      regulated_region: true,
+      area_over_85: false
+    )
+    assert_equal 1, brackets.length
+    assert_in_delta 0.124, brackets[0][:rate], 1e-6
+    assert_nil brackets[0][:max]
+  end
+
+  test "brackets_for returns single bracket for officetel" do
+    brackets = AcquisitionTaxCalculator.brackets_for(
+      property_type_id: @officetel_id,
+      household_tier: "homeless",
+      regulated_region: false,
+      area_over_85: nil
+    )
+    assert_equal 1, brackets.length
+    assert_in_delta 0.046, brackets[0][:rate], 1e-6
+    assert_nil brackets[0][:max]
+  end
+
+  test "brackets_for returns [] for unknown property_type" do
+    stub_pt = PropertyType.create!(code: "stub_brackets_empty", name: "stub", enabled: false, sort_order: 99)
+    brackets = AcquisitionTaxCalculator.brackets_for(
+      property_type_id: stub_pt.id,
+      household_tier: "homeless",
+      regulated_region: false,
+      area_over_85: false
+    )
+    assert_equal [], brackets
+  end
 end

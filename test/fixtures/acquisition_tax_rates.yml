@@ -23,6 +23,22 @@ apartment_homeless_6to9_under85:
   area_over_85: false
   total_rate: 0.0220
 
+apartment_homeless_6to9_over85:
+  property_type: apartment
+  household_tier: homeless
+  price_bucket_min_manwon: 60000
+  price_bucket_max_manwon: 90000
+  area_over_85: true
+  total_rate: 0.0240
+
+apartment_homeless_over9_under85:
+  property_type: apartment
+  household_tier: homeless
+  price_bucket_min_manwon: 90000
+  price_bucket_max_manwon: # null
+  area_over_85: false
+  total_rate: 0.0330
+
 apartment_homeless_over9_over85:
   property_type: apartment
   household_tier: homeless
