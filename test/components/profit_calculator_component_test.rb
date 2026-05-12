@@ -164,4 +164,42 @@ class ProfitCalculatorComponentTest < ViewComponent::TestCase
     assert_empty brackets,
                  "without a budget setting we have no property_type_id to look up brackets"
   end
+
+  # F-B — radio values must match the AcquisitionTaxRate HOUSEHOLD_TIERS keys
+  # so the JS can use the selected value directly as a brackets lookup key.
+  test "renders 4-tier ownership radio aligned with AcquisitionTaxRate tiers" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget,
+      report: @report
+    ))
+
+    values = rendered.css("input[type='radio'][name='ownership']").map { |i| i["value"] }
+    assert_equal %w[homeless single_home multi_home_2 multi_home_3plus], values
+  end
+
+  test "pre-selects ownership radio matching budget_setting.household_tier" do
+    @budget.update!(household_tier: "multi_home_2")
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget,
+      report: @report
+    ))
+
+    checked = rendered.css("input[type='radio'][name='ownership'][checked]").first
+    refute_nil checked, "expected exactly one ownership radio to be pre-checked"
+    assert_equal "multi_home_2", checked["value"]
+  end
+
+  test "defaults ownership radio to homeless when budget_setting is nil" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: nil,
+      report: @report
+    ))
+
+    checked = rendered.css("input[type='radio'][name='ownership'][checked]").first
+    refute_nil checked
+    assert_equal "homeless", checked["value"]
+  end
 end

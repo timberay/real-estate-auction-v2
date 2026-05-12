@@ -56,6 +56,21 @@ class ProfitCalculatorComponent < ViewComponent::Base
     end
   end
 
+  HOUSEHOLD_TIER_LABELS = {
+    "homeless" => "무주택",
+    "single_home" => "1주택",
+    "multi_home_2" => "2주택",
+    "multi_home_3plus" => "3주택 이상"
+  }.freeze
+
+  def ownership_options
+    HOUSEHOLD_TIER_LABELS
+  end
+
+  def default_household_tier
+    @budget&.household_tier.presence || "homeless"
+  end
+
   # B25 / audit B-19 — tooltip copy for tax-treatment terminology shown
   # in the breakdown table 비고 column.
   TAX_TERM_TOOLTIPS = {

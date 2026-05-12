@@ -25,22 +25,22 @@ export default class extends Controller {
     scrivenerFee: Number,
     repairCost: Number,
     movingCost: Number,
-    maintenanceFee: Number
+    maintenanceFee: Number,
+    taxBrackets: Object
   }
 
-  // Effective acquisition tax rates by ownership type
-  static ACQ_TAX_RATES = {
-    no_home: 0.011,
-    one_home: 0.011,
-    multi_home: 0.084
-  }
-
-  // Effective capital gains tax rates by ownership + holding period
+  // Effective capital gains tax rates by ownership tier + holding period.
+  // Keys mirror AcquisitionTaxRate::HOUSEHOLD_TIERS.
   static CGT_RATES = {
-    no_home:    { under_1y: 0.70, "1to2y": 0.60, over_2y: 0.20 },
-    one_home:   { under_1y: 0.70, "1to2y": 0.60, over_2y: 0.00 },
-    multi_home: { under_1y: 0.70, "1to2y": 0.60, over_2y: 0.40 }
+    homeless:         { under_1y: 0.70, "1to2y": 0.60, over_2y: 0.00 },
+    single_home:      { under_1y: 0.70, "1to2y": 0.60, over_2y: 0.00 },
+    multi_home_2:     { under_1y: 0.70, "1to2y": 0.60, over_2y: 0.40 },
+    multi_home_3plus: { under_1y: 0.70, "1to2y": 0.60, over_2y: 0.40 }
   }
+
+  // Fallback rate when the server emitted no brackets for the selected tier
+  // (e.g. budget_setting was nil, or a tax-table gap for this combination).
+  static ACQ_TAX_FALLBACK_RATE = 0.011
 
   connect() {
     this.bidDisplayTarget.value = this.formatEok(this.minBidValue)
@@ -129,8 +129,9 @@ export default class extends Controller {
     // Investment
     const totalInvestment = bidPrice + assumedAmount
 
-    // Tax calculations
-    const acqTaxRate = this.constructor.ACQ_TAX_RATES[ownership] || 0.011
+    // Tax calculations — bracket-based per the AcquisitionTaxRate table
+    // (kept in sync with the server-rendered tax-brackets value).
+    const acqTaxRate = this.findAcqTaxRate(bidPrice, ownership)
     const acquisitionTax = Math.round(bidPrice * acqTaxRate)
 
     // All costs (for net profit)
@@ -210,7 +211,23 @@ export default class extends Controller {
 
   selectedOwnership() {
     const checked = this.ownershipTargets.find(el => el.checked)
-    return checked ? checked.value : "no_home"
+    return checked ? checked.value : "homeless"
+  }
+
+  // Resolves the acquisition tax rate for a given bid amount + tier by
+  // walking the server-supplied bracket list. Mirrors the SQL bracket
+  // lookup in AcquisitionTaxCalculator#lookup_row.
+  findAcqTaxRate(bidManwon, tier) {
+    const brackets = this.taxBracketsValue?.[tier] || []
+    for (const b of brackets) {
+      if (b.max === null || b.max === undefined || bidManwon < b.max) {
+        return parseFloat(b.rate)
+      }
+    }
+    // Fall through (no bracket matched or table empty): use the last bracket's
+    // rate when available, else the constant fallback.
+    if (brackets.length > 0) return parseFloat(brackets[brackets.length - 1].rate)
+    return this.constructor.ACQ_TAX_FALLBACK_RATE
   }
 
   selectedHoldingPeriod() {
