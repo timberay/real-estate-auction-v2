@@ -102,6 +102,8 @@
              data-reserve-fund-tax-brackets-value="<%= @tax_brackets.to_json %>"
              data-reserve-fund-loan-ratio-value="<%= @setting.loan_ratio.to_f.zero? ? 0.7 : @setting.loan_ratio.to_f %>"
              data-reserve-fund-acquisition-tax-auto-value="<%= @setting.acquisition_tax_auto %>"
+             data-reserve-fund-precise-mode-value="<%= @setting.acquisition_tax_precise_mode %>"
+             data-reserve-fund-area-over-85-value="<%= @setting.area_over_85? %>"
              data-action="reserve-fund:changed->budget-calculator#calculate">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
