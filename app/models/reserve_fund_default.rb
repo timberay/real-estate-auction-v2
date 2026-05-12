@@ -4,8 +4,6 @@ class ReserveFundDefault < ApplicationRecord
   validates :area_range_max, presence: true
   validates :repair_cost, :scrivener_fee, :moving_cost, :maintenance_fee,
             presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :acquisition_tax_rate, presence: true,
-            numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 0.12 }
   validate :area_range_max_greater_than_min
 
   def self.for_property_type_and_area(property_type_id, area_sqm)
