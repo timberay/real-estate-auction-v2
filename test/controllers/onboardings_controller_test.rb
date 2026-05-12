@@ -75,7 +75,10 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     user = User.find(session[:user_id])
     setting = user.budget_setting
     assert setting.completed?
-    assert_equal 96200, setting.max_bid_amount
+    # C=30000, L=0.7, R(excl tax)=780; auto-mode iterates brackets and lands in bracket 3 (3.3%):
+    # B = floor((30000-780)/(0.3+0.033)) = floor(29220/0.333) = 87747; T = round(0.033 × 87747) = 2896
+    assert_equal 87_747, setting.max_bid_amount
+    assert_equal 2_896, setting.acquisition_tax
   end
 
   test "GET step1 renders budget summary in uncalculated state for new user" do
