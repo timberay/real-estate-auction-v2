@@ -75,4 +75,89 @@ class Admin::AcquisitionTaxRatesControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     assert_equal original, rate.reload.total_rate
   end
+
+  # F-D-2 — create/destroy let admins add brand-new rows (e.g. a new
+  # household_tier × property_type combination) and retire stale rows
+  # without seed PRs.
+  test "GET new renders the create form for admin" do
+    post "/testing/sign_in", params: { user_id: @admin.id }
+    get new_admin_acquisition_tax_rate_url
+    assert_response :success
+    assert_match(/세율/, @response.body)
+  end
+
+  test "GET new returns 404 for non-admin" do
+    post "/testing/sign_in", params: { user_id: @non_admin.id }
+    get new_admin_acquisition_tax_rate_url
+    assert_response :not_found
+  end
+
+  test "POST create persists a new rate and redirects to index" do
+    post "/testing/sign_in", params: { user_id: @admin.id }
+    assert_difference -> { AcquisitionTaxRate.count }, +1 do
+      post admin_acquisition_tax_rates_url, params: {
+        acquisition_tax_rate: {
+          property_type_id: property_types(:villa).id,
+          household_tier: "homeless",
+          price_bucket_min_manwon: 0,
+          price_bucket_max_manwon: 60_000,
+          area_over_85: false,
+          regulated_region: nil,
+          total_rate: 0.012
+        }
+      }
+    end
+    assert_redirected_to admin_acquisition_tax_rates_url
+    created = AcquisitionTaxRate.order(:id).last
+    assert_in_delta 0.012, created.total_rate.to_f, 1e-6
+    assert_equal "homeless", created.household_tier
+  end
+
+  test "POST create with invalid params re-renders new" do
+    post "/testing/sign_in", params: { user_id: @admin.id }
+    assert_no_difference -> { AcquisitionTaxRate.count } do
+      post admin_acquisition_tax_rates_url, params: {
+        acquisition_tax_rate: {
+          property_type_id: property_types(:villa).id,
+          household_tier: "homeless",
+          price_bucket_min_manwon: 0,
+          total_rate: 0.50  # > 0.20 cap → validation fails
+        }
+      }
+    end
+    assert_response :unprocessable_content
+  end
+
+  test "POST create from non-admin returns 404 and creates nothing" do
+    post "/testing/sign_in", params: { user_id: @non_admin.id }
+    assert_no_difference -> { AcquisitionTaxRate.count } do
+      post admin_acquisition_tax_rates_url, params: {
+        acquisition_tax_rate: {
+          property_type_id: property_types(:villa).id,
+          household_tier: "homeless",
+          price_bucket_min_manwon: 0,
+          total_rate: 0.012
+        }
+      }
+    end
+    assert_response :not_found
+  end
+
+  test "DELETE destroy removes the row and redirects to index" do
+    post "/testing/sign_in", params: { user_id: @admin.id }
+    rate = acquisition_tax_rates(:apartment_homeless_under6_under85)
+    assert_difference -> { AcquisitionTaxRate.count }, -1 do
+      delete admin_acquisition_tax_rate_url(rate)
+    end
+    assert_redirected_to admin_acquisition_tax_rates_url
+  end
+
+  test "DELETE destroy from non-admin returns 404 and keeps the row" do
+    post "/testing/sign_in", params: { user_id: @non_admin.id }
+    rate = acquisition_tax_rates(:apartment_homeless_under6_under85)
+    assert_no_difference -> { AcquisitionTaxRate.count } do
+      delete admin_acquisition_tax_rate_url(rate)
+    end
+    assert_response :not_found
+  end
 end

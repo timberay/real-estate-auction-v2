@@ -1,11 +1,25 @@
 module Admin
   class AcquisitionTaxRatesController < BaseController
-    before_action :load_rate, only: [ :edit, :update ]
+    before_action :load_rate, only: [ :edit, :update, :destroy ]
 
     def index
       @rates = AcquisitionTaxRate
         .includes(:property_type)
         .order(:property_type_id, :household_tier, :price_bucket_min_manwon, :area_over_85)
+    end
+
+    def new
+      @rate = AcquisitionTaxRate.new
+    end
+
+    def create
+      @rate = AcquisitionTaxRate.new(create_params)
+      if @rate.save
+        redirect_to admin_acquisition_tax_rates_url,
+                    notice: "새 취득세율을 추가했습니다."
+      else
+        render :new, status: :unprocessable_content
+      end
     end
 
     def edit
@@ -20,17 +34,32 @@ module Admin
       end
     end
 
+    def destroy
+      @rate.destroy
+      redirect_to admin_acquisition_tax_rates_url,
+                  notice: "취득세율 행을 삭제했습니다."
+    end
+
     private
 
     def load_rate
       @rate = AcquisitionTaxRate.find(params[:id])
     end
 
-    # property_type_id + household_tier are identity-like keys and stay
-    # immutable here; if a row needs a different tier or asset class,
-    # admins should add a new row (F-D-2 will surface create/destroy).
+    # On edit, property_type_id + household_tier are identity-like keys and
+    # stay immutable so a typo cannot silently rewire which rate a calculator
+    # pulls. On create, both must be set, hence the wider `create_params`
+    # whitelist below.
     def rate_params
       params.expect(acquisition_tax_rate: [
+        :price_bucket_min_manwon, :price_bucket_max_manwon,
+        :area_over_85, :regulated_region, :total_rate
+      ])
+    end
+
+    def create_params
+      params.expect(acquisition_tax_rate: [
+        :property_type_id, :household_tier,
         :price_bucket_min_manwon, :price_bucket_max_manwon,
         :area_over_85, :regulated_region, :total_rate
       ])

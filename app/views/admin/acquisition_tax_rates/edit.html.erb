@@ -6,63 +6,9 @@
     </p>
   </header>
 
-  <% if @rate.errors.any? %>
-    <div class="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-sm text-red-700 dark:text-red-300">
-      <ul class="list-disc pl-5">
-        <% @rate.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
-        <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <%= form_with model: @rate, url: admin_acquisition_tax_rate_path(@rate),
-                method: :patch, local: true, class: "space-y-4" do |f| %>
-    <div>
-      <%= f.label :price_bucket_min_manwon, "구간 시작 (만원)",
-            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-      <%= f.number_field :price_bucket_min_manwon, min: 0, step: 1,
-            class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm" %>
-    </div>
-
-    <div>
-      <%= f.label :price_bucket_max_manwon, "구간 끝 (만원, 비워두면 상한 없음)",
-            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-      <%= f.number_field :price_bucket_max_manwon, min: 0, step: 1,
-            class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm" %>
-    </div>
-
-    <div>
-      <%= f.label :area_over_85, "85㎡ 초과",
-            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-      <%= f.select :area_over_85,
-            [ [ "구분 안함 (모든 면적)", "" ], [ "예 (85㎡↑)", "true" ], [ "아니오 (85㎡↓)", "false" ] ],
-            { selected: @rate.area_over_85.nil? ? "" : @rate.area_over_85.to_s },
-            { class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm" } %>
-    </div>
-
-    <div>
-      <%= f.label :regulated_region, "조정대상지역",
-            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-      <%= f.select :regulated_region,
-            [ [ "구분 안함 (모든 지역)", "" ], [ "예 (조정지역)", "true" ], [ "아니오 (비조정)", "false" ] ],
-            { selected: @rate.regulated_region.nil? ? "" : @rate.regulated_region.to_s },
-            { class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm" } %>
-    </div>
-
-    <div>
-      <%= f.label :total_rate, "세율 (소수점, 예: 0.011 = 1.1%)",
-            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
-      <%= f.number_field :total_rate, min: 0, max: 0.20, step: 0.0001,
-            class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm font-mono" %>
-      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">0 이상 0.20 이하만 허용 (취득세 + 농어촌특별세 + 지방교육세 합산)</p>
-    </div>
-
-    <div class="flex gap-3 pt-2">
-      <%= f.submit "저장",
-            class: "h-10 px-4 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700" %>
-      <%= link_to "취소", admin_acquisition_tax_rates_path,
-            class: "h-10 px-4 inline-flex items-center rounded-md border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800" %>
-    </div>
-  <% end %>
+  <%= render "form",
+        rate: @rate,
+        form_url: admin_acquisition_tax_rate_path(@rate),
+        form_method: :patch,
+        submit_label: "저장" %>
 </div>
