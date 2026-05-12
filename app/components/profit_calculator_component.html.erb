@@ -6,6 +6,7 @@
      data-profit-calculator-repair-cost-value="<%= repair_cost %>"
      data-profit-calculator-moving-cost-value="<%= moving_cost %>"
      data-profit-calculator-maintenance-fee-value="<%= maintenance_fee %>"
+     data-profit-calculator-tax-brackets-value="<%= acquisition_tax_brackets.to_json %>"
      class="space-y-4">
 
   <%# ===== Title + Disclaimer Badge ===== %>
@@ -69,12 +70,12 @@
     <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
       <label class="text-sm font-medium text-slate-600 dark:text-slate-400 block mb-2">소유형태</label>
       <div class="flex flex-col gap-2">
-        <% [["no_home", "무주택"], ["one_home", "1주택"], ["multi_home", "다주택"]].each_with_index do |(value, label), i| %>
+        <% ownership_options.each do |value, label| %>
           <label class="flex items-center gap-2 text-sm text-slate-900 dark:text-slate-100 cursor-pointer">
             <input type="radio" name="ownership" value="<%= value %>"
                    data-profit-calculator-target="ownership"
                    data-action="change->profit-calculator#calculate"
-                   <%= "checked" if i == 0 %>
+                   <%= "checked" if value == default_household_tier %>
                    class="accent-blue-600" />
             <%= label %>
           </label>

@@ -116,4 +116,90 @@ class ProfitCalculatorComponentTest < ViewComponent::TestCase
 
     assert_match(/투자 결정의 (최종 )?책임은 사용자에게/, rendered)
   end
+
+  # F-B — wire AcquisitionTaxCalculator brackets into the Stimulus controller
+  # so the slider drives per-bracket tax rates instead of a hardcoded
+  # effective-rate constant.
+  test "exposes 4-tier acquisition tax brackets via data attribute" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,        # safe_apartment: exclusive_area=84.5 → area_over_85=false
+      budget_setting: @budget,    # apartment, default region=제주 (non-regulated)
+      report: @report
+    ))
+
+    root = rendered.css("[data-controller='profit-calculator']").first
+    raw = root["data-profit-calculator-tax-brackets-value"]
+    refute_nil raw, "expected tax brackets data attribute to be present"
+
+    brackets = JSON.parse(raw)
+    assert_equal %w[homeless multi_home_2 multi_home_3plus single_home],
+                 brackets.keys.sort
+
+    # 84.5㎡ apartment in non-regulated region → homeless tier has 3 brackets
+    homeless = brackets["homeless"]
+    assert_equal 3, homeless.length
+    assert_in_delta 0.0110, homeless[0]["rate"].to_f, 1e-6
+    assert_equal 60000, homeless[0]["max"]
+    assert_in_delta 0.0220, homeless[1]["rate"].to_f, 1e-6
+    assert_equal 90000, homeless[1]["max"]
+    assert_in_delta 0.0330, homeless[2]["rate"].to_f, 1e-6
+    assert_nil homeless[2]["max"]
+
+    # multi_home_3plus non-regulated → single open-ended 8.4% bracket
+    multi3 = brackets["multi_home_3plus"]
+    assert_equal 1, multi3.length
+    assert_in_delta 0.0840, multi3[0]["rate"].to_f, 1e-6
+    assert_nil multi3[0]["max"]
+  end
+
+  test "renders empty acquisition tax brackets when budget_setting is nil" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: nil,
+      report: @report
+    ))
+
+    root = rendered.css("[data-controller='profit-calculator']").first
+    brackets = JSON.parse(root["data-profit-calculator-tax-brackets-value"])
+    assert_empty brackets,
+                 "without a budget setting we have no property_type_id to look up brackets"
+  end
+
+  # F-B — radio values must match the AcquisitionTaxRate HOUSEHOLD_TIERS keys
+  # so the JS can use the selected value directly as a brackets lookup key.
+  test "renders 4-tier ownership radio aligned with AcquisitionTaxRate tiers" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget,
+      report: @report
+    ))
+
+    values = rendered.css("input[type='radio'][name='ownership']").map { |i| i["value"] }
+    assert_equal %w[homeless single_home multi_home_2 multi_home_3plus], values
+  end
+
+  test "pre-selects ownership radio matching budget_setting.household_tier" do
+    @budget.update!(household_tier: "multi_home_2")
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget,
+      report: @report
+    ))
+
+    checked = rendered.css("input[type='radio'][name='ownership'][checked]").first
+    refute_nil checked, "expected exactly one ownership radio to be pre-checked"
+    assert_equal "multi_home_2", checked["value"]
+  end
+
+  test "defaults ownership radio to homeless when budget_setting is nil" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: nil,
+      report: @report
+    ))
+
+    checked = rendered.css("input[type='radio'][name='ownership'][checked]").first
+    refute_nil checked
+    assert_equal "homeless", checked["value"]
+  end
 end
