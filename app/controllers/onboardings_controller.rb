@@ -127,6 +127,18 @@ class OnboardingsController < ApplicationController
       property_type_id: @property_types.pluck(:id)
     ).group_by(&:property_type_id)
     apply_step2_defaults
+    @household_tier_options = [
+      [ "무주택 (현재 집이 없거나 곧 처분)", "homeless" ],
+      [ "1주택 (현재 1채 보유)",          "single_home" ],
+      [ "2주택 보유",                     "multi_home_2" ],
+      [ "3주택 이상",                     "multi_home_3plus" ]
+    ]
+    @tax_brackets = AcquisitionTaxCalculator.brackets_for(
+      property_type_id: @setting.property_type_id,
+      household_tier: @setting.household_tier,
+      regulated_region: @setting.regulated_region?,
+      area_over_85: @setting.area_over_85?
+    )
   end
 
   def apply_step2_defaults
