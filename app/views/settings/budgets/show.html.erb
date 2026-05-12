@@ -99,6 +99,9 @@
         <div data-controller="reserve-fund"
              data-reserve-fund-defaults-value="<%= @reserve_defaults.to_json %>"
              data-reserve-fund-available-cash-value="<%= @setting.available_cash.to_i %>"
+             data-reserve-fund-tax-brackets-value="<%= @tax_brackets.to_json %>"
+             data-reserve-fund-loan-ratio-value="<%= @setting.loan_ratio.to_f.zero? ? 0.7 : @setting.loan_ratio.to_f %>"
+             data-reserve-fund-acquisition-tax-auto-value="<%= @setting.acquisition_tax_auto %>"
              data-action="reserve-fund:changed->budget-calculator#calculate">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
@@ -119,7 +122,28 @@
                 data: { reserve_fund_target: "areaCategory",
                         action: "change->reserve-fund#areaChanged" } %>
             </div>
+
+            <div>
+              <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <span class="relative inline-flex items-center gap-1 cursor-help"
+                      data-controller="tooltip"
+                      data-tooltip-content-value="주택 수가 많을수록 취득세율이 높아집니다 (조정대상지역 2주택 8.4%, 3주택+ 12.4%)"
+                      data-action="mouseenter->tooltip#show mouseleave->tooltip#hide">
+                  주택 보유
+                  <svg class="inline w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </span>
+              </label>
+              <%= f.select :household_tier, @household_tier_options,
+                {},
+                { class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
+                  data: { reserve_fund_target: "householdTier",
+                          action: "change->reserve-fund#householdTierChanged" } } %>
+            </div>
           </div>
+
+          <%= f.hidden_field :acquisition_tax_auto, value: @setting.acquisition_tax_auto, data: { reserve_fund_target: "acquisitionTaxAuto" } %>
 
           <div class="mb-4">
             <label class="flex items-center gap-2">
@@ -147,6 +171,7 @@
                   <%= f.number_field field, inputmode: "numeric",
                     class: "flex-1 min-w-0 h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500",
                     data: { reserve_fund_target: target,
+                            reserve_fund_readonly_when_auto: (field == :acquisition_tax).to_s,
                             action: "input->reserve-fund#updateTotal input->budget-calculator#calculate" } %>
                   <span class="text-slate-600 dark:text-slate-400 text-sm whitespace-nowrap">만원</span>
                 </div>
