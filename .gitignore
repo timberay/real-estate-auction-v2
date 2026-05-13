@@ -44,6 +44,15 @@
 # Playwright MCP artifacts.
 /.playwright-mcp/
 
+# Screenshot artifacts (E2E / QA captures — rebuilt locally).
+# `manual/`, `beginner/`, `expert/` are content (referenced from README.md and
+# E2E reports), keep them tracked. Other subdirs (after/, before/, error/,
+# verify-*/, etc.) are local artifacts.
+/docs/screenshots/*
+!/docs/screenshots/manual/
+!/docs/screenshots/beginner/
+!/docs/screenshots/expert/
+
 # Graphify knowledge graph output (rebuilt locally).
 /graphify-out/
 
