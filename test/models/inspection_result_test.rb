@@ -106,4 +106,30 @@ class InspectionResultTest < ActiveSupport::TestCase
     second = result.snapshot_version!
     assert_equal 2, second.version_number
   end
+
+  # --- T2.7: snapshot_version! accepts explicit override attrs ---
+
+  test "T2.7: snapshot_version! writes the supplied override attrs not current attrs" do
+    result = InspectionResult.create!(
+      property: properties(:safe_apartment),
+      inspection_item: inspection_items(:rights_007),
+      user: users(:guest),
+      source_type: "manual",
+      has_risk: false,
+      evidence: { "source_label" => "현재", "reasoning" => "현재 판단" },
+      resolution_note: "현재 메모"
+    )
+
+    version = result.snapshot_version!(
+      source_type: "ai",
+      has_risk: true,
+      evidence: { "source_label" => "이전 AI", "reasoning" => "이전 판단" },
+      resolution_note: "이전 메모"
+    )
+
+    assert_equal "ai", version.source_type
+    assert_equal true, version.has_risk
+    assert_equal "이전 AI", version.evidence["source_label"]
+    assert_equal "이전 메모", version.resolution_note
+  end
 end
