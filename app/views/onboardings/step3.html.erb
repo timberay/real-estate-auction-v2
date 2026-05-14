@@ -75,6 +75,19 @@
         <div class="mb-6 p-4 bg-blue-100 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
           <p class="text-sm text-slate-600 dark:text-slate-400">예상 최대입찰가</p>
           <p class="text-2xl font-bold text-blue-700 dark:text-blue-400 tabular-nums" data-loan-slider-target="maxBidPreview">계산 중...</p>
+
+          <%# C15: reveal the formula so the number isn't a black box. %>
+          <details class="mt-3">
+            <summary class="cursor-pointer text-sm font-medium text-blue-700 dark:text-blue-400 hover:underline focus-visible:underline focus-visible:outline-none">
+              이 숫자가 어떻게 나왔나요?
+            </summary>
+            <p class="mt-2 text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+              (쓸 수 있는 현금 − 예비비 합계) ÷ (1 − 대출 비율) = 최대입찰가
+            </p>
+            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              쓸 수 있는 현금에서 예비비를 빼고, 남은 자기자금이 입찰가의 (1 − LTV) 비중이 되도록 대출을 더해 계산합니다.
+            </p>
+          </details>
         </div>
 
         <p class="text-sm text-slate-400 dark:text-slate-500 mb-6">

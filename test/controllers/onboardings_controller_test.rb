@@ -7,6 +7,68 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#onboarding_wizard"
   end
 
+  test "GET complete page CTA leads the user to search, not the home redirect loop (C6)" do
+    get start_onboarding_url
+    post step1_onboarding_url, params: { budget_setting: { available_cash: 30000 } }
+    post step2_onboarding_url, params: {
+      budget_setting: {
+        property_type_id: property_types(:apartment).id,
+        area_category: "mid",
+        repair_cost: 500,
+        acquisition_tax: 360,
+        scrivener_fee: 80,
+        moving_cost: 150,
+        maintenance_fee: 50
+      }
+    }
+    post step3_onboarding_url, params: { budget_setting: { loan_ratio: 0.7 } }
+
+    get complete_onboarding_url
+    assert_response :success
+
+    # C6: the post-onboarding CTA used to send users to `root_path` which
+    # redirected back through home → properties. Send them straight to the
+    # property search instead so they can take the next action.
+    assert_select "a[href=?]", search_path, { text: /물건 찾으러 가기|물건 찾기|조건으로 물건 찾기/ }
+  end
+
+  test "step3 exposes a max-bid-formula toggle so users see how the number is computed (C15)" do
+    get start_onboarding_url
+    post step1_onboarding_url, params: { budget_setting: { available_cash: 30000 } }
+    # POST step2 → renders step3
+    post step2_onboarding_url, params: {
+      budget_setting: {
+        property_type_id: property_types(:apartment).id,
+        area_category: "mid",
+        repair_cost: 500,
+        acquisition_tax: 360,
+        scrivener_fee: 80,
+        moving_cost: 150,
+        maintenance_fee: 50
+      }
+    }
+    assert_response :success
+
+    # C15: a <details> must let the user reveal the max-bid formula so the
+    # calculation is not a black box.
+    assert_select "details summary", { text: /이 숫자가 어떻게 나왔나요/ }
+    assert_match(/쓸 수 있는 현금.*?예비비.*?대출.*?최대입찰가/m, response.body,
+      "expected step3 to expose the max-bid formula via toggle")
+  end
+
+  test "step2 hides the manual 예비비 inputs behind a 'fine-tune' toggle (C18)" do
+    get start_onboarding_url
+    # POST step1 → renders step2
+    post step1_onboarding_url, params: { budget_setting: { available_cash: 30000 } }
+    assert_response :success
+
+    # C18: step2 should not dump all five 예비비 inputs onto the screen at
+    # once — they live inside a <details> (closed by default) so the
+    # auto-calculated summary leads.
+    assert_match(/<details[^>]*>.*?수선비/m, response.body,
+      "expected 수선비 input to live inside a <details> for progressive disclosure")
+  end
+
   test "GET step1 stacks the available cash input row vertically on mobile (C2)" do
     get start_onboarding_url
     assert_response :success

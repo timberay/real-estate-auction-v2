@@ -70,8 +70,18 @@
         <%# 자동 모드 플래그 — Stimulus가 체크박스 변화에 맞춰 토글 %>
         <%= f.hidden_field :acquisition_tax_auto, value: @setting.acquisition_tax_auto, data: { reserve_fund_target: "acquisitionTaxAuto" } %>
 
-        <%# 예비비 항목 %>
-        <div class="space-y-3">
+        <%# 예비비 항목 — C18: collapsed by default so the auto-calculated
+            summary leads. Users open this only when they want to tweak the
+            individual lines. %>
+        <details class="space-y-3 group">
+          <summary class="cursor-pointer text-sm font-medium text-blue-700 dark:text-blue-400 hover:underline focus-visible:underline focus-visible:outline-none py-1 mb-2 list-none">
+            <span class="inline-flex items-center gap-1">
+              <svg class="w-4 h-4 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+              예비비 항목 직접 조정하기
+            </span>
+          </summary>
           <% [
             [:repair_cost, "수선비", "repairCost", "평균면적 기준 수선비", "낙찰 후 집을 사용 가능한 상태로 만드는 데 드는 평균 비용"],
             [:acquisition_tax, "취득세", "acquisitionTax", "취득세율 적용", "낙찰 가격의 1.1~3.5%를 등기할 때 세금으로 납부"],
@@ -103,7 +113,7 @@
                  data-reserve-fund-target="<%= target %>Hint"><%= hint_default %></p>
             </div>
           <% end %>
-        </div>
+        </details>
 
         <%# 합계 + 쓸 수 있는 현금 비교 %>
         <div class="mt-4 p-3 rounded-lg border transition-colors"
