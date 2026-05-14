@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_14_133516) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_15_000001) do
   create_table "acquisition_tax_rate_audit_logs", force: :cascade do |t|
     t.integer "acquisition_tax_rate_id"
     t.string "action", null: false
@@ -360,7 +360,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_133516) do
 
   create_table "rights_analysis_reports", force: :cascade do |t|
     t.datetime "analyzed_at", null: false
-    t.integer "assumed_amount", default: 0, null: false
+    t.bigint "assumed_amount", default: 0, null: false
     t.date "base_right_date"
     t.string "base_right_holder"
     t.string "base_right_type"
@@ -370,7 +370,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_133516) do
     t.integer "property_id", null: false
     t.json "report_data"
     t.boolean "source_doc_reviewed", default: false, null: false
-    t.integer "total_risk_amount", default: 0, null: false
+    t.bigint "total_risk_amount", default: 0, null: false
     t.datetime "updated_at", null: false
     t.datetime "user_confirmed_at"
     t.integer "user_id", null: false
@@ -383,14 +383,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_133516) do
 
   create_table "search_results", force: :cascade do |t|
     t.string "address"
-    t.integer "appraisal_price"
+    t.bigint "appraisal_price"
     t.string "auction_date"
     t.string "case_number", null: false
     t.string "court_code"
     t.string "court_name"
     t.datetime "created_at", null: false
     t.integer "failed_bid_count"
-    t.integer "min_bid_price"
+    t.bigint "min_bid_price"
     t.integer "property_count", default: 1, null: false
     t.string "property_type"
     t.string "remarks"
