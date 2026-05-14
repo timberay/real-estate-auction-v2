@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_12_230000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_14_100000) do
   create_table "acquisition_tax_rate_audit_logs", force: :cascade do |t|
     t.integer "acquisition_tax_rate_id"
     t.string "action", null: false
@@ -385,6 +385,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_230000) do
     t.index ["user_id"], name: "index_search_results_on_user_id"
   end
 
+  create_table "transfer_tax_rates", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "holding_period", null: false
+    t.string "household_tier", null: false
+    t.integer "property_type_id", null: false
+    t.boolean "regulated_region"
+    t.decimal "total_rate", precision: 5, scale: 4, null: false
+    t.datetime "updated_at", null: false
+    t.index ["property_type_id", "household_tier", "holding_period", "regulated_region"], name: "index_transfer_tax_rates_on_lookup"
+    t.index ["property_type_id"], name: "index_transfer_tax_rates_on_property_type_id"
+  end
+
   create_table "user_properties", force: :cascade do |t|
     t.datetime "analyzed_at"
     t.datetime "created_at", null: false
@@ -442,6 +454,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_12_230000) do
   add_foreign_key "rights_analysis_reports", "properties"
   add_foreign_key "rights_analysis_reports", "users"
   add_foreign_key "search_results", "users"
+  add_foreign_key "transfer_tax_rates", "property_types"
   add_foreign_key "user_properties", "properties"
   add_foreign_key "user_properties", "users"
 end
