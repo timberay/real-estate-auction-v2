@@ -108,6 +108,21 @@ class ProfitCalculatorComponent < ViewComponent::Base
     @budget&.acquisition_tax_precise_mode == true
   end
 
+  # T1.2-F-B — initial state of the 거주요건 충족 toggle. Defaults to true
+  # because the seeded 1주택 over_2y 0% row already assumes 비과세 eligibility;
+  # users uncheck it to mark non-residency cases (which fall back to the
+  # homeless over_2y rate, see TransferTaxCalculator#effective_household_tier).
+  def transfer_tax_residency_met_default
+    true
+  end
+
+  # T1.2-F-B — sale-price threshold (만원) above which the simple
+  # 1세대 1주택 비과세 model is no longer accurate (12억 초과분 분리 과세).
+  # The Stimulus controller renders an advisory banner when crossed.
+  def transfer_tax_high_value_threshold_manwon
+    120_000
+  end
+
   # Re-derived from the property record so the JS can reapply the
   # 농어촌특별세 surcharge on top of the precise formula. Mirrors the
   # filter used in `acquisition_tax_brackets` so a single source of truth

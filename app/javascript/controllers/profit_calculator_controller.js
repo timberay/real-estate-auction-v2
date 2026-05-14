@@ -16,7 +16,8 @@ export default class extends Controller {
     "rowAcqTax", "rowAcqTaxNote", "rowScrivener", "rowRepair",
     "rowMoving", "rowMaintenance", "rowCgt", "rowCgtNote",
     "rowNetProfit", "rowRoi",
-    "dsrWarning", "dsrRatioLabel", "dsrThresholdLabel"
+    "dsrWarning", "dsrRatioLabel", "dsrThresholdLabel",
+    "residency", "residencyRow", "highValueWarning"
   ]
 
   static values = {
@@ -31,6 +32,8 @@ export default class extends Controller {
     cgtMatrix: Object,
     preciseMode: Boolean,
     areaOver85: Boolean,
+    residencyMet: Boolean,
+    highValueThreshold: Number,
     dsrEnabled: Boolean,
     dsrLoanRatio: Number,
     dsrAnnualIncome: Number,
@@ -161,8 +164,14 @@ export default class extends Controller {
     // Capital gains tax (T1.2 — server matrix lookup, fallback if missing)
     const taxableGain = salePrice - totalInvestment - deductibleCosts
     const matrix = this.cgtMatrixValue || {}
-    const cgtRate = matrix[ownership]?.[holdingPeriod] ?? this.constructor.CGT_FALLBACK_RATE
+    const effectiveTier = this.effectiveOwnershipTier(ownership, holdingPeriod)
+    const cgtRate = matrix[effectiveTier]?.[holdingPeriod] ?? this.constructor.CGT_FALLBACK_RATE
     const capitalGainsTax = taxableGain > 0 ? Math.round(taxableGain * cgtRate) : 0
+
+    // T1.2-F-B — toggle the residency row + 12억 banner whenever ownership /
+    // holding / sale price could change their visibility.
+    this.updateResidencyRowVisibility(ownership, holdingPeriod)
+    this.updateHighValueWarning(ownership, holdingPeriod, salePrice)
 
     // Final results
     const netProfit = salePrice - totalInvestment - allCosts - capitalGainsTax
@@ -182,6 +191,55 @@ export default class extends Controller {
     // T1.5 — DSR warning banner reflects the *current* bid (loan principal
     // = bid * loan_ratio). Hidden entirely if DSR inputs are missing.
     this.updateDsrWarning(bidPrice)
+  }
+
+  // --- T1.2-F-B: 1주택 거주요건 toggle + 12억 advisory ---
+
+  // Re-runs the calculation when the residency checkbox flips. The full
+  // calculation is the cleanest path because the residency-driven rate
+  // change cascades into net profit / ROI / DSR rendering.
+  onResidencyChange() {
+    this.calculate()
+  }
+
+  // The calculator stores the residency_met state as a Boolean value.
+  // Bind reads from the checkbox itself so the value stays the source of
+  // truth even if calculate() runs before the change event fires.
+  get residencyMet() {
+    if (!this.hasResidencyTarget) return this.residencyMetValue
+    return this.residencyTarget.checked
+  }
+
+  // 1세대 1주택 비과세는 보유 2년 + 거주 2년 요건이 필요하다. 거주 요건이
+  // 충족되지 않은 1주택 over_2y 양도는 비과세가 아니라 일반 양도세 대상.
+  // Calculator 서버 단의 effective_household_tier 와 같은 로직이다.
+  effectiveOwnershipTier(ownership, holdingPeriod) {
+    if (ownership === "single_home" && holdingPeriod === "over_2y" && !this.residencyMet) {
+      return "homeless"
+    }
+    return ownership
+  }
+
+  // 거주요건 row 는 1주택 + 2년 이상 보유 조합에서만 의미가 있다. 다른
+  // 조합에서는 숨겨서 사용자 혼선을 줄인다.
+  updateResidencyRowVisibility(ownership, holdingPeriod) {
+    if (!this.hasResidencyRowTarget) return
+    const visible = ownership === "single_home" && holdingPeriod === "over_2y"
+    this.residencyRowTarget.classList.toggle("hidden", !visible)
+  }
+
+  // 양도가액 > 12억 + 1주택 + over_2y + 거주요건 충족인 경우 본 계산기는
+  // 단순 비과세를 가정하지만 실제로는 12억 초과분에 대해 분리 과세가
+  // 적용되므로 사용자에게 advisory banner 를 노출한다.
+  updateHighValueWarning(ownership, holdingPeriod, salePriceManwon) {
+    if (!this.hasHighValueWarningTarget) return
+    const threshold = this.highValueThresholdValue || 0
+    const triggered =
+      ownership === "single_home" &&
+      holdingPeriod === "over_2y" &&
+      this.residencyMet &&
+      salePriceManwon > threshold
+    this.highValueWarningTarget.classList.toggle("hidden", !triggered)
   }
 
   // --- DSR (T1.5) ---
