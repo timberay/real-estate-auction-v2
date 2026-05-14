@@ -54,6 +54,32 @@ class Properties::PhotosControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "T2.8: photos partial preloads blobs (no per-photo N+1 SELECT)" do
+    3.times do |i|
+      @user_property.photos.attach(
+        io: StringIO.new("img#{i}"),
+        filename: "p#{i}.png",
+        content_type: "image/png"
+      )
+    end
+    target_id = @user_property.photos.first.id
+
+    sqls = []
+    callback = lambda do |*, payload|
+      next if payload[:name] == "SCHEMA"
+      sqls << payload[:sql].to_s if payload[:sql].to_s =~ /"active_storage_blobs"/i
+    end
+
+    ActiveSupport::Notifications.subscribed(callback, "sql.active_record") do
+      delete property_photo_path(@property, target_id),
+        headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    end
+
+    single_id_selects = sqls.count { |s| s.match?(/SELECT.+"active_storage_blobs".+WHERE.+"id"\s*=/) }
+    assert single_id_selects <= 1,
+      "N+1 on active_storage_blobs (#{single_id_selects} single-id SELECTs after partial render): #{sqls.join("\n")}"
+  end
+
   # Happy path — create
   test "POST create with image attaches photo" do
     assert_difference -> { @user_property.photos.count }, 1 do

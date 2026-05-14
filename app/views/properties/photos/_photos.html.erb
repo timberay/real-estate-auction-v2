@@ -2,7 +2,7 @@
   <div class="space-y-3">
     <% if user_property.photos.attached? %>
       <div class="flex flex-wrap gap-2">
-        <% user_property.photos.each do |photo| %>
+        <% user_property.photos.with_all_variant_records.each do |photo| %>
           <div class="relative">
             <%= image_tag url_for(photo),
                   class: "max-w-32 max-h-32 object-cover rounded border border-slate-200 dark:border-slate-600",
