@@ -15,6 +15,16 @@ class ManualsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "manual hero shows a '지금 시작하기' CTA leading to the onboarding wizard (C8)" do
+    get manual_url
+    assert_response :success
+
+    # C8: the manual hero copy is inspirational but vague — pair it with a
+    # concrete next-step CTA so first-time visitors aren't left with "what
+    # do I do now?".
+    assert_select "a[href=?]", start_onboarding_path, { text: /지금 시작하기/ }
+  end
+
   test "GET /manual without session redirects to login (lazy guest creation)" do
     reset!
 

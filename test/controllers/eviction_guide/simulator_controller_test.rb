@@ -23,6 +23,17 @@ class EvictionGuide::SimulatorControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", { text: /이어가기/, count: 0 }
   end
 
+  test "simulator landing surfaces an estimated time so users know what they're committing to (C19)" do
+    get eviction_guide_simulator_url
+    assert_response :success
+
+    # C19: "단계별 질문으로 시뮬레이션" alone leaves users wondering how
+    # long this will take. Surface a rough time estimate so they can decide
+    # whether to start now.
+    assert_match(/3분|소요|약\s*\d+\s*개\s*질문|예상 소요/, response.body,
+      "expected simulator landing to surface an estimated time/question count")
+  end
+
   test "question 404 page hides the internal question code from the body copy (C20)" do
     get eviction_guide_simulator_question_url(code: "JT-Q99")
     assert_response :not_found

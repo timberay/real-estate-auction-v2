@@ -13,6 +13,16 @@ class Inspections::GradesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
   end
 
+  test "footer exposes a '전문가 상담' CTA alongside the PDF download (C14)" do
+    get property_inspections_grade_url(@property)
+    assert_response :success
+
+    # C14: the PDF button shouldn't be the sole prominent action. Offer a
+    # path to deeper help so users don't walk away with a PDF and no
+    # answer to "should I bid?".
+    assert_select "a", text: /전문가 상담/
+  end
+
   test "show assigns budget_setting" do
     get property_inspections_grade_url(@property)
     assert_response :success

@@ -161,17 +161,25 @@
   </div>
 
   <%# ===== Footer actions ===== %>
-  <div class="mt-10 flex gap-3">
+  <div class="mt-10 flex flex-wrap gap-3">
     <%= link_to property_inspections_grade_path(@property, format: :pdf),
-        class: "flex-1 rounded-lg bg-blue-600 dark:bg-blue-500 px-4 py-3 text-sm font-semibold text-center text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors",
+        class: "flex-1 min-w-[10rem] rounded-lg bg-blue-600 dark:bg-blue-500 px-4 py-3 text-sm font-semibold text-center text-white hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors",
         data: { turbo: false } do %>
       PDF 다운로드
     <% end %>
+    <%# C14: equal-weight CTA next to PDF so users have a path to deeper
+         help rather than walking away with a PDF and no answer to
+         "should I bid?". Lands on the manual where expert-consultation
+         guidance lives. %>
+    <%= link_to manual_path,
+        class: "flex-1 min-w-[10rem] rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm font-semibold text-center text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" do %>
+      전문가 상담 가이드
+    <% end %>
     <%= link_to property_inspections_grade_path(@property, format: :csv),
-        class: "flex-1 rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm font-semibold text-center text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors",
+        class: "flex-1 min-w-[10rem] rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm font-semibold text-center text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors",
         data: { turbo: false } do %>
       CSV 다운로드
     <% end %>
-    <%= link_to "목록으로 돌아가기", properties_path, class: "flex-1 rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm font-semibold text-center text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" %>
+    <%= link_to "목록으로 돌아가기", properties_path, class: "flex-1 min-w-[10rem] rounded-lg border border-slate-300 dark:border-slate-600 px-4 py-3 text-sm font-semibold text-center text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors" %>
   </div>
 <% end %>

@@ -8,4 +8,16 @@
   <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
     <%= t("manuals.show.hero.tagline") %>
   </p>
+
+  <%# C8: pair the inspirational copy with a concrete next step so first-time
+       visitors can move from "reading about it" to "doing it" in one click. %>
+  <div class="mt-6">
+    <%= link_to helpers.start_onboarding_path,
+        class: "inline-flex items-center gap-2 h-10 px-4 text-sm font-medium rounded-md bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-500 dark:hover:bg-blue-400 transition-colors duration-150 focus-visible:ring-2 focus-visible:ring-blue-500/50 focus-visible:ring-offset-2 dark:focus-visible:ring-blue-400/50 dark:focus-visible:ring-offset-slate-900" do %>
+      지금 시작하기
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+      </svg>
+    <% end %>
+  </div>
 </section>
