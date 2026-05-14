@@ -181,4 +181,98 @@ class TransferTaxCalculatorTest < ActiveSupport::TestCase
     )
     assert_equal({}, matrix)
   end
+
+  # --- T1.2-F-B: residency requirement branch ---
+  # 1세대 1주택 비과세는 보유 2년 + (조정대상지역의 경우) 거주 2년 요건을 충족해야 한다.
+  # 거주 요건이 충족되지 않은 1주택 over_2y 양도는 비과세가 아니라 일반 양도세 대상이다.
+  # 안전한 보수적 처리: residency_met=false 일 때 단일 1주택 over_2y 만 무주택 행으로 폴백.
+
+  test "single_home over_2y with residency_met=true preserves 비과세 (default behavior)" do
+    result = TransferTaxCalculator.call(
+      taxable_gain_manwon: 50_000,
+      property_type_id: @apartment_id,
+      household_tier: "single_home",
+      holding_period: "over_2y",
+      regulated_region: false,
+      residency_met: true
+    )
+    assert_in_delta 0.0, result.rate, 1e-6
+    assert_equal 0, result.tax_manwon
+  end
+
+  test "single_home over_2y with residency_met=false falls back to homeless rate (conservative)" do
+    result = TransferTaxCalculator.call(
+      taxable_gain_manwon: 50_000,
+      property_type_id: @apartment_id,
+      household_tier: "single_home",
+      holding_period: "over_2y",
+      regulated_region: false,
+      residency_met: false
+    )
+    # Should now use the homeless over_2y rate (0.06) instead of single_home's 0.0
+    assert_in_delta 0.06, result.rate, 1e-6
+    assert_equal 3000, result.tax_manwon
+  end
+
+  test "residency_met=false has NO effect on under_1y or btw_1_2y holdings" do
+    # Short-term holdings already use the high punitive rates; residency
+    # requirement is a 2년 보유/거주 concept that only relates to over_2y.
+    [ "under_1y", "btw_1_2y" ].each do |period|
+      with_residency = TransferTaxCalculator.call(
+        taxable_gain_manwon: 10_000,
+        property_type_id: @apartment_id,
+        household_tier: "single_home",
+        holding_period: period,
+        regulated_region: false,
+        residency_met: true
+      )
+      without_residency = TransferTaxCalculator.call(
+        taxable_gain_manwon: 10_000,
+        property_type_id: @apartment_id,
+        household_tier: "single_home",
+        holding_period: period,
+        regulated_region: false,
+        residency_met: false
+      )
+      assert_in_delta with_residency.rate, without_residency.rate, 1e-6,
+        "#{period} should not branch on residency_met"
+    end
+  end
+
+  test "residency_met=false has NO effect on multi_home tiers" do
+    # Multi-home owners are not eligible for 1주택 비과세 in any case;
+    # the residency branch only applies to single_home.
+    [ "multi_home_2", "multi_home_3plus" ].each do |tier|
+      with_residency = TransferTaxCalculator.call(
+        taxable_gain_manwon: 10_000,
+        property_type_id: @apartment_id,
+        household_tier: tier,
+        holding_period: "over_2y",
+        regulated_region: false,
+        residency_met: true
+      )
+      without_residency = TransferTaxCalculator.call(
+        taxable_gain_manwon: 10_000,
+        property_type_id: @apartment_id,
+        household_tier: tier,
+        holding_period: "over_2y",
+        regulated_region: false,
+        residency_met: false
+      )
+      assert_in_delta with_residency.rate, without_residency.rate, 1e-6,
+        "#{tier} should not branch on residency_met"
+    end
+  end
+
+  test "residency_met defaults to true (preserves API backward-compat)" do
+    # Existing callers without :residency_met must see the seeded behavior.
+    result = TransferTaxCalculator.call(
+      taxable_gain_manwon: 50_000,
+      property_type_id: @apartment_id,
+      household_tier: "single_home",
+      holding_period: "over_2y",
+      regulated_region: false
+    )
+    assert_in_delta 0.0, result.rate, 1e-6
+  end
 end
