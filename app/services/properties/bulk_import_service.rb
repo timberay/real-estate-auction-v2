@@ -17,18 +17,54 @@ module Properties
     end
 
     def call
-      lines = parse_input
-      total_input = lines.size
-      truncated_count = [ total_input - MAX_ROWS, 0 ].max
-      lines = lines.first(MAX_ROWS)
+      rows, truncated_count = parsed_rows_with_truncation
       succeeded = []
       failed = []
 
-      lines.each do |row|
-        process_row(row, succeeded, failed)
+      rows.each do |row|
+        processed = process(row)
+        if processed.error_message.present?
+          failed << processed
+        else
+          succeeded << processed
+        end
       end
 
       Result.new(succeeded: succeeded, failed: failed, truncated_count: truncated_count)
+    end
+
+    def parsed_rows_with_truncation
+      lines = parse_input
+      total_input = lines.size
+      truncated_count = [ total_input - MAX_ROWS, 0 ].max
+      [ lines.first(MAX_ROWS), truncated_count ]
+    end
+
+    def process(row)
+      return row if row.error_message.present?
+
+      court_code = CourtAuction::CaseSearchClient::COURT_CODES[row.court_name]
+      unless court_code
+        return Row.new(**row.to_h.merge(error_message: "등록되지 않은 법원: '#{row.court_name}'"))
+      end
+
+      begin
+        CourtAuction::CaseNumberParser.parse(row.case_number)
+      rescue DataProvider::ParseError
+        return Row.new(**row.to_h.merge(error_message: "사건번호 형식 오류: '#{row.case_number}' (예: 2026타경1234)"))
+      end
+
+      result = CaseSearchService.call(court_code: court_code, case_number: row.case_number)
+
+      if result.error
+        return Row.new(**row.to_h.merge(court_code: court_code, error_message: localized_error(result.error)))
+      end
+
+      property = result.properties.first
+      user_property = @user.user_properties.find_by(property: property)
+      already_existed = user_property.present?
+      @user.user_properties.find_or_create_by!(property: property)
+      Row.new(**row.to_h.merge(court_code: court_code, property: property, already_existed: already_existed))
     end
 
     private
@@ -77,39 +113,6 @@ module Properties
         error_message: "형식 오류: '#{raw}' — 예시 형식 '서울중앙지방법원,2026타경1234'",
         already_existed: false
       )
-    end
-
-    def process_row(row, succeeded, failed)
-      if row.error_message.present?
-        failed << row
-        return
-      end
-
-      court_code = CourtAuction::CaseSearchClient::COURT_CODES[row.court_name]
-      unless court_code
-        failed << Row.new(**row.to_h.merge(error_message: "등록되지 않은 법원: '#{row.court_name}'"))
-        return
-      end
-
-      begin
-        CourtAuction::CaseNumberParser.parse(row.case_number)
-      rescue DataProvider::ParseError
-        failed << Row.new(**row.to_h.merge(error_message: "사건번호 형식 오류: '#{row.case_number}' (예: 2026타경1234)"))
-        return
-      end
-
-      result = CaseSearchService.call(court_code: court_code, case_number: row.case_number)
-
-      if result.error
-        failed << Row.new(**row.to_h.merge(court_code: court_code, error_message: localized_error(result.error)))
-        return
-      end
-
-      property = result.properties.first
-      user_property = @user.user_properties.find_by(property: property)
-      already_existed = user_property.present?
-      @user.user_properties.find_or_create_by!(property: property)
-      succeeded << Row.new(**row.to_h.merge(court_code: court_code, property: property, already_existed: already_existed))
     end
 
     def localized_error(error)
