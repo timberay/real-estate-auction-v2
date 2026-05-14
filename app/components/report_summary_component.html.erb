@@ -64,6 +64,22 @@
       <div class="text-xs text-slate-600 dark:text-slate-400 mb-3">
         예상 매각가 <strong class="text-slate-900 dark:text-slate-100"><%= format_price(distribution_result.sale_price) %></strong>로 시뮬레이션 (집행비용 3% 차감 후 우선변제 순서대로 배당)
       </div>
+      <% if small_tenant_period_caption %>
+        <div class="text-xs text-slate-500 dark:text-slate-400 mb-3" data-testid="small-tenant-period">
+          <%= small_tenant_period_caption %>
+        </div>
+      <% end %>
+      <% first_priority_rows = distribution_result.distributions.select { |d| d["kind"] == "first_priority" } %>
+      <% if first_priority_rows.any? %>
+        <div class="mb-3 rounded-md bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 px-3 py-2 text-xs text-amber-900 dark:text-amber-200">
+          <div class="font-semibold mb-1">최우선변제 (소액임차인)</div>
+          <ul class="space-y-0.5">
+            <% first_priority_rows.each do |row| %>
+              <li><%= row["label"] %>: <strong><%= format_price(row["amount"]) %></strong></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
       <table class="w-full text-sm">
         <thead>
           <tr class="text-left text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
