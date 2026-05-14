@@ -70,4 +70,41 @@ class CaseSearchServiceTest < ActiveSupport::TestCase
     assert result.success?
     assert_equal "EXISTING", result.properties.first.address
   end
+
+  # D3c — exercises the rescue branch in CaseSearchService#persist that handles a
+  # TOCTOU race: between `find_or_create_by!` checking for existence and inserting,
+  # a sibling request inserts the same case_number, raising RecordNotUnique.
+  # The previous "race condition" test pre-creates the row so `find_or_create_by!`
+  # short-circuits on the find — it never reaches the rescue. Here we force the
+  # raise via a singleton-method stub (project convention: see ApplicationHelperTest).
+  test "race condition (rescue branch): RecordNotUnique resolves to existing Property" do
+    stub_request(:post, ENDPOINT).to_return(status: 200, body: @fixture)
+    existing = Property.create!(
+      case_number: "2022타경564",
+      appraisal_price: 1,
+      min_bid_price: 1,
+      address: "EXISTING-AFTER-RACE"
+    )
+
+    with_property_find_or_create_raising do
+      result = CaseSearchService.call(court_code: "B000530", case_number: "2022타경564")
+      assert result.success?
+      assert_equal existing.id, result.properties.first.id
+      assert_equal "EXISTING-AFTER-RACE", result.properties.first.address
+    end
+  end
+
+  private
+
+  # Minitest 6 dropped minitest/mock, so use the project's singleton-method
+  # stub pattern (see ApplicationHelperTest#with_stubbed_count).
+  def with_property_find_or_create_raising
+    sc = Property.singleton_class
+    sc.send(:define_method, :find_or_create_by!) do |*_args, &_blk|
+      raise ActiveRecord::RecordNotUnique, "simulated TOCTOU race"
+    end
+    yield
+  ensure
+    sc.send(:remove_method, :find_or_create_by!) if sc.instance_methods(false).include?(:find_or_create_by!)
+  end
 end
