@@ -61,9 +61,7 @@ module Llm
     def detect_truncation(body)
       return unless body.is_a?(Hash) && body["stop_reason"] == "max_tokens"
 
-      raise Llm::Errors::ResponseTruncated,
-        "Anthropic response truncated at max_tokens=#{max_tokens}. " \
-        "Increase ANTHROPIC_MAX_TOKENS or reduce prompt size."
+      raise_truncated!(env_var: "ANTHROPIC_MAX_TOKENS")
     end
 
     def build_user_content(prompt, encoded_pdfs)

@@ -83,6 +83,15 @@ module Llm
       end
     end
 
+    # Shared truncation raiser so every adapter surfaces the same error class
+    # and message shape. Adapter-specific detect_truncation methods pick the
+    # right finish_reason field per provider then call this.
+    def raise_truncated!(env_var:)
+      raise Llm::Errors::ResponseTruncated,
+        "#{provider_name} response truncated at max_tokens. " \
+        "Increase #{env_var} or reduce prompt size."
+    end
+
     def encode_pdf_base64(blob_or_path)
       if blob_or_path.respond_to?(:download)
         Base64.strict_encode64(blob_or_path.download)

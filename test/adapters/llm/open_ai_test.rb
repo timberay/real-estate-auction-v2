@@ -43,4 +43,22 @@ class Llm::OpenAiTest < ActiveSupport::TestCase
   ensure
     ENV["OPENAI_API_KEY"] = original
   end
+
+  test "raises ResponseTruncated when finish_reason is length" do
+    original = ENV["OPENAI_API_KEY"]
+    ENV["OPENAI_API_KEY"] = "test-key"
+
+    truncated = {
+      "choices" => [ { "message" => { "content" => '{"par' }, "finish_reason" => "length" } ]
+    }
+    stub_request(:post, "https://api.openai.com/v1/chat/completions")
+      .to_return(status: 200, body: truncated.to_json, headers: { "Content-Type" => "application/json" })
+
+    error = assert_raises(Llm::Errors::ResponseTruncated) do
+      @adapter.analyze(system: "test", prompt: "test")
+    end
+    assert_match(/OPENAI_MAX_TOKENS/, error.message)
+  ensure
+    ENV["OPENAI_API_KEY"] = original
+  end
 end

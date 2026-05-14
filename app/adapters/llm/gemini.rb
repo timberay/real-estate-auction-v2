@@ -35,6 +35,7 @@ module Llm
         }
       end
       handle_response(response)
+      detect_truncation(response.body)
       text = response.body["candidates"][0]["content"]["parts"][0]["text"]
       sanitize_and_parse_json(text)
     end
@@ -43,6 +44,11 @@ module Llm
 
     def base_url
       ENV.fetch("GEMINI_BASE_URL", DEFAULT_BASE_URL)
+    end
+
+    def detect_truncation(body)
+      return unless body.is_a?(Hash) && body.dig("candidates", 0, "finishReason") == "MAX_TOKENS"
+      raise_truncated!(env_var: "GEMINI_MAX_OUTPUT_TOKENS")
     end
 
     def build_content_parts(prompt, encoded_pdfs)
