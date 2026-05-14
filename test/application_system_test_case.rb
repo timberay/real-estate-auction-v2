@@ -1,4 +1,6 @@
 require "test_helper"
+require "axe-capybara"
+require "axe/matchers/be_axe_clean"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :selenium, using: :headless_chrome, screen_size: [ 1400, 900 ]
@@ -16,5 +18,16 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       })
     JS
     sleep 0.3
+  end
+
+  # Run axe-core against the current page and assert no violations remain.
+  # Pass `skip_rules: [...]` to suppress known rules tracked as a11y debt
+  # (master TODO T4.6 follow-ups). Pass `within:` to scope to one element.
+  def assert_axe_clean(within: nil, skip_rules: [])
+    audit = Axe::Matchers::BeAxeClean.new
+    audit = audit.within(within) if within
+    audit = audit.skipping(*skip_rules) if skip_rules.any?
+    matches = audit.matches?(page)
+    assert matches, audit.failure_message
   end
 end
