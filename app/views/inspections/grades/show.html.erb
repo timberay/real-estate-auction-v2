@@ -16,6 +16,29 @@
     </div>
   <% end %>
 
+  <%# ===== T3.1: 비주거 매물 세금 매트릭스 경고 ===== %>
+  <% unless @property.residential? %>
+    <% category_label = { officetel: "오피스텔", commercial: "상가", land: "토지", unknown: "분류 불명" }[@property.usage_category] %>
+    <div class="rounded-md border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-400 p-4 mb-4 mt-4" role="note" data-testid="non-residential-tax-warning">
+      <h3 class="font-semibold text-amber-900 dark:text-amber-100">
+        ⚠️ <%= category_label %> 매물 — 세금 매트릭스 별도 확인 필요
+      </h3>
+      <p class="text-sm mt-1 text-amber-800 dark:text-amber-200">
+        이 페이지의 취득세 / 양도세 계산은 주거용 부동산 기준입니다.
+        <% case @property.usage_category %>
+        <% when :officetel %>
+          오피스텔은 주거용으로 등록한 경우만 1세대 1주택 비과세 대상이며, 그 외에는 사업용 부동산으로 분류됩니다.
+        <% when :commercial %>
+          상가는 일반세율(4.6% 등) 및 사업소득 양도세가 적용됩니다.
+        <% when :land %>
+          토지는 비사업용 양도세 중과(70% 추가) 가능성이 있으니 세무 전문가 확인을 권장합니다.
+        <% else %>
+          매물 유형이 분명하지 않으니 세무 전문가에게 확인하세요.
+        <% end %>
+      </p>
+    </div>
+  <% end %>
+
   <%# ===== A7: Incomplete-input warning banner ===== %>
   <% if @rating == :incomplete && @unanswered_high_priority_count > 0 %>
     <div class="rounded-md border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 dark:border-red-400 p-4 mb-6 mt-4">

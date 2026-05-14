@@ -39,6 +39,34 @@ class Property < ApplicationRecord
     inspection_results.where(has_risk: nil).exists?
   end
 
+  # T3.1 — categorize property_type (free-text from court data) into a
+  # coarse usage bucket. The acquisition/transfer tax matrices in this app
+  # are seeded for 주거(residential) types; non-residential properties
+  # (오피스텔/상가/토지) need the user to verify externally because the
+  # tax brackets differ materially (e.g. CGT is not subject to the 1세대
+  # 1주택 비과세, acquisition tax may be flat 4.6%). When property_type is
+  # blank we default to :residential — the safer assumption for the most
+  # common case (아파트/빌라 dominate the dataset).
+  def usage_category
+    return :residential if property_type.blank?
+    case property_type
+    when /오피스텔/
+      :officetel
+    when /상가|근린|시장/
+      :commercial
+    when /토지|대지|임야|전\b|답\b|과수원|목장|공장용지|잡종지/
+      :land
+    when /아파트|빌라|다세대|연립|단독|주택|도시형생활주택/
+      :residential
+    else
+      :unknown
+    end
+  end
+
+  def residential?
+    usage_category == :residential
+  end
+
   private
 
   def documents_must_be_pdf
