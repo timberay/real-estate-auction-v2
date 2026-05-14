@@ -6,18 +6,22 @@
     <%= link_to "← 목록으로", properties_path,
         class: "text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300" %>
     <h1 class="text-lg font-semibold text-slate-900 dark:text-slate-100">물건 비교 · <%= @user_properties.size %>건</h1>
+    <%= link_to "CSV 다운로드",
+        compare_properties_path(format: :csv, ids: @user_properties.map(&:property_id).join(",")),
+        class: "inline-flex items-center gap-1 text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200 dark:border-slate-600 rounded-md px-3 py-1.5" %>
   </div>
 
   <div class="overflow-x-auto rounded-lg border border-slate-200 dark:border-slate-700">
-    <table class="min-w-full text-sm">
+    <table class="min-w-full text-sm" data-controller="comparison-sort">
       <caption class="sr-only">물건 비교 표</caption>
       <thead>
         <tr class="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
           <th class="px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap w-32">항목</th>
-          <% @user_properties.each do |up| %>
-            <th class="px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">
-              <%= link_to up.property.case_number, property_path(up.property),
-                  class: "hover:text-blue-600 dark:hover:text-blue-400" %>
+          <% @user_properties.each_with_index do |up, idx| %>
+            <th scope="col" data-column-index="<%= idx %>"
+                class="px-4 py-3 text-left font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">
+              <%= link_to property_path(up.property), class: "hover:text-blue-600 dark:hover:text-blue-400",
+                  data: { property_case_number: true } do %><%= up.property.case_number %><% end %>
             </th>
           <% end %>
         </tr>
@@ -25,38 +29,47 @@
       <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
         <tr class="bg-white dark:bg-slate-900">
           <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">법원</td>
-          <% @user_properties.each do |up| %>
-            <td class="px-4 py-3 text-slate-700 dark:text-slate-300"><%= up.property.court_name.presence || "—" %></td>
+          <% @user_properties.each_with_index do |up, idx| %>
+            <td data-column-index="<%= idx %>" class="px-4 py-3 text-slate-700 dark:text-slate-300"><%= up.property.court_name.presence || "—" %></td>
           <% end %>
         </tr>
         <tr class="bg-slate-50 dark:bg-slate-800/50">
           <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">주소</td>
-          <% @user_properties.each do |up| %>
-            <td class="px-4 py-3 text-slate-700 dark:text-slate-300"><%= up.property.address.presence || "—" %></td>
+          <% @user_properties.each_with_index do |up, idx| %>
+            <td data-column-index="<%= idx %>" class="px-4 py-3 text-slate-700 dark:text-slate-300"><%= up.property.address.presence || "—" %></td>
           <% end %>
         </tr>
-        <tr class="bg-white dark:bg-slate-900">
-          <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">감정가</td>
-          <% @user_properties.each do |up| %>
-            <td class="px-4 py-3 font-medium text-slate-700 dark:text-slate-300"><%= format_price_won(up.property.appraisal_price) %></td>
+        <tr class="bg-white dark:bg-slate-900" data-sort-key="appraisal_price">
+          <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+            <%= render "sort_header", label: "감정가" %>
+          </td>
+          <% @user_properties.each_with_index do |up, idx| %>
+            <td data-column-index="<%= idx %>" data-sort-value="<%= up.property.appraisal_price.to_i %>"
+                class="px-4 py-3 font-medium text-slate-700 dark:text-slate-300"><%= format_price_won(up.property.appraisal_price) %></td>
           <% end %>
         </tr>
-        <tr class="bg-slate-50 dark:bg-slate-800/50">
-          <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">최저가</td>
-          <% @user_properties.each do |up| %>
-            <td class="px-4 py-3 font-medium text-slate-700 dark:text-slate-300"><%= format_price_won(up.property.min_bid_price) %></td>
+        <tr class="bg-slate-50 dark:bg-slate-800/50" data-sort-key="min_bid_price">
+          <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+            <%= render "sort_header", label: "최저가" %>
+          </td>
+          <% @user_properties.each_with_index do |up, idx| %>
+            <td data-column-index="<%= idx %>" data-sort-value="<%= up.property.min_bid_price.to_i %>"
+                class="px-4 py-3 font-medium text-slate-700 dark:text-slate-300"><%= format_price_won(up.property.min_bid_price) %></td>
           <% end %>
         </tr>
-        <tr class="bg-white dark:bg-slate-900">
-          <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">유찰횟수</td>
-          <% @user_properties.each do |up| %>
-            <td class="px-4 py-3 text-slate-700 dark:text-slate-300"><%= up.property.failed_bid_count %>회</td>
+        <tr class="bg-white dark:bg-slate-900" data-sort-key="failed_bid_count">
+          <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+            <%= render "sort_header", label: "유찰횟수" %>
+          </td>
+          <% @user_properties.each_with_index do |up, idx| %>
+            <td data-column-index="<%= idx %>" data-sort-value="<%= up.property.failed_bid_count.to_i %>"
+                class="px-4 py-3 text-slate-700 dark:text-slate-300"><%= up.property.failed_bid_count %>회</td>
           <% end %>
         </tr>
         <tr class="bg-slate-50 dark:bg-slate-800/50">
           <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">다음 매각기일</td>
-          <% @user_properties.each do |up| %>
-            <td class="px-4 py-3 text-slate-700 dark:text-slate-300">
+          <% @user_properties.each_with_index do |up, idx| %>
+            <td data-column-index="<%= idx %>" class="px-4 py-3 text-slate-700 dark:text-slate-300">
               <% schedule = up.property.next_auction_schedule %>
               <%= schedule&.schedule_date&.strftime("%Y.%m.%d") || "—" %>
             </td>
@@ -64,26 +77,47 @@
         </tr>
         <tr class="bg-white dark:bg-slate-900">
           <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">종합판정</td>
-          <% @user_properties.each do |up| %>
-            <td class="px-4 py-3">
+          <% @user_properties.each_with_index do |up, idx| %>
+            <td data-column-index="<%= idx %>" class="px-4 py-3">
               <% rating = @ratings_by_property[up.property_id] %>
               <%= render SafetyBadgeComponent.new(rating: rating) %>
             </td>
           <% end %>
         </tr>
-        <tr class="bg-slate-50 dark:bg-slate-800/50">
-          <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">인수금액</td>
-          <% @user_properties.each do |up| %>
-            <td class="px-4 py-3 text-slate-700 dark:text-slate-300">
-              <% report = @reports_by_property[up.property_id] %>
+        <tr class="bg-slate-50 dark:bg-slate-800/50" data-sort-key="total_risk_amount">
+          <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+            <%= render "sort_header", label: "인수금액" %>
+          </td>
+          <% @user_properties.each_with_index do |up, idx| %>
+            <% report = @reports_by_property[up.property_id] %>
+            <td data-column-index="<%= idx %>" data-sort-value="<%= report&.total_risk_amount.to_i %>"
+                class="px-4 py-3 text-slate-700 dark:text-slate-300">
               <%= report ? format_price_won(report.total_risk_amount) : "—" %>
             </td>
           <% end %>
         </tr>
-        <tr class="bg-white dark:bg-slate-900">
+        <tr class="bg-white dark:bg-slate-900" data-sort-key="estimated_margin">
+          <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
+            <%= render "sort_header", label: "예상 차익" %>
+            <span class="block text-[10px] text-slate-400 dark:text-slate-500 font-normal">감정가 − 최저가 − 인수금액</span>
+          </td>
+          <% @user_properties.each_with_index do |up, idx| %>
+            <% report = @reports_by_property[up.property_id] %>
+            <% margin = up.property.appraisal_price.to_i - up.property.min_bid_price.to_i - report&.total_risk_amount.to_i %>
+            <td data-column-index="<%= idx %>" data-sort-value="<%= margin %>"
+                class="px-4 py-3 font-medium text-slate-700 dark:text-slate-300">
+              <% if margin > 0 %>
+                <%= format_price_won(margin) %>
+              <% else %>
+                —
+              <% end %>
+            </td>
+          <% end %>
+        </tr>
+        <tr class="bg-slate-50 dark:bg-slate-800/50">
           <td class="px-4 py-3 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">임차인수</td>
-          <% @user_properties.each do |up| %>
-            <td class="px-4 py-3 text-slate-700 dark:text-slate-300">
+          <% @user_properties.each_with_index do |up, idx| %>
+            <td data-column-index="<%= idx %>" class="px-4 py-3 text-slate-700 dark:text-slate-300">
               <% report = @reports_by_property[up.property_id] %>
               <%= report ? "#{report.effective_tenants.size}명" : "—" %>
             </td>
@@ -95,5 +129,6 @@
 
   <p class="text-xs text-slate-400 dark:text-slate-500">
     종합판정은 체크리스트 완료 여부에 따라 '미완료'로 표시될 수 있습니다.
+    숫자 행의 정렬 버튼을 누르면 매물 순서를 그 기준으로 정렬합니다.
   </p>
 </div>

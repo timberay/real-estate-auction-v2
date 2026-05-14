@@ -56,6 +56,35 @@ class PropertyCompareTest < ApplicationSystemTestCase
     assert_no_selector "#compare-action-bar:not(.hidden)", wait: 2
   end
 
+  # T3.5 #23 — sessionStorage persistence regression guard.
+  test "selected checkboxes survive a page refresh via sessionStorage" do
+    visit properties_path
+
+    check_property_card(@prop1)
+    check_property_card(@prop2)
+
+    within "#compare-action-bar" do
+      assert_text "선택한 2건"
+    end
+
+    visit properties_path
+
+    within "#compare-action-bar" do
+      assert_text "선택한 2건"
+      assert_button "비교하기"
+    end
+
+    # Verify checkboxes restored, not just the counter
+    [ @prop1, @prop2 ].each do |property|
+      card = find("##{ActionView::RecordIdentifier.dom_id(property, :card)}")
+      within(card) do
+        checkbox = find("input[data-property-id='#{property.id}']", visible: :all)
+        assert checkbox.checked?,
+          "expected property #{property.id} checkbox to remain checked after refresh"
+      end
+    end
+  end
+
   private
 
   def check_property_card(property)

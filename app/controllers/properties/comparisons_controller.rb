@@ -28,6 +28,19 @@ module Properties
       @ratings_by_property = @user_properties.each_with_object({}) do |up, h|
         h[up.property_id] = InspectionRatingService.new(property: up.property, user: current_user).overall_rating
       end
+
+      respond_to do |format|
+        format.html
+        format.csv { send_comparison_csv }
+      end
+    end
+
+    private
+
+    def send_comparison_csv
+      csv_data = Export::ComparisonCsvExporter.new(user_properties: @user_properties, user: current_user).to_csv
+      filename = "물건비교_#{@user_properties.size}건_#{Date.current}.csv"
+      send_data csv_data, filename: filename, type: "text/csv; charset=utf-8", disposition: "attachment"
     end
   end
 end
