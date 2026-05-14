@@ -38,4 +38,54 @@ class PropertyCardOverflowMenuTest < ApplicationSystemTestCase
       assert_no_button "삭제"
     end
   end
+
+  test "Esc closes the menu and returns focus to the trigger" do
+    visit properties_path
+
+    card = find("##{ActionView::RecordIdentifier.dom_id(@property, :card)}")
+
+    within card do
+      trigger = find("[data-overflow-menu-target='trigger']")
+      trigger.click
+      assert_selector "[data-overflow-menu-target='menu']:not([hidden])"
+    end
+
+    find("body").send_keys(:escape)
+
+    within card do
+      assert_selector "[data-overflow-menu-target='menu'][hidden]", visible: :all
+      trigger = find("[data-overflow-menu-target='trigger']")
+      assert_equal "false", trigger["aria-expanded"]
+    end
+
+    # Focus should be back on the trigger of the card whose menu we just closed.
+    focused_label = page.evaluate_script("document.activeElement && document.activeElement.getAttribute('aria-label')")
+    assert_match(/#{Regexp.escape(@property.case_number)} 더보기 메뉴/, focused_label.to_s)
+  end
+
+  test "opening one card menu auto-closes any other open menu" do
+    other_property = properties(:risky_villa)
+    UserProperty.find_or_create_by!(user: @user, property: other_property)
+
+    visit properties_path
+
+    card_a = find("##{ActionView::RecordIdentifier.dom_id(@property, :card)}")
+    card_b = find("##{ActionView::RecordIdentifier.dom_id(other_property, :card)}")
+
+    within card_a do
+      find("[data-overflow-menu-target='trigger']").click
+      assert_selector "[data-overflow-menu-target='menu']:not([hidden])"
+    end
+
+    within card_b do
+      find("[data-overflow-menu-target='trigger']").click
+      assert_selector "[data-overflow-menu-target='menu']:not([hidden])"
+    end
+
+    within card_a do
+      assert_selector "[data-overflow-menu-target='menu'][hidden]", visible: :all
+      trigger = find("[data-overflow-menu-target='trigger']")
+      assert_equal "false", trigger["aria-expanded"]
+    end
+  end
 end

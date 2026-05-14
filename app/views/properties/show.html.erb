@@ -59,13 +59,14 @@
       </div>
 
       <%# B14 / E-43: inline AI 수동분석 등록 — replaces the standalone /analyses/new redirect. %>
+      <%# Heading is h4 because the surrounding CardComponent renders the section title as h3 (Follow-up #11). %>
       <div class="space-y-3 border-t border-slate-200 dark:border-slate-700 pt-4">
-        <h3 class="font-semibold text-slate-900 dark:text-slate-100">AI 수동분석 등록</h3>
+        <h4 class="font-semibold text-slate-900 dark:text-slate-100">AI 수동분석 등록</h4>
         <p class="text-sm text-slate-500 dark:text-slate-400">
           아래 프롬프트를 복사해 ChatGPT·Claude·Gemini에 PDF와 함께 입력한 뒤, 받은 JSON 결과를 업로드하세요.
         </p>
         <div data-controller="analysis-tabs" data-analysis-tabs-prompt-url-value="<%= prompt_analyses_path %>">
-          <%= render LlmDataDisclosureComponent.new %>
+          <%= render LlmDataDisclosureComponent.new(heading_level: 4) %>
           <%= render "analyses/manual_form" %>
         </div>
       </div>
