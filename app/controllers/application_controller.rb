@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_user
 
+  rescue_from ActiveRecord::RecordInvalid, with: :handle_record_invalid
   rescue_from Auth::Error, with: :handle_auth_error
   rescue_from DataProvider::MissingCredentialError, with: :handle_missing_credential
   rescue_from DataProvider::ConsentRequiredError, with: :handle_consent_required
@@ -87,6 +88,23 @@ class ApplicationController < ActionController::Base
 
     Rails.cache.write("last_seen:#{user.id}", true, expires_in: LAST_SEEN_TTL_SECONDS.seconds)
     user.update_column(:last_seen_at, Time.current)
+  end
+
+  # Global safety net for unhandled validation failures from bang-method writes
+  # (update!/save!/create!/destroy!). HTML/Turbo Stream redirects back with a
+  # flash alert; JSON returns 422 with structured errors. Per-controller code
+  # should still prefer the non-bang form when it wants to re-render the form
+  # with the unsaved record — this handler is a last-resort catch.
+  def handle_record_invalid(error)
+    messages = error.record&.errors&.full_messages || []
+    Rails.logger.warn("[RecordInvalid] #{error.record&.class}: #{messages.join(', ')}")
+    alert_text = messages.any? ? messages.to_sentence : "입력값이 올바르지 않습니다."
+
+    if request.format.json?
+      render json: { errors: messages }, status: :unprocessable_entity
+    else
+      redirect_back fallback_location: root_path, alert: alert_text
+    end
   end
 
   def handle_auth_error(error)
