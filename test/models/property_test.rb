@@ -49,4 +49,32 @@ class PropertyTest < ActiveSupport::TestCase
     property = properties(:unanalyzed_officetel)
     assert_not property.analyzed?
   end
+
+  # T1.4(b) — 차회 매각가 자동 계산: 한국 법원경매 표준 8할 저감.
+  # 다음 회차 최저가 = (현재 최저가 × 0.8) 만원 단위 절사.
+  test "next_round_min_bid_price returns 80% of min_bid_price floored to 만원" do
+    property = Property.new(min_bid_price: 350_000_000) # 3.5억
+    # 350M * 0.8 = 280M (정확히 만원 단위 떨어짐)
+    assert_equal 280_000_000, property.next_round_min_bid_price
+  end
+
+  test "next_round_min_bid_price floors to 만원 (10,000원) granularity" do
+    property = Property.new(min_bid_price: 333_333_333)
+    # 333,333,333 * 0.8 = 266,666,666.4 → 만원 단위 절사 → 266,660,000
+    assert_equal 266_660_000, property.next_round_min_bid_price
+  end
+
+  test "next_round_min_bid_price returns nil when min_bid_price is nil" do
+    property = Property.new(min_bid_price: nil)
+    assert_nil property.next_round_min_bid_price
+  end
+
+  test "next_round_min_bid_price returns nil when min_bid_price is zero" do
+    property = Property.new(min_bid_price: 0)
+    assert_nil property.next_round_min_bid_price
+  end
+
+  test "NEXT_ROUND_REDUCTION_RATE constant is 0.80" do
+    assert_equal 0.80, Property::NEXT_ROUND_REDUCTION_RATE
+  end
 end

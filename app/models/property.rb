@@ -19,6 +19,18 @@ class Property < ApplicationRecord
   validates :case_number, presence: true, uniqueness: true
   validate :documents_must_be_pdf
 
+  # T1.4(b) — 한국 법원경매 표준 저감률 (8할). 일부 법원은 7할이지만
+  # 가장 보편적인 8할로 간소화. 향후 법원별 차등이 필요하면 별도 분기.
+  NEXT_ROUND_REDUCTION_RATE = 0.80
+
+  # 유찰 시 다음 회차 최저매각가. 만원(10,000원) 단위로 절사하여
+  # 법원 공고 표시 단위와 맞춤.
+  def next_round_min_bid_price
+    return nil if min_bid_price.nil? || min_bid_price.zero?
+    reduced = (min_bid_price * NEXT_ROUND_REDUCTION_RATE).floor
+    (reduced / 10_000) * 10_000
+  end
+
   def analyzed?
     inspection_results.exists?
   end
