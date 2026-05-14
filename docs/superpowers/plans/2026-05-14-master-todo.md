@@ -96,7 +96,7 @@ T3.4 Notification 인프라가 T3.3 D-day 알림 의존. 따라서 **T3.4 → T3
 | T4.3 | 인지 흐름 정리 묶음 — 한 PR (C10 은 controller redirect 으로 이미 처리됨, 잔여 4건) | ✅ 완료 (#159) — W3-3: C6, C9, C10, C15, C18 |
 | T4.4 | 안내/가이드 묶음 4건 — 한 PR | ✅ 완료 (#160) — W3-4: C8, C14, C16, C19 |
 | T4.5 | 빈 상태/진행 표시 묶음 — 한 PR (C12 처리, C11 은 controller redirect 와 mismatch 로 SKIP) | ✅ 완료 (#162) — W3-5: C11, C12 |
-| T4.6 | a11y 점검 패스 (axe-core 통합) | W4-1 / C34 |
+| T4.6 | a11y 점검 패스 (axe-core 통합) — ✅ #166 baseline 인프라 + 4종 부채 캡처. fix 는 follow-up PR. | W4-1 / C34 |
 | T4.7 | `analyses#prompt` 인증/rate-limit | ✅ 완료 (#161) — W4-2 / C31 / E-39 |
 | T4.8 | Backlog P3 묶음 (한국어화 / disclaimer / menu Esc / tooltip / heading / nested cards / base_right_date 컨트롤러 테스트) — ✅ 완료 #163/#164/#165 (3 묶음 8건) | Follow-up #3, #5, #6, #7, #8, #11, #12, #14 |
 | T4.9 | 외부 게이트 5건 — CSP enforce 플립, OAuth 콘솔 redirect URI, SNS self-review (multi-tab/account settings/rack-attack/terms·privacy), OAuth Symbol provider 회귀 테스트, branch protection 정책 결정 | W0-1~5 |
