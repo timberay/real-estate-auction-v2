@@ -26,6 +26,12 @@ Rails.application.routes.draw do
     get    "failure",  to: "omniauth_callbacks#failure"
   end
 
+  resources :notifications, only: [ :index ] do
+    member do
+      post :mark_read
+    end
+  end
+
   resource :onboarding, only: [] do
     collection do
       get "/", action: :step1, as: :start

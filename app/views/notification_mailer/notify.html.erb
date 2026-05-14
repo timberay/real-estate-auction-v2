@@ -1,0 +1,17 @@
+<h2 style="font-family: sans-serif; color: #1e293b;"><%= @notification.title %></h2>
+
+<% if @notification.body.present? %>
+  <p style="font-family: sans-serif; color: #334155; white-space: pre-wrap;"><%= @notification.body %></p>
+<% end %>
+
+<% if @notification.action_url.present? %>
+  <p style="margin-top: 16px;">
+    <a href="<%= @notification.action_url %>"
+       style="display: inline-block; padding: 8px 16px; background: #2563eb; color: white; text-decoration: none; border-radius: 4px; font-family: sans-serif;">
+      확인하기
+    </a>
+  </p>
+  <p style="font-family: sans-serif; color: #94a3b8; font-size: 12px; margin-top: 8px;">
+    <%= @notification.action_url %>
+  </p>
+<% end %>

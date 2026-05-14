@@ -133,6 +133,50 @@ module Header
       assert_text "5억"
     end
 
+    # --- Notification bell ---
+
+    test "renders notification bell link to /notifications when current_user present" do
+      user = users(:budget_user)
+      render_inline(Header::Component.new(current_user: user))
+
+      assert_selector "a[href='/notifications'][aria-label*='알림']"
+    end
+
+    test "notification badge shows unread count" do
+      user = users(:budget_user)
+      user.notifications.create!(kind: "x", title: "unread 1")
+      user.notifications.create!(kind: "x", title: "unread 2")
+      user.notifications.create!(kind: "x", title: "read", read_at: Time.current)
+
+      render_inline(Header::Component.new(current_user: user))
+
+      assert_selector "#notification_badge", text: "2"
+    end
+
+    test "notification badge hides count when zero unread" do
+      user = users(:budget_user)
+      user.notifications.create!(kind: "x", title: "all read", read_at: Time.current)
+
+      render_inline(Header::Component.new(current_user: user))
+
+      # Badge container exists (for turbo replace target) but no visible number
+      assert_selector "#notification_badge"
+      refute_selector "#notification_badge span[aria-label*='새 알림']"
+    end
+
+    test "subscribes to user notifications Turbo channel when current_user present" do
+      user = users(:budget_user)
+      render_inline(Header::Component.new(current_user: user))
+
+      assert_selector "turbo-cable-stream-source", visible: :all
+    end
+
+    test "no bell rendered when current_user is nil" do
+      render_inline(Header::Component.new(current_user: nil))
+
+      assert_no_selector "a[href='/notifications']"
+    end
+
     test "renders budget unset link when no budget" do
       user = users(:budget_user)
       user.budget_setting&.destroy

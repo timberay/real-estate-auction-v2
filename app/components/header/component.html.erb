@@ -21,6 +21,14 @@
       </button>
     </div>
 
+    <% if @current_user %>
+      <%= helpers.turbo_stream_from "user_#{@current_user.id}_notifications" %>
+      <%= link_to notifications_path, class: "relative #{BUTTON_CLASSES}", aria: { label: "알림 #{unread_notification_count}건" } do %>
+        <%= bell_icon %>
+        <%= render partial: "notifications/badge", locals: { unread_count: unread_notification_count } %>
+      <% end %>
+    <% end %>
+
     <% if signed_in? %>
       <div class="relative" data-controller="dropdown" data-dropdown-open-value="false">
         <button type="button" class="<%= BUTTON_CLASSES %> flex items-center gap-2" data-action="dropdown#toggle" aria-label="사용자 메뉴">
