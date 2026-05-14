@@ -102,6 +102,11 @@
 
 ## 시작하기
 
+### 필수 환경
+
+- **Ruby**: 3.1 이상 (`Gemfile`의 `:windows` 플랫폼 심볼이 Ruby 3.0.x 이하 + 구 Bundler 환경에서 파싱 실패). 본 저장소는 `.ruby-version`으로 3.4.8을 고정.
+- **Bundler**: 2.x
+
 ```bash
 bin/setup        # 의존성 설치 및 데이터베이스 준비
 bin/dev          # 개발 서버 실행 (Puma + CSS/JS 감시)
