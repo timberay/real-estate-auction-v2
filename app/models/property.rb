@@ -67,6 +67,23 @@ class Property < ApplicationRecord
     usage_category == :residential
   end
 
+  # D3b — pull fresh data from the court auction API into this Property.
+  # CaseSearchService#persist is "create or no-op on existing", which is the
+  # wrong semantics for a refresh, so this method explicitly rewrites
+  # court-sourced columns (case_number, the identity, is preserved).
+  def refresh_from_court_auction!
+    raise ArgumentError, "court_code is required for refresh" if court_code.blank?
+
+    api_data = GovernmentCourtAuctionAdapter.new.search_case(court_code: court_code, case_number: case_number)
+    parsed = api_data && CourtAuction::ResponseParser.new.parse_case_search(api_data: api_data)
+
+    if parsed.nil?
+      raise DataProvider::DataNotFoundError, "Case #{case_number} not found at court #{court_code}"
+    end
+
+    update!(parsed.except(:case_number))
+  end
+
   private
 
   def documents_must_be_pdf

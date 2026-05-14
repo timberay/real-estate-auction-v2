@@ -127,4 +127,68 @@ class PropertyTest < ActiveSupport::TestCase
       assert_not Property.new(property_type: t).residential?, "#{t} should not be residential"
     end
   end
+
+  # D3b — Property#refresh_from_court_auction!
+  # Lets the user pull fresh court-sourced data into an existing Property using
+  # the stored court_code + case_number. The persist path of CaseSearchService
+  # is "create or no-op on existing", which is the wrong semantics for a refresh,
+  # so this method explicitly updates court-sourced fields.
+
+  REFRESH_ENDPOINT = "https://www.courtauction.go.kr/pgj/pgj15A/selectAuctnCsSrchRslt.on"
+
+  test "refresh_from_court_auction! raises ArgumentError when court_code is blank" do
+    property = Property.new(case_number: "2099타경999", court_code: nil)
+    assert_raises(ArgumentError) { property.refresh_from_court_auction! }
+  end
+
+  test "refresh_from_court_auction! updates court-sourced fields from API" do
+    property = Property.create!(
+      case_number: "2022타경564",
+      court_code: "B000530",
+      court_name: "stale-court",
+      address: "stale-address",
+      appraisal_price: 1,
+      min_bid_price: 1
+    )
+    fixture = File.read(Rails.root.join("test/fixtures/files/court_auction_case_search_valid.json"))
+    stub_request(:post, REFRESH_ENDPOINT).to_return(status: 200, body: fixture)
+
+    property.refresh_from_court_auction!
+    property.reload
+
+    assert_equal "제주지방법원", property.court_name
+    assert_not_equal "stale-address", property.address
+    assert_not_equal 1, property.appraisal_price
+    assert_not_equal 1, property.min_bid_price
+  end
+
+  test "refresh_from_court_auction! preserves identity (case_number unchanged)" do
+    property = Property.create!(
+      case_number: "2022타경564",
+      court_code: "B000530",
+      address: "x",
+      appraisal_price: 1,
+      min_bid_price: 1
+    )
+    fixture = File.read(Rails.root.join("test/fixtures/files/court_auction_case_search_valid.json"))
+    stub_request(:post, REFRESH_ENDPOINT).to_return(status: 200, body: fixture)
+
+    property.refresh_from_court_auction!
+    property.reload
+    assert_equal "2022타경564", property.case_number
+  end
+
+  test "refresh_from_court_auction! raises DataNotFoundError when case not found" do
+    property = Property.create!(
+      case_number: "2099타경999",
+      court_code: "B000530",
+      address: "x",
+      appraisal_price: 1,
+      min_bid_price: 1
+    )
+    body = { "data" => { "dma_csBasInf" => { "csNo" => "" } } }.to_json
+    stub_request(:post, REFRESH_ENDPOINT).to_return(status: 200, body: body)
+
+    assert_raises(DataProvider::DataNotFoundError) { property.refresh_from_court_auction! }
+  end
 end
