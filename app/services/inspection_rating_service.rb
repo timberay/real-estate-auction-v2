@@ -10,9 +10,21 @@ class InspectionRatingService
     new(property:, user:).call
   end
 
-  def initialize(property:, user:)
+  # Pre-loads InspectionItem reference data once. Pass the returned hash via
+  # item_cache: when computing ratings for many properties in one request
+  # (e.g. comparison page) — avoids re-scanning inspection_items per call.
+  def self.build_item_cache
+    items = InspectionItem.all.to_a
+    {
+      by_code: items.index_by(&:code),
+      high_priority: items.select { |i| i.priority == "상" }
+    }
+  end
+
+  def initialize(property:, user:, item_cache: nil)
     @property = property
     @user = user
+    @item_cache = item_cache
   end
 
   def call
@@ -87,13 +99,21 @@ class InspectionRatingService
     @visible_high_items ||= begin
       all_results = @property.inspection_results.where(user: @user).includes(:inspection_item)
       answered_context = all_results.index_by { |r| r.inspection_item.code }
-      all_items_by_code = InspectionItem.all.index_by(&:code)
+      all_items_by_code = items_by_code
       property_type = @property.property_type
 
-      InspectionItem.where(priority: "상").select do |item|
+      high_priority_items.select do |item|
         item.visible_for?(property_type: property_type, answered_results: answered_context, all_items_by_code: all_items_by_code)
       end
     end
+  end
+
+  def items_by_code
+    @item_cache&.dig(:by_code) || InspectionItem.all.index_by(&:code)
+  end
+
+  def high_priority_items
+    @item_cache&.dig(:high_priority) || InspectionItem.where(priority: "상").to_a
   end
 
   def answered_high_count

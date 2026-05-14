@@ -254,4 +254,49 @@ class InspectionRatingServiceTest < ActiveSupport::TestCase
     service = InspectionRatingService.new(property: @property, user: @user)
     assert_equal :safe, service.overall_rating
   end
+
+  # M1 N+1 fix: shared item_cache across multiple service instances
+  test "build_item_cache returns reference data usable by multiple instances" do
+    cache = InspectionRatingService.build_item_cache
+    assert_kind_of Hash, cache[:by_code]
+    assert_kind_of Array, cache[:high_priority]
+    assert cache[:high_priority].all? { |i| i.priority == "상" }
+    assert_equal InspectionItem.count, cache[:by_code].size
+  end
+
+  test "overall_rating with item_cache matches uncached result" do
+    answer_all_high_priority_no_risk(except: @item)
+    InspectionResult.create!(property: @property, inspection_item: @item, user: @user, source_type: "auto", has_risk: true, resolvable: true)
+
+    uncached = InspectionRatingService.new(property: @property, user: @user).overall_rating
+    cached = InspectionRatingService.new(
+      property: @property, user: @user, item_cache: InspectionRatingService.build_item_cache
+    ).overall_rating
+
+    assert_equal uncached, cached
+    assert_equal :caution, cached
+  end
+
+  test "overall_rating with item_cache skips reference-data scans of inspection_items" do
+    # Cache eliminates: SELECT * FROM inspection_items (full scan)
+    # and          SELECT * FROM inspection_items WHERE priority = ?
+    # `includes(:inspection_item)` lookups (WHERE id IN ...) remain — those load
+    # records related to specific inspection_results, not the global table.
+    answer_all_high_priority_no_risk
+    cache = InspectionRatingService.build_item_cache
+
+    reference_scans = []
+    callback = lambda do |_n, _s, _f, _i, payload|
+      sql = payload[:sql]
+      next unless sql =~ /FROM "inspection_items"/i
+      next if sql =~ /WHERE "inspection_items"."id" IN/i
+      reference_scans << sql
+    end
+    ActiveSupport::Notifications.subscribed(callback, "sql.active_record") do
+      InspectionRatingService.new(property: @property, user: @user, item_cache: cache).overall_rating
+    end
+
+    assert_empty reference_scans,
+                 "expected no full/priority scans of inspection_items when item_cache supplied, got: #{reference_scans.inspect}"
+  end
 end
