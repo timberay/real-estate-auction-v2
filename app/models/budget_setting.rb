@@ -14,6 +14,15 @@ class BudgetSetting < ApplicationRecord
   RESERVE_FIELDS.each do |field|
     validates field, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
   end
+
+  # T1.5 — DSR 입력. 미입력 시 DsrCalculator 가 nil 반환하여 경고 배너가
+  # 자체 숨김. 단위는 만원 (다른 reserve 필드와 일관).
+  validates :annual_income, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :existing_debt_monthly, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+
+  def dsr_inputs_complete?
+    annual_income.to_i.positive?
+  end
   REGIONS = Regions::ALL
   DEFAULT_REGION = Regions::DEFAULT
 

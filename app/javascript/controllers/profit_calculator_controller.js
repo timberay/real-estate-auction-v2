@@ -15,7 +15,8 @@ export default class extends Controller {
     "rowSalePrice", "rowBidPrice", "rowAssumed",
     "rowAcqTax", "rowAcqTaxNote", "rowScrivener", "rowRepair",
     "rowMoving", "rowMaintenance", "rowCgt", "rowCgtNote",
-    "rowNetProfit", "rowRoi"
+    "rowNetProfit", "rowRoi",
+    "dsrWarning", "dsrRatioLabel", "dsrThresholdLabel"
   ]
 
   static values = {
@@ -29,7 +30,14 @@ export default class extends Controller {
     taxBrackets: Object,
     cgtMatrix: Object,
     preciseMode: Boolean,
-    areaOver85: Boolean
+    areaOver85: Boolean,
+    dsrEnabled: Boolean,
+    dsrLoanRatio: Number,
+    dsrAnnualIncome: Number,
+    dsrExistingDebtMonthly: Number,
+    dsrAnnualRate: Number,
+    dsrTermYears: Number,
+    dsrThreshold: Number
   }
 
   // F-C-1 — bid range (in 만원) where the precise progressive formula
@@ -170,6 +178,58 @@ export default class extends Controller {
       capitalGainsTax, cgtRate,
       netProfit, totalOutlay, totalCostsAll, roiPercent
     })
+
+    // T1.5 — DSR warning banner reflects the *current* bid (loan principal
+    // = bid * loan_ratio). Hidden entirely if DSR inputs are missing.
+    this.updateDsrWarning(bidPrice)
+  }
+
+  // --- DSR (T1.5) ---
+
+  updateDsrWarning(bidPriceManwon) {
+    if (!this.dsrEnabledValue || !this.hasDsrWarningTarget) {
+      if (this.hasDsrWarningTarget) this.dsrWarningTarget.classList.add("hidden")
+      return
+    }
+
+    const principalManwon = Math.round(bidPriceManwon * this.dsrLoanRatioValue)
+    const ratio = this.computeDsrRatio(principalManwon)
+    const threshold = this.dsrThresholdValue || 0.40
+
+    if (ratio > threshold) {
+      this.dsrWarningTarget.classList.remove("hidden")
+      if (this.hasDsrRatioLabelTarget) {
+        this.dsrRatioLabelTarget.textContent = `DSR ${(ratio * 100).toFixed(1)}%`
+      }
+      if (this.hasDsrThresholdLabelTarget) {
+        this.dsrThresholdLabelTarget.textContent = (threshold * 100).toFixed(0)
+      }
+    } else {
+      this.dsrWarningTarget.classList.add("hidden")
+    }
+  }
+
+  // 원리금균등상환 산식 — 서버 DsrCalculator#compute_monthly_payment 미러.
+  computeDsrRatio(principalManwon) {
+    const annualIncome = this.dsrAnnualIncomeValue
+    if (annualIncome <= 0) return 0
+
+    const months = (this.dsrTermYearsValue || 30) * 12
+    const annualRate = this.dsrAnnualRateValue || 0.045
+    const r = annualRate / 12
+
+    let monthlyPayment = 0
+    if (principalManwon > 0) {
+      if (r === 0) {
+        monthlyPayment = principalManwon / months
+      } else {
+        const pow = Math.pow(1 + r, months)
+        monthlyPayment = principalManwon * (r * pow) / (pow - 1)
+      }
+    }
+
+    const annualDebt = (monthlyPayment + this.dsrExistingDebtMonthlyValue) * 12
+    return annualDebt / annualIncome
   }
 
   // --- Rendering ---

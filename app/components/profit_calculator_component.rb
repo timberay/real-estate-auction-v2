@@ -56,6 +56,39 @@ class ProfitCalculatorComponent < ViewComponent::Base
     end
   end
 
+  # T1.5 — DSR (Debt Service Ratio) inputs forwarded to the Stimulus
+  # controller. When dsr_enabled? is false (annual_income missing/zero),
+  # the JS hides the warning banner entirely. Loan terms come from
+  # DsrCalculator constants (4.5% / 30 years) so the matrix stays internal
+  # to the calc service — the component just exposes the parameters.
+  def dsr_enabled?
+    @budget&.dsr_inputs_complete? == true
+  end
+
+  def dsr_loan_ratio
+    @budget&.loan_ratio.to_f
+  end
+
+  def dsr_annual_income_manwon
+    @budget&.annual_income.to_i
+  end
+
+  def dsr_existing_debt_monthly_manwon
+    @budget&.existing_debt_monthly.to_i
+  end
+
+  def dsr_annual_rate
+    DsrCalculator::DEFAULT_ANNUAL_RATE.to_f
+  end
+
+  def dsr_term_years
+    DsrCalculator::DEFAULT_TERM_YEARS
+  end
+
+  def dsr_threshold
+    DsrCalculator::DEFAULT_THRESHOLD
+  end
+
   # T1.2 — feed the seeded transfer-tax matrix into the Stimulus controller.
   # Returns a nested hash keyed by household_tier and holding_period so the
   # JS can look up the effective CGT rate without a server round-trip when

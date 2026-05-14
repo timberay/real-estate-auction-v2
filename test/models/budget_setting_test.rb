@@ -151,4 +151,34 @@ class BudgetSettingTest < ActiveSupport::TestCase
     bs = BudgetSetting.new
     assert_not bs.area_over_85?
   end
+
+  # T1.5 — DSR 입력 컬럼 검증
+  test "annual_income accepts nil (DSR optional)" do
+    bs = BudgetSetting.new(user: users(:guest), available_cash: 30000, annual_income: nil)
+    assert bs.valid?
+  end
+
+  test "annual_income must not be negative" do
+    bs = BudgetSetting.new(user: users(:guest), available_cash: 30000, annual_income: -1)
+    assert_not bs.valid?
+    assert_includes bs.errors[:annual_income], "은(는) 0 이상이어야 합니다"
+  end
+
+  test "existing_debt_monthly accepts nil" do
+    bs = BudgetSetting.new(user: users(:guest), available_cash: 30000, existing_debt_monthly: nil)
+    assert bs.valid?
+  end
+
+  test "existing_debt_monthly must not be negative" do
+    bs = BudgetSetting.new(user: users(:guest), available_cash: 30000, existing_debt_monthly: -10)
+    assert_not bs.valid?
+    assert_includes bs.errors[:existing_debt_monthly], "은(는) 0 이상이어야 합니다"
+  end
+
+  test "dsr_inputs_complete? returns true only when annual_income is positive" do
+    bs = BudgetSetting.new(annual_income: 5000)
+    assert bs.dsr_inputs_complete?
+    assert_not BudgetSetting.new(annual_income: nil).dsr_inputs_complete?
+    assert_not BudgetSetting.new(annual_income: 0).dsr_inputs_complete?
+  end
 end
