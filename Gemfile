@@ -27,6 +27,9 @@ gem "omniauth-kakao-oauth2", "~> 1.0"
 # Rate limiting for auth endpoints
 gem "rack-attack"
 
+# Structured request logging — one JSON line per request (production observability)
+gem "lograge"
+
 # Browser automation for government site scraping
 gem "playwright-ruby-client", require: "playwright"
 
