@@ -19,7 +19,7 @@
 | Theme | 핵심 질문 | 상태 |
 |-------|----------|------|
 | **1. 계산 엔진 신뢰성** | "숫자가 진짜 맞나?" — 베테랑 retention | T1.1·T1.2·T1.4(b)·T1.5 완료, T1.3·T1.4(a) 대기 |
-| **2. 운영 가시성 + 안전망** | "깨지면 보이고, 사용자 작업이 보호되나?" | T2.1·T2.2·T2.3·T2.4·T2.5·T2.7 완료, 잔여 2건 (T2.6/T2.8) |
+| **2. 운영 가시성 + 안전망** | "깨지면 보이고, 사용자 작업이 보호되나?" | T2.1·T2.2·T2.3·T2.4·T2.5·T2.7·T2.8 완료, 잔여 1건 (T2.6) |
 | **3. 권리분석/매물 다양성 확장** | "다룰 수 있는 매물 범위는 어디까지?" | 대기 |
 | **4. UX 폴리시 + 외부 정리** | "이미 되는 걸 매끄럽게" | 대기 |
 
@@ -62,7 +62,7 @@
 | T2.5 | PDF/LLM rescue 분기 — service 단 ResponseTruncated/Faraday::Error 분기, retry/discard 는 Job 단 유지 | ✅ 완료 (#147) — A4 |
 | T2.6 | Stimulus JS 테스트 인프라 (Vitest 도입 또는 system test 보강) | A3 |
 | T2.7 | InspectionResultVersion 동시성 + N+1 — snapshot_version! retry on RecordNotUnique, mapper *_was 사용으로 refetch 제거 | ✅ 완료 (#148) — Follow-up #9, #10 |
-| T2.8 | B27/B10 controller 견고화 (T2.3 systemic fix 후 잔여) | Follow-up #15, #16, #17, #18, #19 |
+| T2.8 | B27/B10 controller 견고화 — #15/#19 T2.3 흡수, #17 photos N+1 (#149), #16 tenant blank clear (#150). #18 멀티파일 업로드는 UI feature add 로 deferred. | ✅ 완료 (#149, #150) — Follow-up #15-19 |
 
 권장 순서: **T2.3 (systemic fix) → T2.1 (lograge) → T2.2 → T2.4 → T2.5 → T2.6 → T2.7 → T2.8**.
 
