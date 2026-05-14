@@ -19,9 +19,9 @@
 | Theme | 핵심 질문 | 상태 |
 |-------|----------|------|
 | **1. 계산 엔진 신뢰성** | "숫자가 진짜 맞나?" — 베테랑 retention | T1.1·T1.2·T1.3·T1.4(b)·T1.5 완료, T1.4(a) 대기 |
-| **2. 운영 가시성 + 안전망** | "깨지면 보이고, 사용자 작업이 보호되나?" | T2.1·T2.2·T2.3·T2.4·T2.5·T2.7·T2.8 완료, T2.6 partial(Vitest deferred — user 결정 대기) |
+| **2. 운영 가시성 + 안전망** | "깨지면 보이고, 사용자 작업이 보호되나?" | T2.1·T2.2·T2.3·T2.4·T2.5·T2.7·T2.8 완료, T2.6 [DEFERRED](../../decisions/2026-05-14-T2.6-vitest-deferred.md) (Vitest 1~2개월 후 재평가) |
 | **3. 권리분석/매물 다양성 확장** | "다룰 수 있는 매물 범위는 어디까지?" | ✅ 완료 (T3.1~T3.6) |
-| **4. UX 폴리시 + 외부 정리** | "이미 되는 걸 매끄럽게" | T4.1·T4.2·T4.3·T4.4·T4.5·T4.7 완료, T4.6·T4.8·T4.9 대기 |
+| **4. UX 폴리시 + 외부 정리** | "이미 되는 걸 매끄럽게" | T4.1·T4.2·T4.3·T4.4·T4.5·T4.6·T4.7 완료 (#169 a11y 4종 clear), T4.8 완료, T4.9 W0-3.3 ✅ (#172 rack-attack), W0-1·W0-2·W0-3.4·W0-5 runbook 화 (실행 대기), W0-3.1·W0-3.2 [DEFERRED](../../decisions/2026-05-14-deferred-features.md) |
 
 권장 진행 순서: **Theme 1 → Theme 2 → Theme 3 → Theme 4**.
 같은 흐름 내 항목은 의존성/임팩트 순으로 진행.
@@ -96,10 +96,10 @@ T3.4 Notification 인프라가 T3.3 D-day 알림 의존. 따라서 **T3.4 → T3
 | T4.3 | 인지 흐름 정리 묶음 — 한 PR (C10 은 controller redirect 으로 이미 처리됨, 잔여 4건) | ✅ 완료 (#159) — W3-3: C6, C9, C10, C15, C18 |
 | T4.4 | 안내/가이드 묶음 4건 — 한 PR | ✅ 완료 (#160) — W3-4: C8, C14, C16, C19 |
 | T4.5 | 빈 상태/진행 표시 묶음 — 한 PR (C12 처리, C11 은 controller redirect 와 mismatch 로 SKIP) | ✅ 완료 (#162) — W3-5: C11, C12 |
-| T4.6 | a11y 점검 패스 (axe-core 통합) — ✅ #166 baseline 인프라 + 4종 부채 캡처. fix 는 follow-up PR. | W4-1 / C34 |
+| T4.6 | a11y 점검 패스 (axe-core 통합) — ✅ #166 baseline 인프라 + 4종 부채 캡처, ✅ #169 4종 fix (html-has-lang / select-name / heading-order / color-contrast) — KNOWN_VIOLATIONS=[] 잠금 | W4-1 / C34 |
 | T4.7 | `analyses#prompt` 인증/rate-limit | ✅ 완료 (#161) — W4-2 / C31 / E-39 |
 | T4.8 | Backlog P3 묶음 (한국어화 / disclaimer / menu Esc / tooltip / heading / nested cards / base_right_date 컨트롤러 테스트) — ✅ 완료 #163/#164/#165 (3 묶음 8건) | Follow-up #3, #5, #6, #7, #8, #11, #12, #14 |
-| T4.9 | 외부 게이트 5건 — CSP enforce 플립, OAuth 콘솔 redirect URI, SNS self-review (multi-tab/account settings/rack-attack/terms·privacy), OAuth Symbol provider 회귀 테스트 ✅ #167 (W0-4), branch protection 정책 결정 — 4건 대기 (W0-1, W0-2, W0-3, W0-5) | W0-1~5 |
+| T4.9 | 외부 게이트 5건 — W0-1 [CSP enforce runbook](../../operations/csp-enforce-runbook.md) (1주 관찰 후 실행), W0-2 [OAuth 콘솔 runbook](../../operations/oauth-redirect-uri-runbook.md) (도메인 확정 후 외부 작업), W0-3 SNS self-review: ✅ rack-attack #172 (W0-3.3), [terms/privacy runbook](../../operations/legal-content-runbook.md) (W0-3.4 법무 검토), W0-3.1·W0-3.2 [DEFERRED](../../decisions/2026-05-14-deferred-features.md), W0-4 ✅ #167, W0-5 [branch protection runbook](../../operations/branch-protection-runbook.md) (I2 self-hosted runner 선행) | W0-1~5 |
 
 ---
 
@@ -107,12 +107,12 @@ T3.4 Notification 인프라가 T3.3 D-day 알림 의존. 따라서 **T3.4 → T3
 
 | ID | 항목 | 원본 ref |
 |----|------|---------|
-| D1 | `Gemfile` `:windows` 플랫폼 심볼 + `.ruby-version` 표준화 | C3 (debt) |
-| D2 | `preferred_purchase_risk` 라벨 의미 충돌 (TODO 코멘트 기 표시) | C1 (debt) |
-| D3 | TODOS.md 사건번호 후속 3건: 60-법원 auto-discovery / `Property#refresh_from_court_auction!` / CaseSearchService race-rescue 테스트 | C2 (debt) |
-| I1 | GlitchTip 또는 Sentry 검토 (lograge 1주 운영 후) | I-1 |
-| I2 | self-hosted GitHub Actions runner | I-2 |
-| I3 | Litestream 외부 백업 검토 | I-3 |
+| D1 | `Gemfile` `:windows` 플랫폼 심볼 + `.ruby-version` 표준화 — ✅ #170 (README 필수 환경 + bin/setup Ruby 3.1+ 가드) | C3 (debt) |
+| D2 | `preferred_purchase_risk` 라벨 의미 충돌 — ✅ #171 (위험 신호 박스 분리) | C1 (debt) |
+| D3 | TODOS.md 사건번호 후속 3건 — ✅ D3b `Property#refresh_from_court_auction!` #170, ✅ D3c CaseSearchService race-rescue 테스트 #170, D3a 60-법원 auto-discovery [DEFERRED](../../decisions/2026-05-14-deferred-features.md) | C2 (debt) |
+| I1 | GlitchTip 또는 Sentry 검토 (lograge 1주 운영 후) — [DECISION DEFERRED 1주](../../decisions/2026-05-14-I1-error-tracking.md) | I-1 |
+| I2 | self-hosted GitHub Actions runner — [RECOMMENDED 즉시 구현](../../decisions/2026-05-14-I2-self-hosted-runner.md) | I-2 |
+| I3 | Litestream 외부 백업 검토 — [DEFERRED 30일](../../decisions/2026-05-14-I3-litestream-backup.md) | I-3 |
 
 ---
 
