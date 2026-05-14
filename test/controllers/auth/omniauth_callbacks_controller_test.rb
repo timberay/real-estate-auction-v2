@@ -100,4 +100,35 @@ class Auth::OmniauthCallbacksControllerTest < ActionDispatch::IntegrationTest
 
     assert_match "PDF 내보내기를 다시 눌러주세요", flash[:notice]
   end
+
+  # W0-4 regression: the controller does ADAPTERS[…["provider"].to_s], so a
+  # Symbol provider value (which OmniAuth strategies can produce) must still
+  # route correctly. Guard against accidental removal of the `.to_s` defense.
+  test "Symbol provider in omniauth.auth still routes to the correct adapter" do
+    mock_omniauth(:kakao, uid: "sym-1", email: "sym@example.com", name: "Sym")
+    # Replace the provider key with a Symbol — this is the exact regression we
+    # want to guard against.
+    OmniAuth.config.mock_auth[:kakao]["provider"] = :kakao
+
+    assert_difference -> { User.where.not(guest: true).count }, 1 do
+      get "/auth/kakao/callback"
+    end
+
+    assert_redirected_to root_path
+    user = User.find(session[:user_id])
+    assert_equal "sym@example.com", user.email
+    assert_equal "kakao", user.identities.first.provider
+  end
+
+  test "Symbol provider for google_oauth2 still resolves the adapter" do
+    mock_omniauth(:google_oauth2, uid: "sym-g", email: "g@example.com", name: "G")
+    OmniAuth.config.mock_auth[:google_oauth2]["provider"] = :google_oauth2
+
+    get "/auth/google_oauth2/callback"
+
+    assert_redirected_to root_path
+    user = User.find(session[:user_id])
+    # GoogleAdapter normalizes the persisted provider to "google" (PROVIDER constant).
+    assert_equal "google", user.identities.first.provider
+  end
 end
