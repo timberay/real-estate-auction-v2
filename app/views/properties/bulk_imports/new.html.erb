@@ -9,7 +9,8 @@
     </p>
   </div>
 
-  <%= form_with url: bulk_import_properties_path, method: :post, multipart: true do |f| %>
+  <%= form_with url: bulk_import_properties_path, method: :post, multipart: true,
+        data: { turbo: false } do |f| %>
     <div class="space-y-4">
       <%= f.label :bulk_input, "법원,사건번호 목록 (최대 50건)",
           class: "block mb-1.5 text-sm font-medium text-slate-700 dark:text-slate-300" %>
