@@ -99,6 +99,9 @@ group :test do
 
   # Controller assigns helpers
   gem "rails-controller-testing"
+
+  # axe-core accessibility checks via Capybara (T4.6 / W4-1 / C34)
+  gem "axe-core-capybara"
 end
 
 gem "dotenv", "~> 3.2", groups: [ :development, :test ]
