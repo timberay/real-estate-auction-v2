@@ -2,14 +2,14 @@
 <% if budget&.max_bid_amount.present? %>
   <%= link_to settings_budget_path,
       class: "inline-flex items-center gap-1.5 rounded-md bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 px-3 h-8 hover:bg-blue-100 dark:hover:bg-blue-800/30 transition-colors duration-150" do %>
-    <span class="text-sm text-slate-500 dark:text-slate-400">최대입찰가</span>
+    <span class="text-sm text-slate-600 dark:text-slate-400">최대입찰가</span>
     <span class="text-sm font-bold tabular-nums text-blue-700 dark:text-blue-300"><%= format_price_in_eok(budget.max_bid_amount) %></span>
     <svg class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
   <% end %>
 <% else %>
   <%= link_to settings_budget_path,
       class: "inline-flex items-center gap-1.5 rounded-md bg-slate-50 dark:bg-slate-800 border border-dashed border-slate-300 dark:border-slate-600 px-3 h-8 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors duration-150" do %>
-    <span class="text-sm text-slate-400 dark:text-slate-500">예산 미설정</span>
+    <span class="text-sm text-slate-600 dark:text-slate-400">예산 미설정</span>
     <svg class="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
   <% end %>
 <% end %>

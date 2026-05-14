@@ -50,6 +50,16 @@ class EmptyStateComponentTest < ViewComponent::TestCase
     assert_includes html, "font-semibold"
   end
 
+  test "renders title as h2 (a11y heading order)" do
+    render_inline(EmptyStateComponent.new(
+      icon: "document-text",
+      title: "제목",
+      description: "설명"
+    ))
+
+    assert_selector "h2", text: "제목"
+  end
+
   # --- Description styling ---
 
   test "renders description with correct styling" do

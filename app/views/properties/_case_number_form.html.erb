@@ -9,6 +9,7 @@
           grouped_options_for_select(CourtAuction::CaseSearchClient.court_options_for(setting&.effective_region)),
           required: true,
           include_blank: false,
+          aria: { label: "법원 선택" },
           class: "w-44 shrink-0 h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" %>
       <%= text_field_tag :case_number, nil,
           placeholder: "예: 2026타경1234",
