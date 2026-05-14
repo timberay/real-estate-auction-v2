@@ -1,7 +1,7 @@
 <div class="flex flex-col items-center justify-center py-16 px-4">
   <%= icon_html %>
-  <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-1"><%= @title %></h3>
-  <p class="text-sm text-slate-500 dark:text-slate-400 text-center max-w-sm mb-6"><%= @description %></p>
+  <h2 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-1"><%= @title %></h2>
+  <p class="text-sm text-slate-600 dark:text-slate-400 text-center max-w-sm mb-6"><%= @description %></p>
   <% if cta? %>
     <%= render ButtonComponent.new(tag: :a, href: @cta_href, icon: "plus").with_content(@cta_text) %>
   <% end %>
