@@ -51,10 +51,21 @@ class RightsAnalysisReport < ApplicationRecord
     tenants = data.dig("calculated", "tenants") || data["tenants"] || []
     raise IndexError, "tenant index #{index} out of bounds (size #{tenants.size})" if index >= tenants.size
 
-    tenants[index] = tenants[index].merge(
-      "deposit"         => attrs[:deposit].present? ? Integer(attrs[:deposit]) : tenants[index]["deposit"],
-      "move_in_date"    => attrs[:move_in_date].presence || tenants[index]["move_in_date"],
-      "confirmed_date"  => attrs[:confirmed_date].presence || tenants[index]["confirmed_date"],
+    # T2.8 / Follow-up #16: distinguish "field omitted from attrs" (keep
+    # existing) from "field explicitly submitted as blank" (clear to nil),
+    # so a user can erase an incorrect AI-extracted date.
+    current = tenants[index]
+    next_deposit = if attrs.key?(:deposit)
+      val = attrs[:deposit].to_s.strip
+      val.empty? ? nil : Integer(val)
+    else
+      current["deposit"]
+    end
+
+    tenants[index] = current.merge(
+      "deposit"         => next_deposit,
+      "move_in_date"    => attrs.key?(:move_in_date) ? attrs[:move_in_date].presence : current["move_in_date"],
+      "confirmed_date"  => attrs.key?(:confirmed_date) ? attrs[:confirmed_date].presence : current["confirmed_date"],
       "user_edited"     => true
     )
 
