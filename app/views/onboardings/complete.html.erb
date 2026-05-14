@@ -36,8 +36,14 @@
     </p>
 
     <div class="mt-6 space-y-3">
-      <%= render ButtonComponent.new(tag: :a, href: root_path, icon: "magnifying-glass", class: "w-full justify-center") { "내 예산 범위 물건 보기" } %>
-      <%= render ButtonComponent.new(variant: :outline, tag: :a, href: settings_budget_path, icon: "cog-6-tooth", class: "w-full justify-center") { "설정 다시 하기" } %>
+      <%# C6: send users straight to the search page after onboarding so they
+            can take the next action without bouncing through the home redirect. %>
+      <%= render ButtonComponent.new(tag: :a, href: search_path, icon: "magnifying-glass", class: "w-full justify-center") do %>
+        물건 찾으러 가기
+      <% end %>
+      <%= render ButtonComponent.new(variant: :outline, tag: :a, href: settings_budget_path, icon: "cog-6-tooth", class: "w-full justify-center") do %>
+        설정 다시 하기
+      <% end %>
     </div>
   <% end %>
 </div>

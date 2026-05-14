@@ -41,8 +41,8 @@ module Sidebar
       render_inline(Sidebar::Component.new)
 
       assert_text "예산 설정"
-      assert_text "물건 목록"
-      assert_text "내 물건"
+      assert_text "물건 찾기"
+      assert_text "분석 중인 물건"
       assert_text "AI 분석"
     end
 
@@ -70,8 +70,8 @@ module Sidebar
       render_inline(Sidebar::Component.new)
 
       assert_selector "a[href='/onboarding']", text: "예산 설정"
-      assert_selector "a[href='/search']", text: "물건 목록"
-      assert_selector "a[href='/properties']", text: "내 물건"
+      assert_selector "a[href='/search']", text: "물건 찾기"
+      assert_selector "a[href='/properties']", text: "분석 중인 물건"
       assert_selector "a[href='/analyses/new']", text: "AI 분석"
     end
 
@@ -94,13 +94,13 @@ module Sidebar
     test "marks properties path as active" do
       render_inline(Sidebar::Component.new(current_path: "/properties"))
 
-      assert_selector "a[href='/properties'][class*='bg-blue-50']", text: "내 물건"
+      assert_selector "a[href='/properties'][class*='bg-blue-50']", text: "분석 중인 물건"
     end
 
     test "marks search path as active for /search" do
       render_inline(Sidebar::Component.new(current_path: "/search"))
 
-      assert_selector "a[href='/search'][class*='bg-blue-50']", text: "물건 목록"
+      assert_selector "a[href='/search'][class*='bg-blue-50']", text: "물건 찾기"
     end
 
     test "marks 예산 설정 active when on /settings/budget (post-onboarding redirect target)" do

@@ -8,7 +8,10 @@ class OnboardingStep2TooltipsTest < ApplicationSystemTestCase
     visit start_onboarding_path
     fill_in "available_cash_display", with: "5000"
     find("button[type='submit']").click
-    # Now on step2
+    # Now on step2. C18 (T4.3) wraps the 5 cost inputs in a <details> closed
+    # by default so the auto-summary leads. Open it so the tooltip elements
+    # are visible to Capybara.
+    find("summary", text: /예비비 항목 직접 조정하기/).click
   end
 
   EXPECTED_TOOLTIPS = {
