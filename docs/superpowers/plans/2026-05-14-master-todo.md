@@ -42,9 +42,9 @@
 | T1.5 | DSR 한도 초과 경고 (BudgetSetting + DsrCalculator + profit calc 배너) | ✅ 완료 (#142) | W2-2 / C26 / E-29 |
 
 **T1.2 출하 시점 후속 (별도 PR로 분리)**:
-- T1.2-F-A 양도세 admin UI (취득세 F-D 패턴)
-- T1.2-F-B 1주택자 9억 초과 누진 정밀 모드 + 12억 비과세 거주요건 분기 (취득세 F-C 패턴)
-- T1.2-F-C 양도세율 변경 audit log (취득세 F-D-3 패턴)
+- T1.2-F-A 양도세 admin UI (취득세 F-D 패턴) — ✅ 완료 (#174)
+- T1.2-F-B 1주택자 9억 초과 누진 정밀 모드 + 12억 비과세 거주요건 분기 — ✅ 완료 (#175, residency 분기 + 12억 advisory banner; 12억 초과분 분리 과세 정밀 계산은 sale_price 입력 plumbing 필요해서 advisory 로 처리)
+- T1.2-F-C 양도세율 변경 audit log (취득세 F-D-3 패턴) — ✅ 완료 (#174)
 - T1.2-F-D property_type 별 매트릭스 (오피스텔/상가/토지) → Theme 3 T3.1 에서 흡수
 
 ---
