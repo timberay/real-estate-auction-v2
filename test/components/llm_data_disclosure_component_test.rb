@@ -11,6 +11,17 @@ class LlmDataDisclosureComponentTest < ViewComponent::TestCase
     assert_text "외부 LLM API로 전송되는 정보"
   end
 
+  test "default heading level is h3" do
+    assert_selector "h3", text: /외부 LLM API로 전송되는 정보/
+  end
+
+  test "heading_level: 4 renders h4 (for embedding under a CardComponent h3)" do
+    rendered = render_inline(LlmDataDisclosureComponent.new(heading_level: 4))
+
+    assert_selector "h4", text: /외부 LLM API로 전송되는 정보/
+    refute_selector "h3", text: /외부 LLM API로 전송되는 정보/
+  end
+
   test "renders all four disclosure items" do
     assert_selector "dt", text: "전송 항목:"
     assert_selector "dt", text: "제공처:"

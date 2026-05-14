@@ -3,9 +3,11 @@
 // Disclosure pattern for a small menu attached to a trigger button.
 // - toggle: flip the menu's hidden state and aria-expanded
 // - closeIfOutside: close when a click happens outside this controller's scope
+// - closeOnEscape: close when Esc is pressed and return focus to the trigger
 //
 // Usage:
-//   <div data-controller="overflow-menu">
+//   <div data-controller="overflow-menu"
+//        data-action="keydown@window->overflow-menu#closeOnEscape">
 //     <button type="button"
 //             data-action="overflow-menu#toggle click@window->overflow-menu#closeIfOutside"
 //             data-overflow-menu-target="trigger"
@@ -32,6 +34,16 @@ export default class extends Controller {
     this.menuTarget.hidden = true
     if (this.hasTriggerTarget) {
       this.triggerTarget.setAttribute("aria-expanded", "false")
+    }
+  }
+
+  closeOnEscape(event) {
+    if (event.key !== "Escape") return
+    if (this.menuTarget.hidden) return
+    this.menuTarget.hidden = true
+    if (this.hasTriggerTarget) {
+      this.triggerTarget.setAttribute("aria-expanded", "false")
+      this.triggerTarget.focus()
     }
   }
 }
