@@ -27,6 +27,7 @@ export default class extends Controller {
     movingCost: Number,
     maintenanceFee: Number,
     taxBrackets: Object,
+    cgtMatrix: Object,
     preciseMode: Boolean,
     areaOver85: Boolean
   }
@@ -42,14 +43,10 @@ export default class extends Controller {
   // over-85 case stays differentiated from under-85.
   static AREA_OVER_85_SURCHARGE = 0.002
 
-  // Effective capital gains tax rates by ownership tier + holding period.
-  // Keys mirror AcquisitionTaxRate::HOUSEHOLD_TIERS.
-  static CGT_RATES = {
-    homeless:         { under_1y: 0.70, "1to2y": 0.60, over_2y: 0.00 },
-    single_home:      { under_1y: 0.70, "1to2y": 0.60, over_2y: 0.00 },
-    multi_home_2:     { under_1y: 0.70, "1to2y": 0.60, over_2y: 0.40 },
-    multi_home_3plus: { under_1y: 0.70, "1to2y": 0.60, over_2y: 0.40 }
-  }
+  // T1.2 — server-driven CGT matrix (TransferTaxCalculator.matrix_for) is
+  // injected via cgtMatrixValue. This constant is the conservative fallback
+  // when the matrix is empty (budget_setting nil or unseeded property_type).
+  static CGT_FALLBACK_RATE = 0.20
 
   // Fallback rate when the server emitted no brackets for the selected tier
   // (e.g. budget_setting was nil, or a tax-table gap for this combination).
@@ -153,9 +150,10 @@ export default class extends Controller {
     // Deductible costs only (for taxable gain)
     const deductibleCosts = acquisitionTax + scrivenerFee + repairCost
 
-    // Capital gains tax
+    // Capital gains tax (T1.2 — server matrix lookup, fallback if missing)
     const taxableGain = salePrice - totalInvestment - deductibleCosts
-    const cgtRate = this.constructor.CGT_RATES[ownership]?.[holdingPeriod] || 0.20
+    const matrix = this.cgtMatrixValue || {}
+    const cgtRate = matrix[ownership]?.[holdingPeriod] ?? this.constructor.CGT_FALLBACK_RATE
     const capitalGainsTax = taxableGain > 0 ? Math.round(taxableGain * cgtRate) : 0
 
     // Final results

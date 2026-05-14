@@ -56,6 +56,18 @@ class ProfitCalculatorComponent < ViewComponent::Base
     end
   end
 
+  # T1.2 — feed the seeded transfer-tax matrix into the Stimulus controller.
+  # Returns a nested hash keyed by household_tier and holding_period so the
+  # JS can look up the effective CGT rate without a server round-trip when
+  # the user toggles ownership / holding-period radios.
+  def transfer_tax_matrix
+    return {} unless @budget&.property_type_id
+    TransferTaxCalculator.matrix_for(
+      property_type_id: @budget.property_type_id,
+      regulated_region: @budget.regulated_region?
+    )
+  end
+
   # F-C-1 — opt-in flag for the precise 6~9억 progressive formula.
   # When true, the JS controller switches from a flat bracket rate to
   # `(가액(억) × 2/3 − 3) / 100` within the 6~9억 range.

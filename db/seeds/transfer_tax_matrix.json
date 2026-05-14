@@ -1,0 +1,75 @@
+[
+  {
+    "_comment": "=== 산출 기준 (2026-05-14) — 단순화된 양도세 룩업 테이블 ===",
+    "_basis": "단기보유: 1년 미만 70%, 1~2년 60% (전 tier 동일). 2년 이상: homeless 6% (보수적 일반세율 첫 구간), single_home 0% (1세대1주택 12억 이하 비과세 가정), multi_home_2 비조정 24% / 조정 44% (일반 24% + 20%p 중과), multi_home_3plus 비조정 24% / 조정 54% (일반 24% + 30%p 중과). 다주택 비조정은 2022.5.10~ 한시 유예 반영.",
+    "_excluded": "1세대1주택 9억 초과 누진 / 12억 비과세 거주요건 / 양도소득기본공제 / 장기보유특별공제 → 후속 follow-up F-B (정밀 모드)",
+    "_holding_periods": "under_1y / btw_1_2y / over_2y"
+  },
+  {
+    "property_type_code": "apartment",
+    "rates": [
+      { "household_tier": "homeless",         "holding_period": "under_1y", "regulated_region": null,  "total_rate": "0.7000" },
+      { "household_tier": "homeless",         "holding_period": "btw_1_2y", "regulated_region": null,  "total_rate": "0.6000" },
+      { "household_tier": "homeless",         "holding_period": "over_2y",  "regulated_region": null,  "total_rate": "0.0600" },
+
+      { "household_tier": "single_home",      "holding_period": "under_1y", "regulated_region": null,  "total_rate": "0.7000" },
+      { "household_tier": "single_home",      "holding_period": "btw_1_2y", "regulated_region": null,  "total_rate": "0.6000" },
+      { "household_tier": "single_home",      "holding_period": "over_2y",  "regulated_region": null,  "total_rate": "0.0000" },
+
+      { "household_tier": "multi_home_2",     "holding_period": "under_1y", "regulated_region": null,  "total_rate": "0.7000" },
+      { "household_tier": "multi_home_2",     "holding_period": "btw_1_2y", "regulated_region": null,  "total_rate": "0.6000" },
+      { "household_tier": "multi_home_2",     "holding_period": "over_2y",  "regulated_region": false, "total_rate": "0.2400" },
+      { "household_tier": "multi_home_2",     "holding_period": "over_2y",  "regulated_region": true,  "total_rate": "0.4400" },
+
+      { "household_tier": "multi_home_3plus", "holding_period": "under_1y", "regulated_region": null,  "total_rate": "0.7000" },
+      { "household_tier": "multi_home_3plus", "holding_period": "btw_1_2y", "regulated_region": null,  "total_rate": "0.6000" },
+      { "household_tier": "multi_home_3plus", "holding_period": "over_2y",  "regulated_region": false, "total_rate": "0.2400" },
+      { "household_tier": "multi_home_3plus", "holding_period": "over_2y",  "regulated_region": true,  "total_rate": "0.5400" }
+    ]
+  },
+  {
+    "property_type_code": "villa",
+    "rates": [
+      { "household_tier": "homeless",         "holding_period": "under_1y", "regulated_region": null,  "total_rate": "0.7000" },
+      { "household_tier": "homeless",         "holding_period": "btw_1_2y", "regulated_region": null,  "total_rate": "0.6000" },
+      { "household_tier": "homeless",         "holding_period": "over_2y",  "regulated_region": null,  "total_rate": "0.0600" },
+
+      { "household_tier": "single_home",      "holding_period": "under_1y", "regulated_region": null,  "total_rate": "0.7000" },
+      { "household_tier": "single_home",      "holding_period": "btw_1_2y", "regulated_region": null,  "total_rate": "0.6000" },
+      { "household_tier": "single_home",      "holding_period": "over_2y",  "regulated_region": null,  "total_rate": "0.0000" },
+
+      { "household_tier": "multi_home_2",     "holding_period": "under_1y", "regulated_region": null,  "total_rate": "0.7000" },
+      { "household_tier": "multi_home_2",     "holding_period": "btw_1_2y", "regulated_region": null,  "total_rate": "0.6000" },
+      { "household_tier": "multi_home_2",     "holding_period": "over_2y",  "regulated_region": false, "total_rate": "0.2400" },
+      { "household_tier": "multi_home_2",     "holding_period": "over_2y",  "regulated_region": true,  "total_rate": "0.4400" },
+
+      { "household_tier": "multi_home_3plus", "holding_period": "under_1y", "regulated_region": null,  "total_rate": "0.7000" },
+      { "household_tier": "multi_home_3plus", "holding_period": "btw_1_2y", "regulated_region": null,  "total_rate": "0.6000" },
+      { "household_tier": "multi_home_3plus", "holding_period": "over_2y",  "regulated_region": false, "total_rate": "0.2400" },
+      { "household_tier": "multi_home_3plus", "holding_period": "over_2y",  "regulated_region": true,  "total_rate": "0.5400" }
+    ]
+  },
+  {
+    "property_type_code": "officetel",
+    "_note": "오피스텔 양도세는 주거용/업무용에 따라 다름. 단순화: 주거용 매트릭스 그대로 적용. 정밀화는 T3.1 property_type 분기에서 흡수.",
+    "rates": [
+      { "household_tier": "homeless",         "holding_period": "under_1y", "regulated_region": null,  "total_rate": "0.7000" },
+      { "household_tier": "homeless",         "holding_period": "btw_1_2y", "regulated_region": null,  "total_rate": "0.6000" },
+      { "household_tier": "homeless",         "holding_period": "over_2y",  "regulated_region": null,  "total_rate": "0.0600" },
+
+      { "household_tier": "single_home",      "holding_period": "under_1y", "regulated_region": null,  "total_rate": "0.7000" },
+      { "household_tier": "single_home",      "holding_period": "btw_1_2y", "regulated_region": null,  "total_rate": "0.6000" },
+      { "household_tier": "single_home",      "holding_period": "over_2y",  "regulated_region": null,  "total_rate": "0.0000" },
+
+      { "household_tier": "multi_home_2",     "holding_period": "under_1y", "regulated_region": null,  "total_rate": "0.7000" },
+      { "household_tier": "multi_home_2",     "holding_period": "btw_1_2y", "regulated_region": null,  "total_rate": "0.6000" },
+      { "household_tier": "multi_home_2",     "holding_period": "over_2y",  "regulated_region": false, "total_rate": "0.2400" },
+      { "household_tier": "multi_home_2",     "holding_period": "over_2y",  "regulated_region": true,  "total_rate": "0.4400" },
+
+      { "household_tier": "multi_home_3plus", "holding_period": "under_1y", "regulated_region": null,  "total_rate": "0.7000" },
+      { "household_tier": "multi_home_3plus", "holding_period": "btw_1_2y", "regulated_region": null,  "total_rate": "0.6000" },
+      { "household_tier": "multi_home_3plus", "holding_period": "over_2y",  "regulated_region": false, "total_rate": "0.2400" },
+      { "household_tier": "multi_home_3plus", "holding_period": "over_2y",  "regulated_region": true,  "total_rate": "0.5400" }
+    ]
+  }
+]

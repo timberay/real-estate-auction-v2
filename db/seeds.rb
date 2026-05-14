@@ -51,6 +51,24 @@ tax_data.each do |group|
 end
 puts "  -> #{AcquisitionTaxRate.count} acquisition tax rates"
 
+puts "Seeding transfer tax rates..."
+transfer_data = JSON.parse(File.read(Rails.root.join("db/seeds/transfer_tax_matrix.json")))
+transfer_data.each do |group|
+  next unless group["property_type_code"]
+  pt = PropertyType.find_by!(code: group["property_type_code"])
+  TransferTaxRate.where(property_type: pt).destroy_all
+  group["rates"].each do |attrs|
+    TransferTaxRate.create!(
+      property_type: pt,
+      household_tier: attrs["household_tier"],
+      holding_period: attrs["holding_period"],
+      regulated_region: attrs["regulated_region"],
+      total_rate: attrs["total_rate"]
+    )
+  end
+end
+puts "  -> #{TransferTaxRate.count} transfer tax rates"
+
 puts "Seeding loan policies..."
 loan_data = JSON.parse(File.read(Rails.root.join("db/seeds/loan_policies.json")))
 loan_data.each do |group|

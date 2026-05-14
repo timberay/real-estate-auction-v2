@@ -1,0 +1,99 @@
+# 양도세 매트릭스 — apartment 중심 (14행). villa/officetel 은 같은 매트릭스이므로 생략.
+
+apt_homeless_under1y:
+  property_type: apartment
+  household_tier: homeless
+  holding_period: under_1y
+  regulated_region: # null
+  total_rate: 0.7000
+
+apt_homeless_btw12y:
+  property_type: apartment
+  household_tier: homeless
+  holding_period: btw_1_2y
+  regulated_region:
+  total_rate: 0.6000
+
+apt_homeless_over2y:
+  property_type: apartment
+  household_tier: homeless
+  holding_period: over_2y
+  regulated_region:
+  total_rate: 0.0600
+
+apt_single_under1y:
+  property_type: apartment
+  household_tier: single_home
+  holding_period: under_1y
+  regulated_region:
+  total_rate: 0.7000
+
+apt_single_btw12y:
+  property_type: apartment
+  household_tier: single_home
+  holding_period: btw_1_2y
+  regulated_region:
+  total_rate: 0.6000
+
+apt_single_over2y:
+  property_type: apartment
+  household_tier: single_home
+  holding_period: over_2y
+  regulated_region:
+  total_rate: 0.0000
+
+apt_multi2_under1y:
+  property_type: apartment
+  household_tier: multi_home_2
+  holding_period: under_1y
+  regulated_region:
+  total_rate: 0.7000
+
+apt_multi2_btw12y:
+  property_type: apartment
+  household_tier: multi_home_2
+  holding_period: btw_1_2y
+  regulated_region:
+  total_rate: 0.6000
+
+apt_multi2_over2y_nonregulated:
+  property_type: apartment
+  household_tier: multi_home_2
+  holding_period: over_2y
+  regulated_region: false
+  total_rate: 0.2400
+
+apt_multi2_over2y_regulated:
+  property_type: apartment
+  household_tier: multi_home_2
+  holding_period: over_2y
+  regulated_region: true
+  total_rate: 0.4400
+
+apt_multi3_under1y:
+  property_type: apartment
+  household_tier: multi_home_3plus
+  holding_period: under_1y
+  regulated_region:
+  total_rate: 0.7000
+
+apt_multi3_btw12y:
+  property_type: apartment
+  household_tier: multi_home_3plus
+  holding_period: btw_1_2y
+  regulated_region:
+  total_rate: 0.6000
+
+apt_multi3_over2y_nonregulated:
+  property_type: apartment
+  household_tier: multi_home_3plus
+  holding_period: over_2y
+  regulated_region: false
+  total_rate: 0.2400
+
+apt_multi3_over2y_regulated:
+  property_type: apartment
+  household_tier: multi_home_3plus
+  holding_period: over_2y
+  regulated_region: true
+  total_rate: 0.5400

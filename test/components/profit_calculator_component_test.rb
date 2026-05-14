@@ -238,4 +238,72 @@ class ProfitCalculatorComponentTest < ViewComponent::TestCase
     root = rendered.css("[data-controller='profit-calculator']").first
     assert_equal "false", root["data-profit-calculator-precise-mode-value"]
   end
+
+  # T1.2 — wire TransferTaxCalculator matrix into the Stimulus controller so
+  # the CGT row reflects the seeded effective-rate table instead of a 12-cell
+  # hardcoded constant. Mirrors the F-B acquisition-tax-brackets pattern.
+  test "exposes 4-tier × 3-period transfer tax matrix via data attribute" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget,
+      report: @report
+    ))
+
+    root = rendered.css("[data-controller='profit-calculator']").first
+    raw = root["data-profit-calculator-cgt-matrix-value"]
+    refute_nil raw, "expected cgt matrix data attribute to be present"
+
+    matrix = JSON.parse(raw)
+    assert_equal %w[homeless multi_home_2 multi_home_3plus single_home], matrix.keys.sort
+    %w[under_1y btw_1_2y over_2y].each do |period|
+      assert_in_delta 0.70, matrix["homeless"]["under_1y"].to_f, 1e-6 if period == "under_1y"
+      assert matrix["homeless"].key?(period), "homeless missing period #{period}"
+    end
+
+    # Default budget region is 제주 (non-regulated) → multi_home_2 over_2y = 0.24
+    assert_in_delta 0.24, matrix["multi_home_2"]["over_2y"].to_f, 1e-6
+    # 1세대1주택 비과세 가정
+    assert_in_delta 0.0, matrix["single_home"]["over_2y"].to_f, 1e-6
+  end
+
+  test "transfer tax matrix differentiates regulated region for multi_home over_2y" do
+    @budget.update!(region: "서울특별시") # regulated
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget,
+      report: @report
+    ))
+
+    matrix = JSON.parse(
+      rendered.css("[data-controller='profit-calculator']").first["data-profit-calculator-cgt-matrix-value"]
+    )
+    assert_in_delta 0.44, matrix["multi_home_2"]["over_2y"].to_f, 1e-6
+    assert_in_delta 0.54, matrix["multi_home_3plus"]["over_2y"].to_f, 1e-6
+  end
+
+  test "transfer tax matrix is empty hash when budget_setting is nil" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: nil,
+      report: @report
+    ))
+
+    matrix = JSON.parse(
+      rendered.css("[data-controller='profit-calculator']").first["data-profit-calculator-cgt-matrix-value"]
+    )
+    assert_empty matrix
+  end
+
+  # Holding-period radio values must match TransferTaxRate::HOLDING_PERIODS so
+  # the JS can use the selected value as a matrix lookup key directly.
+  test "renders 3-period holding radio aligned with TransferTaxRate periods" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property,
+      budget_setting: @budget,
+      report: @report
+    ))
+
+    values = rendered.css("input[type='radio'][name='holding_period']").map { |i| i["value"] }
+    assert_equal %w[under_1y btw_1_2y over_2y], values
+  end
 end
