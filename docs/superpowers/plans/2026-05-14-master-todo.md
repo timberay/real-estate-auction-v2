@@ -99,7 +99,7 @@ T3.4 Notification 인프라가 T3.3 D-day 알림 의존. 따라서 **T3.4 → T3
 | T4.6 | a11y 점검 패스 (axe-core 통합) — ✅ #166 baseline 인프라 + 4종 부채 캡처. fix 는 follow-up PR. | W4-1 / C34 |
 | T4.7 | `analyses#prompt` 인증/rate-limit | ✅ 완료 (#161) — W4-2 / C31 / E-39 |
 | T4.8 | Backlog P3 묶음 (한국어화 / disclaimer / menu Esc / tooltip / heading / nested cards / base_right_date 컨트롤러 테스트) — ✅ 완료 #163/#164/#165 (3 묶음 8건) | Follow-up #3, #5, #6, #7, #8, #11, #12, #14 |
-| T4.9 | 외부 게이트 5건 — CSP enforce 플립, OAuth 콘솔 redirect URI, SNS self-review (multi-tab/account settings/rack-attack/terms·privacy), OAuth Symbol provider 회귀 테스트, branch protection 정책 결정 | W0-1~5 |
+| T4.9 | 외부 게이트 5건 — CSP enforce 플립, OAuth 콘솔 redirect URI, SNS self-review (multi-tab/account settings/rack-attack/terms·privacy), OAuth Symbol provider 회귀 테스트 ✅ #167 (W0-4), branch protection 정책 결정 — 4건 대기 (W0-1, W0-2, W0-3, W0-5) | W0-1~5 |
 
 ---
 
