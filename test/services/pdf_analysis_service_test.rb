@@ -394,4 +394,65 @@ class PdfAnalysisServiceTest < ActiveSupport::TestCase
     assert_equal "manual_upload", log.system_prompt
     assert_equal "completed", log.status
   end
+
+  # --- T2.2: user_edited tenant preservation on re-analysis ---
+
+  test "T2.2: re-analysis preserves user_edited tenant fields by name match" do
+    PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by!(property: @property, user: @user)
+
+    # Tenant 0 is 김○○ in the fixture. User overrides deposit + dates.
+    report.update_tenant!(0, deposit: "99000000", move_in_date: "2020-01-01", confirmed_date: "2020-02-02")
+
+    PdfAnalysisService.call(property: @property, user: @user)
+    report.reload
+
+    kim = report.report_data["calculated"]["tenants"].find { |t| t["name"] == "김○○" }
+    assert_equal 99_000_000, kim["deposit"]
+    assert_equal "2020-01-01", kim["move_in_date"]
+    assert_equal "2020-02-02", kim["confirmed_date"]
+    assert_equal true, kim["user_edited"]
+  end
+
+  test "T2.2: re-analysis updates non-user-edited tenants freely" do
+    PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by!(property: @property, user: @user)
+
+    report.update_tenant!(0, deposit: "99000000", move_in_date: "2020-01-01", confirmed_date: "2020-02-02")
+
+    PdfAnalysisService.call(property: @property, user: @user)
+    report.reload
+
+    park = report.report_data["calculated"]["tenants"].find { |t| t["name"] == "박○○" }
+    assert_equal 30_000_000, park["deposit"], "non-edited tenant must reflect fresh AI value"
+    assert_equal "2024-05-01", park["move_in_date"]
+    assert_nil park["user_edited"]
+  end
+
+  test "T2.2: first analysis (new record) does not crash on missing prior report" do
+    # Sanity: ensure overlay path is no-op when report does not yet exist.
+    assert_nil RightsAnalysisReport.find_by(property: @property, user: @user)
+
+    PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by(property: @property, user: @user)
+
+    kim = report.report_data["calculated"]["tenants"].find { |t| t["name"] == "김○○" }
+    # Fresh AI run — no user_edited flag.
+    assert_nil kim["user_edited"]
+    assert_equal 50_000_000, kim["deposit"]
+  end
+
+  test "T2.2: re-analysis with no user_edited rows behaves like fresh analysis" do
+    PdfAnalysisService.call(property: @property, user: @user)
+    report = RightsAnalysisReport.find_by!(property: @property, user: @user)
+    original_deposit = report.report_data["calculated"]["tenants"][0]["deposit"]
+
+    PdfAnalysisService.call(property: @property, user: @user)
+    report.reload
+
+    assert_equal original_deposit, report.report_data["calculated"]["tenants"][0]["deposit"]
+    report.report_data["calculated"]["tenants"].each do |t|
+      assert_nil t["user_edited"], "no row should be flagged when there were no prior edits"
+    end
+  end
 end

@@ -175,13 +175,15 @@ class PdfAnalysisService
     end
 
     rights_timeline = rights_data["rights_timeline"] || []
-    tenants = rights_data["tenants"] || []
+    tenants = overlay_user_edited_tenants(report, rights_data["tenants"] || [])
 
     validation = Inspection::RightsValidator.call(
       base_right_date: rights_data["base_right_date"],
       tenants: tenants,
       rights_timeline: rights_timeline
     )
+
+    validated_tenants = restamp_user_edited_flag(report, validation.validated_tenants)
 
     opportunity_type, opportunity_evidence = enforce_hug_waiver_citation(rights_data, property)
 
@@ -204,7 +206,7 @@ class PdfAnalysisService
           "checklist_references" => rights_data["checklist_references"]
         },
         "calculated" => {
-          "tenants" => validation.validated_tenants,
+          "tenants" => validated_tenants,
           "assumed_amount" => validation.validated_amounts["assumed_amount"],
           "opposing_deposits" => validation.validated_amounts["opposing_deposits"],
           "total_risk_amount" => validation.validated_amounts["total_risk_amount"],
@@ -215,6 +217,45 @@ class PdfAnalysisService
         "discrepancies" => validation.discrepancies
       }
     )
+  end
+
+  # T2.2: when re-analyzing a property whose report already has user-edited
+  # tenant rows, overlay the user's deposit / move_in_date / confirmed_date
+  # onto the fresh AI tenants by name match so RightsValidator recomputes
+  # derived fields (opposing_power, priority_rank, effective_date) against
+  # user-corrected inputs. Unmatched user edits are dropped (current behavior).
+  def overlay_user_edited_tenants(report, ai_tenants)
+    return ai_tenants if report.new_record?
+    edits = prior_user_edits(report)
+    return ai_tenants if edits.empty?
+
+    ai_tenants.map do |t|
+      edit = edits[t["name"]]
+      next t unless edit
+      t.merge(
+        "deposit" => edit["deposit"],
+        "move_in_date" => edit["move_in_date"],
+        "confirmed_date" => edit["confirmed_date"]
+      )
+    end
+  end
+
+  # Re-stamp `user_edited: true` on validated tenants whose name matched a
+  # prior user-edited row, so the UI badge persists across re-analysis.
+  def restamp_user_edited_flag(report, validated_tenants)
+    return validated_tenants if report.new_record?
+    edited_names = prior_user_edits(report).keys
+    return validated_tenants if edited_names.empty?
+
+    validated_tenants.map do |t|
+      edited_names.include?(t["name"]) ? t.merge("user_edited" => true) : t
+    end
+  end
+
+  def prior_user_edits(report)
+    (report.parsed_data&.dig("calculated", "tenants") || [])
+      .select { |t| t["user_edited"] == true }
+      .index_by { |t| t["name"] }
   end
 
   # B5 / E-11: Persist a human-readable failure_reason on the report so the UI
