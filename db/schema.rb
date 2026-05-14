@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_14_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_14_120000) do
   create_table "acquisition_tax_rate_audit_logs", force: :cascade do |t|
     t.integer "acquisition_tax_rate_id"
     t.string "action", null: false
@@ -98,11 +98,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_100000) do
     t.integer "acquisition_tax"
     t.boolean "acquisition_tax_auto", default: true, null: false
     t.boolean "acquisition_tax_precise_mode", default: false, null: false
+    t.integer "annual_income"
     t.integer "area_range_max"
     t.integer "area_range_min"
     t.integer "available_cash"
     t.datetime "completed_at"
     t.datetime "created_at", null: false
+    t.integer "existing_debt_monthly"
     t.string "household_tier", default: "homeless", null: false
     t.integer "loan_policy_id"
     t.decimal "loan_ratio", precision: 3, scale: 2

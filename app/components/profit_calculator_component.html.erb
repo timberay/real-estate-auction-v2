@@ -8,6 +8,13 @@
      data-profit-calculator-maintenance-fee-value="<%= maintenance_fee %>"
      data-profit-calculator-tax-brackets-value="<%= acquisition_tax_brackets.to_json %>"
      data-profit-calculator-cgt-matrix-value="<%= transfer_tax_matrix.to_json %>"
+     data-profit-calculator-dsr-enabled-value="<%= dsr_enabled? %>"
+     data-profit-calculator-dsr-loan-ratio-value="<%= dsr_loan_ratio %>"
+     data-profit-calculator-dsr-annual-income-value="<%= dsr_annual_income_manwon %>"
+     data-profit-calculator-dsr-existing-debt-monthly-value="<%= dsr_existing_debt_monthly_manwon %>"
+     data-profit-calculator-dsr-annual-rate-value="<%= dsr_annual_rate %>"
+     data-profit-calculator-dsr-term-years-value="<%= dsr_term_years %>"
+     data-profit-calculator-dsr-threshold-value="<%= dsr_threshold %>"
      data-profit-calculator-precise-mode-value="<%= precise_acquisition_tax? %>"
      data-profit-calculator-area-over-85-value="<%= area_over_85? %>"
      class="space-y-4">
@@ -101,6 +108,18 @@
             <%= label %>
           </label>
         <% end %>
+      </div>
+    </div>
+  </div>
+
+  <%# ===== T1.5 DSR Warning Banner (toggled by Stimulus) ===== %>
+  <div data-profit-calculator-target="dsrWarning"
+       class="hidden p-3 bg-amber-100 dark:bg-amber-900/20 border border-amber-400 dark:border-amber-700 rounded-lg text-sm text-amber-900 dark:text-amber-200">
+    <div class="flex items-start gap-2">
+      <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M5 19h14a2 2 0 001.84-2.75L13.74 4a2 2 0 00-3.48 0L3.16 16.25A2 2 0 005 19z"/></svg>
+      <div class="flex-1">
+        <p class="font-semibold">DSR <span data-profit-calculator-target="dsrThresholdLabel">40</span>% 한도 초과 — <span data-profit-calculator-target="dsrRatioLabel">—</span></p>
+        <p class="text-sm mt-0.5">현재 입찰가 기준 신규 대출 + 기존 부채 합산 DSR 이 한도를 넘어 실제 대출이 거절될 가능성이 있습니다. 입찰가를 낮추거나 대출 비율을 조정하세요.</p>
       </div>
     </div>
   </div>

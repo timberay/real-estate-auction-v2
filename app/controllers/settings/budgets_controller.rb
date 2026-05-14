@@ -120,7 +120,8 @@ module Settings
         :household_tier, :acquisition_tax_auto, :acquisition_tax_precise_mode,
         :repair_cost, :acquisition_tax, :scrivener_fee,
         :moving_cost, :maintenance_fee, :loan_policy_id, :loan_ratio,
-        :region
+        :region,
+        :annual_income, :existing_debt_monthly
       ])
     end
   end

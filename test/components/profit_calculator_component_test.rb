@@ -306,4 +306,45 @@ class ProfitCalculatorComponentTest < ViewComponent::TestCase
     values = rendered.css("input[type='radio'][name='holding_period']").map { |i| i["value"] }
     assert_equal %w[under_1y btw_1_2y over_2y], values
   end
+
+  # T1.5 — DSR inputs forwarded as JS values
+  test "exposes DSR enabled=false when budget has no annual_income" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property, budget_setting: @budget, report: @report
+    ))
+    root = rendered.css("[data-controller='profit-calculator']").first
+    assert_equal "false", root["data-profit-calculator-dsr-enabled-value"]
+    assert_equal "0", root["data-profit-calculator-dsr-annual-income-value"]
+  end
+
+  test "exposes DSR enabled=true and forwards inputs when budget has annual_income" do
+    @budget.update!(annual_income: 6000, existing_debt_monthly: 50)
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property, budget_setting: @budget, report: @report
+    ))
+    root = rendered.css("[data-controller='profit-calculator']").first
+    assert_equal "true", root["data-profit-calculator-dsr-enabled-value"]
+    assert_equal "6000", root["data-profit-calculator-dsr-annual-income-value"]
+    assert_equal "50", root["data-profit-calculator-dsr-existing-debt-monthly-value"]
+    assert_equal "0.4", root["data-profit-calculator-dsr-threshold-value"]
+    assert_equal "0.045", root["data-profit-calculator-dsr-annual-rate-value"]
+    assert_equal "30", root["data-profit-calculator-dsr-term-years-value"]
+  end
+
+  test "DSR warning banner is rendered hidden by default" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property, budget_setting: @budget, report: @report
+    ))
+    banner = rendered.css("[data-profit-calculator-target='dsrWarning']").first
+    refute_nil banner, "expected DSR warning banner to be rendered"
+    assert_match(/\bhidden\b/, banner["class"])
+  end
+
+  test "DSR enabled=false when budget_setting is nil" do
+    rendered = render_inline(ProfitCalculatorComponent.new(
+      property: @property, budget_setting: nil, report: @report
+    ))
+    root = rendered.css("[data-controller='profit-calculator']").first
+    assert_equal "false", root["data-profit-calculator-dsr-enabled-value"]
+  end
 end
