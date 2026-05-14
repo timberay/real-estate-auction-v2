@@ -186,6 +186,23 @@ module Header
 
       assert_selector "a[href='/settings/budget']", text: "예산 미설정"
     end
+
+    test "budget indicator is hidden on mobile and shown from md: up (C7)" do
+      user = users(:budget_user)
+      user.create_budget_setting!(max_bid_amount: 50_000) unless user.budget_setting
+      user.budget_setting.update!(max_bid_amount: 50_000)
+
+      render_inline(Header::Component.new(current_user: user))
+
+      # The header budget link must be hidden when the hamburger button is
+      # visible (< md). Mobile users see the indicator inside the sidebar
+      # after opening the menu. Using the same md: breakpoint as the
+      # hamburger keeps the two views mutually exclusive.
+      link = page.find("a[href='/settings/budget']", text: /최대입찰가/)
+      wrapper = link.find(:xpath, "ancestor::*[contains(@class, 'md:inline-flex') or contains(@class, 'md:flex') or contains(@class, 'md:block')][1]")
+      assert_includes wrapper[:class], "hidden",
+        "expected header budget indicator wrapper to be hidden on mobile"
+    end
   end
 
   class RouteHelpersTest < ActiveSupport::TestCase

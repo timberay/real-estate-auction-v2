@@ -7,6 +7,36 @@ class OnboardingsControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#onboarding_wizard"
   end
 
+  test "GET step1 stacks the available cash input row vertically on mobile (C2)" do
+    get start_onboarding_url
+    assert_response :success
+
+    # The cash input + "만원" + "다음" row must collapse to a column on narrow
+    # screens so the controls don't squeeze.
+    cash_input = css_select("input#available_cash_display").first
+    assert cash_input, "expected available_cash_display input to be rendered"
+    wrapper = cash_input.parent
+    classes = wrapper["class"].to_s
+    assert_includes classes, "flex-col",
+      "expected cash input row wrapper to stack vertically on mobile"
+    assert_includes classes, "sm:flex-row",
+      "expected cash input row wrapper to switch to row at sm:"
+  end
+
+  test "GET step1 stacks the region select row vertically on mobile (C2)" do
+    get start_onboarding_url
+    assert_response :success
+
+    region_select = css_select("select[name='budget_setting[region]']").first
+    assert region_select, "expected region select to be rendered"
+    wrapper = region_select.parent
+    classes = wrapper["class"].to_s
+    assert_includes classes, "flex-col",
+      "expected region select row wrapper to stack vertically on mobile"
+    assert_includes classes, "sm:flex-row",
+      "expected region select row wrapper to switch to row at sm:"
+  end
+
   test "POST step1 saves available_cash and renders step2" do
     get start_onboarding_url  # create guest session
 

@@ -43,7 +43,7 @@
 
     <%= render Header::Component.new(page_title: content_for(:page_title), current_user: current_user) %>
     <%= turbo_frame_tag "auth_modal" %>
-    <%= render Sidebar::Component.new(current_path: request.path) %>
+    <%= render Sidebar::Component.new(current_path: request.path, current_user: current_user) %>
 
     <div class="fixed inset-0 z-20 bg-black/50 hidden md:hidden" data-sidebar-target="backdrop" data-action="click->sidebar#close"></div>
 
