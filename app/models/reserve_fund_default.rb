@@ -17,7 +17,7 @@ class ReserveFundDefault < ApplicationRecord
   def area_range_max_greater_than_min
     return unless area_range_min.present? && area_range_max.present?
     if area_range_max <= area_range_min
-      errors.add(:area_range_max, "must be greater than area_range_min")
+      errors.add(:area_range_max, "최소 면적보다 커야 합니다")
     end
   end
 end

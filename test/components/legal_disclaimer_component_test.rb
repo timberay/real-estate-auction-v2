@@ -31,4 +31,16 @@ class LegalDisclaimerComponentTest < ViewComponent::TestCase
     # Full body markers
     assert_match(/⚖️ 법적 고지/, rendered)
   end
+
+  test "default variant exposes role=note for assistive tech" do
+    rendered = render_inline(LegalDisclaimerComponent.new).to_s
+
+    assert_match(/role="note"/, rendered)
+  end
+
+  test "compact variant exposes role=note for assistive tech" do
+    rendered = render_inline(LegalDisclaimerComponent.new(compact: true)).to_s
+
+    assert_match(/role="note"/, rendered)
+  end
 end
