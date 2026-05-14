@@ -187,6 +187,14 @@ module Header
       assert_selector "a[href='/settings/budget']", text: "예산 미설정"
     end
 
+    test "header exposes a help link to the manual so first-time users can reach guidance (C16)" do
+      render_inline(Header::Component.new)
+
+      # C16: a persistent "도움말" link keeps the FAQ/manual reachable from
+      # every page — not just for users who happen to open the sidebar.
+      assert_selector "header a[href='/manual']", text: /도움말/
+    end
+
     test "budget indicator is hidden on mobile and shown from md: up (C7)" do
       user = users(:budget_user)
       user.create_budget_setting!(max_bid_amount: 50_000) unless user.budget_setting
