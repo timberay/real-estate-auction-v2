@@ -169,4 +169,42 @@ class UserPropertyTest < ActiveSupport::TestCase
       assert_equal(-31, up.days_to_eviction_deadline)
     end
   end
+
+  # T3.2 — deposit rate (공유지분 매물 보증금 비율)
+
+  test "deposit_rate defaults to 10% on new records" do
+    up = UserProperty.new(user: users(:budget_user), property: properties(:unanalyzed_officetel))
+    assert_equal BigDecimal("0.10"), up.deposit_rate
+  end
+
+  test "deposit_rate accepts custom values" do
+    up = user_properties(:guest_safe_apartment)
+    up.update!(deposit_rate: 0.20)
+    assert_equal BigDecimal("0.20"), up.reload.deposit_rate
+  end
+
+  test "estimated_deposit returns deposit_rate * min_bid_price" do
+    up = user_properties(:guest_safe_apartment)
+    # safe_apartment min_bid_price = 5.6억
+    up.deposit_rate = BigDecimal("0.10")
+    assert_equal 56_000_000, up.estimated_deposit
+  end
+
+  test "estimated_deposit returns nil when min_bid_price is nil" do
+    up = user_properties(:guest_safe_apartment)
+    up.property.update!(min_bid_price: nil)
+    assert_nil up.estimated_deposit
+  end
+
+  test "shared_ownership? is true when property_count > 1" do
+    up = user_properties(:guest_safe_apartment)
+    up.property.update!(property_count: 3)
+    assert up.shared_ownership?
+  end
+
+  test "shared_ownership? is false when property_count is 1" do
+    up = user_properties(:guest_safe_apartment)
+    up.property.update!(property_count: 1)
+    assert_not up.shared_ownership?
+  end
 end

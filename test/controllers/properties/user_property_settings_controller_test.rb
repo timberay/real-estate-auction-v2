@@ -73,6 +73,16 @@ class Properties::UserPropertySettingsControllerTest < ActionDispatch::Integrati
     assert_equal Date.new(2026, 1, 15), @user_property.reload.payment_completed_on
   end
 
+  # T3.2 — deposit_rate
+  test "PATCH update persists deposit_rate" do
+    patch property_user_property_settings_path(@property),
+      params: { user_property: { deposit_rate: "0.20" } },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :success
+    assert_equal BigDecimal("0.20"), @user_property.reload.deposit_rate
+  end
+
   test "PATCH update with blank payment_completed_on clears the value" do
     @user_property.update!(payment_completed_on: Date.new(2026, 1, 15))
 

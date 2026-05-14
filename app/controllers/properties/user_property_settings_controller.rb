@@ -25,7 +25,7 @@ module Properties
     private
 
     def user_property_params
-      params.require(:user_property).permit(:notes, :inspection_visited_on, :payment_completed_on)
+      params.require(:user_property).permit(:notes, :inspection_visited_on, :payment_completed_on, :deposit_rate)
     end
   end
 end
