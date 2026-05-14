@@ -15,6 +15,7 @@ Exact versions: see `Gemfile.lock` (Rails), `.ruby-version` (Ruby).
 - **Asset Pipeline**: Propshaft (Rails 8 default, replaces Sprockets)
   - **importmap-rails**: Default JS management without Node.js bundling
   - Use `bin/importmap pin <package>` to add JS dependencies
+- **Logging**: `lograge` emits one structured JSON line per request in production and test (disabled in development for human-readable output). Custom payload includes `request_id`, `remote_ip`, `user_id`, and `guest` flag — see `config/initializers/lograge.rb`.
 
 ### Frontend
 
@@ -26,6 +27,8 @@ Exact versions: see `Gemfile.lock` (Rails), `.ruby-version` (Ruby).
   - **No TypeScript** — use only JavaScript
 - **Styling**: TailwindCSS
 - **Components**: ViewComponent for reusable UI with Lookbook for previews
+- **Icons**: `heroicon` gem — render via `heroicon "name"` helper in views/components
+- **Markdown rendering**: `redcarpet` for legal pages and analysis output (see `app/helpers/markdown_helper.rb`)
 
 ### Testing
 
@@ -126,8 +129,8 @@ env:
 - **Backend**: Solid Queue (database-backed, no Redis)
 - **Worker**: `bin/jobs` (Rails 8 default; wraps `SolidQueue::Cli`)
 - **Use Cases**: Heavy API calls, email delivery, data processing
-- **Recurring jobs**: Defined in `config/recurring.yml` (e.g., `GuestCleanupJob` daily 3am, `LoanPolicySyncJob` daily 6am)
-- **Kamal**: Deploy as separate `job` role for resource isolation
+- **Recurring jobs**: Defined in `config/recurring.yml`. Currently scheduled: `GuestCleanupJob` (daily 3am), `EvictionDeadlineJob` (daily 8am), `LoanPolicySyncJob` (daily 6am, production only), `clear_solid_queue_finished_jobs` (hourly, production only).
+- **Kamal**: In single-server mode, `SOLID_QUEUE_IN_PUMA=true` (set in `config/deploy.yml`) runs the supervisor inside Puma. Split into a dedicated `job` role for resource isolation when scaling out.
 
 ## Architecture Patterns
 
@@ -226,7 +229,12 @@ Test helpers: `mock_omniauth` in `test_helper.rb`, `/testing/sign_in` and `/test
 
 ## Internationalization (i18n)
 
-The product is Korean-only; default copy is written in Korean directly in views and components. `I18n.t` is reserved for subsystems that benefit from key-based copy (currently the user manual under `app/components/manual/*` backed by `config/locales/manuals.ko.yml`). `config/locales/en.yml` covers Rails defaults only.
+`config.i18n.default_locale = :ko` with `available_locales = [:ko, :en]` and `fallbacks = [:en]` (see `config/application.rb`). Default copy is written in Korean directly in views and components. `I18n.t` is reserved for subsystems that benefit from key-based copy (currently the user manual under `app/components/manual/*` backed by `config/locales/manuals.ko.yml`).
+
+Locale files:
+- `config/locales/en.yml` — Rails defaults only.
+- `config/locales/ko.yml` — Korean ActiveRecord/ActiveModel error messages with dual-particle handling (`을(를)`, `은(는)`, etc.) since Rails locale strings cannot encode Korean postpositional logic.
+- `config/locales/manuals.ko.yml` — manual copy keyed by step.
 
 If a future feature requires `I18n.t`:
 - Add keys to a feature-scoped YAML file under `config/locales/`

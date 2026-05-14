@@ -24,6 +24,10 @@ Separate **Structural Changes** (refactoring) from **Behavioral Changes** (new l
 - **`docs/superpowers/`**: Project documentation managed by superpowers plugin
   - `specs/` — Design specs from brainstorming sessions
   - `plans/` — Implementation plans for feature work
+  - `archive/` — Superseded specs/plans kept for historical reference; do not edit
+- **`docs/operations/`**: Runbooks for production-affecting procedures (OAuth setup, branch protection, CSP enforcement, backup, etc.). Each runbook is one playbook for one operator action.
+- **`docs/decisions/`**: Decision records (ADR-style). Filename: `<YYYY-MM-DD>-<short-id>-<title>.md`. Captures the *why* behind a decision; do not rewrite history — append a follow-up record instead.
+- **`docs/audits/`**: One-off audit reports (UX, security, accessibility). Dated and immutable once filed.
 - **`docs/references/`**: Persistent reference material (e.g., parsed external docs, regulation excerpts) — keep only what is actually consulted
 - **`docs/screenshots/`**: Manual and README screenshots — checked in, treated as content, not test artifacts
 - **`db/seeds/`**: Seed data JSON files. The seed loader (`db/seeds.rb`) is the source of truth for which files are loaded.
