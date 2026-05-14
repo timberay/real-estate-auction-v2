@@ -32,11 +32,21 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 
-# Rails credentials key files.
+# Rails credentials key files (master + per-environment).
 /config/*.key
+/config/credentials/*.key
 
 # Bootsnap cache.
 /tmp/cache/bootsnap/
+
+# Test coverage output (SimpleCov, etc.).
+/coverage/
+
+# Ruby REPL / debugger history (may contain secrets typed into a console).
+.irb_history
+.pry_history
+.byebug_history
+.rdbg_history
 
 # Kamal deployment secrets.
 /.kamal/secrets
@@ -70,5 +80,4 @@
 # OS files.
 .DS_Store
 Thumbs.db
-db/development.sqlite3
 
