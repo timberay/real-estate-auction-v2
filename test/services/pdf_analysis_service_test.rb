@@ -395,6 +395,58 @@ class PdfAnalysisServiceTest < ActiveSupport::TestCase
     assert_equal "completed", log.status
   end
 
+  # --- T2.5: retryable vs fatal rescue branch differentiation ---
+
+  test "T2.5: ResponseTruncated writes truncation-specific failure_reason and re-raises" do
+    mock_llm = Llm::Mock.new
+    mock_llm.define_singleton_method(:analyze) { |**| raise Llm::Errors::ResponseTruncated, "Anthropic response truncated at max_tokens. Increase ANTHROPIC_MAX_TOKENS or reduce prompt size." }
+    original_for = Llm::Base.method(:for)
+    Llm::Base.define_singleton_method(:for) { mock_llm }
+
+    assert_raises(Llm::Errors::ResponseTruncated) do
+      PdfAnalysisService.call(property: @property, user: @user)
+    end
+
+    report = RightsAnalysisReport.find_by(property: @property, user: @user)
+    assert_not_nil report, "extraction_failed report should be written"
+    assert_match(/응답이 잘렸/, report.report_data["failure_reason"])
+  ensure
+    Llm::Base.define_singleton_method(:for, original_for)
+  end
+
+  test "T2.5: Faraday::ConnectionFailed writes connection-specific failure_reason and re-raises" do
+    mock_llm = Llm::Mock.new
+    mock_llm.define_singleton_method(:analyze) { |**| raise Faraday::ConnectionFailed, "connection refused" }
+    original_for = Llm::Base.method(:for)
+    Llm::Base.define_singleton_method(:for) { mock_llm }
+
+    assert_raises(Faraday::ConnectionFailed) do
+      PdfAnalysisService.call(property: @property, user: @user)
+    end
+
+    report = RightsAnalysisReport.find_by(property: @property, user: @user)
+    assert_not_nil report
+    assert_match(/연결할 수 없|통신 오류/, report.report_data["failure_reason"])
+  ensure
+    Llm::Base.define_singleton_method(:for, original_for)
+  end
+
+  test "T2.5: Faraday::TimeoutError still writes timeout-specific reason (regression)" do
+    mock_llm = Llm::Mock.new
+    mock_llm.define_singleton_method(:analyze) { |**| raise Faraday::TimeoutError, "timed out" }
+    original_for = Llm::Base.method(:for)
+    Llm::Base.define_singleton_method(:for) { mock_llm }
+
+    assert_raises(Faraday::TimeoutError) do
+      PdfAnalysisService.call(property: @property, user: @user)
+    end
+
+    report = RightsAnalysisReport.find_by(property: @property, user: @user)
+    assert_match(/응답 시간 초과/, report.report_data["failure_reason"])
+  ensure
+    Llm::Base.define_singleton_method(:for, original_for)
+  end
+
   # --- T2.2: user_edited tenant preservation on re-analysis ---
 
   test "T2.2: re-analysis preserves user_edited tenant fields by name match" do
