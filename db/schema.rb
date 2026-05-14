@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_14_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_14_120001) do
   create_table "acquisition_tax_rate_audit_logs", force: :cascade do |t|
     t.integer "acquisition_tax_rate_id"
     t.string "action", null: false
@@ -284,6 +284,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_120000) do
     t.index ["property_type_id"], name: "index_loan_policies_on_property_type_id"
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.string "action_url"
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.string "kind", null: false
+    t.datetime "read_at"
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["user_id", "created_at"], name: "index_notifications_on_user_id_and_created_at"
+    t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
   create_table "properties", force: :cascade do |t|
     t.string "address"
     t.bigint "appraisal_price"
@@ -452,6 +466,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_120000) do
   add_foreign_key "llm_analysis_logs", "properties"
   add_foreign_key "llm_analysis_logs", "users"
   add_foreign_key "loan_policies", "property_types"
+  add_foreign_key "notifications", "users"
   add_foreign_key "reserve_fund_defaults", "property_types"
   add_foreign_key "rights_analysis_reports", "properties"
   add_foreign_key "rights_analysis_reports", "users"

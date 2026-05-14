@@ -1,0 +1,10 @@
+<%= @notification.title %>
+<%= "=" * @notification.title.length %>
+
+<% if @notification.body.present? %>
+<%= @notification.body %>
+
+<% end %>
+<% if @notification.action_url.present? %>
+확인하기: <%= @notification.action_url %>
+<% end %>

@@ -1,0 +1,45 @@
+<% content_for(:page_title, "알림") %>
+
+<div class="space-y-4 max-w-3xl">
+  <h1 class="text-xl font-semibold text-slate-900 dark:text-slate-100">알림</h1>
+
+  <% if @notifications.any? %>
+    <ul class="space-y-2">
+      <% @notifications.each do |notification| %>
+        <li data-read="<%= notification.read? %>"
+            class="rounded-md border <%= notification.read? ? 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900' : 'border-blue-200 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20' %> px-4 py-3 flex items-start justify-between gap-3">
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-2">
+              <% unless notification.read? %>
+                <span class="inline-block w-2 h-2 rounded-full bg-blue-500" aria-hidden="true"></span>
+              <% end %>
+              <p class="text-sm font-medium text-slate-900 dark:text-slate-100">
+                <%= notification.title %>
+              </p>
+            </div>
+            <% if notification.body.present? %>
+              <p class="mt-1 text-sm text-slate-600 dark:text-slate-400 whitespace-pre-wrap"><%= notification.body %></p>
+            <% end %>
+            <p class="mt-1 text-xs text-slate-400 dark:text-slate-500">
+              <%= notification.created_at.in_time_zone.strftime("%Y.%m.%d %H:%M") %>
+            </p>
+          </div>
+          <div class="flex-shrink-0 flex flex-col items-end gap-1">
+            <% if notification.action_url.present? %>
+              <%= link_to "이동", notification.action_url,
+                  class: "text-xs text-blue-600 dark:text-blue-400 hover:underline" %>
+            <% end %>
+            <% unless notification.read? %>
+              <%= button_to "읽음으로 표시", mark_read_notification_path(notification),
+                  method: :post,
+                  class: "text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200",
+                  form_class: "inline" %>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="text-sm text-slate-500 dark:text-slate-400">아직 알림이 없습니다.</p>
+  <% end %>
+</div>

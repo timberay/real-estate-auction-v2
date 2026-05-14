@@ -43,5 +43,18 @@ module Header
         path_options: {}
       )
     end
+
+    def bell_icon
+      raw Heroicon::Icon.render(
+        name: "bell",
+        variant: :outline,
+        options: { class: "w-5 h-5" },
+        path_options: {}
+      )
+    end
+
+    def unread_notification_count
+      @current_user&.notifications&.unread&.count.to_i
+    end
   end
 end
