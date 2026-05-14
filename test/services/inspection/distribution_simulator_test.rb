@@ -1,4 +1,5 @@
 require "test_helper"
+require "ostruct"
 
 class Inspection::DistributionSimulatorTest < ActiveSupport::TestCase
   # ---------------------------------------------------------------------------
@@ -333,5 +334,177 @@ class Inspection::DistributionSimulatorTest < ActiveSupport::TestCase
     assert_includes kinds, "lien"
     assert_includes kinds, "tenant"
     assert(result.distributions.all? { |d| d.key?("amount") && d.key?("label") })
+  end
+
+  # ---------------------------------------------------------------------------
+  # 최우선변제 (small tenant first-priority) — T1.3 / W1-4 / C25 / E-27
+  # ---------------------------------------------------------------------------
+  test "first-priority is skipped when property is omitted (existing simulator behavior preserved)" do
+    tenants = [
+      {
+        "name" => "소액", "deposit" => 50_000_000, "move_in_date" => "2024-01-01",
+        "confirmed_date" => "2024-01-02", "dividend_requested" => true, "opposing_power" => true,
+        "has_priority_repayment" => true, "effective_date" => "2024-01-02", "priority_rank" => 1
+      }
+    ]
+    rights = [
+      { "type" => "근저당", "amount" => 100_000_000, "registered_date" => "2023-01-01", "extinguished_on_sale" => true }
+    ]
+
+    result = Inspection::DistributionSimulator.call(
+      sale_price: 100_000_000, validated_tenants: tenants, rights_timeline: rights
+    )
+
+    refute(result.distributions.any? { |d| d["kind"] == "first_priority" })
+  end
+
+  test "eligible small tenant gets first-priority dividend ahead of an earlier 근저당 (서울 현행)" do
+    property = OpenStruct.new(sido: "서울특별시", sigungu: "강남구")
+    tenants = [
+      {
+        "name" => "소액", "deposit" => 50_000_000, "move_in_date" => "2024-01-01",
+        "confirmed_date" => "2024-01-02", "dividend_requested" => true, "opposing_power" => true,
+        "has_priority_repayment" => true, "effective_date" => "2024-01-02", "priority_rank" => 1
+      }
+    ]
+    rights = [
+      { "type" => "근저당", "amount" => 200_000_000, "registered_date" => "2023-06-01", "extinguished_on_sale" => true }
+    ]
+
+    # Sale 200M − 6M = 194M. First-priority 55M (서울 현행 한도). Tenant 우선변제 capped at deposit−FP = 0.
+    # Lien gets 194M − 55M = 139M. Tenant fully repaid, buyer assumes 0.
+    result = Inspection::DistributionSimulator.call(
+      sale_price: 200_000_000, validated_tenants: tenants, rights_timeline: rights, property: property
+    )
+
+    fp_distributions = result.distributions.select { |d| d["kind"] == "first_priority" }
+    assert_equal 1, fp_distributions.size
+    assert_equal 50_000_000, fp_distributions.first["amount"]  # min(deposit 50M, protection 55M) = 50M
+
+    tenant = result.tenant_outcomes.first
+    assert_equal 50_000_000, tenant["dividend"]
+    assert_equal 0, tenant["uncovered_remainder"]
+    assert_equal 0, result.buyer_assumed_amount
+  end
+
+  test "tenant with deposit above 한도 is ineligible for first-priority (but still gets 우선변제 via 확정일자)" do
+    property = OpenStruct.new(sido: "서울특별시", sigungu: "강남구")
+    tenants = [
+      {
+        "name" => "고액", "deposit" => 200_000_000, "move_in_date" => "2024-01-01",
+        "confirmed_date" => "2024-01-02", "dividend_requested" => true, "opposing_power" => true,
+        "has_priority_repayment" => true, "effective_date" => "2024-01-02", "priority_rank" => 1
+      }
+    ]
+    rights = []
+
+    # 보증금 2억 > 서울 현행 한도 1억6500만 → first-priority 0. 일반 우선변제 만으로 처리.
+    result = Inspection::DistributionSimulator.call(
+      sale_price: 250_000_000, validated_tenants: tenants, rights_timeline: rights, property: property
+    )
+
+    refute(result.distributions.any? { |d| d["kind"] == "first_priority" })
+    tenant = result.tenant_outcomes.first
+    # Sale 250M − 7.5M = 242.5M; tenant 200M via 우선변제.
+    assert_equal 200_000_000, tenant["dividend"]
+  end
+
+  test "tenant without dividend_requested is ineligible for first-priority" do
+    property = OpenStruct.new(sido: "서울특별시", sigungu: "강남구")
+    tenants = [
+      {
+        "name" => "미신청", "deposit" => 50_000_000, "move_in_date" => "2024-01-01",
+        "confirmed_date" => "2024-01-02", "dividend_requested" => false, "opposing_power" => true,
+        "has_priority_repayment" => true, "effective_date" => "2024-01-02", "priority_rank" => 1
+      }
+    ]
+    rights = [
+      { "type" => "근저당", "amount" => 200_000_000, "registered_date" => "2023-06-01", "extinguished_on_sale" => true }
+    ]
+
+    result = Inspection::DistributionSimulator.call(
+      sale_price: 100_000_000, validated_tenants: tenants, rights_timeline: rights, property: property
+    )
+
+    refute(result.distributions.any? { |d| d["kind"] == "first_priority" })
+  end
+
+  test "tenant without move_in_date is ineligible for first-priority (대항요건 미충족)" do
+    property = OpenStruct.new(sido: "서울특별시", sigungu: "강남구")
+    tenants = [
+      {
+        "name" => "미전입", "deposit" => 50_000_000, "move_in_date" => nil,
+        "confirmed_date" => "2024-01-02", "dividend_requested" => true, "opposing_power" => false,
+        "has_priority_repayment" => false, "effective_date" => nil, "priority_rank" => nil
+      }
+    ]
+
+    result = Inspection::DistributionSimulator.call(
+      sale_price: 100_000_000, validated_tenants: tenants, rights_timeline: [], property: property
+    )
+
+    refute(result.distributions.any? { |d| d["kind"] == "first_priority" })
+  end
+
+  test "aggregate first-priority is capped at 1/2 of sale price and pro-rated when exceeded (시행령 §10③)" do
+    property = OpenStruct.new(sido: "서울특별시", sigungu: "강남구")
+    tenants = [
+      {
+        "name" => "A", "deposit" => 50_000_000, "move_in_date" => "2024-01-01",
+        "confirmed_date" => "2024-01-02", "dividend_requested" => true, "opposing_power" => true,
+        "has_priority_repayment" => true, "effective_date" => "2024-01-02", "priority_rank" => 1
+      },
+      {
+        "name" => "B", "deposit" => 50_000_000, "move_in_date" => "2024-01-01",
+        "confirmed_date" => "2024-01-02", "dividend_requested" => true, "opposing_power" => true,
+        "has_priority_repayment" => true, "effective_date" => "2024-01-02", "priority_rank" => 2
+      }
+    ]
+
+    # Sale 80M. Cap = 40M. Each requests min(50M, 55M) = 50M, aggregate 100M. Pro-rate → each 20M.
+    result = Inspection::DistributionSimulator.call(
+      sale_price: 80_000_000, validated_tenants: tenants, rights_timeline: [], property: property
+    )
+
+    fp_distributions = result.distributions.select { |d| d["kind"] == "first_priority" }
+    fp_total = fp_distributions.sum { |d| d["amount"] }
+    assert_equal 40_000_000, fp_total
+    assert(fp_distributions.all? { |d| d["amount"] == 20_000_000 })
+  end
+
+  test "period is selected from the earliest extinguishing 근저당 date" do
+    property = OpenStruct.new(sido: "서울특별시", sigungu: "강남구")
+    tenants = [
+      {
+        "name" => "오래된", "deposit" => 95_000_000, "move_in_date" => "2014-06-01",
+        "confirmed_date" => "2014-06-02", "dividend_requested" => true, "opposing_power" => true,
+        "has_priority_repayment" => true, "effective_date" => "2014-06-02", "priority_rank" => 1
+      }
+    ]
+    rights = [
+      # Earliest 근저당 falls in 2014-01-01 ~ 2016-03-30 period → 서울 한도 9500만/변제 3200만
+      { "type" => "근저당", "amount" => 100_000_000, "registered_date" => "2015-01-01", "extinguished_on_sale" => true },
+      { "type" => "근저당", "amount" => 50_000_000, "registered_date" => "2024-01-01", "extinguished_on_sale" => true }
+    ]
+
+    result = Inspection::DistributionSimulator.call(
+      sale_price: 300_000_000, validated_tenants: tenants, rights_timeline: rights, property: property
+    )
+
+    fp_distributions = result.distributions.select { |d| d["kind"] == "first_priority" }
+    assert_equal 1, fp_distributions.size
+    # Deposit 95M ≤ 한도 95M, protection 32M → tenant gets 32M first-priority.
+    assert_equal 32_000_000, fp_distributions.first["amount"]
+  end
+
+  test "result exposes small_tenant_period metadata when property is provided" do
+    property = OpenStruct.new(sido: "서울특별시", sigungu: "강남구")
+    result = Inspection::DistributionSimulator.call(
+      sale_price: 100_000_000, validated_tenants: [], rights_timeline: [], property: property
+    )
+    assert_respond_to result, :small_tenant_period
+    refute_nil result.small_tenant_period
+    assert_match(/2023-02-21/, result.small_tenant_period[:period_label])
+    assert_equal "seoul", result.small_tenant_period[:tier]
   end
 end

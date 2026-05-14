@@ -177,6 +177,56 @@ class ReportSummaryComponentTest < ViewComponent::TestCase
     assert_no_text "예상 매각가 기준 임차인 미배당 잔액"
   end
 
+  test "renders first-priority dividend row when small tenant is eligible (T1.3 / W1-4 / C25)" do
+    report = rights_analysis_reports(:risky_villa_report)
+    report.report_data = JSON.generate({
+      "calculated" => {
+        "tenants" => [
+          {
+            "name" => "김임차", "deposit" => 50_000_000,
+            "move_in_date" => "2024-01-01", "confirmed_date" => "2024-01-02",
+            "dividend_requested" => true, "opposing_power" => true,
+            "has_priority_repayment" => true, "effective_date" => "2024-01-02", "priority_rank" => 1
+          }
+        ],
+        "unevaluated_rights" => [],
+        "disclaimer" => nil
+      }
+    })
+    property = properties(:risky_villa)
+    property.min_bid_price = 200_000_000
+    render_inline(ReportSummaryComponent.new(report: report, property: property))
+    # 경기도 수원시 → overcrowded tier, 현행 보호 4800만. 50M ≤ 145M 한도 → 4800만 first-priority.
+    assert_text "최우선변제 김임차"
+    assert_text "4,800만원"
+    # 베테랑 검증용 시점/지역 캡션
+    assert_selector "[data-testid='small-tenant-period']", text: /과밀억제권역/
+    assert_selector "[data-testid='small-tenant-period']", text: /2023-02-21/
+  end
+
+  test "does NOT render first-priority row when tenant deposit exceeds 한도" do
+    report = rights_analysis_reports(:risky_villa_report)
+    report.report_data = JSON.generate({
+      "calculated" => {
+        "tenants" => [
+          {
+            "name" => "고액임차", "deposit" => 500_000_000,
+            "move_in_date" => "2024-01-01", "confirmed_date" => "2024-01-02",
+            "dividend_requested" => true, "opposing_power" => true,
+            "has_priority_repayment" => true, "effective_date" => "2024-01-02", "priority_rank" => 1
+          }
+        ],
+        "unevaluated_rights" => [],
+        "disclaimer" => nil
+      }
+    })
+    property = properties(:risky_villa)
+    property.min_bid_price = 600_000_000
+    render_inline(ReportSummaryComponent.new(report: report, property: property))
+    # 보증금 5억 > 한도 1.45억 → first-priority 0 → amber list 자체가 렌더되지 않음
+    assert_no_text "최우선변제 고액임차"
+  end
+
   test "checklist_refs memoizes — single query per render even with multiple calls" do
     report = rights_analysis_reports(:risky_villa_report)
     report.report_data = JSON.generate({ "checklist_references" => [ "rights-002", "rights-003" ] })
