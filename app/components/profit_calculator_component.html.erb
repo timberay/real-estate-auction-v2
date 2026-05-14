@@ -7,6 +7,7 @@
      data-profit-calculator-moving-cost-value="<%= moving_cost %>"
      data-profit-calculator-maintenance-fee-value="<%= maintenance_fee %>"
      data-profit-calculator-tax-brackets-value="<%= acquisition_tax_brackets.to_json %>"
+     data-profit-calculator-cgt-matrix-value="<%= transfer_tax_matrix.to_json %>"
      data-profit-calculator-precise-mode-value="<%= precise_acquisition_tax? %>"
      data-profit-calculator-area-over-85-value="<%= area_over_85? %>"
      class="space-y-4">
@@ -90,7 +91,7 @@
     <div class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
       <label class="text-sm font-medium text-slate-600 dark:text-slate-400 block mb-2">예상 보유기간</label>
       <div class="flex flex-col gap-2">
-        <% [["under_1y", "1년 미만"], ["1to2y", "1~2년"], ["over_2y", "2년 이상"]].each_with_index do |(value, label), i| %>
+        <% [["under_1y", "1년 미만"], ["btw_1_2y", "1~2년"], ["over_2y", "2년 이상"]].each_with_index do |(value, label), i| %>
           <label class="flex items-center gap-2 text-sm text-slate-900 dark:text-slate-100 cursor-pointer">
             <input type="radio" name="holding_period" value="<%= value %>"
                    data-profit-calculator-target="holdingPeriod"
