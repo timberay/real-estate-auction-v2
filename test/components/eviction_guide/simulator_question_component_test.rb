@@ -41,6 +41,20 @@ module EvictionGuide
       assert_no_selector "[data-test='main-progress']"
     end
 
+    test "step badge omits internal step code, shows only the user-facing step name (C5)" do
+      render_inline(SimulatorQuestionComponent.new(
+        question: @main_question,
+        simulation: @simulation,
+        step: @step
+      ))
+
+      # C5: step codes like "JT-S1" are internal — surface only the human
+      # name. The component used to render "JT-S1 — 배당표 확인" which leaks
+      # the code.
+      assert_no_text @step.code
+      assert_text(@step.name)
+    end
+
     test "yes/no buttons stack vertically on mobile, horizontally on sm and up (C3)" do
       render_inline(SimulatorQuestionComponent.new(
         question: @main_question,

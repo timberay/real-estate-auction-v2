@@ -23,6 +23,17 @@ class EvictionGuide::SimulatorControllerTest < ActionDispatch::IntegrationTest
     assert_select "a", { text: /이어가기/, count: 0 }
   end
 
+  test "question 404 page hides the internal question code from the body copy (C20)" do
+    get eviction_guide_simulator_question_url(code: "JT-Q99")
+    assert_response :not_found
+
+    # C20: internal codes like "JT-Q99" or "F02-Q3" are meaningless to users —
+    # the friendly message and CTA are enough on their own.
+    assert_select "code", { text: /JT-Q99/, count: 0 }
+    assert_no_match(/JT-Q99/, response.body,
+      "expected response body to not echo the internal question code")
+  end
+
   test "question 404 shows resume CTA when simulation has answers" do
     post eviction_guide_simulation_url, params: { property_id: "" }
     patch eviction_guide_simulation_url, params: {
