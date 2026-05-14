@@ -9,6 +9,24 @@ class PropertyCardComponentTest < ViewComponent::TestCase
     assert_text property.case_number
   end
 
+  test "price tooltips support click (mobile) in addition to hover (desktop) (C12)" do
+    property = properties(:safe_apartment)
+    render_inline(PropertyCardComponent.new(property: property))
+
+    # C12: hover doesn't exist on mobile, so the appraisal/min-bid tooltip
+    # triggers must also fire on click. Keep the hover bindings so desktop
+    # behavior is unchanged.
+    tooltips = page.all("[data-controller='tooltip']")
+    assert tooltips.any?, "expected at least one tooltip element in the card"
+    tooltips.each do |el|
+      action = el["data-action"].to_s
+      assert_includes action, "mouseenter->tooltip#show",
+        "tooltip must still respond to hover (desktop)"
+      assert_includes action, "click->tooltip#toggleVisible",
+        "tooltip must also respond to click for mobile (C12)"
+    end
+  end
+
   test "renders safety badge" do
     property = properties(:safe_apartment)
     render_inline(PropertyCardComponent.new(property: property, safety_rating: "safe"))

@@ -15,6 +15,19 @@ export default class extends Controller {
     }
   }
 
+  // Mobile-friendly click toggle (C12): hover doesn't fire on touch, so the
+  // tap target needs to flip the same show/hide state used by desktop hover.
+  toggleVisible(event) {
+    if (event && typeof event.preventDefault === "function") {
+      event.preventDefault()
+    }
+    if (this.tooltipElement) {
+      this.hide()
+    } else {
+      this.show()
+    }
+  }
+
   show() {
     if (this.tooltipElement) return
 
