@@ -18,6 +18,26 @@ class Inspections::TabsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "sticky header top row stacks vertically on mobile (C17)" do
+    get edit_property_inspections_tab_url(@property, tab_key: "rights_analysis")
+    assert_response :success
+
+    # The sticky-header top row holds case_number/badge on the left and budget
+    # chips on the right. On mobile (<sm) those two groups must stack onto
+    # separate rows; ≥sm they sit side-by-side via justify-between.
+    sticky = css_select("[data-controller='sticky-header']").first
+    assert sticky, "expected sticky-header wrapper to be rendered"
+    top_row = sticky.css("> div").first
+    assert top_row, "expected a top-row child div inside sticky header"
+    classes = top_row["class"].to_s
+    assert_includes classes, "flex-col",
+      "expected sticky header top row to stack on mobile"
+    assert_includes classes, "sm:flex-row",
+      "expected sticky header top row to switch to row at sm:"
+    assert_includes classes, "sm:justify-between",
+      "expected sticky header top row to use justify-between only at sm:"
+  end
+
   test "override auto result changes source_type to manual and preserves auto_value" do
     auto_result = @property.inspection_results
       .where(user: @user, source_type: "auto")

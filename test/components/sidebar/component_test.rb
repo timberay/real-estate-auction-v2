@@ -186,5 +186,29 @@ module Sidebar
 
       assert_selector "a[href='/manual'][class*='bg-blue-50']"
     end
+
+    # --- Mobile budget indicator (C7) ---
+
+    test "renders budget indicator inside sidebar so mobile users can see it via hamburger (C7)" do
+      user = users(:budget_user)
+      user.create_budget_setting!(max_bid_amount: 50_000) unless user.budget_setting
+      user.budget_setting.update!(max_bid_amount: 50_000)
+
+      render_inline(Sidebar::Component.new(current_user: user))
+
+      # Sidebar should expose the budget link so it remains reachable on mobile
+      # (the header copy is hidden on mobile to free space). It should only show
+      # on small screens (< md) — md+ keeps the header copy and this one would
+      # otherwise duplicate it.
+      assert_selector "nav a[href='/settings/budget']", text: /최대입찰가/
+      wrapper = page.find("nav a[href='/settings/budget']", text: /최대입찰가/).find(:xpath, "ancestor::*[contains(@class, 'md:hidden')][1]")
+      assert wrapper, "expected sidebar budget link to live inside a md:hidden wrapper"
+    end
+
+    test "budget indicator is omitted from sidebar when current_user is nil" do
+      render_inline(Sidebar::Component.new(current_user: nil))
+
+      assert_no_selector "nav a[href='/settings/budget']", text: /최대입찰가/
+    end
   end
 end

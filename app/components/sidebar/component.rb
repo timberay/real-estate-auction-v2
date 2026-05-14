@@ -25,8 +25,9 @@ module Sidebar
     DISABLED_CLASSES = "opacity-50 cursor-not-allowed text-slate-400 dark:text-slate-500"
     ITEM_COMMON_CLASSES = "flex items-center justify-center lg:justify-start lg:gap-3 lg:px-4 py-2 text-sm rounded-md transition-colors duration-150"
 
-    def initialize(current_path: "/")
+    def initialize(current_path: "/", current_user: nil)
       @current_path = current_path
+      @current_user = current_user
     end
 
     private

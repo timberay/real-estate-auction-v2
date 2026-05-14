@@ -43,7 +43,7 @@
   <% end %>
 
   <%# Yes/No buttons %>
-  <div class="flex gap-4 mb-4">
+  <div class="flex flex-col sm:flex-row gap-4 mb-4">
     <%= form_with url: helpers.eviction_guide_simulation_path, method: :patch, class: "flex-1",
                   data: { turbo_frame: yes_ends? ? "_top" : "simulator_question" } do |f| %>
       <%= f.hidden_field :question_code, value: @question.code %>

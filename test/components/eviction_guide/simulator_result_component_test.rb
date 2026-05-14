@@ -97,5 +97,26 @@ module EvictionGuide
 
       assert_equal 0, called, "Component must not call DifficultyAssessor when breakdown is provided"
     end
+
+    test "stat cards stack vertically on mobile, side-by-side on sm and up (C13)" do
+      simulation = EvictionSimulation.new(
+        occupant_type: "junior_tenant",
+        difficulty_level: "low",
+        result_path: []
+      )
+
+      rendered = render_inline(SimulatorResultComponent.new(simulation: simulation))
+      html = rendered.to_html
+
+      # The stat-card row that contains "전체 명도 단계" and "추가 분기 단계"
+      # must stack on mobile (flex-col) and switch to row at sm:.
+      match = html.match(/<div class="([^"]*?)"[^>]*>\s*<div [^>]*?>\s*<div [^>]*?>전체 명도 단계/)
+      assert match, "expected to find the stat-card row wrapper containing 전체 명도 단계"
+      wrapper_classes = match[1]
+      assert_includes wrapper_classes, "flex-col",
+        "expected stat cards to stack vertically on mobile, got: #{wrapper_classes}"
+      assert_includes wrapper_classes, "sm:flex-row",
+        "expected stat cards to switch to row on sm and up, got: #{wrapper_classes}"
+    end
   end
 end
