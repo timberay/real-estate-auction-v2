@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_15_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_15_000002) do
   create_table "acquisition_tax_rate_audit_logs", force: :cascade do |t|
     t.integer "acquisition_tax_rate_id"
     t.string "action", null: false
@@ -262,6 +262,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_000001) do
     t.datetime "updated_at", null: false
     t.integer "user_id"
     t.text "user_prompt", null: false
+    t.index ["executed_at"], name: "index_llm_analysis_logs_on_executed_at"
     t.index ["property_id", "status"], name: "index_llm_analysis_logs_on_property_id_and_status"
     t.index ["property_id"], name: "index_llm_analysis_logs_on_property_id"
     t.index ["status"], name: "index_llm_analysis_logs_on_status"
@@ -329,6 +330,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_15_000001) do
     t.datetime "updated_at", null: false
     t.integer "view_count", default: 0
     t.index ["case_number"], name: "index_properties_on_case_number", unique: true
+    t.index ["created_at"], name: "index_properties_on_created_at"
     t.index ["property_type"], name: "index_properties_on_property_type"
     t.index ["sido", "sigungu", "dong"], name: "idx_properties_location"
   end
