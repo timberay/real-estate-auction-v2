@@ -17,6 +17,15 @@
               id: "user_property_inspection_visited_on",
               class: "rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" %>
       </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" for="user_property_payment_completed_on">매각대금 납부일</label>
+        <%= f.date_field :payment_completed_on,
+              id: "user_property_payment_completed_on",
+              class: "rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100" %>
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          납부일로부터 6개월 이내에 인도명령을 신청해야 합니다. 마감 30일 전·7일 전·당일에 알림을 받습니다.
+        </p>
+      </div>
       <div class="flex gap-2">
         <%= f.submit "저장",
               class: "rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" %>

@@ -1,5 +1,6 @@
 <turbo-frame id="user-property-notes-edit">
-  <% if user_property.notes.present? || user_property.inspection_visited_on.present? %>
+  <% has_content = user_property.notes.present? || user_property.inspection_visited_on.present? || user_property.payment_completed_on.present? %>
+  <% if has_content %>
     <div class="space-y-2">
       <% if user_property.notes.present? %>
         <p class="text-sm text-slate-800 dark:text-slate-200 whitespace-pre-wrap"><%= user_property.notes %></p>
@@ -7,6 +8,25 @@
       <% if user_property.inspection_visited_on.present? %>
         <p class="text-sm text-slate-500 dark:text-slate-400">
           임장일: <span class="text-slate-700 dark:text-slate-300 font-medium"><%= user_property.inspection_visited_on.strftime("%Y.%m.%d") %></span>
+        </p>
+      <% end %>
+      <% if user_property.payment_completed_on.present? %>
+        <% days = user_property.days_to_eviction_deadline %>
+        <% deadline = user_property.eviction_deadline %>
+        <p class="text-sm text-slate-500 dark:text-slate-400" data-testid="eviction-deadline-display">
+          매각대금 납부일: <span class="text-slate-700 dark:text-slate-300 font-medium"><%= user_property.payment_completed_on.strftime("%Y.%m.%d") %></span>
+          <span class="block mt-0.5">
+            인도명령 마감 <span class="text-slate-700 dark:text-slate-300 font-medium"><%= deadline.strftime("%Y.%m.%d") %></span>
+            <% if days >= 0 %>
+              <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium <%= days <= 7 ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' : days <= 30 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' : 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300' %>">
+                <%= days == 0 ? "D-day" : "D-#{days}" %>
+              </span>
+            <% else %>
+              <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                D+<%= days.abs %> (마감 경과)
+              </span>
+            <% end %>
+          </span>
         </p>
       <% end %>
     </div>

@@ -20,9 +20,17 @@ production:
     class: GuestCleanupJob
     queue: default
     schedule: every day at 3am
+  eviction_deadline_check:
+    class: EvictionDeadlineJob
+    queue: default
+    schedule: every day at 8am
 
 development:
   guest_cleanup:
     class: GuestCleanupJob
     queue: default
     schedule: every day at 3am
+  eviction_deadline_check:
+    class: EvictionDeadlineJob
+    queue: default
+    schedule: every day at 8am
