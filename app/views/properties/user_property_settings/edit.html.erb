@@ -26,6 +26,21 @@
           납부일로부터 6개월 이내에 인도명령을 신청해야 합니다. 마감 30일 전·7일 전·당일에 알림을 받습니다.
         </p>
       </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" for="user_property_deposit_rate">보증금 비율 (%)</label>
+        <%= f.number_field :deposit_rate,
+              id: "user_property_deposit_rate",
+              step: "0.01", min: "0", max: "1",
+              class: "rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 text-sm text-slate-900 dark:text-slate-100 w-32" %>
+        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
+          일반 부동산 경매는 최저가의 10% (0.10). 재매각·공유지분 등 특별 사건은 사건 정보에서 확인 후 비율(예: 0.20)을 입력하세요.
+          <% if @user_property.shared_ownership? %>
+            <span class="block mt-1 text-yellow-700 dark:text-yellow-400 font-medium">
+              ⚠️ 공유지분 매물(<%= @property.property_count %>건)입니다. 보증금 비율을 사건 정보에서 확인하세요.
+            </span>
+          <% end %>
+        </p>
+      </div>
       <div class="flex gap-2">
         <%= f.submit "저장",
               class: "rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700" %>

@@ -25,6 +25,15 @@ class UserProperty < ApplicationRecord
     (eviction_deadline - Date.current).to_i
   end
 
+  def estimated_deposit
+    return nil unless property&.min_bid_price.to_i.positive?
+    (property.min_bid_price * deposit_rate).to_i
+  end
+
+  def shared_ownership?
+    property&.property_count.to_i > 1
+  end
+
   private
 
   def photos_must_be_images

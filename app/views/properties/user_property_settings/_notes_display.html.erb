@@ -1,5 +1,5 @@
 <turbo-frame id="user-property-notes-edit">
-  <% has_content = user_property.notes.present? || user_property.inspection_visited_on.present? || user_property.payment_completed_on.present? %>
+  <% has_content = user_property.notes.present? || user_property.inspection_visited_on.present? || user_property.payment_completed_on.present? || user_property.estimated_deposit.present? %>
   <% if has_content %>
     <div class="space-y-2">
       <% if user_property.notes.present? %>
@@ -10,6 +10,17 @@
           임장일: <span class="text-slate-700 dark:text-slate-300 font-medium"><%= user_property.inspection_visited_on.strftime("%Y.%m.%d") %></span>
         </p>
       <% end %>
+      <% if user_property.estimated_deposit.present? %>
+        <p class="text-sm text-slate-500 dark:text-slate-400" data-testid="estimated-deposit-display">
+          예상 보증금
+          <% if user_property.shared_ownership? %>
+            <span class="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300" data-testid="shared-ownership-badge">공유지분 <%= property.property_count %>건</span>
+          <% end %>:
+          <span class="text-slate-700 dark:text-slate-300 font-medium"><%= format_price_won(user_property.estimated_deposit) %></span>
+          <span class="ml-1 text-xs text-slate-400 dark:text-slate-500">(최저가 × <%= (user_property.deposit_rate * 100).to_i %>%)</span>
+        </p>
+      <% end %>
+
       <% if user_property.payment_completed_on.present? %>
         <% days = user_property.days_to_eviction_deadline %>
         <% deadline = user_property.eviction_deadline %>
