@@ -26,10 +26,10 @@
     </span>
   <% end %>
 
-  <%# Step badge %>
+  <%# Step badge — internal step code hidden, only the user-facing name shown (C5) %>
   <% if @step %>
     <span class="text-sm text-slate-500 dark:text-slate-400 mb-2 inline-block">
-      <%= @step.code %> — <%= @step.name %>
+      <%= @step.name %>
     </span>
   <% end %>
 
