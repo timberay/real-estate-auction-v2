@@ -19,7 +19,7 @@
 | Theme | 핵심 질문 | 상태 |
 |-------|----------|------|
 | **1. 계산 엔진 신뢰성** | "숫자가 진짜 맞나?" — 베테랑 retention | T1.1·T1.2·T1.4(b)·T1.5 완료, T1.3·T1.4(a) 대기 |
-| **2. 운영 가시성 + 안전망** | "깨지면 보이고, 사용자 작업이 보호되나?" | T2.1·T2.2·T2.3 완료, 잔여 5건 |
+| **2. 운영 가시성 + 안전망** | "깨지면 보이고, 사용자 작업이 보호되나?" | T2.1·T2.2·T2.3·T2.4 완료, 잔여 4건 |
 | **3. 권리분석/매물 다양성 확장** | "다룰 수 있는 매물 범위는 어디까지?" | 대기 |
 | **4. UX 폴리시 + 외부 정리** | "이미 되는 걸 매끄럽게" | 대기 |
 
@@ -58,7 +58,7 @@
 | T2.1 | lograge 구조화 로깅 (1요청 1JSON, production+test 활성, custom payload: request_id/user_id/guest/exception) | ✅ 완료 (#144) — W1-1 |
 | T2.2 | AI 재분석 silent overwrite 방지 (`user_edited` 보존 — name 매칭 overlay + restamp) | ✅ 완료 (#145) — W1-2 / Follow-up #13 |
 | T2.3 | 컨트롤러 bang-method rescue systemic fix (ApplicationController `rescue_from ActiveRecord::RecordInvalid` — HTML→redirect_back+flash, JSON→422+errors) | ✅ 완료 (#143) — A1 |
-| T2.4 | LLM truncation 감지 통일 — Gemini/Ollama 우선 + 공통 `LlmTruncationError` | A2 / Follow-up #2 |
+| T2.4 | LLM truncation 감지 통일 — 5개 어댑터 (Anthropic/OpenAI/OpenRouter/Gemini/Ollama) 모두 `Llm::Errors::ResponseTruncated` 일관 raise | ✅ 완료 (#146) — A2 / Follow-up #2 |
 | T2.5 | PDF/LLM rescue 분기 (retryable vs fatal) | A4 |
 | T2.6 | Stimulus JS 테스트 인프라 (Vitest 도입 또는 system test 보강) | A3 |
 | T2.7 | InspectionResultVersion 동시성 + N+1 | Follow-up #9, #10 |
