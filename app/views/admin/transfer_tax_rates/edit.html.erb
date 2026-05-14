@@ -1,0 +1,14 @@
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <header class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">양도세율 수정</h1>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+      <%= @rate.property_type.name %> · <%= @rate.household_tier %> · <%= @rate.holding_period %>
+    </p>
+  </header>
+
+  <%= render "form",
+        rate: @rate,
+        form_url: admin_transfer_tax_rate_path(@rate),
+        form_method: :patch,
+        submit_label: "저장" %>
+</div>

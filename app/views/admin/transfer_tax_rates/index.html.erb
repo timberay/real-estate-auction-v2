@@ -1,0 +1,60 @@
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <header class="mb-6 flex items-end justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">양도세율 관리</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+        세법 개정 시 시드 PR 없이 바로 수정합니다. 변경 사항은 즉시 모든 사용자의 계산에 반영됩니다.
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <%= link_to "변경 이력", admin_transfer_tax_rate_audit_logs_path,
+            class: "h-10 px-4 inline-flex items-center rounded-md border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-200 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 whitespace-nowrap" %>
+      <%= link_to "신규 추가", new_admin_transfer_tax_rate_path,
+            class: "h-10 px-4 inline-flex items-center rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 whitespace-nowrap" %>
+    </div>
+  </header>
+
+  <% if flash[:notice] %>
+    <div class="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded text-sm text-green-700 dark:text-green-300">
+      <%= flash[:notice] %>
+    </div>
+  <% end %>
+
+  <div class="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-100 dark:bg-slate-800">
+        <tr>
+          <th class="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">부동산 유형</th>
+          <th class="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">세대</th>
+          <th class="px-4 py-2 text-left font-semibold text-slate-600 dark:text-slate-400">보유 기간</th>
+          <th class="px-4 py-2 text-center font-semibold text-slate-600 dark:text-slate-400">조정지역</th>
+          <th class="px-4 py-2 text-right font-semibold text-slate-600 dark:text-slate-400">세율</th>
+          <th class="px-4 py-2"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @rates.each do |rate| %>
+          <tr class="border-t border-slate-100 dark:border-slate-800">
+            <td class="px-4 py-2 text-slate-900 dark:text-slate-100"><%= rate.property_type.name %></td>
+            <td class="px-4 py-2 text-slate-900 dark:text-slate-100"><%= rate.household_tier %></td>
+            <td class="px-4 py-2 text-slate-900 dark:text-slate-100"><%= rate.holding_period %></td>
+            <td class="px-4 py-2 text-center text-slate-600 dark:text-slate-400">
+              <%= rate.regulated_region.nil? ? "—" : (rate.regulated_region ? "예" : "아니오") %>
+            </td>
+            <td class="px-4 py-2 text-right font-mono text-slate-900 dark:text-slate-100">
+              <%= number_to_percentage(rate.total_rate * 100, precision: 2) %>
+            </td>
+            <td class="px-4 py-2 text-right whitespace-nowrap">
+              <%= link_to "수정", edit_admin_transfer_tax_rate_path(rate),
+                    class: "text-blue-600 hover:underline text-sm" %>
+              <%= button_to "삭제", admin_transfer_tax_rate_path(rate),
+                    method: :delete,
+                    form: { data: { turbo_confirm: "정말 삭제하시겠습니까?" }, class: "inline" },
+                    class: "ml-2 text-red-600 hover:underline text-sm bg-transparent border-0 p-0 cursor-pointer" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
