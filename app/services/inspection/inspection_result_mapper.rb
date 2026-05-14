@@ -93,9 +93,14 @@ module Inspection
         # there is real prior state (persisted AI result) AND attributes are
         # actually changing — avoids no-op version rows.
         if result.persisted? && result.source_type_was == "ai" && result.changed?
-          # Snapshot uses the in-database (was-) values, not the new ones.
-          previous = InspectionResult.find(result.id)
-          previous.snapshot_version!
+          # T2.7: pass *_was values explicitly so we snapshot the prior state
+          # without a second SELECT against inspection_results.
+          result.snapshot_version!(
+            source_type: result.source_type_was,
+            has_risk: result.has_risk_was,
+            evidence: result.evidence_was,
+            resolution_note: result.resolution_note_was
+          )
         end
 
         result.save!

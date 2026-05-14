@@ -165,6 +165,35 @@ class Inspection::InspectionResultMapperTest < ActiveSupport::TestCase
     assert_includes result.evidence["quote"], "HUG"
   end
 
+  test "T2.7: mapper does not refetch inspection_result by id when snapshotting" do
+    # Seed an AI result so the mapper has something to snapshot.
+    item = InspectionItem.find_by!(code: "rights-002")
+    prior = InspectionResult.find_or_initialize_by(
+      property: @property, inspection_item: item, user: @user
+    )
+    prior.update!(
+      source_type: "ai",
+      has_risk: false,
+      evidence: { "source_label" => "AI 분석", "confidence" => "high", "reasoning" => "이전 판단" }
+    )
+
+    by_id_selects = 0
+    callback = lambda do |*, payload|
+      next if payload[:name] == "SCHEMA"
+      sql = payload[:sql].to_s
+      by_id_selects += 1 if sql =~ /SELECT.+"inspection_results".+WHERE.+"inspection_results"\."id"\s*=/
+    end
+
+    ActiveSupport::Notifications.subscribed(callback, "sql.active_record") do
+      Inspection::InspectionResultMapper.call(
+        response: @response, property: @property, user: @user, items: @items
+      )
+    end
+
+    assert_equal 1, prior.reload.versions.count, "sanity: snapshot was created"
+    assert_equal 0, by_id_selects, "mapper should not refetch inspection_results by id"
+  end
+
   test "snapshots prior AI state into versions before overwriting" do
     # Seed an AI result so the mapper has something to overwrite.
     item = InspectionItem.find_by!(code: "rights-002")
