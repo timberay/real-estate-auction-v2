@@ -61,4 +61,26 @@ class AnalysesHistoryTest < ApplicationSystemTestCase
 
     assert_text "분석 이력이 없습니다"
   end
+
+  test "long error_message tooltip is truncated to limit DOM exposure" do
+    @property.llm_analysis_logs.destroy_all
+    huge_message = "X" * 1000
+
+    LlmAnalysisLog.create!(
+      property: @property, user: @user,
+      system_prompt: "s", user_prompt: "u",
+      provider: "openai", model: "gpt-5",
+      status: :failed, error_message: huge_message,
+      executed_at: Time.zone.local(2026, 5, 11, 12, 0)
+    )
+
+    visit history_analyses_path(property_id: @property.id)
+
+    cell = find("[data-testid='llm-history-row'] td[title]")
+    title = cell["title"]
+
+    assert_operator title.length, :<=, 500,
+      "expected title attribute to be truncated to 500 chars or fewer, got #{title.length}"
+    assert title.include?("..."), "expected truncated title to end with ellipsis"
+  end
 end

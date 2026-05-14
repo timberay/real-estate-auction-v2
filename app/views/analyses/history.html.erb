@@ -57,7 +57,7 @@
                       <span class="inline-flex items-center rounded px-1.5 py-0.5 text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200"><%= log.status_label %></span>
                     <% end %>
                   </td>
-                  <td class="py-2 pr-4 text-slate-500 dark:text-slate-400 max-w-xs truncate" title="<%= log.error_message %>">
+                  <td class="py-2 pr-4 text-slate-500 dark:text-slate-400 max-w-xs truncate" title="<%= truncate(log.error_message.to_s, length: 500) %>">
                     <%= log.error_message.present? ? truncate(log.error_message, length: 80) : "—" %>
                   </td>
                 </tr>

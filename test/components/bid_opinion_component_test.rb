@@ -19,7 +19,14 @@ class BidOpinionComponentTest < ViewComponent::TestCase
   test "shows disclaimer about responsibility" do
     rendered = render_inline(BidOpinionComponent.new(risk_count: 0, opportunity_count: 0)).to_s
     assert_match(/입찰 권유가 아닙니다/, rendered)
-    assert_match(/모든 투자 결정의 책임은 사용자에게/, rendered)
+    assert_match(/투자 결정의 (최종 )?책임은 사용자에게/, rendered)
+  end
+
+  test "responsibility statement is not duplicated between inline and compact disclaimer" do
+    rendered = render_inline(BidOpinionComponent.new(risk_count: 0, opportunity_count: 0)).to_s
+
+    refute_match(/모든 투자 결정의 책임은 사용자에게/, rendered)
+    assert_equal 1, rendered.scan(/투자 결정의 (?:최종 )?책임은 사용자에게/).length
   end
 
   test "renders zero counts gracefully" do
