@@ -1,0 +1,14 @@
+<% if row.error_message.present? %>
+  <li class="text-sm">
+    <p class="text-slate-500 dark:text-slate-400 font-mono truncate" title="<%= row.raw %>"><%= row.raw %></p>
+    <p class="text-red-600 dark:text-red-400"><%= row.error_message %></p>
+  </li>
+<% else %>
+  <li class="text-sm text-slate-600 dark:text-slate-400">
+    <%= link_to row.property.case_number, property_path(row.property),
+        class: "underline hover:text-blue-600 dark:hover:text-blue-400" %>
+    <% if row.already_existed %>
+      <span class="text-xs text-slate-400 dark:text-slate-500">(이미 추가됨)</span>
+    <% end %>
+  </li>
+<% end %>

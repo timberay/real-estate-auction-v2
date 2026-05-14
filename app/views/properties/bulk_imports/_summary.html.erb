@@ -1,0 +1,24 @@
+<div id="bulk_import_<%= batch_token %>_summary" class="space-y-3">
+  <% if truncated.to_i > 0 %>
+    <div class="rounded-md bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 px-4 py-3 text-sm text-yellow-800 dark:text-yellow-300">
+      최대 50건까지 한 번에 처리합니다. 처음 50건만 처리되었어요. (입력: <%= total + truncated %>건)
+    </div>
+  <% end %>
+
+  <% all_ok = failed == 0 && succeeded > 0 %>
+  <% all_bad = succeeded == 0 && failed > 0 %>
+  <% banner_classes = if all_ok
+       "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 text-green-800 dark:text-green-300"
+     elsif all_bad
+       "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700 text-red-800 dark:text-red-300"
+     else
+       "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-300"
+     end %>
+  <div class="rounded-md border px-4 py-3 text-sm font-medium <%= banner_classes %>">
+    <% if succeeded + failed == 0 %>
+      처리할 항목이 없습니다.
+    <% else %>
+      총 <%= succeeded + failed %>건 처리 완료 — 성공 <%= succeeded %>건, 실패 <%= failed %>건
+    <% end %>
+  </div>
+</div>

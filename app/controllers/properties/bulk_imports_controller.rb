@@ -1,13 +1,30 @@
 module Properties
   class BulkImportsController < ApplicationController
     def new
-      @result = nil
+      @batch_token = nil
     end
 
     def create
       raw_input = bulk_input_text
-      @result = Properties::BulkImportService.call(user: current_user, raw_input: raw_input)
-      render :new, status: (@result.failed.any? ? :unprocessable_entity : :ok)
+
+      if raw_input.strip.empty?
+        @batch_token = nil
+        render :new, status: :ok
+        return
+      end
+
+      @batch_token = SecureRandom.hex(8)
+      # Brief wait gives the browser time to establish the Turbo Stream
+      # subscription before the job starts broadcasting. Without it, very
+      # fast jobs (e.g. all-unknown-court input that fails without HTTP)
+      # finish before the subscriber connects and the user sees only the
+      # placeholder.
+      PropertyImportJob.set(wait: 0.5.seconds).perform_later(
+        user_id: current_user.id,
+        batch_token: @batch_token,
+        raw_input: raw_input
+      )
+      render :new, status: :accepted
     end
 
     private
