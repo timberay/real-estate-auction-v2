@@ -62,4 +62,25 @@ class Properties::UserPropertySettingsControllerTest < ActionDispatch::Integrati
     assert_response :success
     assert_select "turbo-frame[id='user-property-notes-edit']"
   end
+
+  # T3.3 — payment_completed_on
+  test "PATCH update persists payment_completed_on" do
+    patch property_user_property_settings_path(@property),
+      params: { user_property: { payment_completed_on: "2026-01-15" } },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :success
+    assert_equal Date.new(2026, 1, 15), @user_property.reload.payment_completed_on
+  end
+
+  test "PATCH update with blank payment_completed_on clears the value" do
+    @user_property.update!(payment_completed_on: Date.new(2026, 1, 15))
+
+    patch property_user_property_settings_path(@property),
+      params: { user_property: { payment_completed_on: "" } },
+      headers: { "Accept" => "text/vnd.turbo-stream.html" }
+
+    assert_response :success
+    assert_nil @user_property.reload.payment_completed_on
+  end
 end

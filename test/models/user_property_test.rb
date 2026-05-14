@@ -133,4 +133,40 @@ class UserPropertyTest < ActiveSupport::TestCase
     )
     assert up.valid?
   end
+
+  # T3.3 — eviction deadline (인도명령 6개월)
+
+  test "eviction_deadline is nil when payment_completed_on is nil" do
+    up = user_properties(:guest_safe_apartment)
+    up.payment_completed_on = nil
+    assert_nil up.eviction_deadline
+  end
+
+  test "eviction_deadline is payment_completed_on + 6 months" do
+    up = user_properties(:guest_safe_apartment)
+    up.payment_completed_on = Date.new(2026, 1, 15)
+    assert_equal Date.new(2026, 7, 15), up.eviction_deadline
+  end
+
+  test "days_to_eviction_deadline returns nil when no payment date" do
+    up = user_properties(:guest_safe_apartment)
+    up.payment_completed_on = nil
+    assert_nil up.days_to_eviction_deadline
+  end
+
+  test "days_to_eviction_deadline counts days from today to deadline" do
+    up = user_properties(:guest_safe_apartment)
+    travel_to Date.new(2026, 5, 14) do
+      up.payment_completed_on = Date.new(2026, 1, 14)  # deadline 2026-07-14
+      assert_equal 61, up.days_to_eviction_deadline
+    end
+  end
+
+  test "days_to_eviction_deadline returns negative when past deadline" do
+    up = user_properties(:guest_safe_apartment)
+    travel_to Date.new(2026, 8, 14) do
+      up.payment_completed_on = Date.new(2026, 1, 14)  # deadline 2026-07-14
+      assert_equal(-31, up.days_to_eviction_deadline)
+    end
+  end
 end

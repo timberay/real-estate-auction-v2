@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_14_120001) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_14_120002) do
   create_table "acquisition_tax_rate_audit_logs", force: :cascade do |t|
     t.integer "acquisition_tax_rate_id"
     t.string "action", null: false
@@ -419,6 +419,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_14_120001) do
     t.boolean "favorite", default: false, null: false
     t.date "inspection_visited_on"
     t.text "notes"
+    t.date "payment_completed_on"
     t.integer "property_id", null: false
     t.integer "safety_rating"
     t.datetime "updated_at", null: false

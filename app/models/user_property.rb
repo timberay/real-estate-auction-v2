@@ -13,6 +13,18 @@ class UserProperty < ApplicationRecord
 
   scope :ordered_for_list, -> { order(favorite: :desc, created_at: :desc) }
 
+  EVICTION_WINDOW = 6.months
+
+  def eviction_deadline
+    return nil unless payment_completed_on
+    payment_completed_on + EVICTION_WINDOW
+  end
+
+  def days_to_eviction_deadline
+    return nil unless eviction_deadline
+    (eviction_deadline - Date.current).to_i
+  end
+
   private
 
   def photos_must_be_images
