@@ -24,6 +24,30 @@ class RightsReportSectionComponentTest < ViewComponent::TestCase
     assert_text "우선매수권 행사 위험"
   end
 
+  # D2 — preferred_purchase_risk is a RISK signal, not an opportunity. It must
+  # render in its own amber "위험 신호" box, never inside the green
+  # "안전 기회물건" container.
+  test "preferred_purchase_risk renders in dedicated 위험 신호 section, not inside green opportunity box" do
+    @report.opportunity_type = "preferred_purchase_risk"
+    @report.opportunity_reason = "공유자우선매수권이 신고되어 있음"
+    render_inline(RightsReportSectionComponent.new(report: @report, property: @property))
+
+    # Must render the dedicated risk-signal heading and reason
+    assert_text "위험 신호"
+    assert_text "공유자우선매수권이 신고되어 있음"
+    # Must NOT appear inside the green opportunity box
+    assert_no_text "안전 기회물건"
+  end
+
+  test "non-risk opportunity_type still renders the green 안전 기회물건 box" do
+    @report.opportunity_type = "hug_waiver"
+    render_inline(RightsReportSectionComponent.new(report: @report, property: @property))
+
+    assert_text "안전 기회물건"
+    # And NOT a risk-signal section
+    assert_no_text "위험 신호"
+  end
+
   # --- B8 / E-41: hug_waiver opportunity citation ---
 
   test "renders opportunity citation when hug_waiver" do
