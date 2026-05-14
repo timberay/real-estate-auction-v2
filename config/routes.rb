@@ -63,6 +63,8 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :acquisition_tax_rates, only: [ :index, :new, :create, :edit, :update, :destroy ]
     resources :acquisition_tax_rate_audit_logs, only: [ :index ]
+    resources :transfer_tax_rates, only: [ :index, :new, :create, :edit, :update, :destroy ]
+    resources :transfer_tax_rate_audit_logs, only: [ :index ]
   end
 
   resources :properties, only: [ :index, :show, :create, :destroy ] do

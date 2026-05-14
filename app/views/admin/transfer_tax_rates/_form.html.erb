@@ -1,0 +1,65 @@
+<% if rate.errors.any? %>
+  <div class="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-sm text-red-700 dark:text-red-300">
+    <ul class="list-disc pl-5">
+      <% rate.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: rate, url: form_url, method: form_method,
+              local: true, class: "space-y-4" do |f| %>
+  <% if rate.new_record? %>
+    <div>
+      <%= f.label :property_type_id, "부동산 유형",
+            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <%= f.collection_select :property_type_id,
+            PropertyType.order(:sort_order), :id, :name,
+            { prompt: "선택하세요" },
+            { class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm" } %>
+    </div>
+
+    <div>
+      <%= f.label :household_tier, "세대",
+            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <%= f.select :household_tier,
+            TransferTaxRate::HOUSEHOLD_TIERS,
+            { prompt: "선택하세요" },
+            { class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm" } %>
+    </div>
+
+    <div>
+      <%= f.label :holding_period, "보유 기간",
+            class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+      <%= f.select :holding_period,
+            TransferTaxRate::HOLDING_PERIODS,
+            { prompt: "선택하세요" },
+            { class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm" } %>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :regulated_region, "조정대상지역",
+          class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+    <%= f.select :regulated_region,
+          [ [ "구분 안함 (모든 지역)", "" ], [ "예 (조정지역)", "true" ], [ "아니오 (비조정)", "false" ] ],
+          { selected: rate.regulated_region.nil? ? "" : rate.regulated_region.to_s },
+          { class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm" } %>
+  </div>
+
+  <div>
+    <%= f.label :total_rate, "세율 (소수점, 예: 0.06 = 6%)",
+          class: "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1" %>
+    <%= f.number_field :total_rate, min: 0, max: 1.0, step: 0.0001,
+          class: "w-full h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm font-mono" %>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">0 이상 1.0 이하 — 양도소득세 단일세율 (지방소득세 별도)</p>
+  </div>
+
+  <div class="flex gap-3 pt-2">
+    <%= f.submit submit_label,
+          class: "h-10 px-4 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700" %>
+    <%= link_to "취소", admin_transfer_tax_rates_path,
+          class: "h-10 px-4 inline-flex items-center rounded-md border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800" %>
+  </div>
+<% end %>
