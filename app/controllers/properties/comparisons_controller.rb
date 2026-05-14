@@ -25,8 +25,11 @@ module Properties
         .where(user: current_user, property_id: @user_properties.map(&:property_id))
         .index_by(&:property_id)
 
+      item_cache = InspectionRatingService.build_item_cache
       @ratings_by_property = @user_properties.each_with_object({}) do |up, h|
-        h[up.property_id] = InspectionRatingService.new(property: up.property, user: current_user).overall_rating
+        h[up.property_id] = InspectionRatingService.new(
+          property: up.property, user: current_user, item_cache: item_cache
+        ).overall_rating
       end
 
       respond_to do |format|
