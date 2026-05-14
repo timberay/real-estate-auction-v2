@@ -12,6 +12,13 @@ FileUtils.chdir APP_ROOT do
   # This script is idempotent, so that you can run it at any time and get an expectable outcome.
   # Add necessary setup steps to this file.
 
+  # D1 — Gemfile uses the `:windows` platform symbol, which Ruby 3.0.x with
+  # older Bundler fails to parse. Fail fast with a clear message so devs
+  # don't chase a confusing `bundle install` error.
+  if Gem::Version.new(RUBY_VERSION) < Gem::Version.new("3.1.0")
+    abort "[bin/setup] Ruby #{RUBY_VERSION} is unsupported. This project requires Ruby >= 3.1 (.ruby-version pins 3.4.8)."
+  end
+
   puts "== Installing dependencies =="
   system("bundle check") || system!("bundle install")
 
