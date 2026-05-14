@@ -29,6 +29,17 @@ class PdfAnalysisService
     write_extraction_failure(reason: "AI 서버 응답 시간 초과")
     log_failure(e)
     raise
+  rescue Llm::Errors::ResponseTruncated => e
+    write_extraction_failure(reason: "AI 응답이 잘렸습니다. 잠시 후 다시 시도하거나 운영자에게 문의해주세요.")
+    log_failure(e)
+    raise
+  rescue Faraday::Error => e
+    # Other Faraday transport failures (connection refused, server 5xx,
+    # client 4xx). Job retry policy decides whether to retry; the service
+    # only writes a user-facing reason and re-raises.
+    write_extraction_failure(reason: "AI 서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요. (#{e.class.name.demodulize})")
+    log_failure(e)
+    raise
   rescue => e
     write_extraction_failure(reason: "분석 중 알 수 없는 오류 (#{e.class.name})")
     log_failure(e)
