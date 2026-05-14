@@ -55,6 +55,22 @@ module Properties
       assert_equal 10, assigns(:user_properties).size
     end
 
+    test "GET /properties/compare.csv returns a CSV with the same properties" do
+      get compare_properties_url(format: :csv), params: { ids: "#{@prop1.id},#{@prop2.id}" }
+      assert_response :success
+      assert_match %r{text/csv}, response.media_type
+      assert_match %r{filename=.*\.csv}, response.headers["Content-Disposition"]
+      body = response.body.force_encoding("UTF-8").delete_prefix("\xEF\xBB\xBF")
+      assert_includes body, @prop1.case_number
+      assert_includes body, @prop2.case_number
+      assert_includes body, "예상차익"
+    end
+
+    test "GET /properties/compare.csv with fewer than 2 ids still redirects (consistent with HTML)" do
+      get compare_properties_url(format: :csv), params: { ids: @prop1.id.to_s }
+      assert_redirected_to properties_url
+    end
+
     test "GET /properties/compare with an id the user does not own silently filters it out" do
       other_user = users(:budget_user)
       other_prop = properties(:high_view_apartment)

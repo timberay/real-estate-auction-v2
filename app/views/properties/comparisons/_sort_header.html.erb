@@ -1,0 +1,10 @@
+<span class="inline-flex items-center gap-1">
+  <%= label %>
+  <button type="button"
+          data-action="click->comparison-sort#sort"
+          class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-xs"
+          aria-label="<%= label %> 기준 정렬">
+    <span data-sort-indicator>↕</span>
+    <span class="sr-only">정렬</span>
+  </button>
+</span>
