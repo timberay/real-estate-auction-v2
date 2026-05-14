@@ -28,7 +28,7 @@ class ReserveFundDefaultTest < ActiveSupport::TestCase
       scrivener_fee: 80, moving_cost: 255, maintenance_fee: 0
     )
     assert_not rfd.valid?
-    assert_includes rfd.errors[:area_range_max], "must be greater than area_range_min"
+    assert_includes rfd.errors[:area_range_max], "최소 면적보다 커야 합니다"
   end
 
   test "scope for_property_type_and_area finds matching default" do
