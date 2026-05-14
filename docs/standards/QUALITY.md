@@ -8,6 +8,8 @@ Testing strategy, security standards, code quality, accessibility, and performan
 
 - **Unit/Integration**: Minitest (Rails 8 default)
 - **System tests**: Capybara + `selenium-webdriver` (headless Chrome via `ApplicationSystemTestCase`)
+- **HTTP stubbing**: `webmock` — registered in `test/test_helper.rb`; disable real HTTP in adapter tests
+- **Controller test helpers**: `rails-controller-testing` re-enables `assigns(...)` / `assert_template` for legacy-style assertions
 - **External-app E2E**: `playwright-ruby-client` for scraper/black-box flows (see [TOOLS.md → E2E / Browser Automation](TOOLS.md#e2e--browser-automation))
 - **Performance**: No load-testing tool currently in the stack — add one (and document here) before publishing performance budgets
 
@@ -95,6 +97,10 @@ Never rely on color alone to convey status. Always pair with text and/or icons.
 
 Mobile-first approach using TailwindCSS breakpoints. Ensure touch targets are at least 44x44px.
 
+### Automated Accessibility Checks
+
+`axe-core-capybara` is wired into system tests via `ApplicationSystemTestCase`; the baseline suite at `test/system/a11y_baseline_test.rb` runs axe on critical pages. Add new pages to that test (or write a focused axe assertion) when introducing UI that materially changes structure.
+
 ## Performance Guidelines
 
 ### Fragment Caching
@@ -147,6 +153,8 @@ For diagnosis workflow, follow the `systematic-debugging` skill.
 - [ ] No linting errors (`bin/rubocop`)
 - [ ] No security warnings (`bin/brakeman`)
 - [ ] No dependency vulnerabilities (`bin/bundler-audit`)
+- [ ] No vulnerable importmap pins (`bin/importmap audit`)
+- [ ] Seeds replant cleanly (`RAILS_ENV=test bin/rails db:seed:replant`)
 
 ### Manual Review
 

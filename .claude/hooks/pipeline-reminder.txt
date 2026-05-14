@@ -4,8 +4,8 @@ Before any planning or implementation, verify the 4-phase design separation (see
 
 - **Phase 1 (Product Decision)** — `~/.gstack/projects/<slug>/designs/<feature>.md` via `/office-hours`
 - **Phase 2 (System Architecture)** — `~/.gstack/projects/<slug>/designs/<feature>-eng-review.md` via `/plan-eng-review`
-- **Phase 3 (Technical Design)** — `docs/superpowers/specs/<date>-<feature>-tech-design.md` via `/superpowers:brainstorming`
-- **Phase 4 (Task Breakdown)** — `docs/superpowers/plans/<date>-<feature>-plan.md` via `/superpowers:writing-plans`
+- **Phase 3 (Technical Design)** — `docs/superpowers/specs/<YYYY-MM-DD>-<feature>-design.md` via `/superpowers:brainstorming`
+- **Phase 4 (Task Breakdown)** — `docs/superpowers/plans/<YYYY-MM-DD>-<feature>.md` via `/superpowers:writing-plans`
 
 Rules:
 1. Check each phase artifact BEFORE implementing. If missing, START from that phase — do not skip.
