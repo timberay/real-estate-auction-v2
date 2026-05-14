@@ -9,6 +9,6 @@ class BidOpinionComponent < ViewComponent::Base
   end
 
   def disclaimer
-    "본 도구는 권리분석 보조이며 입찰 권유가 아닙니다. 모든 투자 결정의 책임은 사용자에게 있습니다."
+    "본 도구는 권리분석 보조이며 입찰 권유가 아닙니다."
   end
 end
