@@ -1,13 +1,25 @@
 module Properties
   class BulkImportsController < ApplicationController
     def new
-      @result = nil
+      @batch_token = nil
     end
 
     def create
       raw_input = bulk_input_text
-      @result = Properties::BulkImportService.call(user: current_user, raw_input: raw_input)
-      render :new, status: (@result.failed.any? ? :unprocessable_entity : :ok)
+
+      if raw_input.strip.empty?
+        @batch_token = nil
+        render :new, status: :ok
+        return
+      end
+
+      @batch_token = SecureRandom.hex(8)
+      PropertyImportJob.perform_later(
+        user_id: current_user.id,
+        batch_token: @batch_token,
+        raw_input: raw_input
+      )
+      render :new, status: :accepted
     end
 
     private
