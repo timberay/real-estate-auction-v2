@@ -77,4 +77,54 @@ class PropertyTest < ActiveSupport::TestCase
   test "NEXT_ROUND_REDUCTION_RATE constant is 0.80" do
     assert_equal 0.80, Property::NEXT_ROUND_REDUCTION_RATE
   end
+
+  # T3.1 — property_type categorization
+
+  test "usage_category classifies 아파트 as :residential" do
+    assert_equal :residential, Property.new(property_type: "아파트").usage_category
+  end
+
+  test "usage_category classifies 빌라/다세대 as :residential" do
+    assert_equal :residential, Property.new(property_type: "빌라").usage_category
+    assert_equal :residential, Property.new(property_type: "다세대주택").usage_category
+  end
+
+  test "usage_category classifies 단독주택/연립주택 as :residential" do
+    assert_equal :residential, Property.new(property_type: "단독주택").usage_category
+    assert_equal :residential, Property.new(property_type: "연립주택").usage_category
+  end
+
+  test "usage_category classifies 오피스텔 as :officetel" do
+    assert_equal :officetel, Property.new(property_type: "오피스텔").usage_category
+  end
+
+  test "usage_category classifies 상가/근린상가 as :commercial" do
+    assert_equal :commercial, Property.new(property_type: "상가").usage_category
+    assert_equal :commercial, Property.new(property_type: "근린상가").usage_category
+  end
+
+  test "usage_category classifies 토지/대지/임야 as :land" do
+    assert_equal :land, Property.new(property_type: "토지").usage_category
+    assert_equal :land, Property.new(property_type: "대지").usage_category
+    assert_equal :land, Property.new(property_type: "임야").usage_category
+  end
+
+  test "usage_category returns :unknown for unrecognized types" do
+    assert_equal :unknown, Property.new(property_type: "기타").usage_category
+  end
+
+  test "usage_category returns :residential when property_type is blank (conservative default)" do
+    assert_equal :residential, Property.new(property_type: nil).usage_category
+    assert_equal :residential, Property.new(property_type: "").usage_category
+  end
+
+  test "residential? is true for :residential" do
+    assert Property.new(property_type: "아파트").residential?
+  end
+
+  test "residential? is false for :officetel / :commercial / :land" do
+    [ "오피스텔", "상가", "토지" ].each do |t|
+      assert_not Property.new(property_type: t).residential?, "#{t} should not be residential"
+    end
+  end
 end
