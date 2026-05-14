@@ -107,6 +107,34 @@ class RightsAnalysisReportTest < ActiveSupport::TestCase
     end
   end
 
+  test "T2.8: update_tenant! allows clearing move_in_date when explicit blank submitted" do
+    @report_with_tenants.update_tenant!(0, move_in_date: "")
+    @report_with_tenants.reload
+    assert_nil @report_with_tenants.effective_tenants.first["move_in_date"]
+    # Other fields untouched
+    assert_equal 30_000_000, @report_with_tenants.effective_tenants.first["deposit"]
+  end
+
+  test "T2.8: update_tenant! allows clearing confirmed_date when explicit blank submitted" do
+    @report_with_tenants.update_tenant!(0, confirmed_date: "")
+    @report_with_tenants.reload
+    assert_nil @report_with_tenants.effective_tenants.first["confirmed_date"]
+  end
+
+  test "T2.8: update_tenant! allows clearing deposit when explicit blank submitted" do
+    @report_with_tenants.update_tenant!(0, deposit: "")
+    @report_with_tenants.reload
+    assert_nil @report_with_tenants.effective_tenants.first["deposit"]
+  end
+
+  test "T2.8: update_tenant! preserves fields not present in attrs" do
+    # Submit only deposit — move_in_date and confirmed_date must be unchanged.
+    @report_with_tenants.update_tenant!(0, deposit: 25_000_000)
+    @report_with_tenants.reload
+    assert_equal "2023-01-01", @report_with_tenants.effective_tenants.first["move_in_date"]
+    assert_equal "2023-01-05", @report_with_tenants.effective_tenants.first["confirmed_date"]
+  end
+
   test "update_tenant! does not mutate other tenants" do
     @report_with_tenants.update!(report_data: {
       "calculated" => {
