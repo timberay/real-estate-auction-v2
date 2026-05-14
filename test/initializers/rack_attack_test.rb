@@ -80,4 +80,74 @@ class RackAttackThrottleTest < ActiveSupport::TestCase
     discriminator = call_prompt_throttle_block(req)
     assert_nil discriminator
   end
+
+  # --- W0-3.3: progressive backoff (tiered throttles) ---
+
+  test "auth:ip:hour tier-2 throttle is registered" do
+    assert Rack::Attack.throttles.key?("auth:ip:hour"),
+      "expected hour-window throttle to exist for progressive backoff on /auth/*"
+  end
+
+  test "auth:ip:hour tier-2 has a larger budget but longer window than minute tier" do
+    minute_tier = Rack::Attack.throttles["auth:ip"]
+    hour_tier = Rack::Attack.throttles["auth:ip:hour"]
+    assert_operator hour_tier.limit, :>, minute_tier.limit, "hour-tier budget must exceed minute-tier"
+    assert_operator hour_tier.period, :>, minute_tier.period, "hour-tier window must exceed minute-tier"
+  end
+
+  test "auth:ip:hour throttle triggers on POST to /auth/*" do
+    req = make_request(script_name: "", path_info: "/auth/login", method: "POST")
+    block = Rack::Attack.throttles["auth:ip:hour"].block
+    assert_equal "1.2.3.4", block.call(req)
+  end
+
+  test "auth:ip:hour throttle does not trigger on GET" do
+    req = make_request(script_name: "", path_info: "/auth/login", method: "GET")
+    assert_nil Rack::Attack.throttles["auth:ip:hour"].block.call(req)
+  end
+
+  test "analyses_prompt:ip:hour tier-2 throttle is registered" do
+    assert Rack::Attack.throttles.key?("analyses_prompt:ip:hour"),
+      "expected hour-window throttle to exist for progressive backoff on /analyses/prompt"
+  end
+
+  # --- W0-3.3: static IP denylist (env-driven) ---
+
+  test "blocked_ips blocklist is registered" do
+    assert Rack::Attack.blocklists.key?("blocked_ips"),
+      "expected blocked_ips static denylist to be configured"
+  end
+
+  test "blocked_ips returns an Array (lazy-parsed from BLOCKED_IPS env)" do
+    assert_respond_to Rack::Attack, :blocked_ips
+    assert_kind_of Array, Rack::Attack.blocked_ips
+  end
+
+  test "blocked_ips blocklist matches when ip is in the configured set" do
+    with_blocked_ips([ "9.9.9.9" ]) do
+      req = make_request(script_name: "", path_info: "/properties", method: "GET", ip: "9.9.9.9")
+      block = Rack::Attack.blocklists["blocked_ips"].block
+      assert block.call(req), "expected request from blocked IP to match denylist"
+    end
+  end
+
+  test "blocked_ips blocklist does not match when ip is not in the configured set" do
+    with_blocked_ips([ "9.9.9.9" ]) do
+      req = make_request(script_name: "", path_info: "/properties", method: "GET", ip: "1.1.1.1")
+      block = Rack::Attack.blocklists["blocked_ips"].block
+      refute block.call(req)
+    end
+  end
+
+  private
+
+  # The blocked_ips list is memoized on the class. Swap the ivar in/out so
+  # tests can configure their own set without touching ENV.
+  def with_blocked_ips(ips)
+    previous = Rack::Attack.instance_variable_get(:@blocked_ips)
+    Rack::Attack.instance_variable_set(:@blocked_ips, ips.freeze)
+    yield
+  ensure
+    Rack::Attack.instance_variable_set(:@blocked_ips, previous)
+  end
 end
