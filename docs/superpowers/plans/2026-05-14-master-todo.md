@@ -19,7 +19,7 @@
 | Theme | 핵심 질문 | 상태 |
 |-------|----------|------|
 | **1. 계산 엔진 신뢰성** | "숫자가 진짜 맞나?" — 베테랑 retention | T1.1·T1.2·T1.4(b)·T1.5 완료, T1.3·T1.4(a) 대기 |
-| **2. 운영 가시성 + 안전망** | "깨지면 보이고, 사용자 작업이 보호되나?" | T2.1·T2.2·T2.3·T2.4·T2.5·T2.7·T2.8 완료, 잔여 1건 (T2.6) |
+| **2. 운영 가시성 + 안전망** | "깨지면 보이고, 사용자 작업이 보호되나?" | T2.1·T2.2·T2.3·T2.4·T2.5·T2.7·T2.8 완료, T2.6 partial(Vitest deferred — user 결정 대기) |
 | **3. 권리분석/매물 다양성 확장** | "다룰 수 있는 매물 범위는 어디까지?" | 대기 |
 | **4. UX 폴리시 + 외부 정리** | "이미 되는 걸 매끄럽게" | 대기 |
 
@@ -60,7 +60,7 @@
 | T2.3 | 컨트롤러 bang-method rescue systemic fix (ApplicationController `rescue_from ActiveRecord::RecordInvalid` — HTML→redirect_back+flash, JSON→422+errors) | ✅ 완료 (#143) — A1 |
 | T2.4 | LLM truncation 감지 통일 — 5개 어댑터 (Anthropic/OpenAI/OpenRouter/Gemini/Ollama) 모두 `Llm::Errors::ResponseTruncated` 일관 raise | ✅ 완료 (#146) — A2 / Follow-up #2 |
 | T2.5 | PDF/LLM rescue 분기 — service 단 ResponseTruncated/Faraday::Error 분기, retry/discard 는 Job 단 유지 | ✅ 완료 (#147) — A4 |
-| T2.6 | Stimulus JS 테스트 인프라 (Vitest 도입 또는 system test 보강) | A3 |
+| T2.6 | Stimulus JS 테스트 인프라 — profit_calculator/eviction/grade 등 핵심 controller 는 기존 system test 로 cover (`test/system/profit_calculator_test.rb` 외). Vitest 도입은 인프라 결정, 사용자 검토 대기. | 🟡 부분 (system test 보강 완료, Vitest deferred) — A3 |
 | T2.7 | InspectionResultVersion 동시성 + N+1 — snapshot_version! retry on RecordNotUnique, mapper *_was 사용으로 refetch 제거 | ✅ 완료 (#148) — Follow-up #9, #10 |
 | T2.8 | B27/B10 controller 견고화 — #15/#19 T2.3 흡수, #17 photos N+1 (#149), #16 tenant blank clear (#150). #18 멀티파일 업로드는 UI feature add 로 deferred. | ✅ 완료 (#149, #150) — Follow-up #15-19 |
 
