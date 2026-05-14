@@ -26,6 +26,7 @@ module Llm
         }
       end
       handle_response(response)
+      detect_truncation(response.body)
       sanitize_and_parse_json(response.body["message"]["content"])
     end
 
@@ -33,6 +34,11 @@ module Llm
 
     def base_url
       ENV.fetch("OLLAMA_BASE_URL", DEFAULT_BASE_URL)
+    end
+
+    def detect_truncation(body)
+      return unless body.is_a?(Hash) && body["done_reason"] == "length"
+      raise_truncated!(env_var: "OLLAMA_NUM_PREDICT")
     end
   end
 end

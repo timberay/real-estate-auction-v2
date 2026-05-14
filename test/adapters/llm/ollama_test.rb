@@ -45,4 +45,18 @@ class Llm::OllamaTest < ActiveSupport::TestCase
 
     assert_raises(RuntimeError) { @adapter.analyze(system: "test", prompt: "test") }
   end
+
+  test "raises ResponseTruncated when done_reason is length" do
+    truncated = {
+      "message" => { "content" => '{"par' },
+      "done_reason" => "length"
+    }
+    stub_request(:post, "http://localhost:11434/api/chat")
+      .to_return(status: 200, body: truncated.to_json, headers: { "Content-Type" => "application/json" })
+
+    error = assert_raises(Llm::Errors::ResponseTruncated) do
+      @adapter.analyze(system: "test", prompt: "test")
+    end
+    assert_match(/OLLAMA_NUM_PREDICT/, error.message)
+  end
 end

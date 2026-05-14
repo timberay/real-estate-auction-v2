@@ -29,6 +29,7 @@ module Llm
         }
       end
       handle_response(response)
+      detect_truncation(response.body)
       sanitize_and_parse_json(response.body["choices"][0]["message"]["content"])
     end
 
@@ -40,6 +41,11 @@ module Llm
 
     def max_tokens
       ENV.fetch("OPENROUTER_MAX_TOKENS", DEFAULT_MAX_TOKENS).to_i
+    end
+
+    def detect_truncation(body)
+      return unless body.is_a?(Hash) && body.dig("choices", 0, "finish_reason") == "length"
+      raise_truncated!(env_var: "OPENROUTER_MAX_TOKENS")
     end
   end
 end

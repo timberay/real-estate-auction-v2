@@ -44,4 +44,23 @@ class Llm::GeminiTest < ActiveSupport::TestCase
   ensure
     ENV["GEMINI_API_KEY"] = original
   end
+
+  test "raises ResponseTruncated when finishReason is MAX_TOKENS" do
+    original = ENV["GEMINI_API_KEY"]
+    ENV["GEMINI_API_KEY"] = "test-key"
+
+    truncated = {
+      "candidates" => [ { "content" => { "parts" => [ { "text" => '{"par' } ] }, "finishReason" => "MAX_TOKENS" } ]
+    }
+    stub_request(:post, "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent")
+      .with(headers: { "x-goog-api-key" => "test-key" })
+      .to_return(status: 200, body: truncated.to_json, headers: { "Content-Type" => "application/json" })
+
+    error = assert_raises(Llm::Errors::ResponseTruncated) do
+      @adapter.analyze(system: "test", prompt: "test")
+    end
+    assert_match(/GEMINI_MAX_OUTPUT_TOKENS/, error.message)
+  ensure
+    ENV["GEMINI_API_KEY"] = original
+  end
 end
