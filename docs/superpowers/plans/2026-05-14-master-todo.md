@@ -100,7 +100,7 @@ T3.4 Notification 인프라가 T3.3 D-day 알림 의존. 따라서 **T3.4 → T3
 | T4.6 | a11y 점검 패스 (axe-core 통합) — ✅ #166 baseline 인프라 + 4종 부채 캡처, ✅ #169 4종 fix (html-has-lang / select-name / heading-order / color-contrast) — KNOWN_VIOLATIONS=[] 잠금 | W4-1 / C34 |
 | T4.7 | `analyses#prompt` 인증/rate-limit | ✅ 완료 (#161) — W4-2 / C31 / E-39 |
 | T4.8 | Backlog P3 묶음 (한국어화 / disclaimer / menu Esc / tooltip / heading / nested cards / base_right_date 컨트롤러 테스트) — ✅ 완료 #163/#164/#165 (3 묶음 8건) | Follow-up #3, #5, #6, #7, #8, #11, #12, #14 |
-| T4.9 | 외부 게이트 5건 — W0-1 [CSP enforce runbook](../../operations/csp-enforce-runbook.md) (1주 관찰 후 실행), W0-2 [OAuth 콘솔 runbook](../../operations/oauth-redirect-uri-runbook.md) (도메인 확정 후 외부 작업), W0-3 SNS self-review: ✅ rack-attack #172 (W0-3.3), [terms/privacy runbook](../../operations/legal-content-runbook.md) (W0-3.4 법무 검토), W0-3.1·W0-3.2 [DEFERRED](../../decisions/2026-05-14-deferred-features.md), W0-4 ✅ #167, W0-5 [branch protection runbook](../../operations/branch-protection-runbook.md) (I2 self-hosted runner 선행) | W0-1~5 |
+| T4.9 | 외부 게이트 5건 — W0-1 [CSP enforce runbook](../../operations/csp-enforce-runbook.md) (1주 관찰 후 실행), W0-2 [OAuth 콘솔 runbook](../../operations/oauth-redirect-uri-runbook.md) (도메인 확정 후 외부 작업), W0-3 SNS self-review: ✅ rack-attack #172 (W0-3.3), ✅ W0-3.4 terms/privacy 본문 작성 완료, W0-3.1·W0-3.2 [DEFERRED](../../decisions/2026-05-14-deferred-features.md), W0-4 ✅ #167, W0-5 [branch protection runbook](../../operations/branch-protection-runbook.md) (I2 self-hosted runner 선행) | W0-1~5 |
 
 ---
 
