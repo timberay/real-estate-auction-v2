@@ -347,4 +347,12 @@ class ProfitCalculatorComponentTest < ViewComponent::TestCase
     root = rendered.css("[data-controller='profit-calculator']").first
     assert_equal "false", root["data-profit-calculator-dsr-enabled-value"]
   end
+
+  test "renders the T1.4(a)-lite nearby-auction external link card" do
+    render_inline(ProfitCalculatorComponent.new(
+      property: @property, budget_setting: @budget, report: @report
+    ))
+    assert_text "인근 매각가율 확인"
+    assert_selector "a[href='#{NearbyAuctionLinksComponent::COURT_SEARCH_URL}']"
+  end
 end

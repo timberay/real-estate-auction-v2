@@ -38,7 +38,8 @@
 | T1.2 | 양도세 매트릭스 (서버 매트릭스 + Stimulus 주입, 한시 유예 반영) | ✅ 완료 (#140) | W1-3 / C23 / E-25 |
 | T1.3 | 소액임차인 최우선변제 자동 계산 (DividendSimulator) | ✅ 완료 (#168) | W1-4 / C25 / E-27 |
 | T1.4(b) | 차회 매각가 자동 계산 (8할 저감 산식 표시) | ✅ 완료 (#141) | W2-1 / C22 / E-24 |
-| T1.4(a) | 인근 낙찰가 통계 + 경쟁률 (스크래퍼 + AuctionResult 모델) | 대기 | W2-1 / C22 / E-24 |
+| T1.4(a)-lite | 인근 매각가율 외부 링크 (NearbyAuctionLinksComponent → 법원경매정보 매각결과 검색) | ✅ 완료 | W2-1 / C22 / E-24 |
+| T1.4(a)-full | 인근 낙찰가 통계 + 경쟁률 (스크래퍼 + AuctionResult 모델) | [DEFERRED](../../decisions/2026-05-15-T1.4a-full-deferred.md) — ROI 재검토 결과 lite 로 충분 | W2-1 / C22 / E-24 |
 | T1.5 | DSR 한도 초과 경고 (BudgetSetting + DsrCalculator + profit calc 배너) | ✅ 완료 (#142) | W2-2 / C26 / E-29 |
 
 **T1.2 출하 시점 후속 (별도 PR로 분리)**:
