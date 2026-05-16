@@ -4,6 +4,11 @@ class PropertiesController < ApplicationController
 
   before_action :set_user_property, only: %i[show destroy toggle_favorite]
 
+  # IDOR-safe: status stays 404 so existence of other users' properties is not
+  # disclosed. The friendly page replaces the dev-mode stack trace and the bare
+  # public/404.html in production, giving the user a clear next step.
+  rescue_from ActiveRecord::RecordNotFound, with: :render_property_not_found
+
   def index
     @user_properties = current_user.user_properties
       .includes(property: [ :inspection_results, :next_auction_schedule ])
@@ -41,14 +46,16 @@ class PropertiesController < ApplicationController
     court_code  = params[:court_code].to_s.strip
 
     unless valid_inputs?(case_number, court_code)
-      redirect_to properties_path, alert: "사건번호 형식이 올바르지 않습니다. (예: 2026타경1234)"
+      redirect_to retry_params_path(case_number, court_code),
+                  alert: "사건번호 형식이 올바르지 않습니다. (예: 2026타경1234)"
       return
     end
 
     result = CaseSearchService.call(court_code: court_code, case_number: case_number)
 
     if result.error
-      redirect_to properties_path, alert: error_message_for(result.error)
+      redirect_to retry_params_path(case_number, court_code),
+                  alert: error_message_for(result.error)
       return
     end
 
@@ -86,6 +93,27 @@ class PropertiesController < ApplicationController
   end
 
   private
+
+  # Preserve a rejected submission (case_number + court_code) on the redirect
+  # URL so the form re-renders with the values the user typed, instead of
+  # losing them and forcing a retype.
+  def retry_params_path(case_number, court_code)
+    qp = {}
+    qp[:case_number] = case_number if case_number.present?
+    qp[:court_code]  = court_code  if court_code.present?
+    properties_path(qp)
+  end
+
+  def render_property_not_found
+    respond_to do |format|
+      format.html do
+        flash.now[:alert] = "이 물건은 내 목록에 없습니다."
+        render "shared/error", status: :not_found
+      end
+      format.turbo_stream { head :not_found }
+      format.json         { head :not_found }
+    end
+  end
 
   def valid_inputs?(case_number, court_code)
     return false if case_number.blank? || court_code.blank?

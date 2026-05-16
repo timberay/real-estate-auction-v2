@@ -30,6 +30,17 @@ class NotificationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "li[data-read='true']", count: 1
   end
 
+  test "GET /notifications page header shows both total and unread counts (B-005)" do
+    @user.notifications.create!(kind: "x", title: "third", read_at: Time.current)
+    get notifications_url
+    assert_response :success
+    # Header badge counts only unread; page used to show all items with no
+    # subtitle, making users think header (0) disagreed with page (N).
+    # Now the page header itself spells out the distinction.
+    assert_match "전체 3건", response.body
+    assert_match "읽지 않음 1건", response.body
+  end
+
   test "POST /notifications/:id/mark_read marks the notification as read" do
     assert_nil @notif1.read_at
     post mark_read_notification_url(@notif1)

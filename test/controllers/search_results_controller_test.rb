@@ -26,6 +26,13 @@ class SearchResultsControllerTest < ActionDispatch::IntegrationTest
     assert_match "관심 지역", response.body
   end
 
+  test "GET index shows empty-state message when search returned zero results (B-003)" do
+    @user.update!(last_search_api_total_count: 0)
+    get search_results_url
+    assert_response :success
+    assert_match "조건에 맞는 물건이 없습니다", response.body
+  end
+
   test "POST create enqueues CourtAuctionSearchJob and does not call service synchronously" do
     called = false
     original_call = CourtAuctionSearchService.method(:call)
