@@ -291,4 +291,26 @@ class AnalysesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_analysis_path(tab: "manual")
     assert_equal "metadata.case_number가 필요합니다.", flash[:alert]
   end
+
+  # F-01: rescue 핸들러가 사용자 알림에 raw 예외 메시지를 누설하지 않아야 한다.
+  test "POST manual: internal exception does NOT leak e.message to flash, uses incident_id instead" do
+    Property.create!(case_number: "2024타경LEAK")
+    json_text = { "metadata" => { "case_number" => "2024타경LEAK" }, "results" => {} }.to_json
+    sensitive = "PG::UndefinedColumn: column users.secret_internal_field does not exist"
+
+    original = PdfAnalysisService.method(:call)
+    PdfAnalysisService.define_singleton_method(:call) { |**_kw| raise StandardError, sensitive }
+    begin
+      post manual_analyses_path, params: { json_text: json_text }
+    ensure
+      PdfAnalysisService.define_singleton_method(:call, original)
+    end
+
+    assert_redirected_to new_analysis_path(tab: "manual")
+    assert_not_nil flash[:alert]
+    assert_not_includes flash[:alert].to_s, sensitive
+    assert_not_includes flash[:alert].to_s, "secret_internal_field"
+    assert_not_includes flash[:alert].to_s, "PG::"
+    assert_match(/\b[0-9a-f]{8}\b/, flash[:alert].to_s, "incident id (8 hex chars) should be present")
+  end
 end
