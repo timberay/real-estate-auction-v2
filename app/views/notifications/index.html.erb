@@ -1,7 +1,12 @@
 <% content_for(:page_title, "알림") %>
 
 <div class="space-y-4 max-w-3xl">
-  <h1 class="text-xl font-semibold text-slate-900 dark:text-slate-100">알림</h1>
+  <div class="flex items-baseline gap-3 flex-wrap">
+    <h1 class="text-xl font-semibold text-slate-900 dark:text-slate-100">알림</h1>
+    <p class="text-sm text-slate-500 dark:text-slate-400">
+      전체 <%= @total_count %>건 · 읽지 않음 <%= @unread_count %>건
+    </p>
+  </div>
 
   <% if @notifications.any? %>
     <ul class="space-y-2">

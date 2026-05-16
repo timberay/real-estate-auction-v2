@@ -1,6 +1,8 @@
 class NotificationsController < ApplicationController
   def index
     @notifications = current_user.notifications.ordered_recent
+    @total_count   = @notifications.size
+    @unread_count  = current_user.notifications.unread.count
   end
 
   def mark_read
