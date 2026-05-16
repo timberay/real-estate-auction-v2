@@ -69,7 +69,10 @@ module Sidebar
     test "renders enabled items as links" do
       render_inline(Sidebar::Component.new)
 
-      assert_selector "a[href='/onboarding']", text: "예산 설정"
+      # F-06: 예산 설정 메뉴는 settings/budget 으로 직접 이동해야 한다.
+      # (이전에는 start_onboarding_path 로 이동해 위저드를 재시작시켰음)
+      assert_selector "a[href='/settings/budget']", text: "예산 설정"
+      assert_no_selector "a[href='/onboarding']", text: "예산 설정"
       assert_selector "a[href='/search']", text: "물건 찾기"
       assert_selector "a[href='/properties']", text: "분석 중인 물건"
       assert_selector "a[href='/analyses/new']", text: "AI 분석"
@@ -84,11 +87,12 @@ module Sidebar
     # --- Active item ---
 
     test "marks active item based on current_path" do
-      render_inline(Sidebar::Component.new(current_path: "/onboarding"))
+      # F-06 후: settings/budget 경로일 때 "예산 설정" 메뉴가 active.
+      render_inline(Sidebar::Component.new(current_path: "/settings/budget"))
 
-      assert_selector "a[href='/onboarding'][class*='bg-blue-50']"
-      assert_selector "a[href='/onboarding'][class*='text-blue-700']"
-      assert_selector "a[href='/onboarding'][class*='font-medium']"
+      assert_selector "a[href='/settings/budget'][class*='bg-blue-50']"
+      assert_selector "a[href='/settings/budget'][class*='text-blue-700']"
+      assert_selector "a[href='/settings/budget'][class*='font-medium']"
     end
 
     test "marks properties path as active" do
@@ -103,17 +107,17 @@ module Sidebar
       assert_selector "a[href='/search'][class*='bg-blue-50']", text: "물건 찾기"
     end
 
-    test "marks 예산 설정 active when on /settings/budget (post-onboarding redirect target)" do
+    test "marks 예산 설정 active when on /settings/budget" do
       render_inline(Sidebar::Component.new(current_path: "/settings/budget"))
 
-      assert_selector "a[href='/onboarding'][class*='bg-blue-50']", text: "예산 설정"
+      assert_selector "a[href='/settings/budget'][class*='bg-blue-50']", text: "예산 설정"
     end
 
     test "active item has dark mode classes" do
-      render_inline(Sidebar::Component.new(current_path: "/onboarding"))
+      render_inline(Sidebar::Component.new(current_path: "/settings/budget"))
 
-      assert_selector "a[href='/onboarding'][class*='dark:bg-blue-900/50']"
-      assert_selector "a[href='/onboarding'][class*='dark:text-blue-400']"
+      assert_selector "a[href='/settings/budget'][class*='dark:bg-blue-900/50']"
+      assert_selector "a[href='/settings/budget'][class*='dark:text-blue-400']"
     end
 
     # --- Toggle button ---
