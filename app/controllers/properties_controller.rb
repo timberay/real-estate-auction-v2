@@ -46,14 +46,16 @@ class PropertiesController < ApplicationController
     court_code  = params[:court_code].to_s.strip
 
     unless valid_inputs?(case_number, court_code)
-      redirect_to properties_path, alert: "사건번호 형식이 올바르지 않습니다. (예: 2026타경1234)"
+      redirect_to retry_params_path(case_number, court_code),
+                  alert: "사건번호 형식이 올바르지 않습니다. (예: 2026타경1234)"
       return
     end
 
     result = CaseSearchService.call(court_code: court_code, case_number: case_number)
 
     if result.error
-      redirect_to properties_path, alert: error_message_for(result.error)
+      redirect_to retry_params_path(case_number, court_code),
+                  alert: error_message_for(result.error)
       return
     end
 
@@ -91,6 +93,16 @@ class PropertiesController < ApplicationController
   end
 
   private
+
+  # Preserve a rejected submission (case_number + court_code) on the redirect
+  # URL so the form re-renders with the values the user typed, instead of
+  # losing them and forcing a retype.
+  def retry_params_path(case_number, court_code)
+    qp = {}
+    qp[:case_number] = case_number if case_number.present?
+    qp[:court_code]  = court_code  if court_code.present?
+    properties_path(qp)
+  end
 
   def render_property_not_found
     respond_to do |format|

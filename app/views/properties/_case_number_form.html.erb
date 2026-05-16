@@ -6,12 +6,15 @@
   <%= form_with url: properties_path, method: :post, data: { action: "submit->criteria-search#submitCaseNumber" } do |f| %>
     <div class="flex items-center gap-2">
       <%= select_tag :court_code,
-          grouped_options_for_select(CourtAuction::CaseSearchClient.court_options_for(setting&.effective_region)),
+          grouped_options_for_select(
+            CourtAuction::CaseSearchClient.court_options_for(setting&.effective_region),
+            params[:court_code]
+          ),
           required: true,
           include_blank: false,
           aria: { label: "법원 선택" },
           class: "w-44 shrink-0 h-10 rounded-md border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 text-sm text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500" %>
-      <%= text_field_tag :case_number, nil,
+      <%= text_field_tag :case_number, params[:case_number],
           placeholder: "예: 2026타경1234",
           required: true,
           data: { criteria_search_target: "caseInput", action: "input->criteria-search#clearCaseError" },

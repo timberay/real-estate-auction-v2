@@ -55,7 +55,7 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
 
   test "POST create with blank case number shows format error" do
     post properties_url, params: { court_code: "B000530", case_number: "" }
-    assert_redirected_to properties_path
+    assert_redirected_to properties_path(court_code: "B000530")
     follow_redirect!
     assert_match "사건번호 형식이 올바르지 않습니다", flash[:alert]
   end
@@ -65,37 +65,46 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     stub_request(:post, ENDPOINT).to_return(status: 200, body: body)
 
     post properties_url, params: { court_code: "B000530", case_number: "2099타경999" }
-    assert_redirected_to properties_path
+    assert_redirected_to properties_path(case_number: "2099타경999", court_code: "B000530")
     follow_redirect!
     assert_match "물건을 찾을 수 없습니다", flash[:alert]
   end
 
   test "POST create with blank court_code shows format error" do
     post properties_url, params: { court_code: "", case_number: "2024타경881" }
-    assert_redirected_to properties_path
+    assert_redirected_to properties_path(case_number: "2024타경881")
     follow_redirect!
     assert_match "사건번호 형식이 올바르지 않습니다", flash[:alert]
   end
 
   test "POST create with tampered (non-allow-list) court_code shows format error" do
     post properties_url, params: { court_code: "FAKE_CODE", case_number: "2024타경881" }
-    assert_redirected_to properties_path
+    assert_redirected_to properties_path(case_number: "2024타경881", court_code: "FAKE_CODE")
     follow_redirect!
     assert_match "사건번호 형식이 올바르지 않습니다", flash[:alert]
   end
 
   test "POST create with bad case_number format shows format error and makes no HTTP call" do
     post properties_url, params: { court_code: "B000530", case_number: "hello" }
-    assert_redirected_to properties_path
+    assert_redirected_to properties_path(case_number: "hello", court_code: "B000530")
     follow_redirect!
     assert_match "사건번호 형식이 올바르지 않습니다", flash[:alert]
+  end
+
+  test "POST create with invalid input preserves case_number in form for re-edit (B-002)" do
+    post properties_url, params: { court_code: "B000530", case_number: "abc123" }
+    assert_redirected_to properties_path(case_number: "abc123", court_code: "B000530")
+    follow_redirect!
+    # value attribute (server-rendered) carries the rejected input back so the
+    # user can fix it instead of retyping.
+    assert_match 'value="abc123"', response.body
   end
 
   test "POST create when court site returns 503 shows site-unavailable alert" do
     stub_request(:post, ENDPOINT).to_return(status: 503)
 
     post properties_url, params: { court_code: "B000530", case_number: "2024타경881" }
-    assert_redirected_to properties_path
+    assert_redirected_to properties_path(case_number: "2024타경881", court_code: "B000530")
     follow_redirect!
     assert_match "법원경매 사이트에 접속할 수 없습니다", flash[:alert]
   end
