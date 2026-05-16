@@ -173,6 +173,19 @@ class PropertiesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to new_analysis_path(property_id: property.id)
   end
 
+  test "GET show renders friendly 404 page when property not in user's list (B-008)" do
+    other_property = Property.create!(
+      case_number: "9999타경99998", court_name: "테스트법원", address: "테스트"
+    )
+
+    get property_url(other_property)
+    # Status stays 404 to keep IDOR protection (existence of other users'
+    # properties not disclosed), but the body is the friendly shared/error page
+    # instead of a raw stack trace or bare public/404.html.
+    assert_response :not_found
+    assert_match "내 목록에 없습니다", response.body
+  end
+
   test "index does NOT assign search-related instance vars (moved to SearchResultsController#index)" do
     get properties_url
 

@@ -4,6 +4,11 @@ class PropertiesController < ApplicationController
 
   before_action :set_user_property, only: %i[show destroy toggle_favorite]
 
+  # IDOR-safe: status stays 404 so existence of other users' properties is not
+  # disclosed. The friendly page replaces the dev-mode stack trace and the bare
+  # public/404.html in production, giving the user a clear next step.
+  rescue_from ActiveRecord::RecordNotFound, with: :render_property_not_found
+
   def index
     @user_properties = current_user.user_properties
       .includes(property: [ :inspection_results, :next_auction_schedule ])
@@ -86,6 +91,17 @@ class PropertiesController < ApplicationController
   end
 
   private
+
+  def render_property_not_found
+    respond_to do |format|
+      format.html do
+        flash.now[:alert] = "이 물건은 내 목록에 없습니다."
+        render "shared/error", status: :not_found
+      end
+      format.turbo_stream { head :not_found }
+      format.json         { head :not_found }
+    end
+  end
 
   def valid_inputs?(case_number, court_code)
     return false if case_number.blank? || court_code.blank?
