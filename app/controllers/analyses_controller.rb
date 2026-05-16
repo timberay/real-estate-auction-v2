@@ -2,13 +2,12 @@ class AnalysesController < ApplicationController
   include PdfUploadValidatable
 
   def new
-    if params[:property_id].present?
-      @property = Property.find_by(id: params[:property_id])
-      unless @property
-        redirect_to new_analysis_path, alert: "해당 물건을 찾을 수 없습니다."
-        nil
-      end
-    end
+    return if params[:property_id].blank?
+
+    @property = Property.find_by(id: params[:property_id])
+    return if @property
+
+    redirect_to new_analysis_path, alert: "해당 물건을 찾을 수 없습니다."
   end
 
   def prompt
@@ -67,8 +66,10 @@ class AnalysesController < ApplicationController
       redirect_to new_analysis_path(tab: "manual"), alert: "분석 결과 저장 중 오류가 발생했습니다: #{result.error}"
     end
   rescue => e
-    Rails.logger.error "[ManualUpload] #{e.class}: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
-    redirect_to new_analysis_path(tab: "manual"), alert: "분석 결과 저장 중 오류가 발생했습니다: #{e.message}"
+    incident_id = SecureRandom.hex(4)
+    Rails.logger.error "[ManualUpload][#{incident_id}] #{e.class}: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
+    redirect_to new_analysis_path(tab: "manual"),
+      alert: "분석 결과 저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요. (오류코드: #{incident_id})"
   end
 
   # B15 / E-44: AI 분석 이력. List recent LlmAnalysisLog entries for a property

@@ -35,4 +35,19 @@ class Auth::SessionsControllerTest < ActionDispatch::IntegrationTest
     refute_equal user.id, session[:user_id]
     assert User.find(session[:user_id]).guest?
   end
+
+  # F-18: target="_blank" 외부/신탭 링크는 rel="noopener" 또는
+  # rel="noopener noreferrer" 를 명시해 tabnabbing 을 방지해야 한다.
+  test "login modal terms/privacy links use rel=noopener noreferrer" do
+    get "/auth/login"
+    assert_response :success
+
+    [ "이용약관", "개인정보 처리방침" ].each do |label|
+      assert_match(
+        %r{<a[^>]*target="_blank"[^>]*rel="noopener noreferrer"[^>]*>#{Regexp.escape(label)}</a>}m,
+        response.body,
+        "login modal '#{label}' link must declare rel=noopener noreferrer when target=_blank"
+      )
+    end
+  end
 end
