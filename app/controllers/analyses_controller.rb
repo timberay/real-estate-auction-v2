@@ -2,13 +2,12 @@ class AnalysesController < ApplicationController
   include PdfUploadValidatable
 
   def new
-    if params[:property_id].present?
-      @property = Property.find_by(id: params[:property_id])
-      unless @property
-        redirect_to new_analysis_path, alert: "해당 물건을 찾을 수 없습니다."
-        nil
-      end
-    end
+    return if params[:property_id].blank?
+
+    @property = Property.find_by(id: params[:property_id])
+    return if @property
+
+    redirect_to new_analysis_path, alert: "해당 물건을 찾을 수 없습니다."
   end
 
   def prompt
