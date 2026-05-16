@@ -1,5 +1,10 @@
 # E2E Test Report — 2026-05-15
 
+> **🚫 STATUS: CLOSED — WON'T FIX (2026-05-16 결정)**
+>
+> 페어 findings 문서([`docs/qa/2026-05-15-findings.md`](./qa/2026-05-15-findings.md))의 잔여 25건은 작업하지 않기로 결정됨.
+> 결정 기록: [`docs/decisions/2026-05-16-2026-05-15-qa-rounds-wontfix.md`](./decisions/2026-05-16-2026-05-15-qa-rounds-wontfix.md). 본 보고서는 이력 보존용.
+
 - 실행 일시: 2026-05-15 (KST)
 - 대상 URL: `http://localhost:3000`
 - 페르소나: 전문 QA 엔지니어 (변경해야 할 항목 발굴에 초점, 신규 기능 제안 제외)
